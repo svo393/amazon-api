@@ -1,0 +1,57 @@
+{
+  "version": "0.3.14-fixed",
+  "steps": [
+    {
+      "tag": "DeleteDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Item",
+          "field": "asin"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Category",
+          "field": "name"
+        },
+        "directive": "unique"
+      }
+    },
+    {
+      "tag": "UpdateField",
+      "model": "Category",
+      "field": "parent",
+      "arity": "Optional"
+    },
+    {
+      "tag": "UpdateField",
+      "model": "Category",
+      "field": "parentID",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Vendor",
+      "field": "name",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Vendor",
+          "field": "name"
+        },
+        "directive": "unique"
+      }
+    }
+  ]
+}

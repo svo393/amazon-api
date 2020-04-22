@@ -25,6 +25,7 @@ const toDeletedItem = (id: string, cookies: object): string => id
 
 const toNewUser = (object: any): NewUser => {
   return {
+    name: object.name,
     email: parseAsEmail(object.email, 'email'),
     password: parseAsString(object.password, 'password')
   }

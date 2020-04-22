@@ -37,4 +37,4 @@ enum Role {
   USER = 'USER'
 }
 
-export type NewUser = Pick<User, 'email' | 'password'>
+export type NewUser = Pick<User, 'email' | 'password' | 'name'>
