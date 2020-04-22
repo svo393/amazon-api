@@ -1,69 +1,40 @@
-export interface Diagnosis {
-  code: string;
-  name: string;
-  latin?: string;
-}
-
-export enum Gender {
-  Male = 'male',
-  Female = 'female',
-  Other = 'other'
-}
-
-export interface Patient {
+type Item = {
   id: string;
   name: string;
-  occupation: string;
-  gender: Gender;
-  ssn: string;
-  dateOfBirth: string;
-  entries: Entry[];
+  price: number;
+  shortDescription: string;
+  longDescription: string;
+  stock: number;
+  stars: number;
+  asin: string;
+  media: number;
+  primaryMedia: number;
+  createdAt: Date;
+  updatedAt: Date;
+  isAvailable: boolean;
+  userID: string;
+  categoryID: string;
+  vendorID: string;
 }
 
-interface BaseEntry {
+type NewItem = Omit<Item, 'id'>
+
+type User = {
   id: string;
-  description: string;
-  date: string;
-  specialist: string;
-  diagnosisCodes?: Array<Diagnosis['code']>;
+  name?: string | null;
+  email: string;
+  password: string;
+  avatar: boolean;
+  createdAt: Date;
+  resetToken?: string | null;
+  resetTokenExpiry?: string | null;
+  role: Role;
 }
 
-enum HealthCheckRating {
-  'Healthy' = 0,
-  'LowRisk' = 1,
-  'HighRisk' = 2,
-  'CriticalRisk' = 3
+enum Role {
+  ROOT = 'ROOT',
+  ADMIN = 'ADMIN',
+  USER = 'USER'
 }
 
-interface HealthCheckEntry extends BaseEntry {
-  type: 'HealthCheck';
-  healthCheckRating: HealthCheckRating;
-}
-
-interface HospitalEntry extends BaseEntry {
-  type: 'Hospital';
-  discharge: {
-    date: string;
-    criteria: string;
-  };
-}
-
-interface OccupationalHealthcareEntry extends BaseEntry {
-  type: 'OccupationalHealthcare';
-  employerName: string;
-  sickLeave?: {
-    startDate: string;
-    endDate: string;
-  };
-}
-
-export type Entry =
-  | HospitalEntry
-  | OccupationalHealthcareEntry
-  | HealthCheckEntry;
-
-export type PublicPatient = Omit<Patient, 'ssn' | 'entries'>
-
-export type NewPatient = Omit<Patient, 'id'>
-
-export type NewEntry = Omit<Entry, 'id'>
+export type NewUser = Pick<User, 'email' | 'password'>
