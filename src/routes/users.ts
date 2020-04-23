@@ -30,7 +30,7 @@ router.get('/:id', async (req, res) => {
 })
 
 router.put('/:id', async (req, res) => {
-  const userInput = validator.updateUserInput(req.body)
+  const userInput = validator.checkUserUpdateInput(req.body)
   const updatedUser = await userService.updateUser(userInput)
 
   updatedUser
