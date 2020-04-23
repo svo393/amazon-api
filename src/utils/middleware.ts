@@ -1,15 +1,15 @@
 import { NextFunction, Request, Response } from 'express'
+import StatusError from './StatusError'
 
 export const unknownEndpoint = (_req: Request, res: Response): void => {
   res.status(404).send('Unknown endpoint')
 }
 
 export const errorHandler = (
-  error: Error, _req: Request, res: Response, next: NextFunction
+  error: StatusError, _req: Request, res: Response, next: NextFunction
 ): void => {
-  if (error.message.includes('Incorrect or missing')) {
-    res.status(400).send(error.message)
-  }
-
+  error.statusCode
+    ? res.status(error.statusCode).send(error.message)
+    : res.status(500).send('Server error. Please try again later.')
   next(error)
 }

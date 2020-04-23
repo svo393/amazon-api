@@ -1,40 +1,32 @@
-type Item = {
-  id: string;
-  name: string;
-  price: number;
-  shortDescription: string;
-  longDescription: string;
-  stock: number;
-  stars: number;
-  asin: string;
-  media: number;
-  primaryMedia: number;
-  createdAt: Date;
-  updatedAt: Date;
-  isAvailable: boolean;
-  userID: string;
-  categoryID: string;
-  vendorID: string;
+import { User, Item, UserGetPayload } from '@prisma/client'
+
+export type NewItem = Omit<Item, 'id'>
+
+export type UserInput = Pick<User, 'email' | 'password'>
+
+export type UserPersonalData = UserGetPayload<{
+  select: {
+    avatar: true;
+    email: true;
+    id: true;
+    name: true;
+    cart: true;
+    role: true;
+  };
+}>
+
+export type NonSensitiveUser = UserGetPayload<{
+  select: {
+    id: true;
+    name: true;
+    email: true;
+    avatar: true;
+    createdAt: true;
+    role: true;
+    cart: true;
+  };
+}>
+
+export interface AuthUserPersonalData extends UserPersonalData {
+  token: string;
 }
-
-type NewItem = Omit<Item, 'id'>
-
-type User = {
-  id: string;
-  name?: string | null;
-  email: string;
-  password: string;
-  avatar: boolean;
-  createdAt: Date;
-  resetToken?: string | null;
-  resetTokenExpiry?: string | null;
-  role: Role;
-}
-
-enum Role {
-  ROOT = 'ROOT',
-  ADMIN = 'ADMIN',
-  USER = 'USER'
-}
-
-export type NewUser = Pick<User, 'email' | 'password' | 'name'>
