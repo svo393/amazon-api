@@ -1,39 +1,69 @@
-import isEmail from 'validator/lib/isEmail'
-import { NewUser } from '../types'
+import { UserCreateInput, UserUpdateInput } from '@prisma/client'
+import checkEmail from 'validator/lib/isEmail'
 import StatusError from './StatusError'
+import * as R from 'ramda'
 
-const isString = (param: any): param is string => {
-  return typeof (param) === 'string' || param instanceof String
+type CP = {
+  name?: string;
+  param: any;
 }
 
-const parseAsString = (param: any, name: string): string => {
-  if (!param || !isString(param)) {
-    throw new StatusError(400, `Incorrect or missing ${name}: ${param || ''}`)
+const isProvided = ({ name, param }: CP): CP => {
+  if (!param) {
+    throw new StatusError(400, `Missing ${name}`)
   }
-  return param
+  return { name, param }
 }
 
-const parseAsEmail = (param: any, name: string): string => {
-  if (!param || !isString(param) || !isEmail(param)) {
-    throw new StatusError(400, `Incorrect or missing ${name}: ${param || ''}`)
+const isString = ({ name, param }: CP): CP => {
+  if (typeof (param) !== 'string' && !(param instanceof String)) {
+    throw new StatusError(400, `Incorrect ${name}: ${param}`)
   }
-  return param.toLowerCase()
+  return { name, param }
 }
 
-const toNewItem = (object: any): object => object
-const toUpdatedItem = (object: object, cookies: object): object => object
-const toDeletedItem = (id: string, cookies: object): string => id
+const isEmail = ({ param }: CP): CP => {
+  if (!checkEmail(param)) {
+    throw new StatusError(400, `Incorrect email: ${param}`)
+  }
+  return { param }
+}
 
-const authUserInput = (object: any): NewUser => {
+const passwordIsValid = ({ param }: CP): CP => {
+  if (param.length < 8) {
+    throw new StatusError(422, 'Password must be at least 8 characters')
+  }
+  return { param }
+}
+
+const checkNewUserInput = (object: any): UserCreateInput => {
+  const email = R.pipe(
+    isProvided,
+    isString,
+    isEmail
+  )({ name: 'email', param: object.email })
+
   return {
-    email: parseAsEmail(object.email, 'email'),
-    password: parseAsString(object.password, 'password')
+    email: email.param,
+    password: object.password
   }
 }
+
+const checkUserLoginInput = () => {
+  return null
+}
+
+// const updateUserInput = (object: any): UserUpdateInput => {
+//   return {
+//     name: object.name,
+//     avatar: object.avatar,
+//     cart: object.cart,
+//     email: object.email.toLowerCase(),
+//     password: object.password
+//   }
+// }
 
 export default {
-  toNewItem,
-  toUpdatedItem,
-  toDeletedItem,
-  authUserInput
+  checkNewUserInput,
+  checkUserLoginInput
 }

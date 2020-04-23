@@ -1,12 +1,12 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, UserCreateInput, UserUpdateInput } from '@prisma/client'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
-import { UserInput, AuthUserPersonalData, NonSensitiveUser } from '../types'
+import { AuthUserPersonalData, UserPersonalData } from '../types'
 import StatusError from '../utils/StatusError'
 
 const prisma = new PrismaClient()
 
-const addUser = async (userInput: UserInput): Promise<AuthUserPersonalData> => {
+const addUser = async (userInput: UserCreateInput): Promise<AuthUserPersonalData> => {
   const { email, password } = userInput
 
   if (password.length < 8) {
@@ -31,8 +31,8 @@ const addUser = async (userInput: UserInput): Promise<AuthUserPersonalData> => {
       email: true,
       id: true,
       name: true,
-      cart: true,
-      role: true
+      role: true,
+      createdAt: true
     }
   })
 
@@ -44,10 +44,14 @@ const addUser = async (userInput: UserInput): Promise<AuthUserPersonalData> => {
     { expiresIn: '30d' }
   )
 
-  return { ...addedUser, token }
+  return {
+    ...addedUser,
+    cart: [],
+    token
+  }
 }
 
-const loginUser = async (userInput: UserInput): Promise<AuthUserPersonalData> => {
+const loginUser = async (userInput: UserCreateInput): Promise<AuthUserPersonalData> => {
   const { email, password } = userInput
 
   const existingUser = await prisma.user.findOne({
@@ -57,9 +61,9 @@ const loginUser = async (userInput: UserInput): Promise<AuthUserPersonalData> =>
       email: true,
       id: true,
       name: true,
-      cart: true,
       role: true,
-      password: true
+      password: true,
+      createdAt: true
     }
   })
 
@@ -73,6 +77,11 @@ const loginUser = async (userInput: UserInput): Promise<AuthUserPersonalData> =>
     throw new StatusError(401, 'Invalid Email or Password')
   }
 
+  const cartItems = await prisma.cartItem.findMany({
+    where: { user: { id: existingUser.id } },
+    include: { item: true }
+  })
+
   prisma.disconnect()
 
   const token = jwt.sign(
@@ -83,10 +92,14 @@ const loginUser = async (userInput: UserInput): Promise<AuthUserPersonalData> =>
 
   delete existingUser.password
 
-  return { ...existingUser, token }
+  return {
+    ...existingUser,
+    cart: cartItems,
+    token
+  }
 }
 
-const getUsers = async (): Promise<NonSensitiveUser[]> => {
+const getUsers = async (): Promise<UserPersonalData[]> => {
   const users = await prisma.user.findMany({
     select: {
       id: true,
@@ -102,7 +115,7 @@ const getUsers = async (): Promise<NonSensitiveUser[]> => {
   return users
 }
 
-const getUserByID = async (id: string): Promise<NonSensitiveUser | null> => {
+const getUserByID = async (id: string): Promise<UserPersonalData | null> => {
   const user = await prisma.user.findOne({
     where: { id },
     select: {
@@ -119,9 +132,44 @@ const getUserByID = async (id: string): Promise<NonSensitiveUser | null> => {
   return user
 }
 
+const updateUser = async (userInput: UserUpdateInput): Promise<UserPersonalData> => {
+  const { password, id } = userInput
+
+  if (password && password.length < 8) {
+    throw new StatusError(422, 'Password must be at least 8 characters')
+  }
+
+  const updatedUser = await prisma.user.update({
+    where: { id },
+    data: { ...userInput },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      avatar: true,
+      createdAt: true,
+      role: true,
+      cart: true
+    }
+  })
+
+  const cartItems = await prisma.cartItem.findMany({
+    where: { user: { id: updatedUser.id } },
+    include: { item: true }
+  })
+
+  prisma.disconnect()
+
+  return {
+    ...updatedUser,
+    cart: cartItems
+  }
+}
+
 export default {
   addUser,
   getUsers,
   getUserByID,
-  loginUser
+  loginUser,
+  updateUser
 }
