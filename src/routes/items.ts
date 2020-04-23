@@ -1,7 +1,7 @@
 import Router from 'express'
 import itemService from '../services/itemService'
 import logger from '../utils/logger'
-import validator from '../utils/validator'
+import validator from '../utils/inputValidator'
 
 const router = Router()
 

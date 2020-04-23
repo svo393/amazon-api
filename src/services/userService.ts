@@ -9,10 +9,6 @@ const prisma = new PrismaClient()
 const addUser = async (userInput: UserCreateInput): Promise<AuthUserPersonalData> => {
   const { email, password } = userInput
 
-  if (password.length < 8) {
-    throw new StatusError(422, 'Password must be at least 8 characters')
-  }
-
   const existingUser = await prisma.user.findOne({
     where: { email },
     select: { id: true }
@@ -71,9 +67,9 @@ const loginUser = async (userInput: UserCreateInput): Promise<AuthUserPersonalDa
     throw new StatusError(401, 'Invalid Email or Password')
   }
 
-  const passwordIsValid = await bcrypt.compare(password, existingUser.password)
+  const isPasswordValid = await bcrypt.compare(password, existingUser.password)
 
-  if (!passwordIsValid) {
+  if (!isPasswordValid) {
     throw new StatusError(401, 'Invalid Email or Password')
   }
 
@@ -132,13 +128,7 @@ const getUserByID = async (id: string): Promise<UserPersonalData | null> => {
   return user
 }
 
-const updateUser = async (userInput: UserUpdateInput): Promise<UserPersonalData> => {
-  const { password, id } = userInput
-
-  if (password && password.length < 8) {
-    throw new StatusError(422, 'Password must be at least 8 characters')
-  }
-
+const updateUser = async (userInput: UserUpdateInput, id: string): Promise<UserPersonalData> => {
   const updatedUser = await prisma.user.update({
     where: { id },
     data: { ...userInput },

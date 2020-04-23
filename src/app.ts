@@ -5,7 +5,7 @@ import helmet from 'helmet'
 import { errorHandler, unknownEndpoint } from './utils/middleware'
 
 require('express-async-errors')
-import itemsRouter from './routes/items' // eslint-disable-line
+// import itemsRouter from './routes/items' // eslint-disable-line
 import usersRouter from './routes/users' // eslint-disable-line
 
 const app = express()

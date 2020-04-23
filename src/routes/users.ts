@@ -1,19 +1,19 @@
 import Router from 'express'
 import userService from '../services/userService'
-import validator from '../utils/validator'
+import inputValidator from '../utils/inputValidator'
 
 const router = Router()
 
 router.post('/', async (req, res) => {
-  const userInput = validator.checkNewUserInput(req.body)
+  const userInput = inputValidator.checkNewUser(req.body)
   const addedUser = await userService.addUser(userInput)
   res.status(201).json(addedUser)
 })
 
 router.post('/login', async (req, res) => {
-  const userInput = validator.checkUserLoginInput(req.body)
+  const userInput = inputValidator.checkUserLogin(req.body)
   const loggedInUser = await userService.loginUser(userInput)
-  res.status(200).json(loggedInUser)
+  res.json(loggedInUser)
 })
 
 router.get('/', async (_req, res) => {
@@ -30,8 +30,8 @@ router.get('/:id', async (req, res) => {
 })
 
 router.put('/:id', async (req, res) => {
-  const userInput = validator.checkUserUpdateInput(req.body)
-  const updatedUser = await userService.updateUser(userInput)
+  const userInput = inputValidator.checkUserUpdate(req.body)
+  const updatedUser = await userService.updateUser(userInput, req.params.id)
 
   updatedUser
     ? res.json(updatedUser)
