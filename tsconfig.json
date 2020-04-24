@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
-    "target": "ES6",
-    "outDir": "./build/",
+    "target": "ES5",
+    "rootDir": "./src",
+    "outDir": "./build",
     "module": "commonjs",
     "strict": true,
     "noUnusedLocals": true,
@@ -9,5 +10,6 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "esModuleInterop": true
-  }
+  },
+  "include": ["src/**/*"]
 }

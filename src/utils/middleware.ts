@@ -10,6 +10,7 @@ export const errorHandler = (
 ): void => {
   error.statusCode
     ? res.status(error.statusCode).send(error.message)
-    : res.status(500).send('Server error. Please try again later.')
+    : res.status(500).send(error.message)
+    // : res.status(500).send('Server error. Please try again later.')
   next(error)
 }
