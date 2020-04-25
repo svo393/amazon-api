@@ -13,6 +13,13 @@ router.post('/', async (req, res) => {
 router.post('/login', async (req, res) => {
   const userInput = inputValidator.checkUserLogin(req.body)
   const loggedInUser = await userService.loginUser(userInput)
+
+  res.cookie('token', loggedInUser.token, {
+    maxAge: 1000 * 60 * 60 * 24 * 30,
+    httpOnly: true
+  })
+
+  delete loggedInUser.token
   res.json(loggedInUser)
 })
 
