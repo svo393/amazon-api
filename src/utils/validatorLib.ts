@@ -1,6 +1,7 @@
-import StatusError from './StatusError'
-import checkEmail from 'validator/lib/isEmail'
 import * as R from 'ramda'
+import checkEmail from 'validator/lib/isEmail'
+import { UserID } from '../types'
+import StatusError from './StatusError'
 
 type CP = {
   name?: string;
@@ -55,4 +56,10 @@ export const isPasswordValid = ({ param }: CP): CP => {
     throw new StatusError(422, 'Password must be at least 8 characters')
   }
   return { param }
+}
+
+export const checkUserID = (id: UserID): void => {
+  if (!id) {
+    throw new StatusError(401, 'Please log in')
+  }
 }

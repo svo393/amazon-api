@@ -15,3 +15,11 @@ export type UserPersonalData = UserGetPayload<{
 export interface AuthUserPersonalData extends UserPersonalData {
   token: string;
 }
+
+export type DecodedToken = {
+  userID: string;
+  iat: number;
+  exp: number;
+}
+
+export type UserID = string | null | undefined

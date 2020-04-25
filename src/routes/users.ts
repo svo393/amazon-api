@@ -1,12 +1,20 @@
 import Router from 'express'
 import userService from '../services/userService'
 import inputValidator from '../utils/inputValidator'
+import { checkUserID } from '../utils/validatorLib'
 
 const router = Router()
 
 router.post('/', async (req, res) => {
   const userInput = inputValidator.checkNewUser(req.body)
   const addedUser = await userService.addUser(userInput)
+
+  res.cookie('token', addedUser.token, {
+    maxAge: 1000 * 60 * 60 * 24 * 30,
+    httpOnly: true
+  })
+
+  delete addedUser.token
   res.status(201).json(addedUser)
 })
 
@@ -23,7 +31,8 @@ router.post('/login', async (req, res) => {
   res.json(loggedInUser)
 })
 
-router.get('/', async (_req, res) => {
+router.get('/', async (req, res) => {
+  checkUserID(req.userID)
   const users = await userService.getUsers()
   res.json(users)
 })
