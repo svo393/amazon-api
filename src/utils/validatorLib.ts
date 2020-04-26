@@ -60,6 +60,6 @@ export const isPasswordValid = ({ param }: CP): CP => {
 
 export const checkUserID = (id: UserID): void => {
   if (!id) {
-    throw new StatusError(401, 'Please log in')
+    throw new StatusError(403, '', '/login')
   }
 }

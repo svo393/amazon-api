@@ -31,6 +31,12 @@ router.post('/login', async (req, res) => {
   res.json(loggedInUser)
 })
 
+router.post('/logout', (req, res) => {
+  checkUserID(req.userID)
+  res.clearCookie('token')
+  res.status(403).json({ location: '/login' })
+})
+
 router.get('/', async (req, res) => {
   checkUserID(req.userID)
   const users = await userService.getUsers()

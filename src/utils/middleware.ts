@@ -23,9 +23,13 @@ export const unknownEndpoint = (_req: Request, res: Response): void => {
 export const errorHandler = (
   error: StatusError, _req: Request, res: Response, next: NextFunction
 ): void => {
-  error.statusCode
-    ? res.status(error.statusCode).send(error.message)
-    : res.status(500).send(error.message)
-    // : res.status(500).send('Server error. Please try again later.')
+  const statusCode = error.statusCode
+    ? error.statusCode
+    : 500
+
+  error.location
+    ? res.status(statusCode).json({ location: error.location })
+    : res.status(statusCode).send(error.message)
+
   next(error)
 }
