@@ -1,14 +1,9 @@
-import * as R from 'ramda'
+import R from 'ramda'
 import checkEmail from 'validator/lib/isEmail'
-import { UserID } from '../types'
+import { CP, UserID } from '../types'
 import StatusError from './StatusError'
 
-type CP = {
-  name?: string;
-  param: any;
-}
-
-export const isProvided = ({ name, param }: CP): CP => {
+export const isProvided: CP = ({ name, param }) => {
   if (!param) {
     throw new StatusError(400, `Missing ${name}`)
   }
@@ -30,28 +25,28 @@ export const isInputProvided = (param: object): void => {
   }
 }
 
-export const isString = ({ name, param }: CP): CP => {
+export const isString: CP = ({ name, param }) => {
   if (typeof (param) !== 'string' && !(param instanceof String)) {
     throw new StatusError(400, `Incorrect ${name}: ${param}`)
   }
   return { name, param }
 }
 
-export const isBoolean = ({ name, param }: CP): CP => {
+export const isBoolean: CP = ({ name, param }) => {
   if (typeof (param) !== 'boolean') {
     throw new StatusError(400, `Incorrect ${name}: ${param}`)
   }
   return { name, param }
 }
 
-export const isEmail = ({ param }: CP): CP => {
+export const isEmail: CP = ({ param }) => {
   if (!checkEmail(param)) {
     throw new StatusError(400, `Incorrect email: ${param}`)
   }
   return { param }
 }
 
-export const isPasswordValid = ({ param }: CP): CP => {
+export const isPasswordValid: CP = ({ param }) => {
   if (param.length < 8) {
     throw new StatusError(422, 'Password must be at least 8 characters')
   }

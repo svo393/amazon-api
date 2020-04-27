@@ -23,3 +23,11 @@ export type DecodedToken = {
 }
 
 export type UserID = string | null | undefined
+
+export type CP = (params: {
+  name?: string;
+  param: any;
+}) => {
+  name?: string;
+  param: any;
+}

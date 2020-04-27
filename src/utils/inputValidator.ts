@@ -1,5 +1,5 @@
 import { UserCreateInput, UserUpdateInput } from '@prisma/client'
-import * as R from 'ramda'
+import R from 'ramda'
 import { hasDefinedProps, isBoolean, isEmail, isInputProvided, isPasswordValid, isProvided, isString } from './validatorLib'
 
 const checkNewUser = (object: any): UserCreateInput => {

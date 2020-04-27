@@ -1,20 +1,5 @@
 {
-  "name": "api",
-  "version": "1.0.0",
-  "description": "",
-  "main": "src/index.ts",
-  "scripts": {
-    "start": "cross-env NODE_ENV=production node build/src/index.js",
-    "tsc": "rm -rf build && tsc",
-    "dev": "cross-env NODE_ENV=development ts-node-dev src/index.ts",
-    "test": "cross-env NODE_ENV=test jest --verbose --runInBand",
-    "test:dev": "cross-env NODE_ENV=test jest --verbose --runInBand --watch",
-    "lint": "eslint './src/**/*.ts'",
-    "lint:fix": "eslint './src/**/*.ts' --fix"
-  },
-  "keywords": [],
   "author": "",
-  "license": "ISC",
   "dependencies": {
     "@prisma/client": "^2.0.0-beta.3",
     "bcrypt": "^4.0.1",
@@ -29,6 +14,7 @@
     "ramda": "^0.27.0",
     "validator": "^13.0.0"
   },
+  "description": "",
   "devDependencies": {
     "@prisma/cli": "^2.0.0-beta.3",
     "@types/bcrypt": "^3.0.0",
@@ -60,5 +46,20 @@
   "jest": {
     "preset": "ts-jest",
     "testEnvironment": "node"
-  }
+  },
+  "keywords": [],
+  "license": "ISC",
+  "main": "src/index.ts",
+  "name": "amazon-api",
+  "private": true,
+  "scripts": {
+    "dev": "cross-env NODE_ENV=development ts-node-dev src/index.ts",
+    "lint": "eslint './src/**/*.ts'",
+    "lint:fix": "eslint './src/**/*.ts' --fix",
+    "start": "cross-env NODE_ENV=production node build/src/index.js",
+    "test": "cross-env NODE_ENV=test jest --verbose --runInBand",
+    "test:dev": "cross-env NODE_ENV=test jest --verbose --runInBand --watch",
+    "tsc": "rm -rf build && tsc"
+  },
+  "version": "1.0.0"
 }
