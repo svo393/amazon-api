@@ -9,7 +9,7 @@ type Config = {
   NODE_ENV: string;
 }
 
-const envVars = R.pickAll([
+const envVars: object = R.pickAll([
   'PORT',
   'JWT_SECRET',
   'NODE_ENV'
