@@ -16,8 +16,6 @@ type DecodedToken = {
 }
 
 export const getUserID: Middleware = (req, res, next) => {
-  console.info('from middleware', req.cookies)
-
   if (req.cookies.token) {
     try {
       const decodedToken = jwt.verify(req.cookies.token, JWT_SECRET as string)

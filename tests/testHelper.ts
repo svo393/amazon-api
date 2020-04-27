@@ -23,7 +23,7 @@ export const populateUsers = (): void => {
       await prisma.user.create({ data: u })
       prisma.disconnect()
     } catch (error) {
-      console.info(error)
+      console.log(error)
     }
   })
 }

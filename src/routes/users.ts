@@ -40,7 +40,6 @@ router.post('/logout', (_req, res) => {
 })
 
 router.get('/', async (_req, res) => {
-  console.info('from router', res.locals.userID)
   checkUserID(res.locals.userID)
   const users = await userService.getUsers()
   res.json(users)
