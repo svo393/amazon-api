@@ -2,6 +2,8 @@ import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import express from 'express'
 import helmet from 'helmet'
+import logger from 'morgan'
+import env from './utils/config'
 import { errorHandler, getUserID, unknownEndpoint } from './utils/middleware'
 
 require('express-async-errors')
@@ -19,6 +21,7 @@ app.use(cors({
 app.use(cookieParser())
 app.use(getUserID)
 app.use(express.json())
+if ([ 'development', 'test' ].includes(env.NODE_ENV)) { app.use(logger('dev')) }
 
 // app.use('/api/items', itemsRouter)
 app.use('/api/users', usersRouter)

@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
-import { JWT_SECRET } from './config'
+import env from './config'
 import StatusError from './StatusError'
 
 type Middleware = (
@@ -18,7 +18,7 @@ type DecodedToken = {
 export const getUserID: Middleware = (req, res, next) => {
   if (req.cookies.token) {
     try {
-      const decodedToken = jwt.verify(req.cookies.token, JWT_SECRET as string)
+      const decodedToken = jwt.verify(req.cookies.token, env.JWT_SECRET)
       res.locals.userID = (decodedToken as DecodedToken).userID
     } catch (_err) {
       res.clearCookie('token')
@@ -27,8 +27,8 @@ export const getUserID: Middleware = (req, res, next) => {
   next()
 }
 
-export const unknownEndpoint: Middleware = (_req, res) => {
-  res.status(404).json({ error: 'Not Found' })
+export const unknownEndpoint: Middleware = (req, res) => {
+  res.status(405).json({ error: `Method ${req.method} is not allowed` })
 }
 
 export const errorHandler = (
@@ -39,8 +39,15 @@ export const errorHandler = (
     : 500
 
   error.location
-    ? res.status(statusCode).json({ error: error.message, location: error.location })
-    : res.status(statusCode).json({ error: error.message })
+    ? res.status(statusCode).json({
+      status: statusCode,
+      error: error.message,
+      location: error.location
+    })
+    : res.status(statusCode).json({
+      status: statusCode,
+      error: error.message
+    })
 
   next(error)
 }

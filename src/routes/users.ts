@@ -62,8 +62,4 @@ router.put('/:id', async (req, res) => {
     : res.status(404).json({ error: 'Not Found' })
 })
 
-router.all('*', (req, res) => {
-  res.status(405).json({ error: `Method ${req.method} is not allowed` })
-})
-
 export default router

@@ -2,7 +2,7 @@ import { PrismaClient, UserCreateInput, UserUpdateInput } from '@prisma/client'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import { AuthUserPersonalData, UserPersonalData } from '../types'
-import { JWT_SECRET } from '../utils/config'
+import env from '../utils/config'
 import StatusError from '../utils/StatusError'
 
 const prisma = new PrismaClient()
@@ -37,7 +37,7 @@ const addUser = async (userInput: UserCreateInput): Promise<AuthUserPersonalData
 
   const token = jwt.sign(
     { userID: addedUser.id },
-    JWT_SECRET as string,
+    env.JWT_SECRET,
     { expiresIn: '30d' }
   )
 
@@ -83,7 +83,7 @@ const loginUser = async (userInput: UserCreateInput): Promise<AuthUserPersonalDa
 
   const token = jwt.sign(
     { userID: existingUser.id },
-    JWT_SECRET as string,
+    env.JWT_SECRET,
     { expiresIn: '30d' }
   )
 
