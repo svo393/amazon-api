@@ -11,7 +11,8 @@ router.post('/', async (req, res) => {
 
   res.cookie('token', addedUser.token, {
     maxAge: 1000 * 60 * 60 * 24 * 30,
-    httpOnly: true
+    httpOnly: true,
+    sameSite: 'lax'
   })
 
   delete addedUser.token
@@ -24,21 +25,23 @@ router.post('/login', async (req, res) => {
 
   res.cookie('token', loggedInUser.token, {
     maxAge: 1000 * 60 * 60 * 24 * 30,
-    httpOnly: true
+    httpOnly: true,
+    sameSite: 'lax'
   })
 
   delete loggedInUser.token
   res.json(loggedInUser)
 })
 
-router.post('/logout', (req, res) => {
-  checkUserID(req.userID)
+router.post('/logout', (_req, res) => {
+  checkUserID(res.locals.userID)
   res.clearCookie('token')
   res.status(403).json({ location: '/login' })
 })
 
-router.get('/', async (req, res) => {
-  checkUserID(req.userID)
+router.get('/', async (_req, res) => {
+  console.info('from router', res.locals.userID)
+  checkUserID(res.locals.userID)
   const users = await userService.getUsers()
   res.json(users)
 })

@@ -1,14 +1,27 @@
 import { NextFunction, Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
-import { DecodedToken } from '../types'
 import { JWT_SECRET } from './config'
 import StatusError from './StatusError'
 
-export const getUserID = (req: Request, res: Response, next: NextFunction): void => {
+type Middleware = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => void
+
+type DecodedToken = {
+  userID: string;
+  iat: number;
+  exp: number;
+}
+
+export const getUserID: Middleware = (req, res, next) => {
+  console.info('from middleware', req.cookies)
+
   if (req.cookies.token) {
     try {
       const decodedToken = jwt.verify(req.cookies.token, JWT_SECRET as string)
-      req.userID = (decodedToken as DecodedToken).userID
+      res.locals.userID = (decodedToken as DecodedToken).userID
     } catch (_err) {
       res.clearCookie('token')
     }
@@ -16,7 +29,7 @@ export const getUserID = (req: Request, res: Response, next: NextFunction): void
   next()
 }
 
-export const unknownEndpoint = (_req: Request, res: Response): void => {
+export const unknownEndpoint: Middleware = (_req, res) => {
   res.status(404).send('Unknown endpoint')
 }
 

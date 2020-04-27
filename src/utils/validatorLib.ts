@@ -1,7 +1,14 @@
 import R from 'ramda'
 import checkEmail from 'validator/lib/isEmail'
-import { CP, UserID } from '../types'
 import StatusError from './StatusError'
+
+type CP = (params: {
+  name?: string;
+  param: any;
+}) => {
+  name?: string;
+  param: any;
+}
 
 export const isProvided: CP = ({ name, param }) => {
   if (!param) {
@@ -53,7 +60,7 @@ export const isPasswordValid: CP = ({ param }) => {
   return { param }
 }
 
-export const checkUserID = (id: UserID): void => {
+export const checkUserID = (id: string | null): void => {
   if (!id) {
     throw new StatusError(403, '', '/login')
   }
