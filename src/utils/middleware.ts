@@ -28,7 +28,7 @@ export const getUserID: Middleware = (req, res, next) => {
 }
 
 export const unknownEndpoint: Middleware = (_req, res) => {
-  res.status(404).send('Unknown endpoint')
+  res.status(404).json({ error: 'Not Found' })
 }
 
 export const errorHandler = (
@@ -39,8 +39,8 @@ export const errorHandler = (
     : 500
 
   error.location
-    ? res.status(statusCode).json({ location: error.location })
-    : res.status(statusCode).send(error.message)
+    ? res.status(statusCode).json({ error: error.message, location: error.location })
+    : res.status(statusCode).json({ error: error.message })
 
   next(error)
 }

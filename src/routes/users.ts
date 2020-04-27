@@ -36,7 +36,7 @@ router.post('/login', async (req, res) => {
 router.post('/logout', (_req, res) => {
   checkUserID(res.locals.userID)
   res.clearCookie('token')
-  res.status(403).json({ location: '/login' })
+  res.status(403).json({ error: 'Forbidden', location: '/login' })
 })
 
 router.get('/', async (_req, res) => {
@@ -50,7 +50,7 @@ router.get('/:id', async (req, res) => {
 
   user
     ? res.json(user)
-    : res.sendStatus(404)
+    : res.status(404).json({ error: 'Not Found' })
 })
 
 router.put('/:id', async (req, res) => {
@@ -59,11 +59,11 @@ router.put('/:id', async (req, res) => {
 
   updatedUser
     ? res.json(updatedUser)
-    : res.sendStatus(404)
+    : res.status(404).json({ error: 'Not Found' })
 })
 
 router.all('*', (req, res) => {
-  res.status(405).send(`Method ${req.method} is not allowed`)
+  res.status(405).json({ error: `Method ${req.method} is not allowed` })
 })
 
 export default router
