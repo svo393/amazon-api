@@ -59,9 +59,3 @@ export const isPasswordValid: CP = ({ param }) => {
   }
   return { param }
 }
-
-export const checkUserID = (id: string | null): void => {
-  if (!id) {
-    throw new StatusError(403, 'Forbidden', '/login')
-  }
-}

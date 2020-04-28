@@ -34,9 +34,7 @@ export const unknownEndpoint: Middleware = (req, res) => {
 export const errorHandler = (
   error: StatusError, _req: Request, res: Response, next: NextFunction
 ): void => {
-  const statusCode = error.statusCode
-    ? error.statusCode
-    : 500
+  const statusCode = error.statusCode ? error.statusCode : 500
 
   error.location
     ? res.status(statusCode).json({

@@ -1,41 +1,34 @@
-import { PrismaClient } from '@prisma/client'
 import supertest from 'supertest'
 import app from '../src/app'
-import { initialUsers, populateUsers, usersInDB } from './testHelper'
+import { populateUsers, usersInDB, getUserByEmail } from './testHelper'
 
 const api = supertest(app)
-const prisma = new PrismaClient()
 
 beforeEach(async () => {
-  await prisma.user.deleteMany({})
-  prisma.disconnect()
-  populateUsers()
+  await populateUsers()
 })
 
 describe('user authorization', () => {
-  test('succeeds with 200 code and token in body', async () => {
+  test('should signup', async () => {
     const newUser = {
-      email: 'jack589@example.com',
-      password: '1234567t'
+      email: 'user2@example.com',
+      password: '12345678'
     }
 
-    const res = await api
+    await api
       .post('/api/users')
       .send(newUser)
       .expect(201)
       .expect('Content-Type', /application\/json/)
 
-    expect(res.body.token).toBeDefined()
     const usersAtEnd = await usersInDB()
     const emails = usersAtEnd.map((u) => u.email)
-
-    expect(usersAtEnd).toHaveLength(initialUsers.length + 1)
-    expect(emails).toContain('jack589@example.com')
+    expect(emails).toContain('user@example.com')
   })
 
-  test('fails with 400 code if email was not provided', async () => {
+  test('should fail signup with 400 code if email is not provided', async () => {
     const newUser = {
-      password: '1234567t'
+      password: '12345678'
     }
 
     await api
@@ -43,8 +36,146 @@ describe('user authorization', () => {
       .send(newUser)
       .expect(400)
   })
+
+  test('should login and logout with token deletion', async () => {
+    const user = {
+      email: 'user@example.com',
+      password: '12345678'
+    }
+
+    const resLogin = await api
+      .post('/api/users/login')
+      .send(user)
+      .expect(200)
+
+    const token = resLogin.header['set-cookie'][0].split('; ')[0].slice(6)
+
+    const resLogout = await api
+      .post('/api/users/logout')
+      .set('Cookie', `token=${token}`)
+      .expect(302)
+
+    expect(resLogout.header['set-cookie'][0].split('; ')[0].slice(6)).toHaveLength(0)
+  })
 })
 
+describe('user fetching and updating', () => {
+  test('should get 403 trying fetch users if not root', async () => {
+    const user = {
+      email: 'user@example.com',
+      password: '12345678'
+    }
+
+    const res = await api
+      .post('/api/users/login')
+      .send(user)
+      .expect(200)
+
+    const token = res.header['set-cookie'][0].split('; ')[0].slice(6)
+
+    await api
+      .get('/api/users')
+      .set('Cookie', `token=${token}`)
+      .expect(403)
+  })
+
+  test('should get 200 trying fetch users if root', async () => {
+    const user = {
+      email: 'root@example.com',
+      password: '12345678'
+    }
+
+    const res = await api
+      .post('/api/users/login')
+      .send(user)
+      .expect(200)
+
+    const token = res.header['set-cookie'][0].split('; ')[0].slice(6)
+
+    await api
+      .get('/api/users')
+      .set('Cookie', `token=${token}`)
+      .expect(200)
+  })
+
+  test('should get public user fields if not logged in', async () => {
+    const anotherUser = await getUserByEmail('admin@example.com')
+
+    const resUser = await api
+      .get(`/api/users/${anotherUser.id}`)
+      .expect(200)
+
+    expect(Object.keys(resUser.body)).toHaveLength(3)
+  })
+
+  test('should get all user fields if root', async () => {
+    const user = {
+      email: 'root@example.com',
+      password: '12345678'
+    }
+
+    const resLogin = await api
+      .post('/api/users/login')
+      .send(user)
+      .expect(200)
+
+    const token = resLogin.header['set-cookie'][0].split('; ')[0].slice(6)
+
+    const anotherUser = await getUserByEmail('admin@example.com')
+
+    const resUser = await api
+      .get(`/api/users/${anotherUser.id}`)
+      .set('Cookie', `token=${token}`)
+      .expect(200)
+
+    expect(Object.keys(resUser.body)).toHaveLength(7)
+  })
+
+  test('should get 200 when updating own profile', async () => {
+    const user = {
+      email: 'user@example.com',
+      password: '12345678'
+    }
+
+    const resLogin = await api
+      .post('/api/users/login')
+      .send(user)
+      .expect(200)
+
+    const token = resLogin.header['set-cookie'][0].split('; ')[0].slice(6)
+
+    const resUser = await api
+      .put(`/api/users/${resLogin.body.id}`)
+      .set('Cookie', `token=${token}`)
+      .send({ name: 'Jack' })
+      .expect(200)
+
+    expect(Object.keys(resUser.body)).toHaveLength(7)
+    expect(resUser.body.name === 'Jack')
+  })
+
+  test('should get 403 when updating another user\'s profile', async () => {
+    const user = {
+      email: 'user@example.com',
+      password: '12345678'
+    }
+
+    const resLogin = await api
+      .post('/api/users/login')
+      .send(user)
+      .expect(200)
+
+    const token = resLogin.header['set-cookie'][0].split('; ')[0].slice(6)
+
+    const anotherUser = await getUserByEmail('admin@example.com')
+
+    await api
+      .put(`/api/users/${anotherUser.id}`)
+      .set('Cookie', `token=${token}`)
+      .send({ name: 'Jack' })
+      .expect(403)
+  })
+})
 // describe('when there is initially some notes saved', () => {
 //   test('notes are returned as json', async () => {
 //     await api
@@ -201,4 +332,4 @@ describe('user authorization', () => {
 //   })
 // })
 
-// afterAll(() => prisma.disconnect())
+// afterAll(() => await prisma.disconnect())

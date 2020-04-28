@@ -12,6 +12,14 @@ export type UserPersonalData = UserGetPayload<{
   };
 }>
 
-export interface AuthUserPersonalData extends UserPersonalData {
+export type UserPublicData = UserGetPayload<{
+  select: {
+    id: true;
+    name: true;
+    avatar: true;
+  };
+}>
+
+export type AuthUserPersonalData = UserPersonalData & {
   token: string;
 }

@@ -1,8 +1,10 @@
 import { PrismaClient, UserCreateInput, UserUpdateInput } from '@prisma/client'
 import bcrypt from 'bcrypt'
+import { Response } from 'express'
 import jwt from 'jsonwebtoken'
-import { AuthUserPersonalData, UserPersonalData } from '../types'
+import { AuthUserPersonalData, UserPersonalData, UserPublicData } from '../types'
 import env from '../utils/config'
+import { getUserRole } from '../utils/shield'
 import StatusError from '../utils/StatusError'
 
 const prisma = new PrismaClient()
@@ -16,6 +18,7 @@ const addUser = async (userInput: UserCreateInput): Promise<AuthUserPersonalData
   })
 
   if (existingUser) {
+    await prisma.disconnect()
     throw new StatusError(409, `User with email ${email} already exists`)
   }
 
@@ -33,7 +36,7 @@ const addUser = async (userInput: UserCreateInput): Promise<AuthUserPersonalData
     }
   })
 
-  prisma.disconnect()
+  await prisma.disconnect()
 
   const token = jwt.sign(
     { userID: addedUser.id },
@@ -65,12 +68,14 @@ const loginUser = async (userInput: UserCreateInput): Promise<AuthUserPersonalDa
   })
 
   if (!existingUser) {
+    await prisma.disconnect()
     throw new StatusError(401, 'Invalid Email or Password')
   }
 
   const isPasswordValid = await bcrypt.compare(password, existingUser.password)
 
   if (!isPasswordValid) {
+    await prisma.disconnect()
     throw new StatusError(401, 'Invalid Email or Password')
   }
 
@@ -78,8 +83,7 @@ const loginUser = async (userInput: UserCreateInput): Promise<AuthUserPersonalDa
     where: { user: { id: existingUser.id } },
     include: { item: true }
   })
-
-  prisma.disconnect()
+  await prisma.disconnect()
 
   const token = jwt.sign(
     { userID: existingUser.id },
@@ -96,7 +100,7 @@ const loginUser = async (userInput: UserCreateInput): Promise<AuthUserPersonalDa
   }
 }
 
-const getUsers = async (): Promise<UserPersonalData[]> => {
+const getUsers = async (): Promise<Omit<UserPersonalData, 'cart'>[]> => {
   const users = await prisma.user.findMany({
     select: {
       id: true,
@@ -104,18 +108,19 @@ const getUsers = async (): Promise<UserPersonalData[]> => {
       email: true,
       avatar: true,
       createdAt: true,
-      role: true,
-      cart: true
+      role: true
     }
   })
-  prisma.disconnect()
+  await prisma.disconnect()
   return users
 }
 
-const getUserByID = async (id: string): Promise<UserPersonalData | null> => {
-  const user = await prisma.user.findOne({
-    where: { id },
-    select: {
+const getUserByID = async (id: string, res: Response): Promise<UserPersonalData | UserPublicData> => {
+  const role = await getUserRole(res)
+  const userIsRoot = role === 'ROOT'
+
+  const fieldSet = userIsRoot
+    ? {
       id: true,
       name: true,
       email: true,
@@ -124,8 +129,31 @@ const getUserByID = async (id: string): Promise<UserPersonalData | null> => {
       role: true,
       cart: true
     }
+    : {
+      id: true,
+      name: true,
+      avatar: true
+    }
+
+  const user = await prisma.user.findOne({
+    where: { id },
+    select: fieldSet
   })
-  prisma.disconnect()
+
+  if (!user) {
+    await prisma.disconnect()
+    throw new StatusError(404, 'Not Found')
+  }
+
+  if (userIsRoot) {
+    const cartItems = await prisma.cartItem.findMany({
+      where: { user: { id } },
+      include: { item: true }
+    })
+    user.cart = cartItems
+  }
+  await prisma.disconnect()
+
   return user
 }
 
@@ -139,17 +167,20 @@ const updateUser = async (userInput: UserUpdateInput, id: string): Promise<UserP
       email: true,
       avatar: true,
       createdAt: true,
-      role: true,
-      cart: true
+      role: true
     }
   })
+
+  if (!updatedUser) {
+    await prisma.disconnect()
+    throw new StatusError(404, 'Not Found')
+  }
 
   const cartItems = await prisma.cartItem.findMany({
     where: { user: { id: updatedUser.id } },
     include: { item: true }
   })
-
-  prisma.disconnect()
+  await prisma.disconnect()
 
   return {
     ...updatedUser,

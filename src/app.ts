@@ -21,7 +21,7 @@ app.use(cors({
 app.use(cookieParser())
 app.use(getUserID)
 app.use(express.json())
-if ([ 'development', 'test' ].includes(env.NODE_ENV)) { app.use(logger('dev')) }
+env.NODE_ENV === 'development' && app.use(logger('dev'))
 
 // app.use('/api/items', itemsRouter)
 app.use('/api/users', usersRouter)

@@ -1,7 +1,7 @@
 import Router from 'express'
 import userService from '../services/userService'
 import inputValidator from '../utils/inputValidator'
-import { checkUserID } from '../utils/validatorLib'
+import shield from '../utils/shield'
 
 const router = Router()
 
@@ -34,32 +34,27 @@ router.post('/login', async (req, res) => {
 })
 
 router.post('/logout', (_req, res) => {
-  checkUserID(res.locals.userID)
+  shield.isLoggedIn(res)
   res.clearCookie('token')
-  res.status(403).json({ error: 'Forbidden', location: '/login' })
+  res.status(302).json({ location: '/login' })
 })
 
 router.get('/', async (_req, res) => {
-  checkUserID(res.locals.userID)
+  await shield.isRoot(res)
   const users = await userService.getUsers()
   res.json(users)
 })
 
 router.get('/:id', async (req, res) => {
-  const user = await userService.getUserByID(req.params.id)
-
-  user
-    ? res.json(user)
-    : res.status(404).json({ error: 'Not Found' })
+  const user = await userService.getUserByID(req.params.id, res)
+  res.json(user)
 })
 
 router.put('/:id', async (req, res) => {
+  shield.isSameUser(req, res)
   const userInput = inputValidator.checkUserUpdate(req.body)
   const updatedUser = await userService.updateUser(userInput, req.params.id)
-
-  updatedUser
-    ? res.json(updatedUser)
-    : res.status(404).json({ error: 'Not Found' })
+  res.json(updatedUser)
 })
 
 export default router

@@ -59,7 +59,7 @@
     "lint": "eslint './src/**/*.ts'",
     "lint:fix": "eslint './src/**/*.ts' --fix",
     "start": "cross-env NODE_ENV=production node build/index.js",
-    "test": "cross-env NODE_ENV=test jest --verbose --runInBand",
+    "test": "cross-env NODE_ENV=test jest --verbose --detectOpenHandles  --runInBand",
     "test:dev": "cross-env NODE_ENV=test jest --verbose --runInBand --watch",
     "tsc": "rm -rf build && tsc"
   },
