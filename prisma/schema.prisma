@@ -14,8 +14,8 @@ model Item {
   shortDescription String
   longDescription  String
   stock            Int
-  stars            Int
-  asin             String
+  stars            Int        @default(0)
+  asin             String     @unique
   media            Int
   primaryMedia     Int
   createdAt        DateTime   @default(now())
@@ -25,10 +25,10 @@ model Item {
   questions        Question[]
   user             User       @relation(fields: [userID], references: [id])
   userID           String
-  category         Category   @relation(fields: [categoryID], references: [id])
-  categoryID       String
-  vendor           Vendor     @relation(fields: [vendorID], references: [id])
-  vendorID         String
+  category         Category   @relation(fields: [categoryName], references: [name])
+  categoryName     String
+  vendor           Vendor     @relation(fields: [vendorName], references: [name])
+  vendorName       String
 }
 
 model Category {
@@ -52,7 +52,7 @@ model User {
   createdAt        DateTime    @default(now())
   resetToken       String?     @unique
   resetTokenExpiry String?
-  role             Role        @default(USER)
+  role             Role        @default(CUSTOMER)
   cart             CartItem[]
   items            Item[]
   orders           Order[]
@@ -156,7 +156,7 @@ model AnswerComment {
 enum Role {
   ROOT
   ADMIN
-  USER
+  CUSTOMER
 }
 
 enum OrderStatus {

@@ -27,7 +27,7 @@ export const getUserRole = async (res: Response): Promise<Role | null> => {
   })
   await prisma.disconnect()
 
-  if (!user) { throw new StatusError(500, 'Invernal Server Error') }
+  if (!user) { throw new StatusError(500, 'Internal Server Error') }
   return user.role
 }
 
@@ -101,7 +101,7 @@ const isCreator = async (res: Response, name: Model, id: string): Promise<void |
       data = await prisma.answerComment.findOne(params)
       break
     default:
-      throw new StatusError(500, 'Invernal Server Error')
+      throw new StatusError(500, 'Internal Server Error')
   }
   await prisma.disconnect()
 

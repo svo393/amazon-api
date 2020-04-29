@@ -14,8 +14,8 @@ model Item {
   shortDescription String
   longDescription  String
   stock            Int
-  stars            Int
-  asin             String     @default("tnt-655-34")
+  stars            Int        @default(0)
+  asin             String     @unique
   media            Int
   primaryMedia     Int
   createdAt        DateTime   @default(now())
@@ -25,21 +25,22 @@ model Item {
   questions        Question[]
   user             User       @relation(fields: [userID], references: [id])
   userID           String
-  category         Category   @relation(fields: [categoryID], references: [id])
-  categoryID       String
-  vendor           Vendor     @relation(fields: [vendorID], references: [id])
-  vendorID         String
+  category         Category   @relation(fields: [categoryName], references: [name])
+  categoryName     String
+  vendor           Vendor     @relation(fields: [vendorName], references: [name])
+  vendorName       String
 }
 
 model Category {
-  id       String   @default(cuid()) @id
-  name     String
-  parent   Category @relation("CategoryToCategory", fields: [parentID], references: [id])
-  parentID String
+  id       String    @default(cuid()) @id
+  name     String    @unique
+  parent   Category? @relation("CategoryToCategory", fields: [parentID], references: [id])
+  parentID String?
 }
 
 model Vendor {
-  id String @default(cuid()) @id
+  id   String @default(cuid()) @id
+  name String @unique
 }
 
 model User {
@@ -51,7 +52,7 @@ model User {
   createdAt        DateTime    @default(now())
   resetToken       String?     @unique
   resetTokenExpiry String?
-  role             Role        @default(USER)
+  role             Role        @default(CUSTOMER)
   cart             CartItem[]
   items            Item[]
   orders           Order[]
@@ -155,7 +156,7 @@ model AnswerComment {
 enum Role {
   ROOT
   ADMIN
-  USER
+  CUSTOMER
 }
 
 enum OrderStatus {

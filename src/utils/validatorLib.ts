@@ -11,7 +11,7 @@ type CP = (params: {
 }
 
 export const isProvided: CP = ({ name, param }) => {
-  if (!param) {
+  if (typeof (param) === 'undefined') {
     throw new StatusError(400, `Missing ${name}`)
   }
   return { name, param }
@@ -34,6 +34,13 @@ export const isInputProvided = (param: object): void => {
 
 export const isString: CP = ({ name, param }) => {
   if (typeof (param) !== 'string' && !(param instanceof String)) {
+    throw new StatusError(400, `Incorrect ${name}: ${param}`)
+  }
+  return { name, param }
+}
+
+export const isNumber: CP = ({ name, param }) => {
+  if (typeof (param) !== 'number') {
     throw new StatusError(400, `Incorrect ${name}: ${param}`)
   }
   return { name, param }

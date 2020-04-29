@@ -1,6 +1,7 @@
 import { UserCreateInput, UserUpdateInput } from '@prisma/client'
 import R from 'ramda'
-import { hasDefinedProps, isBoolean, isEmail, isInputProvided, isPasswordValid, isProvided, isString } from './validatorLib'
+import { ItemCreateInputRaw } from '../types'
+import { hasDefinedProps, isBoolean, isEmail, isInputProvided, isNumber, isPasswordValid, isProvided, isString } from './validatorLib'
 
 const checkNewUser = (object: any): UserCreateInput => {
   const email = R.pipe(
@@ -70,8 +71,80 @@ const checkUserUpdate = (object: any): UserUpdateInput => {
   return hasDefinedProps(userInput)
 }
 
+const checkNewItem = (object: any): ItemCreateInputRaw => {
+  const name = R.pipe(
+    isProvided,
+    isString
+  )({ name: 'name', param: object.name })
+
+  const price = R.pipe(
+    isProvided,
+    isNumber
+  )({ name: 'price', param: object.price })
+
+  const shortDescription = R.pipe(
+    isProvided,
+    isString
+  )({ name: 'shortDescription', param: object.shortDescription })
+
+  const longDescription = R.pipe(
+    isProvided,
+    isString
+  )({ name: 'longDescription', param: object.longDescription })
+
+  const stock = R.pipe(
+    isProvided,
+    isNumber
+  )({ name: 'stock', param: object.stock })
+
+  const asin = R.pipe(
+    isProvided,
+    isString
+  )({ name: 'asin', param: object.asin })
+
+  const media = R.pipe(
+    isProvided,
+    isNumber
+  )({ name: 'media', param: object.media })
+
+  const primaryMedia = R.pipe(
+    isProvided,
+    isNumber
+  )({ name: 'primaryMedia', param: object.primaryMedia })
+
+  const user = R.pipe(
+    isProvided,
+    isString
+  )({ name: 'user', param: object.user })
+
+  const category = R.pipe(
+    isProvided,
+    isString
+  )({ name: 'category', param: object.category })
+
+  const vendor = R.pipe(
+    isProvided,
+    isString
+  )({ name: 'vendor', param: object.vendor })
+
+  return {
+    name: name.param,
+    price: price.param,
+    shortDescription: shortDescription.param,
+    longDescription: longDescription.param,
+    stock: stock.param,
+    asin: asin.param,
+    media: media.param,
+    primaryMedia: primaryMedia.param,
+    user: user.param,
+    category: category.param,
+    vendor: vendor.param
+  }
+}
+
 export default {
   checkNewUser,
   checkUserLogin,
-  checkUserUpdate
+  checkUserUpdate,
+  checkNewItem
 }

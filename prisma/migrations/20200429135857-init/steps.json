@@ -7,7 +7,7 @@
       "values": [
         "ROOT",
         "ADMIN",
-        "USER"
+        "CUSTOMER"
       ]
     },
     {
@@ -107,6 +107,31 @@
       "arity": "Required"
     },
     {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Item",
+          "field": "stars"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Item",
+          "field": "stars"
+        },
+        "directive": "default"
+      },
+      "argument": "",
+      "value": "0"
+    },
+    {
       "tag": "CreateField",
       "model": "Item",
       "field": "asin",
@@ -121,22 +146,8 @@
           "model": "Item",
           "field": "asin"
         },
-        "directive": "default"
+        "directive": "unique"
       }
-    },
-    {
-      "tag": "CreateArgument",
-      "location": {
-        "tag": "Directive",
-        "path": {
-          "tag": "Field",
-          "model": "Item",
-          "field": "asin"
-        },
-        "directive": "default"
-      },
-      "argument": "",
-      "value": "\"tnt-655-34\""
     },
     {
       "tag": "CreateField",
@@ -244,7 +255,7 @@
     {
       "tag": "CreateField",
       "model": "Item",
-      "field": "question",
+      "field": "questions",
       "type": "Question",
       "arity": "List"
     },
@@ -331,7 +342,7 @@
         "directive": "relation"
       },
       "argument": "fields",
-      "value": "[categoryID]"
+      "value": "[categoryName]"
     },
     {
       "tag": "CreateArgument",
@@ -345,12 +356,12 @@
         "directive": "relation"
       },
       "argument": "references",
-      "value": "[id]"
+      "value": "[name]"
     },
     {
       "tag": "CreateField",
       "model": "Item",
-      "field": "categoryID",
+      "field": "categoryName",
       "type": "String",
       "arity": "Required"
     },
@@ -384,7 +395,7 @@
         "directive": "relation"
       },
       "argument": "fields",
-      "value": "[vendorID]"
+      "value": "[vendorName]"
     },
     {
       "tag": "CreateArgument",
@@ -398,12 +409,12 @@
         "directive": "relation"
       },
       "argument": "references",
-      "value": "[id]"
+      "value": "[name]"
     },
     {
       "tag": "CreateField",
       "model": "Item",
-      "field": "vendorID",
+      "field": "vendorName",
       "type": "String",
       "arity": "Required"
     },
@@ -462,11 +473,22 @@
       "arity": "Required"
     },
     {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Category",
+          "field": "name"
+        },
+        "directive": "unique"
+      }
+    },
+    {
       "tag": "CreateField",
       "model": "Category",
       "field": "parent",
       "type": "Category",
-      "arity": "Required"
+      "arity": "Optional"
     },
     {
       "tag": "CreateDirective",
@@ -526,7 +548,7 @@
       "model": "Category",
       "field": "parentID",
       "type": "String",
-      "arity": "Required"
+      "arity": "Optional"
     },
     {
       "tag": "CreateModel",
@@ -573,6 +595,24 @@
           "field": "id"
         },
         "directive": "id"
+      }
+    },
+    {
+      "tag": "CreateField",
+      "model": "Vendor",
+      "field": "name",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Vendor",
+          "field": "name"
+        },
+        "directive": "unique"
       }
     },
     {
@@ -773,7 +813,7 @@
         "directive": "default"
       },
       "argument": "",
-      "value": "USER"
+      "value": "CUSTOMER"
     },
     {
       "tag": "CreateField",

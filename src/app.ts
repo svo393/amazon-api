@@ -7,7 +7,7 @@ import env from './utils/config'
 import { errorHandler, getUserID, unknownEndpoint } from './utils/middleware'
 
 require('express-async-errors')
-// import itemsRouter from './routes/items' // eslint-disable-line
+import itemsRouter from './routes/items' // eslint-disable-line
 import usersRouter from './routes/users' // eslint-disable-line
 
 const app = express()
@@ -23,7 +23,7 @@ app.use(getUserID)
 app.use(express.json())
 env.NODE_ENV === 'development' && app.use(logger('dev'))
 
-// app.use('/api/items', itemsRouter)
+app.use('/api/items', itemsRouter)
 app.use('/api/users', usersRouter)
 
 app.use(unknownEndpoint)

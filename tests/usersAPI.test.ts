@@ -1,6 +1,6 @@
 import supertest from 'supertest'
 import app from '../src/app'
-import { populateUsers, usersInDB, getUserByEmail } from './testHelper'
+import { populateUsers, usersInDB, getUserByEmail, loginAs } from './testHelper'
 
 const api = supertest(app)
 
@@ -11,7 +11,7 @@ beforeEach(async () => {
 describe('user authorization', () => {
   test('should signup', async () => {
     const newUser = {
-      email: 'user2@example.com',
+      email: 'customer2@example.com',
       password: '12345678'
     }
 
@@ -23,7 +23,7 @@ describe('user authorization', () => {
 
     const usersAtEnd = await usersInDB()
     const emails = usersAtEnd.map((u) => u.email)
-    expect(emails).toContain('user@example.com')
+    expect(emails).toContain('customer@example.com')
   })
 
   test('should fail signup with 400 code if email is not provided', async () => {
@@ -38,17 +38,7 @@ describe('user authorization', () => {
   })
 
   test('should login and logout with token deletion', async () => {
-    const user = {
-      email: 'user@example.com',
-      password: '12345678'
-    }
-
-    const resLogin = await api
-      .post('/api/users/login')
-      .send(user)
-      .expect(200)
-
-    const token = resLogin.header['set-cookie'][0].split('; ')[0].slice(6)
+    const { token } = await loginAs('customer', api)
 
     const resLogout = await api
       .post('/api/users/logout')
@@ -61,17 +51,7 @@ describe('user authorization', () => {
 
 describe('user fetching and updating', () => {
   test('should get 403 trying fetch users if not root', async () => {
-    const user = {
-      email: 'user@example.com',
-      password: '12345678'
-    }
-
-    const res = await api
-      .post('/api/users/login')
-      .send(user)
-      .expect(200)
-
-    const token = res.header['set-cookie'][0].split('; ')[0].slice(6)
+    const { token } = await loginAs('customer', api)
 
     await api
       .get('/api/users')
@@ -80,17 +60,7 @@ describe('user fetching and updating', () => {
   })
 
   test('should get 200 trying fetch users if root', async () => {
-    const user = {
-      email: 'root@example.com',
-      password: '12345678'
-    }
-
-    const res = await api
-      .post('/api/users/login')
-      .send(user)
-      .expect(200)
-
-    const token = res.header['set-cookie'][0].split('; ')[0].slice(6)
+    const { token } = await loginAs('root', api)
 
     await api
       .get('/api/users')
@@ -109,17 +79,7 @@ describe('user fetching and updating', () => {
   })
 
   test('should get all user fields if root', async () => {
-    const user = {
-      email: 'root@example.com',
-      password: '12345678'
-    }
-
-    const resLogin = await api
-      .post('/api/users/login')
-      .send(user)
-      .expect(200)
-
-    const token = resLogin.header['set-cookie'][0].split('; ')[0].slice(6)
+    const { token } = await loginAs('root', api)
 
     const anotherUser = await getUserByEmail('admin@example.com')
 
@@ -132,20 +92,10 @@ describe('user fetching and updating', () => {
   })
 
   test('should get 200 when updating own profile', async () => {
-    const user = {
-      email: 'user@example.com',
-      password: '12345678'
-    }
-
-    const resLogin = await api
-      .post('/api/users/login')
-      .send(user)
-      .expect(200)
-
-    const token = resLogin.header['set-cookie'][0].split('; ')[0].slice(6)
+    const { token, id } = await loginAs('customer', api)
 
     const resUser = await api
-      .put(`/api/users/${resLogin.body.id}`)
+      .put(`/api/users/${id}`)
       .set('Cookie', `token=${token}`)
       .send({ name: 'Jack' })
       .expect(200)
@@ -155,17 +105,7 @@ describe('user fetching and updating', () => {
   })
 
   test('should get 403 when updating another user\'s profile', async () => {
-    const user = {
-      email: 'user@example.com',
-      password: '12345678'
-    }
-
-    const resLogin = await api
-      .post('/api/users/login')
-      .send(user)
-      .expect(200)
-
-    const token = resLogin.header['set-cookie'][0].split('; ')[0].slice(6)
+    const { token } = await loginAs('customer', api)
 
     const anotherUser = await getUserByEmail('admin@example.com')
 

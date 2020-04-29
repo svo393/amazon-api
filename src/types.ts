@@ -1,4 +1,4 @@
-import { UserGetPayload } from '@prisma/client'
+import { Item, UserGetPayload } from '@prisma/client'
 
 export type UserPersonalData = UserGetPayload<{
   select: {
@@ -22,4 +22,20 @@ export type UserPublicData = UserGetPayload<{
 
 export type AuthUserPersonalData = UserPersonalData & {
   token: string;
+}
+
+export type ItemPublicData = Omit<Item, 'createdAt' | 'updatedAt' | 'userID'>
+
+export type ItemCreateInputRaw = {
+  name: string;
+  price: number;
+  shortDescription: string;
+  longDescription: string;
+  stock: number;
+  asin: string;
+  media: number;
+  primaryMedia: number;
+  user: string;
+  category: string;
+  vendor: string;
 }
