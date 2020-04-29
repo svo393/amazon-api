@@ -1,13 +1,36 @@
-import { PrismaClient, UserCreateInput, UserUpdateInput } from '@prisma/client'
+import { PrismaClient, UserCreateInput, UserGetPayload, UserUpdateInput } from '@prisma/client'
 import bcrypt from 'bcrypt'
 import { Response } from 'express'
 import jwt from 'jsonwebtoken'
-import { AuthUserPersonalData, UserPersonalData, UserPublicData } from '../types'
 import env from '../utils/config'
 import { getUserRole } from '../utils/shield'
 import StatusError from '../utils/StatusError'
 
 const prisma = new PrismaClient()
+
+type UserPersonalData = UserGetPayload<{
+  select: {
+    id: true;
+    email: true;
+    name: true;
+    avatar: true;
+    createdAt: true;
+    role: true;
+    cart: true;
+  };
+}>
+
+type UserPublicData = UserGetPayload<{
+  select: {
+    id: true;
+    name: true;
+    avatar: true;
+  };
+}>
+
+type AuthUserPersonalData = UserPersonalData & {
+  token: string;
+}
 
 const addUser = async (userInput: UserCreateInput): Promise<AuthUserPersonalData> => {
   const { email, password } = userInput

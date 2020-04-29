@@ -1,11 +1,19 @@
-import { Item, PrismaClient } from '@prisma/client'
+import { Item, ItemUpdateInput, PrismaClient, Question } from '@prisma/client'
 import { Response } from 'express'
-import { ItemCreateInputRaw, ItemPublicData } from '../types'
+import { ItemCreateInputRaw } from '../types'
 import { makeID } from '../utils'
 import { getUserRole } from '../utils/shield'
 import StatusError from '../utils/StatusError'
 
 const prisma = new PrismaClient()
+
+type ItemPublicData = Omit<Item, 'createdAt' | 'updatedAt' | 'userID'>
+
+type ItemDataWithQuestions = Item & {
+  questions: Question[];
+}
+
+type ItemPublicDataWithQuestions = Omit<ItemDataWithQuestions, 'createdAt' | 'updatedAt' | 'userID'>
 
 const ItemPublicFields = {
   id: true,
@@ -23,7 +31,7 @@ const ItemPublicFields = {
   vendorName: true
 }
 
-const addItem = async (itemInput: ItemCreateInputRaw): Promise<ItemPublicData> => {
+const addItem = async (itemInput: ItemCreateInputRaw): Promise<ItemPublicDataWithQuestions> => {
   const items = await prisma.item.findMany({ select: { id: true } })
   const itemIDs = items.map((item) => item.id)
   let id = makeID(7)
@@ -50,7 +58,8 @@ const addItem = async (itemInput: ItemCreateInputRaw): Promise<ItemPublicData> =
       user: { connect: { id: itemInput.user } },
       category: { connect: { id: category.id } },
       vendor: { connect: { id: vendor.id } }
-    }
+    },
+    include: { questions: true }
   })
 
   await prisma.disconnect()
@@ -70,61 +79,42 @@ const getItems = async (): Promise<ItemPublicData[]> => {
   return items
 }
 
-const getItemByID = async (id: string, res: Response): Promise<Item | ItemPublicData> => {
-  const role = await getUserRole(res)
-  const userIsRoot = role === 'ROOT'
-
-  const item = userIsRoot
-    ? await prisma.item.findOne({
-      where: { id }
-    })
-    : await prisma.item.findOne({
-      where: { id },
-      select: ItemPublicFields
-    })
-
+const getItemByID = async (id: string, res: Response): Promise<ItemPublicDataWithQuestions| ItemDataWithQuestions> => {
+  const item = await prisma.item.findOne({
+    where: { id },
+    include: { questions: true }
+  })
   await prisma.disconnect()
 
   if (!item) { throw new StatusError(404, 'Not Found') }
 
+  const role = await getUserRole(res)
+  const userIsRoot = role === 'ROOT'
+
+  if (!userIsRoot) {
+    delete item.createdAt
+    delete item.updatedAt
+    delete item.userID
+  }
+
   return item
 }
 
-// const updateItem = async (itemInput: ItemUpdateInput, id: string): Promise<ItemPersonalData> => {
-//   const updatedItem = await prisma.item.update({
-//     where: { id },
-//     data: { ...itemInput },
-//     select: {
-//       id: true,
-//       name: true,
-//       email: true,
-//       avatar: true,
-//       createdAt: true,
-//       role: true
-//     }
-//   })
+const updateItem = async (itemInput: ItemUpdateInput, id: string): Promise<Item> => {
+  const updatedItem = await prisma.item.update({
+    where: { id },
+    data: itemInput
+  })
+  await prisma.disconnect()
 
-//   if (!updatedItem) {
-//     await prisma.disconnect()
-//     throw new StatusError(404, 'Not Found')
-//   }
+  if (!updatedItem) { throw new StatusError(404, 'Not Found') }
 
-//   const cartItems = await prisma.cartItem.findMany({
-//     where: { item: { id: updatedItem.id } },
-//     include: { item: true }
-//   })
-//   await prisma.disconnect()
-
-//   return {
-//     ...updatedItem,
-//     cart: cartItems
-//   }
-// }
+  return updatedItem
+}
 
 export default {
   addItem,
   getItems,
-  getItemByID
-  // loginItem,
-  // updateItem
+  getItemByID,
+  updateItem
 }

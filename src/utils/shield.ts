@@ -2,17 +2,16 @@ import { PrismaClient, Role } from '@prisma/client'
 import { Response, Request } from 'express'
 import StatusError from './StatusError'
 
-enum Model {
-  ITEM = 'item',
-  CART_ITEM = 'cartItem',
-  ORDER = 'order',
-  ORDER_ITEM = 'orderItem',
-  RATING = 'rating',
-  RATING_COMMENT = 'ratingComment',
-  QUESTION = 'question',
-  ANSWER = 'answer',
-  ANSWER_COMMENT = 'answerComment'
-}
+type Model =
+  | 'item'
+  | 'cartItem'
+  | 'order'
+  | 'orderItem'
+  | 'rating'
+  | 'ratingComment'
+  | 'question'
+  | 'answer'
+  | 'answerComment'
 
 const prisma = new PrismaClient()
 

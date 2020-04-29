@@ -1,4 +1,4 @@
-import { UserCreateInput, UserUpdateInput } from '@prisma/client'
+import { ItemUpdateInput, UserCreateInput, UserUpdateInput } from '@prisma/client'
 import R from 'ramda'
 import { ItemCreateInputRaw } from '../types'
 import { hasDefinedProps, isBoolean, isEmail, isInputProvided, isNumber, isPasswordValid, isProvided, isString } from './validatorLib'
@@ -142,9 +142,79 @@ const checkNewItem = (object: any): ItemCreateInputRaw => {
   }
 }
 
+const checkItemUpdate = (object: any): ItemUpdateInput => {
+  isInputProvided(object)
+
+  const name = object.name && isString(
+    { name: 'name', param: object.name }
+  )
+
+  const price = object.price && isNumber(
+    { name: 'price', param: object.price }
+  )
+
+  const shortDescription = object.shortDescription && isString(
+    { name: 'shortDescription', param: object.shortDescription }
+  )
+
+  const longDescription = object.longDescription && isString(
+    { name: 'longDescription', param: object.longDescription }
+  )
+
+  const stock = object.stock && isNumber(
+    { name: 'stock', param: object.stock }
+  )
+
+  const asin = object.asin && isString(
+    { name: 'asin', param: object.asin }
+  )
+
+  const media = object.media && isNumber(
+    { name: 'media', param: object.media }
+  )
+
+  const primaryMedia = object.primaryMedia && isNumber(
+    { name: 'primaryMedia', param: object.primaryMedia }
+  )
+
+  const isAvailable = object.isAvailable && isBoolean(
+    { name: 'isAvailable', param: object.isAvailable }
+  )
+
+  const questions = object.questions && isString(
+    { name: 'questions', param: object.questions }
+  )
+
+  const category = object.category && isString(
+    { name: 'category', param: object.category }
+  )
+
+  const vendor = object.vendor && isString(
+    { name: 'vendor', param: object.vendor }
+  )
+
+  const itemInput = {
+    name: name?.param,
+    price: price?.param,
+    shortDescription: shortDescription?.param,
+    longDescription: longDescription?.param,
+    stock: stock?.param,
+    asin: asin?.param,
+    media: media?.param,
+    primaryMedia: primaryMedia?.param,
+    isAvailable: isAvailable?.param,
+    questions: questions?.param,
+    category: category?.param,
+    vendor: vendor?.param
+  }
+
+  return hasDefinedProps(itemInput)
+}
+
 export default {
   checkNewUser,
   checkUserLogin,
   checkUserUpdate,
-  checkNewItem
+  checkNewItem,
+  checkItemUpdate
 }
