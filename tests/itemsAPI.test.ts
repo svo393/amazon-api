@@ -34,8 +34,8 @@ beforeEach(async () => {
   await populateUsers()
 })
 
-describe('adding item', () => {
-  test('should create item', async () => {
+describe('Item adding', () => {
+  test('200 adding', async () => {
     const { token, id } = await loginAs('root', api)
 
     await api
@@ -50,7 +50,7 @@ describe('adding item', () => {
     expect(longDescriptions).toContain('Very Cool Item')
   })
 
-  test('should fail with 400 code if price is not provided', async () => {
+  test('400 adding if no price', async () => {
     const { token, id } = await loginAs('root', api)
 
     const newItemWithoutPrice = { ...newItem(id), price: undefined }
@@ -63,8 +63,8 @@ describe('adding item', () => {
   })
 })
 
-describe('item fetching', () => {
-  test('should get 200 fetching items', async () => {
+describe('Item fetching', () => {
+  test('200 fetching', async () => {
     await createOneItem()
 
     const { body } = await api
@@ -74,17 +74,17 @@ describe('item fetching', () => {
     expect(body).toBeDefined()
   })
 
-  test('should get public item fields if not root', async () => {
+  test('public item if not root', async () => {
     const { addedItem } = await createOneItem()
 
     const { body } = await api
       .get(`/api/items/${addedItem.id}`)
       .expect(200)
 
-    expect(Object.keys(body)).toHaveLength(14)
+    expect(Object.keys(body)).toHaveLength(15)
   })
 
-  test('should get all item fields if root', async () => {
+  test('full tiem if root', async () => {
     const { addedItem, token } = await createOneItem()
 
     const { body } = await api
@@ -92,12 +92,12 @@ describe('item fetching', () => {
       .set('Cookie', `token=${token}`)
       .expect(200)
 
-    expect(Object.keys(body)).toHaveLength(17)
+    expect(Object.keys(body)).toHaveLength(18)
   })
 })
 
-describe('item updating', () => {
-  test('should get 200 when updating own item', async () => {
+describe('Item updating', () => {
+  test('200 if own item', async () => {
     const { addedItem, token } = await createOneItem()
 
     const { body } = await api
@@ -109,7 +109,7 @@ describe('item updating', () => {
     expect(body.name).toBe('Updated Item')
   })
 
-  test('should get 403 when updating another user\'s item', async () => {
+  test('403 if another user\'s item', async () => {
     const { token } = await createOneItem('admin')
     const { addedItem: anotherAddedItem } = await createOneItem()
 

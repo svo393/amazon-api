@@ -1,4 +1,4 @@
-import { Item, ItemUpdateInput, PrismaClient, Question } from '@prisma/client'
+import { Item, ItemUpdateInput, PrismaClient, Question, Rating } from '@prisma/client'
 import { Response } from 'express'
 import { ItemCreateInputRaw } from '../types'
 import { makeID } from '../utils'
@@ -9,11 +9,12 @@ const prisma = new PrismaClient()
 
 type ItemPublicData = Omit<Item, 'createdAt' | 'updatedAt' | 'userID'>
 
-type ItemDataWithQuestions = Item & {
+type ItemDataWithQuestionsAndRatings = Item & {
   questions: Question[];
+  ratings: Rating[];
 }
 
-type ItemPublicDataWithQuestions = Omit<ItemDataWithQuestions, 'createdAt' | 'updatedAt' | 'userID'>
+type ItemPublicDataWithQuestionsAndRatings = Omit<ItemDataWithQuestionsAndRatings, 'createdAt' | 'updatedAt' | 'userID'>
 
 const ItemPublicFields = {
   id: true,
@@ -31,7 +32,7 @@ const ItemPublicFields = {
   vendorName: true
 }
 
-const addItem = async (itemInput: ItemCreateInputRaw): Promise<ItemPublicDataWithQuestions> => {
+const addItem = async (itemInput: ItemCreateInputRaw): Promise<ItemPublicDataWithQuestionsAndRatings> => {
   const items = await prisma.item.findMany({ select: { id: true } })
   const itemIDs = items.map((item) => item.id)
   let id = makeID(7)
@@ -59,7 +60,7 @@ const addItem = async (itemInput: ItemCreateInputRaw): Promise<ItemPublicDataWit
       category: { connect: { id: category.id } },
       vendor: { connect: { id: vendor.id } }
     },
-    include: { questions: true }
+    include: { questions: true, ratings: true }
   })
 
   await prisma.disconnect()
@@ -79,10 +80,10 @@ const getItems = async (): Promise<ItemPublicData[]> => {
   return items
 }
 
-const getItemByID = async (id: string, res: Response): Promise<ItemPublicDataWithQuestions| ItemDataWithQuestions> => {
+const getItemByID = async (id: string, res: Response): Promise<ItemPublicDataWithQuestionsAndRatings| ItemDataWithQuestionsAndRatings> => {
   const item = await prisma.item.findOne({
     where: { id },
-    include: { questions: true }
+    include: { questions: true, ratings: true }
   })
   await prisma.disconnect()
 

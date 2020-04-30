@@ -8,8 +8,8 @@ beforeEach(async () => {
   await populateUsers()
 })
 
-describe('user authorization', () => {
-  test('should signup', async () => {
+describe('User authorization', () => {
+  test('200 signup', async () => {
     const newUser = {
       email: 'customer2@example.com',
       password: '12345678'
@@ -26,7 +26,7 @@ describe('user authorization', () => {
     expect(emails).toContain('customer@example.com')
   })
 
-  test('should fail signup with 400 code if email is not provided', async () => {
+  test('400 signup if no email', async () => {
     const newUser = {
       password: '12345678'
     }
@@ -37,7 +37,7 @@ describe('user authorization', () => {
       .expect(400)
   })
 
-  test('should login and logout with token deletion', async () => {
+  test('302 logout with token deletion', async () => {
     const { token } = await loginAs('customer', api)
 
     const resLogout = await api
@@ -47,10 +47,22 @@ describe('user authorization', () => {
 
     expect(resLogout.header['set-cookie'][0].split('; ')[0].slice(6)).toHaveLength(0)
   })
+
+  test('400 login if invalid password', async () => {
+    const user = {
+      email: 'customer@example.com',
+      password: '123456789'
+    }
+
+    await api
+      .post('/api/users/login')
+      .send(user)
+      .expect(401)
+  })
 })
 
-describe('user fetching', () => {
-  test('should get 403 trying fetch users if not root', async () => {
+describe('User fetching', () => {
+  test('403 users if not root', async () => {
     const { token } = await loginAs('customer', api)
 
     await api
@@ -59,7 +71,7 @@ describe('user fetching', () => {
       .expect(403)
   })
 
-  test('should get 200 trying fetch users if root', async () => {
+  test('200 users if root', async () => {
     const { token } = await loginAs('root', api)
 
     await api
@@ -68,7 +80,7 @@ describe('user fetching', () => {
       .expect(200)
   })
 
-  test('should get public user fields if not logged in', async () => {
+  test('public user if not root', async () => {
     const anotherUser = await getUserByEmail('admin@example.com')
 
     const { body } = await api
@@ -78,7 +90,7 @@ describe('user fetching', () => {
     expect(Object.keys(body)).toHaveLength(3)
   })
 
-  test('should get all user fields if root', async () => {
+  test('full user if root', async () => {
     const { token } = await loginAs('root', api)
 
     const anotherUser = await getUserByEmail('admin@example.com')
@@ -92,8 +104,8 @@ describe('user fetching', () => {
   })
 })
 
-describe('user updating', () => {
-  test('should get 200 when updating own profile', async () => {
+describe('User updating', () => {
+  test('200 if own profile', async () => {
     const { token, id } = await loginAs('customer', api)
 
     const { body } = await api
@@ -106,7 +118,7 @@ describe('user updating', () => {
     expect(body.name).toBe('Jack')
   })
 
-  test('should get 403 when updating another user\'s profile', async () => {
+  test('403 if another user\'s profile', async () => {
     const { token } = await loginAs('customer', api)
 
     const anotherUser = await getUserByEmail('admin@example.com')
