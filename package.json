@@ -1,7 +1,7 @@
 {
   "author": "",
   "dependencies": {
-    "@prisma/client": "^2.0.0-beta.3",
+    "@prisma/client": "^2.0.0-beta.4",
     "bcrypt": "^4.0.1",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
@@ -19,7 +19,7 @@
   },
   "description": "",
   "devDependencies": {
-    "@prisma/cli": "^2.0.0-beta.3",
+    "@prisma/cli": "^2.0.0-beta.4",
     "@types/bcrypt": "^3.0.0",
     "@types/cookie-parser": "^1.4.2",
     "@types/cors": "^2.8.6",
