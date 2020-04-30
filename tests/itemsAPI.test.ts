@@ -2,6 +2,7 @@ import supertest from 'supertest'
 import app from '../src/app'
 import { ItemCreateInputRaw } from '../src/types'
 import { itemsInDB, loginAs, populateUsers } from './testHelper'
+import path from 'path'
 
 const api = supertest(app)
 
@@ -35,7 +36,7 @@ beforeEach(async () => {
 })
 
 describe('Item adding', () => {
-  test('200 adding', async () => {
+  test('200', async () => {
     const { token, id } = await loginAs('root', api)
 
     await api
@@ -50,7 +51,7 @@ describe('Item adding', () => {
     expect(longDescriptions).toContain('Very Cool Item')
   })
 
-  test('400 adding if no price', async () => {
+  test('400 if no price', async () => {
     const { token, id } = await loginAs('root', api)
 
     const newItemWithoutPrice = { ...newItem(id), price: undefined }
@@ -61,10 +62,42 @@ describe('Item adding', () => {
       .send(newItemWithoutPrice)
       .expect(400)
   })
+
+  test('204 upload file if admin or root', async () => {
+    const { token } = await loginAs('admin', api)
+    const { addedItem } = await createOneItem('admin')
+
+    await api
+      .post(`/api/items/${addedItem.id}/upload`)
+      .set('Cookie', `token=${token}`)
+      .attach('itemMedia', path.join(__dirname, 'test-image.png'))
+      .attach('itemMedia', path.join(__dirname, 'test-image2.png'))
+      .expect(204)
+  })
+
+  test('403 upload file if not admin or root', async () => {
+    const { addedItem } = await createOneItem()
+
+    await api
+      .post(`/api/items/${addedItem.id}/upload`)
+      .attach('itemMedia', path.join(__dirname, 'test-image.png'))
+      .attach('itemMedia', path.join(__dirname, 'test-image2.png'))
+      .expect(403)
+  })
+
+  test('400 upload file if no file', async () => {
+    const { token } = await loginAs('admin', api)
+    const { addedItem } = await createOneItem('admin')
+
+    await api
+      .post(`/api/items/${addedItem.id}/upload`)
+      .set('Cookie', `token=${token}`)
+      .expect(400)
+  })
 })
 
 describe('Item fetching', () => {
-  test('200 fetching', async () => {
+  test('200', async () => {
     await createOneItem()
 
     const { body } = await api
@@ -74,7 +107,7 @@ describe('Item fetching', () => {
     expect(body).toBeDefined()
   })
 
-  test('public item if not root', async () => {
+  test('public item if not admin or root', async () => {
     const { addedItem } = await createOneItem()
 
     const { body } = await api
@@ -84,8 +117,8 @@ describe('Item fetching', () => {
     expect(Object.keys(body)).toHaveLength(15)
   })
 
-  test('full tiem if root', async () => {
-    const { addedItem, token } = await createOneItem()
+  test('full item if admin or root', async () => {
+    const { addedItem, token } = await createOneItem('admin')
 
     const { body } = await api
       .get(`/api/items/${addedItem.id}`)

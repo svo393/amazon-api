@@ -1,7 +1,7 @@
 import { ItemUpdateInput, UserCreateInput, UserUpdateInput } from '@prisma/client'
 import R from 'ramda'
 import { ItemCreateInputRaw } from '../types'
-import { hasDefinedProps, isBoolean, isEmail, isInputProvided, isNumber, isPasswordValid, isProvided, isString } from './validatorLib'
+import { hasDefinedProps, isBoolean, isEmail, isImage, isInputProvided, isNumber, isPasswordValid, isProvided, isString, isStringOrArray } from './validatorLib'
 
 const checkNewUser = (object: any): UserCreateInput => {
   const email = R.pipe(
@@ -211,10 +211,18 @@ const checkItemUpdate = (object: any): ItemUpdateInput => {
   return hasDefinedProps(itemInput)
 }
 
+const checkItemMediaUpload = (object: any): Express.Multer.File[] => {
+  isInputProvided(object, 'Missing images')
+  isStringOrArray({ name: 'images', param: object })
+  object.map((item: object) => isImage({ name: 'images', param: item }))
+  return object
+}
+
 export default {
   checkNewUser,
   checkUserLogin,
   checkUserUpdate,
   checkNewItem,
-  checkItemUpdate
+  checkItemUpdate,
+  checkItemMediaUpload
 }

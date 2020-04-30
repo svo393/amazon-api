@@ -37,13 +37,13 @@ describe('User authorization', () => {
       .expect(400)
   })
 
-  test('302 logout with token deletion', async () => {
+  test('204 logout with token deletion', async () => {
     const { token } = await loginAs('customer', api)
 
     const resLogout = await api
       .post('/api/users/logout')
       .set('Cookie', `token=${token}`)
-      .expect(302)
+      .expect(204)
 
     expect(resLogout.header['set-cookie'][0].split('; ')[0].slice(6)).toHaveLength(0)
   })

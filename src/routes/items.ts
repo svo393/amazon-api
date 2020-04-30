@@ -28,4 +28,11 @@ router.put('/:id', async (req, res) => {
   res.json(updatedItem)
 })
 
+router.post('/:id/upload', itemService.multerUpload.array('itemMedia', 10), async (req, res) => {
+  await shield.isAdmin(res)
+  const itemMedia = inputValidator.checkItemMediaUpload(req.files)
+  itemService.uploadImages(itemMedia, req.params.id)
+  res.sendStatus(204)
+})
+
 export default router

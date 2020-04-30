@@ -26,12 +26,12 @@ export const getUserRole = async (res: Response): Promise<Role | null> => {
   })
   await prisma.disconnect()
 
-  if (!user) { throw new StatusError(500, 'Internal Server Error') }
+  if (!user) { throw new StatusError(403, 'Forbidden') }
   return user.role
 }
 
 const isLoggedIn = (res: Response): void => {
-  if (!res.locals.userID) { throw new StatusError(403, 'Forbidden', '/login') }
+  if (!res.locals.userID) { throw new StatusError(403, 'Forbidden') }
 }
 
 const isRoot = async (res: Response): Promise<void> => {

@@ -15,7 +15,8 @@ app.use(helmet())
 
 app.use(cors({
   credentials: true,
-  origin: 'http://localhost:3000'
+  origin: 'http://localhost:3000',
+  optionsSuccessStatus: 200
 }))
 
 app.use(cookieParser())

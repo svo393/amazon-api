@@ -1,9 +1,13 @@
 import { Item, ItemUpdateInput, PrismaClient, Question, Rating } from '@prisma/client'
-import { Response } from 'express'
+import { Response, Request } from 'express'
 import { ItemCreateInputRaw } from '../types'
 import { makeID } from '../utils'
 import { getUserRole } from '../utils/shield'
 import StatusError from '../utils/StatusError'
+import fs from 'fs'
+import path from 'path'
+import sharp from 'sharp'
+import multer from 'multer'
 
 const prisma = new PrismaClient()
 
@@ -90,9 +94,9 @@ const getItemByID = async (id: string, res: Response): Promise<ItemPublicDataWit
   if (!item) { throw new StatusError(404, 'Not Found') }
 
   const role = await getUserRole(res)
-  const userIsRoot = role === 'ROOT'
+  const userIsAdminOrRoot = role === 'ADMIN' || role === 'ROOT'
 
-  if (!userIsRoot) {
+  if (!userIsAdminOrRoot) {
     delete item.createdAt
     delete item.updatedAt
     delete item.userID
@@ -113,9 +117,59 @@ const updateItem = async (itemInput: ItemUpdateInput, id: string): Promise<Item>
   return updatedItem
 }
 
+const storage = multer.diskStorage({
+  destination: './tmp',
+  filename (_req, file, cb) { cb(null, file.originalname) }
+})
+
+const imagePath = './public/uploads'
+const maxWidth = 500
+const maxHeight = 500
+
+const multerUpload = multer({ storage })
+
+const uploadImages = (files: Express.Multer.File[], id: string): void => {
+  files.map(async (file, index) => {
+    const image = sharp(file.path)
+    const info = await image.metadata()
+    const fileName = `${id}_${index}`
+
+    if ((info.width as number) > maxWidth || (info.height as number) > maxHeight) {
+      await image
+        .resize(maxWidth, maxHeight, { fit: 'inside' })
+        .jpeg({ progressive: true })
+        .toFile(
+          path.resolve(imagePath, `${fileName}.jpg`)
+        )
+
+      await image
+        .resize(maxWidth, maxHeight, { fit: 'inside' })
+        .webp()
+        .toFile(
+          path.resolve(imagePath, `${fileName}.webp`)
+        )
+    } else {
+      await image
+        .jpeg({ progressive: true })
+        .toFile(
+          path.resolve(imagePath, `${fileName}.jpg`)
+        )
+
+      await image
+        .webp()
+        .toFile(
+          path.resolve(imagePath, `${fileName}.webp`)
+        )
+    }
+    fs.unlinkSync(file.path)
+  })
+}
+
 export default {
   addItem,
   getItems,
   getItemByID,
-  updateItem
+  updateItem,
+  multerUpload,
+  uploadImages
 }

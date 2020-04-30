@@ -36,16 +36,10 @@ export const errorHandler = (
 ): void => {
   const statusCode = error.statusCode ? error.statusCode : 500
 
-  error.location
-    ? res.status(statusCode).json({
-      status: statusCode,
-      error: error.message,
-      location: error.location
-    })
-    : res.status(statusCode).json({
-      status: statusCode,
-      error: error.message
-    })
+  res.status(statusCode).json({
+    status: statusCode,
+    error: error.message
+  })
 
   next(error)
 }

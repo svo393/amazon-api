@@ -36,7 +36,7 @@ router.post('/login', async (req, res) => {
 router.post('/logout', (_req, res) => {
   shield.isLoggedIn(res)
   res.clearCookie('token')
-  res.status(302).json({ location: '/login' })
+  res.sendStatus(204)
 })
 
 router.get('/', async (_req, res) => {

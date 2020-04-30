@@ -26,14 +26,21 @@ export const hasDefinedProps = (param: object): object => {
   return strippedObject
 }
 
-export const isInputProvided = (param: object): void => {
+export const isInputProvided = (param: object, msg = 'Missing user input'): void => {
   if (R.isEmpty(param)) {
-    throw new StatusError(400, 'Missing user input')
+    throw new StatusError(400, msg)
   }
 }
 
 export const isString: CP = ({ name, param }) => {
   if (typeof (param) !== 'string' && !(param instanceof String)) {
+    throw new StatusError(400, `Incorrect ${name}: ${param}`)
+  }
+  return { name, param }
+}
+
+export const isStringOrArray: CP = ({ name, param }) => {
+  if (typeof (param) !== 'string' && !(param instanceof String) && !Array.isArray(param)) {
     throw new StatusError(400, `Incorrect ${name}: ${param}`)
   }
   return { name, param }
@@ -63,6 +70,13 @@ export const isEmail: CP = ({ param }) => {
 export const isPasswordValid: CP = ({ param }) => {
   if (param.length < 8) {
     throw new StatusError(422, 'Password must be at least 8 characters')
+  }
+  return { param }
+}
+
+export const isImage: CP = ({ param }) => {
+  if (!param.mimetype || ![ 'image/png', 'image/jpeg', 'image/webp' ].includes(param.mimetype)) {
+    throw new StatusError(400, 'Image files only!')
   }
   return { param }
 }
