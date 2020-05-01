@@ -1,7 +1,10 @@
 import { PrismaClient, UserCreateInput, UserGetPayload, UserUpdateInput } from '@prisma/client'
 import bcrypt from 'bcrypt'
+import { randomBytes } from 'crypto'
 import { Response } from 'express'
 import jwt from 'jsonwebtoken'
+import { promisify } from 'util'
+import { PasswordResetInput } from '../types'
 import env from '../utils/config'
 import { getUserRole } from '../utils/shield'
 import StatusError from '../utils/StatusError'
@@ -58,7 +61,6 @@ const addUser = async (userInput: UserCreateInput): Promise<AuthUserPersonalData
       createdAt: true
     }
   })
-
   await prisma.disconnect()
 
   const token = jwt.sign(
@@ -140,9 +142,9 @@ const getUsers = async (): Promise<Omit<UserPersonalData, 'cart'>[]> => {
 
 const getUserByID = async (id: string, res: Response): Promise<UserPersonalData | UserPublicData> => {
   const role = await getUserRole(res)
-  const userIsRoot = role === 'ROOT'
+  const userHasPermission = role === 'ROOT' || res.locals.userID === id
 
-  const fieldSet = userIsRoot
+  const fieldSet = userHasPermission
     ? {
       id: true,
       name: true,
@@ -168,7 +170,7 @@ const getUserByID = async (id: string, res: Response): Promise<UserPersonalData 
     throw new StatusError(404, 'Not Found')
   }
 
-  if (userIsRoot) {
+  if (userHasPermission) {
     const cartItems = await prisma.cartItem.findMany({
       where: { user: { id } },
       include: { item: true }
@@ -211,10 +213,84 @@ const updateUser = async (userInput: UserUpdateInput, id: string): Promise<UserP
   }
 }
 
+const sendPasswordReset = async (email: string): Promise<void> => {
+  const user = await prisma.user.findOne({ where: { email } })
+  if (!user) { throw new StatusError(401, 'Invalid email') }
+
+  const resetToken = (await promisify(randomBytes)(20)).toString('hex')
+  const resetTokenExpiry = (Date.now() + 1000 * 60 * 60).toString()
+
+  await prisma.user.update({
+    where: { email },
+    data: { resetToken, resetTokenExpiry }
+  })
+  await prisma.disconnect()
+
+  try {
+    // await transport.sendMail({
+    //   from: 'ecom@example.com',
+    //   to: email,
+    //   subject: 'Your Password Reset Token',
+    //   html: makeANiceEmail(`Your Password Reset Token is Here!
+    //       <br/>
+    //       <a href="${env.BASE_URL}/reset-password?resetToken=${resetToken}">
+    //         Click Here to Reset
+    //       </a>`)
+    // })
+  } catch (_err) {
+    throw new StatusError(500, 'Error requesting password reset. Please try again later.')
+  }
+}
+
+const resetPassword = async ({ password, resetToken }: PasswordResetInput): Promise<AuthUserPersonalData> => {
+  const user = await prisma.user.findOne({
+    where: { resetToken },
+    select: { id: true, resetTokenExpiry: true }
+  })
+
+  if (!user?.resetTokenExpiry || parseInt(user.resetTokenExpiry) < Date.now()) {
+    await prisma.disconnect()
+    throw new StatusError(401, 'Reset token is invalid or expired')
+  }
+
+  const passwordHash = await bcrypt.hash(password, 10)
+
+  const updatedUser = await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      resetToken: null,
+      resetTokenExpiry: null,
+      password: passwordHash
+    }
+  })
+
+  const cartItems = await prisma.cartItem.findMany({
+    where: { user: { id: updatedUser.id } },
+    include: { item: true }
+  })
+  await prisma.disconnect()
+
+  const token = jwt.sign(
+    { userID: updatedUser.id },
+    env.JWT_SECRET,
+    { expiresIn: '30d' }
+  )
+
+  delete updatedUser.password
+
+  return {
+    ...updatedUser,
+    cart: cartItems,
+    token
+  }
+}
+
 export default {
   addUser,
   getUsers,
   getUserByID,
   loginUser,
-  updateUser
+  updateUser,
+  sendPasswordReset,
+  resetPassword
 }

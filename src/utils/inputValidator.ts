@@ -1,6 +1,6 @@
 import { ItemUpdateInput, UserCreateInput, UserUpdateInput } from '@prisma/client'
 import R from 'ramda'
-import { ItemCreateInputRaw } from '../types'
+import { ItemCreateInputRaw, PasswordResetInput } from '../types'
 import { hasDefinedProps, isBoolean, isEmail, isImage, isInputProvided, isNumber, isPasswordValid, isProvided, isString, isStringOrArray } from './validatorLib'
 
 const checkNewUser = (object: any): UserCreateInput => {
@@ -17,7 +17,7 @@ const checkNewUser = (object: any): UserCreateInput => {
   )({ name: 'password', param: object.password })
 
   return {
-    email: email.param,
+    email: email.param.toLowerCase(),
     password: password.param
   }
 }
@@ -35,7 +35,35 @@ const checkUserLogin = (object: any): UserCreateInput => {
   )({ name: 'password', param: object.password })
 
   return {
-    email: email.param,
+    email: email.param.toLowerCase(),
+    password: password.param
+  }
+}
+
+const checkUserResetRequest = (object: any): string => {
+  const email = R.pipe(
+    isProvided,
+    isString,
+    isEmail
+  )({ name: 'email', param: object.email })
+
+  return email.param.toLowerCase()
+}
+
+const checkUserResetToken = (object: any): PasswordResetInput => {
+  const resetToken = R.pipe(
+    isProvided,
+    isString
+  )({ name: 'resetToken', param: object.resetToken })
+
+  const password = R.pipe(
+    isProvided,
+    isString,
+    isPasswordValid
+  )({ name: 'password', param: object.password })
+
+  return {
+    resetToken: resetToken.param,
     password: password.param
   }
 }
@@ -222,6 +250,8 @@ export default {
   checkNewUser,
   checkUserLogin,
   checkUserUpdate,
+  checkUserResetRequest,
+  checkUserResetToken,
   checkNewItem,
   checkItemUpdate,
   checkItemMediaUpload

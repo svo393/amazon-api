@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
 import env from './config'
+import logger from './logger'
 import StatusError from './StatusError'
 
 type Middleware = (
@@ -35,6 +36,7 @@ export const errorHandler = (
   error: StatusError, _req: Request, res: Response, next: NextFunction
 ): void => {
   const statusCode = error.statusCode ? error.statusCode : 500
+  env.NODE_ENV === 'test' && logger.error(error)
 
   res.status(statusCode).json({
     status: statusCode,

@@ -5,6 +5,7 @@ import { itemsInDB, loginAs, populateUsers } from './testHelper'
 import path from 'path'
 
 const api = supertest(app)
+const apiURL = '/api/items'
 
 const newItem = (id: string): ItemCreateInputRaw => ({
   name: 'New Item',
@@ -24,7 +25,7 @@ const createOneItem = async (role = 'root'): Promise<any> => {
   const { token, id } = await loginAs(role, api)
 
   const { body } = await api
-    .post('/api/items')
+    .post(apiURL)
     .set('Cookie', `token=${token}`)
     .send(newItem(id))
 
@@ -40,7 +41,7 @@ describe('Item adding', () => {
     const { token, id } = await loginAs('root', api)
 
     await api
-      .post('/api/items')
+      .post(apiURL)
       .set('Cookie', `token=${token}`)
       .send(newItem(id))
       .expect(201)
@@ -57,7 +58,7 @@ describe('Item adding', () => {
     const newItemWithoutPrice = { ...newItem(id), price: undefined }
 
     await api
-      .post('/api/items')
+      .post(apiURL)
       .set('Cookie', `token=${token}`)
       .send(newItemWithoutPrice)
       .expect(400)
@@ -68,7 +69,7 @@ describe('Item adding', () => {
     const { addedItem } = await createOneItem('admin')
 
     await api
-      .post(`/api/items/${addedItem.id}/upload`)
+      .post(`${apiURL}/${addedItem.id}/upload`)
       .set('Cookie', `token=${token}`)
       .attach('itemMedia', path.join(__dirname, 'test-image.png'))
       .attach('itemMedia', path.join(__dirname, 'test-image2.png'))
@@ -79,7 +80,7 @@ describe('Item adding', () => {
     const { addedItem } = await createOneItem()
 
     await api
-      .post(`/api/items/${addedItem.id}/upload`)
+      .post(`${apiURL}/${addedItem.id}/upload`)
       .attach('itemMedia', path.join(__dirname, 'test-image.png'))
       .attach('itemMedia', path.join(__dirname, 'test-image2.png'))
       .expect(403)
@@ -90,7 +91,7 @@ describe('Item adding', () => {
     const { addedItem } = await createOneItem('admin')
 
     await api
-      .post(`/api/items/${addedItem.id}/upload`)
+      .post(`${apiURL}/${addedItem.id}/upload`)
       .set('Cookie', `token=${token}`)
       .expect(400)
   })
@@ -101,7 +102,7 @@ describe('Item fetching', () => {
     await createOneItem()
 
     const { body } = await api
-      .get('/api/items')
+      .get(apiURL)
       .expect(200)
 
     expect(body).toBeDefined()
@@ -111,7 +112,7 @@ describe('Item fetching', () => {
     const { addedItem } = await createOneItem()
 
     const { body } = await api
-      .get(`/api/items/${addedItem.id}`)
+      .get(`${apiURL}/${addedItem.id}`)
       .expect(200)
 
     expect(Object.keys(body)).toHaveLength(15)
@@ -121,7 +122,7 @@ describe('Item fetching', () => {
     const { addedItem, token } = await createOneItem('admin')
 
     const { body } = await api
-      .get(`/api/items/${addedItem.id}`)
+      .get(`${apiURL}/${addedItem.id}`)
       .set('Cookie', `token=${token}`)
       .expect(200)
 
@@ -134,7 +135,7 @@ describe('Item updating', () => {
     const { addedItem, token } = await createOneItem()
 
     const { body } = await api
-      .put(`/api/items/${addedItem.id}`)
+      .put(`${apiURL}/${addedItem.id}`)
       .set('Cookie', `token=${token}`)
       .send({ name: 'Updated Item' })
       .expect(200)
@@ -147,7 +148,7 @@ describe('Item updating', () => {
     const { addedItem: anotherAddedItem } = await createOneItem()
 
     await api
-      .put(`/api/items/${anotherAddedItem.id}`)
+      .put(`${apiURL}/${anotherAddedItem.id}`)
       .set('Cookie', `token=${token}`)
       .send({ name: 'Updated Item' })
       .expect(403)

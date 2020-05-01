@@ -11,3 +11,8 @@ export type ItemCreateInputRaw = {
   category: string;
   vendor: string;
 }
+
+export type PasswordResetInput = {
+  password: string;
+  resetToken: string;
+}

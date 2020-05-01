@@ -3,6 +3,7 @@ import app from '../src/app'
 import { populateUsers, usersInDB, getUserByEmail, loginAs } from './testHelper'
 
 const api = supertest(app)
+const apiURL = '/api/users'
 
 beforeEach(async () => {
   await populateUsers()
@@ -16,7 +17,7 @@ describe('User authorization', () => {
     }
 
     await api
-      .post('/api/users')
+      .post(apiURL)
       .send(newUser)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -32,7 +33,7 @@ describe('User authorization', () => {
     }
 
     await api
-      .post('/api/users')
+      .post(apiURL)
       .send(newUser)
       .expect(400)
   })
@@ -41,7 +42,7 @@ describe('User authorization', () => {
     const { token } = await loginAs('customer', api)
 
     const resLogout = await api
-      .post('/api/users/logout')
+      .post(`${apiURL}/logout`)
       .set('Cookie', `token=${token}`)
       .expect(204)
 
@@ -55,7 +56,7 @@ describe('User authorization', () => {
     }
 
     await api
-      .post('/api/users/login')
+      .post(`${apiURL}/login`)
       .send(user)
       .expect(401)
   })
@@ -66,7 +67,7 @@ describe('User fetching', () => {
     const { token } = await loginAs('customer', api)
 
     await api
-      .get('/api/users')
+      .get(apiURL)
       .set('Cookie', `token=${token}`)
       .expect(403)
   })
@@ -75,7 +76,7 @@ describe('User fetching', () => {
     const { token } = await loginAs('root', api)
 
     await api
-      .get('/api/users')
+      .get(apiURL)
       .set('Cookie', `token=${token}`)
       .expect(200)
   })
@@ -84,7 +85,7 @@ describe('User fetching', () => {
     const anotherUser = await getUserByEmail('admin@example.com')
 
     const { body } = await api
-      .get(`/api/users/${anotherUser.id}`)
+      .get(`${apiURL}/${anotherUser.id}`)
       .expect(200)
 
     expect(Object.keys(body)).toHaveLength(3)
@@ -96,7 +97,18 @@ describe('User fetching', () => {
     const anotherUser = await getUserByEmail('admin@example.com')
 
     const { body } = await api
-      .get(`/api/users/${anotherUser.id}`)
+      .get(`${apiURL}/${anotherUser.id}`)
+      .set('Cookie', `token=${token}`)
+      .expect(200)
+
+    expect(Object.keys(body)).toHaveLength(7)
+  })
+
+  test('full user if own profile', async () => {
+    const { token } = await loginAs('customer', api)
+
+    const { body } = await api
+      .get(`${apiURL}/me`)
       .set('Cookie', `token=${token}`)
       .expect(200)
 
@@ -109,7 +121,7 @@ describe('User updating', () => {
     const { token, id } = await loginAs('customer', api)
 
     const { body } = await api
-      .put(`/api/users/${id}`)
+      .put(`${apiURL}/${id}`)
       .set('Cookie', `token=${token}`)
       .send({ name: 'Jack' })
       .expect(200)
@@ -124,10 +136,17 @@ describe('User updating', () => {
     const anotherUser = await getUserByEmail('admin@example.com')
 
     await api
-      .put(`/api/users/${anotherUser.id}`)
+      .put(`${apiURL}/${anotherUser.id}`)
       .set('Cookie', `token=${token}`)
       .send({ name: 'Jack' })
       .expect(403)
+  })
+
+  test('204 password reset request', async () => {
+    await api
+      .post(`${apiURL}/request-password-reset`)
+      .send({ email: 'customer@example.com' })
+      .expect(204)
   })
 })
 // describe('when there is initially some notes saved', () => {
@@ -252,7 +271,7 @@ describe('User updating', () => {
 //     }
 
 //     await api
-//       .post('/api/users')
+//       .post(apiURL)
 //       .send(newUser)
 //       .expect(201)
 //       .expect('Content-Type', /application\/json/)
@@ -274,7 +293,7 @@ describe('User updating', () => {
 //     }
 
 //     const result = await api
-//       .post('/api/users')
+//       .post(apiURL)
 //       .send(newUser)
 //       .expect(400)
 //       .expect('Content-Type', 'text/html; charset=utf-8')
