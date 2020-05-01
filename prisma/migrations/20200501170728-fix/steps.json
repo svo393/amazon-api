@@ -1,0 +1,77 @@
+{
+  "version": "0.3.14-fixed",
+  "steps": [
+    {
+      "tag": "CreateField",
+      "model": "Item",
+      "field": "cartItems",
+      "type": "CartItem",
+      "arity": "List"
+    },
+    {
+      "tag": "DeleteField",
+      "model": "Item",
+      "field": "CartItem"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Vendor",
+      "field": "items",
+      "type": "Item",
+      "arity": "List"
+    },
+    {
+      "tag": "DeleteField",
+      "model": "Vendor",
+      "field": "Item"
+    },
+    {
+      "tag": "CreateField",
+      "model": "User",
+      "field": "ratings",
+      "type": "Rating",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "User",
+      "field": "ratingComments",
+      "type": "RatingComment",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "User",
+      "field": "answers",
+      "type": "Answer",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "User",
+      "field": "answerCommenta",
+      "type": "AnswerComment",
+      "arity": "List"
+    },
+    {
+      "tag": "DeleteField",
+      "model": "User",
+      "field": "Rating"
+    },
+    {
+      "tag": "DeleteField",
+      "model": "User",
+      "field": "RatingComment"
+    },
+    {
+      "tag": "DeleteField",
+      "model": "User",
+      "field": "Answer"
+    },
+    {
+      "tag": "DeleteField",
+      "model": "User",
+      "field": "AnswerComment"
+    }
+  ]
+}

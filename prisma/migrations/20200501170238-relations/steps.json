@@ -1,0 +1,86 @@
+{
+  "version": "0.3.14-fixed",
+  "steps": [
+    {
+      "tag": "CreateField",
+      "model": "Item",
+      "field": "CartItem",
+      "type": "CartItem",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Category",
+      "field": "items",
+      "type": "Item",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Category",
+      "field": "children",
+      "type": "Category",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Category",
+          "field": "children"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Category",
+          "field": "children"
+        },
+        "directive": "relation"
+      },
+      "argument": "",
+      "value": "\"CategoryToCategory\""
+    },
+    {
+      "tag": "CreateField",
+      "model": "Vendor",
+      "field": "Item",
+      "type": "Item",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "User",
+      "field": "Rating",
+      "type": "Rating",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "User",
+      "field": "RatingComment",
+      "type": "RatingComment",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "User",
+      "field": "Answer",
+      "type": "Answer",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "User",
+      "field": "AnswerComment",
+      "type": "AnswerComment",
+      "arity": "List"
+    }
+  ]
+}

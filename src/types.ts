@@ -1,31 +1,28 @@
 import { Item, Question, Rating } from '@prisma/client'
 
-export type ItemCreateInputRaw = {
-  name: string;
-  price: number;
-  shortDescription: string;
-  longDescription: string;
-  stock: number;
-  asin: string;
-  media: number;
-  primaryMedia: number;
-  user: string;
-  category: string;
-  vendor: string;
-}
-
-export type ItemPublicData = Omit<Item, 'createdAt' | 'updatedAt' | 'userID'>
-
-export type ItemDataWithQuestionsAndRatings = Item & {
+export type ItemAllData = Item & {
   questions: Question[];
   ratings: Rating[];
 }
 
-export type ItemPublicDataWithQuestionsAndRatings = Omit<ItemDataWithQuestionsAndRatings, 'createdAt' | 'updatedAt' | 'userID'>
+export type ItemPublicData = Omit<ItemAllData,
+  | 'createdAt'
+  | 'updatedAt'
+  | 'userID'
+>
 
-export type CategoryCreateInputRaw = {
-  name: string;
-  parent?: string;
+export type ItemCreateInputRaw = Omit<Item,
+  | 'createdAt'
+  | 'updatedAt'
+  | 'stars'
+  | 'id'
+  | 'userID'
+  | 'categoryName'
+  | 'vendorName'
+> & {
+  user: string;
+  category: string;
+  vendor: string;
 }
 
 export type PasswordResetInput = {

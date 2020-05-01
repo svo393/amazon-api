@@ -1,6 +1,6 @@
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url = "***"
 }
 
 generator client {
@@ -29,7 +29,7 @@ model Item {
   categoryName     String
   vendor           Vendor     @relation(fields: [vendorName], references: [name])
   vendorName       String
-  cartItems        CartItem[]
+  CartItem         CartItem[]
 }
 
 model Category {
@@ -42,9 +42,9 @@ model Category {
 }
 
 model Vendor {
-  id    String @default(cuid()) @id
-  name  String @unique
-  items Item[]
+  id   String @default(cuid()) @id
+  name String @unique
+  Item Item[]
 }
 
 model User {
@@ -61,10 +61,10 @@ model User {
   items            Item[]
   orders           Order[]
   orderItems       OrderItem[]
-  ratings          Rating[]
-  ratingComments   RatingComment[]
-  answers          Answer[]
-  answerComments   AnswerComment[]
+  Rating           Rating[]
+  RatingComment    RatingComment[]
+  Answer           Answer[]
+  AnswerComment    AnswerComment[]
 }
 
 model CartItem {

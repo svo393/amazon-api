@@ -1,38 +1,32 @@
 import Router from 'express'
-import itemService from '../services/itemService'
+import categoryService from '../services/categoryService'
 import inputValidator from '../utils/inputValidator'
 import shield from '../utils/shield'
 
 const router = Router()
 
-// router.post('/', async (req, res) => {
-//   const categoryInput = inputValidator.checkNewCategory(req.body)
-//   const addedCategory = await categoryService.addCategory(categoryInput)
-//   res.status(201).json(addedCategory)
-// })
+router.post('/', async (req, res) => {
+  await shield.isAdmin(res)
+  const categoryInput = inputValidator.checkNewCategory(req.body)
+  const addedCategory = await categoryService.addCategory(categoryInput)
+  res.status(201).json(addedCategory)
+})
 
-// router.get('/', async (_req, res) => {
-//   const items = await itemService.getItems()
-//   res.json(items)
-// })
+router.get('/', async (_req, res) => {
+  const categories = await categoryService.getCategories()
+  res.json(categories)
+})
 
-// router.get('/:id', async (req, res) => {
-//   const item = await itemService.getItemByID(req.params.id, res)
-//   res.json(item)
-// })
+router.get('/:id', async (req, res) => {
+  const category = await categoryService.getCategoryByID(req.params.id, res)
+  res.json(category)
+})
 
-// router.put('/:id', async (req, res) => {
-//   await shield.isCreator(res, 'item', req.params.id)
-//   const itemInput = inputValidator.checkItemUpdate(req.body)
-//   const updatedItem = await itemService.updateItem(itemInput, req.params.id)
-//   res.json(updatedItem)
-// })
-
-// router.post('/:id/upload', itemService.multerUpload.array('itemMedia', 10), async (req, res) => {
-//   await shield.isAdmin(res)
-//   const itemMedia = inputValidator.checkItemMediaUpload(req.files)
-//   itemService.uploadImages(itemMedia, req.params.id)
-//   res.sendStatus(204)
-// })
+router.put('/:id', async (req, res) => {
+  await shield.isAdmin(res)
+  const categoryInput = inputValidator.checkCategoryUpdate(req.body)
+  const updatedItem = await categoryService.updateCategory(categoryInput, req.params.id)
+  res.json(updatedItem)
+})
 
 export default router

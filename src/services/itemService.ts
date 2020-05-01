@@ -3,31 +3,21 @@ import { Response } from 'express'
 import fs from 'fs'
 import multer from 'multer'
 import path from 'path'
+import R from 'ramda'
 import sharp from 'sharp'
-import { ItemCreateInputRaw, ItemDataWithQuestionsAndRatings, ItemPublicData, ItemPublicDataWithQuestionsAndRatings } from '../types'
+import { ItemAllData, ItemCreateInputRaw, ItemPublicData } from '../types'
 import { makeID } from '../utils'
 import { getUserRole } from '../utils/shield'
 import StatusError from '../utils/StatusError'
 
 const prisma = new PrismaClient()
 
-const ItemPublicFields = {
-  id: true,
-  name: true,
-  price: true,
-  shortDescription: true,
-  longDescription: true,
-  stock: true,
-  stars: true,
-  asin: true,
-  media: true,
-  primaryMedia: true,
-  isAvailable: true,
-  categoryName: true,
-  vendorName: true
+const itemFieldSet = {
+  questions: true,
+  ratings: true
 }
 
-const addItem = async (itemInput: ItemCreateInputRaw): Promise<ItemPublicDataWithQuestionsAndRatings> => {
+const addItem = async (itemInput: ItemCreateInputRaw): Promise<ItemPublicData> => {
   const items = await prisma.item.findMany({ select: { id: true } })
   const itemIDs = items.map((item) => item.id)
   let id = makeID(7)
@@ -55,30 +45,32 @@ const addItem = async (itemInput: ItemCreateInputRaw): Promise<ItemPublicDataWit
       category: { connect: { id: category.id } },
       vendor: { connect: { id: vendor.id } }
     },
-    include: { questions: true, ratings: true }
+    include: itemFieldSet
   })
 
   await prisma.disconnect()
 
-  delete addedItem.createdAt
-  delete addedItem.updatedAt
-  delete addedItem.userID
+  const itemData = R.omit([
+    'createdAt',
+    'updatedAt',
+    'userID'
+  ], addedItem)
 
-  return addedItem
+  return itemData
 }
 
 const getItems = async (): Promise<ItemPublicData[]> => {
   const items = await prisma.item.findMany({
-    select: ItemPublicFields
+    include: itemFieldSet
   })
   await prisma.disconnect()
   return items
 }
 
-const getItemByID = async (id: string, res: Response): Promise<ItemPublicDataWithQuestionsAndRatings| ItemDataWithQuestionsAndRatings> => {
+const getItemByID = async (id: string, res: Response): Promise<ItemPublicData| ItemAllData> => {
   const item = await prisma.item.findOne({
     where: { id },
-    include: { questions: true, ratings: true }
+    include: itemFieldSet
   })
   await prisma.disconnect()
 
@@ -87,13 +79,15 @@ const getItemByID = async (id: string, res: Response): Promise<ItemPublicDataWit
   const role = await getUserRole(res)
   const userIsAdminOrRoot = role === 'ADMIN' || role === 'ROOT'
 
-  if (!userIsAdminOrRoot) {
-    delete item.createdAt
-    delete item.updatedAt
-    delete item.userID
-  }
+  const itemData = userIsAdminOrRoot
+    ? item
+    : R.omit([
+      'createdAt',
+      'updatedAt',
+      'userID'
+    ], item)
 
-  return item
+  return itemData
 }
 
 const updateItem = async (itemInput: ItemUpdateInput, id: string): Promise<Item> => {

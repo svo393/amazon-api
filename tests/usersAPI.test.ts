@@ -10,7 +10,7 @@ beforeEach(async () => {
 })
 
 describe('User authorization', () => {
-  test('200 signup', async () => {
+  test('201 signup', async () => {
     const newUser = {
       email: 'customer2@example.com',
       password: '12345678'
@@ -88,7 +88,7 @@ describe('User fetching', () => {
       .get(`${apiURL}/${anotherUser.id}`)
       .expect(200)
 
-    expect(Object.keys(body)).toHaveLength(3)
+    expect(Object.keys(body)).toHaveLength(7)
   })
 
   test('full user if root', async () => {
@@ -101,7 +101,7 @@ describe('User fetching', () => {
       .set('Cookie', `token=${token}`)
       .expect(200)
 
-    expect(Object.keys(body)).toHaveLength(7)
+    expect(Object.keys(body)).toHaveLength(14)
   })
 
   test('full user if own profile', async () => {
@@ -112,7 +112,7 @@ describe('User fetching', () => {
       .set('Cookie', `token=${token}`)
       .expect(200)
 
-    expect(Object.keys(body)).toHaveLength(7)
+    expect(Object.keys(body)).toHaveLength(14)
   })
 })
 
@@ -126,7 +126,7 @@ describe('User updating', () => {
       .send({ name: 'Jack' })
       .expect(200)
 
-    expect(Object.keys(body)).toHaveLength(7)
+    expect(Object.keys(body)).toHaveLength(14)
     expect(body.name).toBe('Jack')
   })
 

@@ -40,7 +40,7 @@ router.post('/logout', (_req, res) => {
 })
 
 router.get('/', async (_req, res) => {
-  await shield.isRoot(res)
+  await shield.isAdmin(res)
   const users = await userService.getUsers()
   res.json(users)
 })

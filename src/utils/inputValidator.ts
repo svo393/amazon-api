@@ -1,6 +1,6 @@
-import { ItemUpdateInput, UserCreateInput, UserUpdateInput } from '@prisma/client'
+import { CategoryCreateInput, CategoryUpdateInput, ItemUpdateInput, UserCreateInput, UserUpdateInput } from '@prisma/client'
 import R from 'ramda'
-import { ItemCreateInputRaw, PasswordResetInput, CategoryCreateInputRaw } from '../types'
+import { ItemCreateInputRaw, PasswordResetInput } from '../types'
 import { hasDefinedProps, isBoolean, isEmail, isImage, isInputProvided, isNumber, isPasswordValid, isProvided, isString, isStringOrArray } from './validatorLib'
 
 const checkNewUser = (object: any): UserCreateInput => {
@@ -140,6 +140,11 @@ const checkNewItem = (object: any): ItemCreateInputRaw => {
     isNumber
   )({ name: 'primaryMedia', param: object.primaryMedia })
 
+  const isAvailable = R.pipe(
+    isProvided,
+    isBoolean
+  )({ name: 'isAvailable', param: object.isAvailable })
+
   const user = R.pipe(
     isProvided,
     isString
@@ -161,6 +166,7 @@ const checkNewItem = (object: any): ItemCreateInputRaw => {
     shortDescription: shortDescription.param,
     longDescription: longDescription.param,
     stock: stock.param,
+    isAvailable: isAvailable.param,
     asin: asin.param,
     media: media.param,
     primaryMedia: primaryMedia.param,
@@ -246,7 +252,7 @@ const checkItemMediaUpload = (object: any): Express.Multer.File[] => {
   return object
 }
 
-const checkNewCategory = (object: any): CategoryCreateInputRaw => {
+const checkNewCategory = (object: any): CategoryCreateInput => {
   const name = R.pipe(
     isProvided,
     isString
@@ -256,10 +262,31 @@ const checkNewCategory = (object: any): CategoryCreateInputRaw => {
     { name: 'parent', param: object.parent }
   )
 
-  return {
+  const categoryInput = {
     name: name.param,
     parent: parent?.param
   }
+
+  return hasDefinedProps(categoryInput) as CategoryCreateInput
+}
+
+const checkCategoryUpdate = (object: any): CategoryUpdateInput => {
+  isInputProvided(object)
+
+  const name = object.name && isString(
+    { name: 'name', param: object.name }
+  )
+
+  const parent = object.parent && isNumber(
+    { name: 'parent', param: object.parent }
+  )
+
+  const categoryInput = {
+    name: name?.param,
+    parent: parent?.param
+  }
+
+  return hasDefinedProps(categoryInput)
 }
 
 export default {
@@ -271,5 +298,6 @@ export default {
   checkNewItem,
   checkItemUpdate,
   checkItemMediaUpload,
-  checkNewCategory
+  checkNewCategory,
+  checkCategoryUpdate
 }

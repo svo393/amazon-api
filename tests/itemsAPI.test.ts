@@ -1,8 +1,8 @@
+import path from 'path'
 import supertest from 'supertest'
 import app from '../src/app'
-import { ItemCreateInputRaw, ItemPublicDataWithQuestionsAndRatings } from '../src/types'
+import { ItemCreateInputRaw, ItemPublicData } from '../src/types'
 import { itemsInDB, loginAs, populateUsers } from './testHelper'
-import path from 'path'
 
 const api = supertest(app)
 const apiURL = '/api/items'
@@ -13,6 +13,7 @@ const newItem = (id: string): ItemCreateInputRaw => ({
   shortDescription: 'Cool Item',
   longDescription: 'Very Cool Item',
   stock: 34,
+  isAvailable: true,
   asin: (new Date().getTime()).toString(),
   media: 5,
   primaryMedia: 0,
@@ -21,7 +22,7 @@ const newItem = (id: string): ItemCreateInputRaw => ({
   vendor: 'Demix'
 })
 
-const createOneItem = async (role: string): Promise<{addedItem: ItemPublicDataWithQuestionsAndRatings; token: string}> => {
+const createOneItem = async (role: string): Promise<{addedItem: ItemPublicData; token: string}> => {
   const { token, id } = await loginAs(role, api)
 
   const { body } = await api
@@ -37,7 +38,7 @@ beforeEach(async () => {
 })
 
 describe('Item adding', () => {
-  test('200', async () => {
+  test('201', async () => {
     const { token, id } = await loginAs('root', api)
 
     await api

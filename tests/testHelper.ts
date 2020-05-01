@@ -20,11 +20,12 @@ export const root = {
   password: '12345678'
 }
 
-export const populateUsers = async (): Promise<string | void> => {
+export const populateUsers = async (): Promise<void> => {
   try {
     await prisma.item.deleteMany({})
+    await prisma.category.deleteMany({})
     await prisma.user.deleteMany({})
-    const userData = await userService.addUser(user)
+    await userService.addUser(user)
 
     await userService.addUser(admin)
 
@@ -40,7 +41,6 @@ export const populateUsers = async (): Promise<string | void> => {
       data: { role: 'ROOT' }
     })
     await prisma.disconnect()
-    return userData.id
   } catch (err) {
     console.error(err)
   }

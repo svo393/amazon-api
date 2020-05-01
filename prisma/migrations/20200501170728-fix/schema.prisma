@@ -1,6 +1,6 @@
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url = "***"
 }
 
 generator client {
@@ -64,7 +64,7 @@ model User {
   ratings          Rating[]
   ratingComments   RatingComment[]
   answers          Answer[]
-  answerComments   AnswerComment[]
+  answerCommenta   AnswerComment[]
 }
 
 model CartItem {

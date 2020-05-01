@@ -1,3 +1,4 @@
+import { CategoryCreateInput } from '@prisma/client'
 import supertest from 'supertest'
 import app from '../src/app'
 import { categoriesInDB, loginAs, populateUsers } from './testHelper'
@@ -5,9 +6,9 @@ import { categoriesInDB, loginAs, populateUsers } from './testHelper'
 const api = supertest(app)
 const apiURL = '/api/categories'
 
-const newCategory = {
+const newCategory = (): CategoryCreateInput => ({
   name: `New Category ${(new Date().getTime()).toString()}`
-}
+})
 
 const createOneCategory = async (role: string): Promise<any> => {
   const { token } = await loginAs(role, api)
@@ -15,7 +16,7 @@ const createOneCategory = async (role: string): Promise<any> => {
   const { body } = await api
     .post(apiURL)
     .set('Cookie', `token=${token}`)
-    .send(newCategory)
+    .send(newCategory())
 
   return { addedCategory: body, token }
 }
@@ -25,65 +26,71 @@ beforeEach(async () => {
 })
 
 describe('Category adding', () => {
-  test.only('200', async () => {
+  test('201', async () => {
     const { token } = await loginAs('root', api)
 
     await api
       .post(apiURL)
       .set('Cookie', `token=${token}`)
-      .send(newCategory)
+      .send(newCategory())
       .expect(201)
       .expect('Content-Type', /application\/json/)
 
     const categoriesAtEnd = await categoriesInDB()
-    const longDescriptions = categoriesAtEnd.map((c) => c.name)
-    expect(longDescriptions).toContain('Very Cool Category')
+    expect(categoriesAtEnd).toHaveLength(1)
   })
 
-  // test('403 if not admin or root', async () => {
-  //   const { addedItem } = await createOneItem()
-
-  //   await api
-  //     .post(`${apiURL}/${addedItem.id}/upload`)
-  //     .attach('itemMedia', path.join(__dirname, 'test-image.png'))
-  //     .attach('itemMedia', path.join(__dirname, 'test-image2.png'))
-  //     .expect(403)
-  // })
+  test('403 if not admin or root', async () => {
+    await api
+      .post(apiURL)
+      .send(newCategory())
+      .expect(403)
+  })
 })
 
-// describe('Item fetching', () => {
-//   test('200', async () => {
-//     await createOneItem()
+describe('Category fetching', () => {
+  test('200 categories', async () => {
+    await createOneCategory('admin')
 
-//     const { body } = await api
-//       .get(apiURL)
-//       .expect(200)
+    const { body } = await api
+      .get(apiURL)
+      .expect(200)
 
-//     expect(body).toBeDefined()
-//   })
-// })
+    expect(body).toBeDefined()
+  })
 
-// describe('Item updating', () => {
-//   test('200 if admin or root', async () => {
-//     const { addedItem, token } = await createOneItem()
+  test('200 category', async () => {
+    const { addedCategory } = await createOneCategory('admin')
 
-//     const { body } = await api
-//       .put(`${apiURL}/${addedItem.id}`)
-//       .set('Cookie', `token=${token}`)
-//       .send({ name: 'Updated Item' })
-//       .expect(200)
+    const { body } = await api
+      .get(`${apiURL}/${addedCategory.id}`)
+      .expect(200)
 
-//     expect(body.name).toBe('Updated Item')
-//   })
+    expect(body).toBeDefined()
+  })
+})
 
-//   test('403 if not admin or root', async () => {
-//     const { token } = await createOneItem('admin')
-//     const { addedItem: anotherAddedItem } = await createOneItem()
+describe('Category updating', () => {
+  test('200 if admin or root', async () => {
+    const { addedCategory, token } = await createOneCategory('admin')
 
-//     await api
-//       .put(`${apiURL}/${anotherAddedItem.id}`)
-//       .set('Cookie', `token=${token}`)
-//       .send({ name: 'Updated Item' })
-//       .expect(403)
-//   })
-// })
+    const { body } = await api
+      .put(`${apiURL}/${addedCategory.id}`)
+      .set('Cookie', `token=${token}`)
+      .send({ name: 'Updated Category' })
+      .expect(200)
+
+    expect(body.name).toBe('Updated Category')
+  })
+
+  test('403 if not admin or root', async () => {
+    const { addedCategory } = await createOneCategory('admin')
+    const { token } = await createOneCategory('customer')
+
+    await api
+      .put(`${apiURL}/${addedCategory.id}`)
+      .set('Cookie', `token=${token}`)
+      .send({ name: 'Updated Category' })
+      .expect(403)
+  })
+})
