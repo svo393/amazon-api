@@ -49,7 +49,7 @@ describe('User authorization', () => {
     expect(resLogout.header['set-cookie'][0].split('; ')[0].slice(6)).toHaveLength(0)
   })
 
-  test('400 login if invalid password', async () => {
+  test('401 login if invalid password', async () => {
     const user = {
       email: 'customer@example.com',
       password: '123456789'

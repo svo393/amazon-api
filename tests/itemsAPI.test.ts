@@ -1,6 +1,6 @@
 import supertest from 'supertest'
 import app from '../src/app'
-import { ItemCreateInputRaw } from '../src/types'
+import { ItemCreateInputRaw, ItemPublicDataWithQuestionsAndRatings } from '../src/types'
 import { itemsInDB, loginAs, populateUsers } from './testHelper'
 import path from 'path'
 
@@ -21,7 +21,7 @@ const newItem = (id: string): ItemCreateInputRaw => ({
   vendor: 'Demix'
 })
 
-const createOneItem = async (role = 'root'): Promise<any> => {
+const createOneItem = async (role: string): Promise<{addedItem: ItemPublicDataWithQuestionsAndRatings; token: string}> => {
   const { token, id } = await loginAs(role, api)
 
   const { body } = await api
@@ -77,7 +77,7 @@ describe('Item adding', () => {
   })
 
   test('403 upload file if not admin or root', async () => {
-    const { addedItem } = await createOneItem()
+    const { addedItem } = await createOneItem('root')
 
     await api
       .post(`${apiURL}/${addedItem.id}/upload`)
@@ -99,7 +99,7 @@ describe('Item adding', () => {
 
 describe('Item fetching', () => {
   test('200', async () => {
-    await createOneItem()
+    await createOneItem('root')
 
     const { body } = await api
       .get(apiURL)
@@ -109,7 +109,7 @@ describe('Item fetching', () => {
   })
 
   test('public item if not admin or root', async () => {
-    const { addedItem } = await createOneItem()
+    const { addedItem } = await createOneItem('root')
 
     const { body } = await api
       .get(`${apiURL}/${addedItem.id}`)
@@ -132,7 +132,7 @@ describe('Item fetching', () => {
 
 describe('Item updating', () => {
   test('200 if own item', async () => {
-    const { addedItem, token } = await createOneItem()
+    const { addedItem, token } = await createOneItem('root')
 
     const { body } = await api
       .put(`${apiURL}/${addedItem.id}`)
@@ -145,7 +145,7 @@ describe('Item updating', () => {
 
   test('403 if another user\'s item', async () => {
     const { token } = await createOneItem('admin')
-    const { addedItem: anotherAddedItem } = await createOneItem()
+    const { addedItem: anotherAddedItem } = await createOneItem('root')
 
     await api
       .put(`${apiURL}/${anotherAddedItem.id}`)

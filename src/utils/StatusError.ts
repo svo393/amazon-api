@@ -4,10 +4,9 @@ interface StatusError extends Error {
 }
 
 class StatusError extends Error {
-  constructor (statusCode: number, message: string, location?: string) {
+  constructor (statusCode: number, message: string) {
     super(message)
     this.statusCode = statusCode
-    this.location = location
     Error.captureStackTrace(this, StatusError)
   }
 }

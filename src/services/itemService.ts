@@ -1,24 +1,15 @@
-import { Item, ItemUpdateInput, PrismaClient, Question, Rating } from '@prisma/client'
-import { Response, Request } from 'express'
-import { ItemCreateInputRaw } from '../types'
+import { Item, ItemUpdateInput, PrismaClient } from '@prisma/client'
+import { Response } from 'express'
+import fs from 'fs'
+import multer from 'multer'
+import path from 'path'
+import sharp from 'sharp'
+import { ItemCreateInputRaw, ItemDataWithQuestionsAndRatings, ItemPublicData, ItemPublicDataWithQuestionsAndRatings } from '../types'
 import { makeID } from '../utils'
 import { getUserRole } from '../utils/shield'
 import StatusError from '../utils/StatusError'
-import fs from 'fs'
-import path from 'path'
-import sharp from 'sharp'
-import multer from 'multer'
 
 const prisma = new PrismaClient()
-
-type ItemPublicData = Omit<Item, 'createdAt' | 'updatedAt' | 'userID'>
-
-type ItemDataWithQuestionsAndRatings = Item & {
-  questions: Question[];
-  ratings: Rating[];
-}
-
-type ItemPublicDataWithQuestionsAndRatings = Omit<ItemDataWithQuestionsAndRatings, 'createdAt' | 'updatedAt' | 'userID'>
 
 const ItemPublicFields = {
   id: true,

@@ -1,6 +1,6 @@
 import { ItemUpdateInput, UserCreateInput, UserUpdateInput } from '@prisma/client'
 import R from 'ramda'
-import { ItemCreateInputRaw, PasswordResetInput } from '../types'
+import { ItemCreateInputRaw, PasswordResetInput, CategoryCreateInputRaw } from '../types'
 import { hasDefinedProps, isBoolean, isEmail, isImage, isInputProvided, isNumber, isPasswordValid, isProvided, isString, isStringOrArray } from './validatorLib'
 
 const checkNewUser = (object: any): UserCreateInput => {
@@ -246,6 +246,22 @@ const checkItemMediaUpload = (object: any): Express.Multer.File[] => {
   return object
 }
 
+const checkNewCategory = (object: any): CategoryCreateInputRaw => {
+  const name = R.pipe(
+    isProvided,
+    isString
+  )({ name: 'name', param: object.name })
+
+  const parent = object.parent && isString(
+    { name: 'parent', param: object.parent }
+  )
+
+  return {
+    name: name.param,
+    parent: parent?.param
+  }
+}
+
 export default {
   checkNewUser,
   checkUserLogin,
@@ -254,5 +270,6 @@ export default {
   checkUserResetToken,
   checkNewItem,
   checkItemUpdate,
-  checkItemMediaUpload
+  checkItemMediaUpload,
+  checkNewCategory
 }
