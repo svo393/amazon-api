@@ -1,11 +1,10 @@
-import { Category, CategoryCreateInput, PrismaClient, CategoryGetPayload, CategoryUpdateInput } from '@prisma/client'
-import { Response } from 'express'
+import { Category, CategoryCreateInput, CategoryGetPayload, CategoryUpdateInput, PrismaClient } from '@prisma/client'
 import StatusError from '../utils/StatusError'
 
 const prisma = new PrismaClient()
 
 type CategoryAllData = CategoryGetPayload<{
-  include: { items: true };
+  include: { items: true; children: true };
 }>
 
 const addCategory = async (categoryInput: CategoryCreateInput): Promise<Category> => {
@@ -29,7 +28,7 @@ const addCategory = async (categoryInput: CategoryCreateInput): Promise<Category
 
 const getCategories = async (): Promise<CategoryAllData[]> => {
   const categories = await prisma.category.findMany({
-    include: { items: true }
+    include: { items: true, children: true }
   })
   await prisma.disconnect()
   return categories
@@ -38,7 +37,7 @@ const getCategories = async (): Promise<CategoryAllData[]> => {
 const getCategoryByID = async (id: string): Promise<CategoryAllData> => {
   const category = await prisma.category.findOne({
     where: { id },
-    include: { items: true }
+    include: { items: true, children: true }
   })
   await prisma.disconnect()
 
@@ -51,7 +50,7 @@ const updateCategory = async (categoryInput: CategoryUpdateInput, id: string): P
   const updatedCategory = await prisma.category.update({
     where: { id },
     data: categoryInput,
-    include: { items: true }
+    include: { items: true, children: true }
   })
   await prisma.disconnect()
 
