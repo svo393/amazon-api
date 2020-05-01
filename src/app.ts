@@ -7,6 +7,7 @@ import env from './utils/config'
 import { errorHandler, getUserID, unknownEndpoint } from './utils/middleware'
 
 require('express-async-errors')
+import vendorsRouter from './routes/vendors' // eslint-disable-line
 import categoriesRouter from './routes/categories' // eslint-disable-line
 import itemsRouter from './routes/items' // eslint-disable-line
 import usersRouter from './routes/users' // eslint-disable-line
@@ -25,6 +26,7 @@ app.use(getUserID)
 app.use(express.json())
 env.NODE_ENV === 'development' && app.use(logger('dev'))
 
+app.use('/api/vendors', vendorsRouter)
 app.use('/api/categories', categoriesRouter)
 app.use('/api/items', itemsRouter)
 app.use('/api/users', usersRouter)

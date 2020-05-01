@@ -1,4 +1,4 @@
-import { CategoryCreateInput, CategoryUpdateInput, ItemUpdateInput, UserCreateInput, UserUpdateInput } from '@prisma/client'
+import { CategoryCreateInput, CategoryUpdateInput, ItemUpdateInput, UserCreateInput, UserUpdateInput, VendorCreateInput, VendorUpdateInput } from '@prisma/client'
 import R from 'ramda'
 import { ItemCreateInputRaw, PasswordResetInput } from '../types'
 import { hasDefinedProps, isBoolean, isEmail, isImage, isInputProvided, isNumber, isPasswordValid, isProvided, isString, isStringOrArray } from './validatorLib'
@@ -289,6 +289,33 @@ const checkCategoryUpdate = (object: any): CategoryUpdateInput => {
   return hasDefinedProps(categoryInput)
 }
 
+const checkNewVendor = (object: any): VendorCreateInput => {
+  const name = R.pipe(
+    isProvided,
+    isString
+  )({ name: 'name', param: object.name })
+
+  const vendorInput = {
+    name: name.param
+  }
+
+  return hasDefinedProps(vendorInput) as VendorCreateInput
+}
+
+const checkVendorUpdate = (object: any): VendorUpdateInput => {
+  isInputProvided(object)
+
+  const name = object.name && isString(
+    { name: 'name', param: object.name }
+  )
+
+  const vendorInput = {
+    name: name?.param
+  }
+
+  return hasDefinedProps(vendorInput)
+}
+
 export default {
   checkNewUser,
   checkUserLogin,
@@ -299,5 +326,7 @@ export default {
   checkItemUpdate,
   checkItemMediaUpload,
   checkNewCategory,
-  checkCategoryUpdate
+  checkCategoryUpdate,
+  checkNewVendor,
+  checkVendorUpdate
 }

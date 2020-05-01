@@ -1,4 +1,4 @@
-import { Category, Item, PrismaClient, User } from '@prisma/client'
+import { Category, Item, PrismaClient, User, Vendor } from '@prisma/client'
 import supertest from 'supertest'
 import userService from '../src/services/userService'
 import StatusError from '../src/utils/StatusError'
@@ -24,6 +24,7 @@ export const populateUsers = async (): Promise<void> => {
   try {
     await prisma.item.deleteMany({})
     await prisma.category.deleteMany({})
+    await prisma.vendor.deleteMany({})
     await prisma.user.deleteMany({})
     await userService.addUser(user)
 
@@ -70,6 +71,12 @@ export const categoriesInDB = async (): Promise<Category[]> => {
   const categories = await prisma.category.findMany()
   await prisma.disconnect()
   return categories
+}
+
+export const vendorsInDB = async (): Promise<Vendor[]> => {
+  const vendors = await prisma.vendor.findMany()
+  await prisma.disconnect()
+  return vendors
 }
 
 export const loginAs: (role: string, api: supertest.SuperTest<supertest.Test>) => Promise<{token: string; id: string}> =

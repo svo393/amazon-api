@@ -35,7 +35,7 @@ const getCategories = async (): Promise<CategoryAllData[]> => {
   return categories
 }
 
-const getCategoryByID = async (id: string, res: Response): Promise<CategoryAllData> => {
+const getCategoryByID = async (id: string): Promise<CategoryAllData> => {
   const category = await prisma.category.findOne({
     where: { id },
     include: { items: true }
