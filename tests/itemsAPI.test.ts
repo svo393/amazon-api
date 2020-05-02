@@ -34,7 +34,7 @@ const createOneItem = async (role: string): Promise<{addedItem: ItemPublicData; 
 }
 
 beforeEach(async () => {
-  await populateUsers()
+  await populateUsers(api)
 })
 
 describe('Item adding', () => {

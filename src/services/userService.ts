@@ -1,11 +1,11 @@
 import { PrismaClient, UserCreateInput, UserGetPayload, UserUpdateInput } from '@prisma/client'
 import bcrypt from 'bcrypt'
 import { randomBytes } from 'crypto'
-import { Response } from 'express'
+import { Response, CookieOptions } from 'express'
 import jwt from 'jsonwebtoken'
 import R from 'ramda'
 import { promisify } from 'util'
-import { PasswordResetInput } from '../types'
+import { PasswordResetInput, UserLoginInput } from '../types'
 import env from '../utils/config'
 import { getUserRole } from '../utils/shield'
 import StatusError from '../utils/StatusError'
@@ -49,7 +49,19 @@ type AuthUserPersonalData = UserPersonalData & {
   token: string;
 }
 
-const addUser = async (userInput: UserCreateInput): Promise<AuthUserPersonalData> => {
+const setTokenCookie = (res: Response, token: string, remember: boolean): void => {
+  const config: CookieOptions = {
+    maxAge: 1000 * 60 * 60 * 24 * 30,
+    httpOnly: true,
+    sameSite: 'lax'
+  }
+
+  !remember && delete config.maxAge
+
+  res.cookie('token', token, config)
+}
+
+const addUser = async (userInput: UserCreateInput, res: Response): Promise<AuthUserPersonalData> => {
   const { email, password } = userInput
 
   const existingUser = await prisma.user.findOne({
@@ -76,6 +88,8 @@ const addUser = async (userInput: UserCreateInput): Promise<AuthUserPersonalData
     { expiresIn: '30d' }
   )
 
+  setTokenCookie(res, token, true)
+
   const userData = R.omit([
     'password',
     'resetToken',
@@ -85,8 +99,8 @@ const addUser = async (userInput: UserCreateInput): Promise<AuthUserPersonalData
   return { ...userData, token }
 }
 
-const loginUser = async (userInput: UserCreateInput): Promise<AuthUserPersonalData> => {
-  const { email, password } = userInput
+const loginUser = async (userInput: UserLoginInput, res: Response): Promise<AuthUserPersonalData> => {
+  const { email, password, remember } = userInput
 
   const existingUser = await prisma.user.findOne({
     where: { email },
@@ -110,6 +124,8 @@ const loginUser = async (userInput: UserCreateInput): Promise<AuthUserPersonalDa
     env.JWT_SECRET,
     { expiresIn: '30d' }
   )
+
+  setTokenCookie(res, token, remember)
 
   const userData = R.omit([
     'password',
@@ -218,7 +234,7 @@ const sendPasswordReset = async (email: string): Promise<void> => {
   }
 }
 
-const resetPassword = async ({ password, resetToken }: PasswordResetInput): Promise<AuthUserPersonalData> => {
+const resetPassword = async ({ password, resetToken }: PasswordResetInput, res: Response): Promise<AuthUserPersonalData> => {
   const user = await prisma.user.findOne({
     where: { resetToken },
     select: { id: true, resetTokenExpiry: true }
@@ -247,6 +263,8 @@ const resetPassword = async ({ password, resetToken }: PasswordResetInput): Prom
     env.JWT_SECRET,
     { expiresIn: '30d' }
   )
+
+  setTokenCookie(res, token, true)
 
   const userData = R.omit([
     'password',

@@ -1,7 +1,7 @@
 import { VendorCreateInput } from '@prisma/client'
 import supertest from 'supertest'
 import app from '../src/app'
-import { vendorsInDB, loginAs, populateUsers } from './testHelper'
+import { loginAs, populateUsers, vendorsInDB } from './testHelper'
 
 const api = supertest(app)
 const apiURL = '/api/vendors'
@@ -22,7 +22,7 @@ const createOneVendor = async (role: string): Promise<any> => {
 }
 
 beforeEach(async () => {
-  await populateUsers()
+  await populateUsers(api)
 })
 
 describe('Vendor adding', () => {

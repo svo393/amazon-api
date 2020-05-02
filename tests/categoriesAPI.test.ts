@@ -22,7 +22,7 @@ const createOneCategory = async (role: string): Promise<any> => {
 }
 
 beforeEach(async () => {
-  await populateUsers()
+  await populateUsers(api)
 })
 
 describe('Category adding', () => {

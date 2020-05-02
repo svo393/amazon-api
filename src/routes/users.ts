@@ -7,29 +7,13 @@ const router = Router()
 
 router.post('/', async (req, res) => {
   const userInput = inputValidator.checkNewUser(req.body)
-  const addedUser = await userService.addUser(userInput)
-
-  res.cookie('token', addedUser.token, {
-    maxAge: 1000 * 60 * 60 * 24 * 30,
-    httpOnly: true,
-    sameSite: 'lax'
-  })
-
-  delete addedUser.token
+  const addedUser = await userService.addUser(userInput, res)
   res.status(201).json(addedUser)
 })
 
 router.post('/login', async (req, res) => {
   const userInput = inputValidator.checkUserLogin(req.body)
-  const loggedInUser = await userService.loginUser(userInput)
-
-  res.cookie('token', loggedInUser.token, {
-    maxAge: 1000 * 60 * 60 * 24 * 30,
-    httpOnly: true,
-    sameSite: 'lax'
-  })
-
-  delete loggedInUser.token
+  const loggedInUser = await userService.loginUser(userInput, res)
   res.json(loggedInUser)
 })
 
@@ -45,7 +29,8 @@ router.get('/', async (_req, res) => {
   res.json(users)
 })
 
-router.get('/me', async (req, res) => {
+router.get('/me', async (_req, res) => {
+  shield.isLoggedIn(res)
   const user = await userService.getUserByID(res.locals.userID, res)
   res.json(user)
 })
@@ -70,15 +55,7 @@ router.post('/request-password-reset', async (req, res) => {
 
 router.post('/reset-password', async (req, res) => {
   const userInput = inputValidator.checkUserResetToken(req.body)
-  const updatedUser = await userService.resetPassword(userInput)
-
-  res.cookie('token', updatedUser.token, {
-    maxAge: 1000 * 60 * 60 * 24 * 30,
-    httpOnly: true,
-    sameSite: 'lax'
-  })
-
-  delete updatedUser.token
+  const updatedUser = await userService.resetPassword(userInput, res)
   res.json(updatedUser)
 })
 

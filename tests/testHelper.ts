@@ -1,6 +1,5 @@
 import { Category, Item, PrismaClient, User, Vendor } from '@prisma/client'
 import supertest from 'supertest'
-import userService from '../src/services/userService'
 import StatusError from '../src/utils/StatusError'
 
 const prisma = new PrismaClient()
@@ -20,22 +19,29 @@ export const root = {
   password: '12345678'
 }
 
-export const populateUsers = async (): Promise<void> => {
+export const populateUsers = async (api: supertest.SuperTest<supertest.Test>): Promise<void> => {
   try {
     await prisma.item.deleteMany({})
     await prisma.category.deleteMany({})
     await prisma.vendor.deleteMany({})
     await prisma.user.deleteMany({})
-    await userService.addUser(user)
 
-    await userService.addUser(admin)
+    await api
+      .post('/api/users')
+      .send(user)
+
+    await api
+      .post('/api/users')
+      .send(admin)
 
     await prisma.user.update({
       where: { email: admin.email },
       data: { role: 'ADMIN' }
     })
 
-    await userService.addUser(root)
+    await api
+      .post('/api/users')
+      .send(root)
 
     await prisma.user.update({
       where: { email: root.email },
@@ -83,7 +89,8 @@ export const loginAs: (role: string, api: supertest.SuperTest<supertest.Test>) =
 async (role, api) => {
   const user = {
     email: `${role}@example.com`,
-    password: '12345678'
+    password: '12345678',
+    remember: true
   }
 
   const res = await api

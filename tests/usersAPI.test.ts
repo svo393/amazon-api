@@ -1,12 +1,12 @@
 import supertest from 'supertest'
 import app from '../src/app'
-import { populateUsers, usersInDB, getUserByEmail, loginAs } from './testHelper'
+import { getUserByEmail, loginAs, populateUsers, usersInDB } from './testHelper'
 
 const api = supertest(app)
 const apiURL = '/api/users'
 
 beforeEach(async () => {
-  await populateUsers()
+  await populateUsers(api)
 })
 
 describe('User authorization', () => {
@@ -52,7 +52,8 @@ describe('User authorization', () => {
   test('401 login if invalid password', async () => {
     const user = {
       email: 'customer@example.com',
-      password: '123456789'
+      password: '123456789',
+      remember: true
     }
 
     await api

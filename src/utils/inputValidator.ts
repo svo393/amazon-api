@@ -1,6 +1,6 @@
 import { CategoryCreateInput, CategoryUpdateInput, ItemUpdateInput, UserCreateInput, UserUpdateInput, VendorCreateInput, VendorUpdateInput } from '@prisma/client'
 import R from 'ramda'
-import { ItemCreateInputRaw, PasswordResetInput } from '../types'
+import { ItemCreateInputRaw, PasswordResetInput, UserLoginInput } from '../types'
 import { hasDefinedProps, isBoolean, isEmail, isImage, isInputProvided, isNumber, isPasswordValid, isProvided, isString, isStringOrArray } from './validatorLib'
 
 const checkNewUser = (object: any): UserCreateInput => {
@@ -22,7 +22,7 @@ const checkNewUser = (object: any): UserCreateInput => {
   }
 }
 
-const checkUserLogin = (object: any): UserCreateInput => {
+const checkUserLogin = (object: any): UserLoginInput => {
   const email = R.pipe(
     isProvided,
     isString,
@@ -34,9 +34,15 @@ const checkUserLogin = (object: any): UserCreateInput => {
     isString
   )({ name: 'password', param: object.password })
 
+  const remember = R.pipe(
+    isProvided,
+    isBoolean
+  )({ name: 'remember', param: object.remember })
+
   return {
     email: email.param.toLowerCase(),
-    password: password.param
+    password: password.param,
+    remember: remember.param
   }
 }
 

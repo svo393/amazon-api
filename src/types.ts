@@ -29,3 +29,9 @@ export type PasswordResetInput = {
   password: string;
   resetToken: string;
 }
+
+export type UserLoginInput = {
+  email: string;
+  password: string;
+  remember: boolean;
+}
