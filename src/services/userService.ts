@@ -1,4 +1,4 @@
-import { PrismaClient, UserCreateInput, UserGetPayload, UserUpdateInput } from '@prisma/client'
+import { PrismaClient, UserCreateInput, UserGetPayload, UserUpdateInput, User } from '@prisma/client'
 import bcrypt from 'bcrypt'
 import { randomBytes } from 'crypto'
 import { Response, CookieOptions } from 'express'
@@ -25,6 +25,12 @@ const userFieldSet = {
   answerComments: true
 }
 
+type UserListData = Omit<User,
+  | 'password'
+  | 'resetToken'
+  | 'resetTokenExpiry'
+>
+
 type UserAllData = UserGetPayload<{
   include: typeof userFieldSet;
 }>
@@ -45,10 +51,6 @@ type UserPublicData = Omit<UserPersonalData,
   | 'orderItems'
   >
 
-type AuthUserPersonalData = UserPersonalData & {
-  token: string;
-}
-
 const setTokenCookie = (res: Response, token: string, remember: boolean): void => {
   const config: CookieOptions = {
     maxAge: 1000 * 60 * 60 * 24 * 30,
@@ -61,7 +63,7 @@ const setTokenCookie = (res: Response, token: string, remember: boolean): void =
   res.cookie('token', token, config)
 }
 
-const addUser = async (userInput: UserCreateInput, res: Response): Promise<AuthUserPersonalData> => {
+const addUser = async (userInput: UserCreateInput, res: Response): Promise<UserPersonalData> => {
   const { email, password } = userInput
 
   const existingUser = await prisma.user.findOne({
@@ -96,10 +98,10 @@ const addUser = async (userInput: UserCreateInput, res: Response): Promise<AuthU
     'resetTokenExpiry'
   ], addedUser)
 
-  return { ...userData, token }
+  return userData
 }
 
-const loginUser = async (userInput: UserLoginInput, res: Response): Promise<AuthUserPersonalData> => {
+const loginUser = async (userInput: UserLoginInput, res: Response): Promise<UserPersonalData> => {
   const { email, password, remember } = userInput
 
   const existingUser = await prisma.user.findOne({
@@ -133,22 +135,20 @@ const loginUser = async (userInput: UserLoginInput, res: Response): Promise<Auth
     'resetTokenExpiry'
   ], existingUser)
 
-  return { ...userData, token }
+  return userData
 }
 
-const getUsers = async (): Promise<UserPersonalData[]> => {
-  const users = await prisma.user.findMany({
-    include: userFieldSet
-  })
+const getUsers = async (): Promise<UserListData[]> => {
+  const users = await prisma.user.findMany()
   await prisma.disconnect()
 
-  const userData = R.map(R.omit([
+  const usersData = R.map(R.omit([
     'password',
     'resetToken',
     'resetTokenExpiry'
   ]))(users)
 
-  return userData
+  return usersData
 }
 
 const getUserByID = async (id: string, res: Response): Promise<UserPersonalData | UserPublicData> => {
@@ -234,7 +234,7 @@ const sendPasswordReset = async (email: string): Promise<void> => {
   }
 }
 
-const resetPassword = async ({ password, resetToken }: PasswordResetInput, res: Response): Promise<AuthUserPersonalData> => {
+const resetPassword = async ({ password, resetToken }: PasswordResetInput, res: Response): Promise<UserPersonalData> => {
   const user = await prisma.user.findOne({
     where: { resetToken },
     select: { id: true, resetTokenExpiry: true }
@@ -272,7 +272,7 @@ const resetPassword = async ({ password, resetToken }: PasswordResetInput, res: 
     'resetTokenExpiry'
   ], updatedUser)
 
-  return { ...userData, token }
+  return userData
 }
 
 export default {
