@@ -49,10 +49,11 @@ const isAdmin = async (res: Response): Promise<void> => {
   }
 }
 
-const isSameUser = (req: Request, res: Response): void => {
+const isSameUser = async (req: Request, res: Response): Promise<void> => {
   isLoggedIn(res)
+  const role = await getUserRole(res)
 
-  if (res.locals.userID !== req.params.id) {
+  if (res.locals.userID !== req.params.id && role !== 'ROOT') {
     throw new StatusError(403, 'Forbidden')
   }
 }

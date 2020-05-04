@@ -1,7 +1,7 @@
 import { CategoryCreateInput, CategoryUpdateInput, ItemUpdateInput, UserCreateInput, UserUpdateInput, VendorCreateInput, VendorUpdateInput } from '@prisma/client'
 import R from 'ramda'
 import { ItemCreateInputRaw, PasswordResetInput, UserLoginInput } from '../types'
-import { hasDefinedProps, isBoolean, isEmail, isImage, isInputProvided, isNumber, isPasswordValid, isProvided, isString, isStringOrArray } from './validatorLib'
+import { hasDefinedProps, isBoolean, isEmail, isImage, isInputProvided, isNumber, isPasswordValid, isProvided, isRole, isString, isStringOrArray } from './validatorLib'
 
 const checkNewUser = (object: any): UserCreateInput => {
   const email = R.pipe(
@@ -95,11 +95,17 @@ const checkUserUpdate = (object: any): UserUpdateInput => {
     { name: 'avatar', param: object.avatar }
   )
 
+  const role = object.role && R.pipe(
+    isString,
+    isRole
+  )({ name: 'role', param: object.role })
+
   const userInput = {
     name: name?.param,
     email: email?.param,
     password: password?.param,
-    avatar: avatar?.param
+    avatar: avatar?.param,
+    role: role?.param
   }
 
   return hasDefinedProps(userInput)

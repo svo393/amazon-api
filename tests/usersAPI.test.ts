@@ -143,6 +143,18 @@ describe('User updating', () => {
       .expect(403)
   })
 
+  test.only('200 if root', async () => {
+    const { token } = await loginAs('root', api)
+
+    const anotherUser = await getUserByEmail('admin@example.com')
+
+    await api
+      .put(`${apiURL}/${anotherUser.id}`)
+      .set('Cookie', `token=${token}`)
+      .send({ role: 'CUSTOMER' })
+      .expect(200)
+  })
+
   test('204 password reset request', async () => {
     await api
       .post(`${apiURL}/request-password-reset`)

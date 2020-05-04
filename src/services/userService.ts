@@ -139,7 +139,9 @@ const loginUser = async (userInput: UserLoginInput, res: Response): Promise<User
 }
 
 const getUsers = async (): Promise<UserListData[]> => {
-  const users = await prisma.user.findMany()
+  const users = await prisma.user.findMany({
+    where: { role: { not: 'ROOT' } }
+  })
   await prisma.disconnect()
 
   const usersData = R.map(R.omit([

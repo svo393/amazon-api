@@ -18,7 +18,6 @@ router.post('/login', async (req, res) => {
 })
 
 router.post('/logout', (_req, res) => {
-  shield.isLoggedIn(res)
   res.clearCookie('token')
   res.sendStatus(204)
 })
@@ -41,8 +40,9 @@ router.get('/:id', async (req, res) => {
 })
 
 router.put('/:id', async (req, res) => {
-  shield.isSameUser(req, res)
+  await shield.isSameUser(req, res)
   const userInput = inputValidator.checkUserUpdate(req.body)
+  console.info('|+|=> router | req.params.id:', req.params.id)
   const updatedUser = await userService.updateUser(userInput, req.params.id)
   res.json(updatedUser)
 })

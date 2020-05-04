@@ -1,6 +1,7 @@
 import R from 'ramda'
 import checkEmail from 'validator/lib/isEmail'
 import StatusError from './StatusError'
+import { Role } from '@prisma/client'
 
 type CP = (params: {
   name?: string;
@@ -60,23 +61,30 @@ export const isBoolean: CP = ({ name, param }) => {
   return { name, param }
 }
 
-export const isEmail: CP = ({ param }) => {
+export const isEmail: CP = ({ name, param }) => {
   if (!checkEmail(param)) {
     throw new StatusError(400, `Incorrect email: ${param}`)
   }
-  return { param }
+  return { name, param }
 }
 
-export const isPasswordValid: CP = ({ param }) => {
+export const isRole: CP = ({ name, param }) => {
+  if (!Role) {
+    throw new StatusError(400, `Incorrect role: ${param}`)
+  }
+  return { name, param }
+}
+
+export const isPasswordValid: CP = ({ name, param }) => {
   if (param.length < 8) {
     throw new StatusError(422, 'Password must be at least 8 characters')
   }
-  return { param }
+  return { name, param }
 }
 
-export const isImage: CP = ({ param }) => {
+export const isImage: CP = ({ name, param }) => {
   if (!param.mimetype || ![ 'image/png', 'image/jpeg', 'image/webp' ].includes(param.mimetype)) {
     throw new StatusError(400, 'Image files only!')
   }
-  return { param }
+  return { name, param }
 }
