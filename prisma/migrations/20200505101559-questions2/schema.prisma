@@ -1,6 +1,6 @@
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url = "***"
 }
 
 generator client {
@@ -137,8 +137,8 @@ model Question {
   answers   Answer[]
   item      Item     @relation(fields: [itemID], references: [id])
   itemID    String
-  User      User    @relation(fields: [userID], references: [id])
-  userID    String
+  User      User    @relation(fields: [userId], references: [id])
+  userId    String
 }
 
 model Answer {

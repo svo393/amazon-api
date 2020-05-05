@@ -1,5 +1,4 @@
-import { Vendor, VendorCreateInput, PrismaClient, VendorGetPayload, VendorUpdateInput } from '@prisma/client'
-import { Response } from 'express'
+import { PrismaClient, Vendor, VendorCreateInput, VendorGetPayload, VendorUpdateInput } from '@prisma/client'
 import StatusError from '../utils/StatusError'
 
 const prisma = new PrismaClient()

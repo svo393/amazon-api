@@ -1,7 +1,7 @@
-import { PrismaClient, UserCreateInput, UserGetPayload, UserUpdateInput, User } from '@prisma/client'
+import { PrismaClient, User, UserCreateInput, UserGetPayload, UserUpdateInput } from '@prisma/client'
 import bcrypt from 'bcrypt'
 import { randomBytes } from 'crypto'
-import { Response, CookieOptions } from 'express'
+import { CookieOptions, Response } from 'express'
 import jwt from 'jsonwebtoken'
 import R from 'ramda'
 import { promisify } from 'util'
@@ -21,6 +21,7 @@ const userFieldSet = {
   orderItems: true,
   ratings: true,
   ratingComments: true,
+  questions: true,
   answers: true,
   answerComments: true
 }
@@ -29,7 +30,11 @@ type UserListData = Omit<User,
   | 'password'
   | 'resetToken'
   | 'resetTokenExpiry'
->
+> & {
+  ordersCount: number;
+  ratingsCount: number;
+  questionsCount: number;
+}
 
 type UserAllData = UserGetPayload<{
   include: typeof userFieldSet;
@@ -140,15 +145,33 @@ const loginUser = async (userInput: UserLoginInput, res: Response): Promise<User
 
 const getUsers = async (): Promise<UserListData[]> => {
   const users = await prisma.user.findMany({
-    where: { role: { not: 'ROOT' } }
+    where: { role: { not: 'ROOT' } },
+    include: {
+      orders: true,
+      ratings: true,
+      questions: true,
+    }
   })
   await prisma.disconnect()
 
-  const usersData = R.map(R.omit([
-    'password',
-    'resetToken',
-    'resetTokenExpiry'
-  ]))(users)
+  const usersWithCounts = users.map((u) => ({
+    ...u,
+    ordersCount: u.orders.length,
+    ratingsCount: u.ratings.length,
+    questionsCount: u.questions.length,
+  }))
+
+  const usersData = R.map(
+    R.pipe(
+      R.omit([
+        'password',
+        'resetToken',
+        'resetTokenExpiry',
+        'orders',
+        'ratings',
+        'questions'
+      ])
+    ))(usersWithCounts)
 
   return usersData
 }

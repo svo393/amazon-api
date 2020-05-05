@@ -1,7 +1,7 @@
+import { Role } from '@prisma/client'
 import R from 'ramda'
 import checkEmail from 'validator/lib/isEmail'
 import StatusError from './StatusError'
-import { Role } from '@prisma/client'
 
 type CP = (params: {
   name?: string;
