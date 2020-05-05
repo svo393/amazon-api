@@ -1,6 +1,6 @@
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url = "***"
 }
 
 generator client {
@@ -8,74 +8,42 @@ generator client {
 }
 
 model Item {
-  id               String          @id
+  id               String     @id
   name             String
-  listPrice        Int
   price            Int
   shortDescription String
   longDescription  String
   stock            Int
-  stars            Int             @default(0)
+  stars            Int        @default(0)
   media            Int
   primaryMedia     Int
-  createdAt        DateTime        @default(now())
-  updatedAt        DateTime        @updatedAt
-  isAvailable      Boolean         @default(true)
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  isAvailable      Boolean    @default(true)
   ratings          Rating[]
   questions        Question[]
-  user             User            @relation(fields: [userID], references: [id])
+  user             User       @relation(fields: [userID], references: [id])
   userID           String
-  category         Category        @relation(fields: [categoryName], references: [name])
+  category         Category   @relation(fields: [categoryName], references: [name])
   categoryName     String
-  vendor           Vendor          @relation(fields: [vendorName], references: [name])
+  vendor           Vendor     @relation(fields: [vendorName], references: [name])
   vendorName       String
-  brandSection     BrandSection    @relation(fields: [brandSectionID], references: [id])
-  brandSectionID   String
   cartItems        CartItem[]
-  group            ItemGroup[]     @relation(references: [id])
-  itemParameter    ItemParameter[]
 }
 
 model Category {
-  name     String     @id
-  parent   Category?  @relation("CategoryToCategory", fields: [parentID], references: [name])
+  id       String     @default(cuid()) @id
+  name     String     @unique
+  parent   Category?  @relation("CategoryToCategory", fields: [parentID], references: [id])
   parentID String?
-  children Category[] @relation("CategoryToCategory")
   items    Item[]
+  children Category[] @relation("CategoryToCategory")
 }
 
 model Vendor {
-  name  String @id
+  id    String @default(cuid()) @id
+  name  String @unique
   items Item[]
-}
-
-model BrandSection {
-  id      String @default(cuid()) @id
-  content String
-  item    Item[]
-}
-
-model ItemGroup {
-  id          String    @default(cuid()) @id
-  parameter   Parameter @relation(fields: [parameterID], references: [name])
-  parameterID String
-  item        Item[]    @relation(references: [id])
-}
-
-model Parameter {
-  name          String          @id
-  group         ItemGroup[]
-  itemParameter ItemParameter[]
-}
-
-model ItemParameter {
-  value         String
-  item          Item      @relation(fields: [itemID], references: [id])
-  itemID        String
-  parameter     Parameter @relation(fields: [parameterName], references: [name])
-  parameterName String
-
-  @@id([itemID, parameterName])
 }
 
 model User {
@@ -100,13 +68,12 @@ model User {
 }
 
 model CartItem {
+  id     String @default(cuid()) @id
   qty    Int
   item   Item   @relation(fields: [itemID], references: [id])
   itemID String
   user   User   @relation(fields: [userID], references: [id])
   userID String
-
-  @@id([itemID, userID])
 }
 
 model Order {
@@ -122,6 +89,7 @@ model Order {
 }
 
 model OrderItem {
+  id           String @default(cuid()) @id
   name         String
   primaryMedia Int
   price        Int
@@ -131,8 +99,6 @@ model OrderItem {
   userID       String
   order        Order  @relation(fields: [orderID], references: [id])
   orderID      String
-
-  @@id([orderID, userID])
 }
 
 model Rating {
@@ -170,7 +136,7 @@ model Question {
   answers   Answer[]
   item      Item     @relation(fields: [itemID], references: [id])
   itemID    String
-  user      User     @relation(fields: [userID], references: [id])
+  User      User    @relation(fields: [userID], references: [id])
   userID    String
 }
 
