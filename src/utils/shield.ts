@@ -26,7 +26,11 @@ export const getUserRole = async (res: Response): Promise<Role | null> => {
   })
   await prisma.disconnect()
 
-  if (!user) { throw new StatusError(403, 'Forbidden') }
+  if (!user) {
+    res.clearCookie('token')
+    throw new StatusError(403, 'Forbidden')
+  }
+
   return user.role
 }
 
