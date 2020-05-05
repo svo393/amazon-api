@@ -149,7 +149,7 @@ const getUsers = async (): Promise<UserListData[]> => {
     include: {
       orders: true,
       ratings: true,
-      questions: true,
+      questions: true
     }
   })
   await prisma.disconnect()
@@ -158,7 +158,7 @@ const getUsers = async (): Promise<UserListData[]> => {
     ...u,
     ordersCount: u.orders.length,
     ratingsCount: u.ratings.length,
-    questionsCount: u.questions.length,
+    questionsCount: u.questions.length
   }))
 
   const usersData = R.map(
@@ -201,6 +201,7 @@ const getUserByID = async (id: string, res: Response): Promise<UserPersonalData 
       'avatar',
       'ratings',
       'ratingComments',
+      'questions',
       'answers',
       'answerComments'
     ], user)
