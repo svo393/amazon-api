@@ -89,7 +89,7 @@ describe('User fetching', () => {
       .get(`${apiURL}/${anotherUser.id}`)
       .expect(200)
 
-    expect(Object.keys(body)).toHaveLength(7)
+    expect(Object.keys(body)).toHaveLength(8)
   })
 
   test('full user if root', async () => {
@@ -102,7 +102,7 @@ describe('User fetching', () => {
       .set('Cookie', `token=${token}`)
       .expect(200)
 
-    expect(Object.keys(body)).toHaveLength(14)
+    expect(Object.keys(body)).toHaveLength(15)
   })
 
   test('full user if own profile', async () => {
@@ -113,7 +113,7 @@ describe('User fetching', () => {
       .set('Cookie', `token=${token}`)
       .expect(200)
 
-    expect(Object.keys(body)).toHaveLength(14)
+    expect(Object.keys(body)).toHaveLength(15)
   })
 })
 
@@ -127,7 +127,7 @@ describe('User updating', () => {
       .send({ name: 'Jack' })
       .expect(200)
 
-    expect(Object.keys(body)).toHaveLength(14)
+    expect(Object.keys(body)).toHaveLength(15)
     expect(body.name).toBe('Jack')
   })
 
@@ -143,7 +143,7 @@ describe('User updating', () => {
       .expect(403)
   })
 
-  test.only('200 if root', async () => {
+  test('200 if root', async () => {
     const { token } = await loginAs('root', api)
 
     const anotherUser = await getUserByEmail('admin@example.com')
