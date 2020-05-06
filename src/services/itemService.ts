@@ -24,16 +24,16 @@ const addItem = async (itemInput: ItemCreateInputRaw): Promise<ItemPublicData> =
   while (itemIDs.includes(id)) { id = makeID(7) }
 
   const category = await prisma.category.upsert({
-    where: { name: itemInput.category },
-    update: { name: itemInput.category },
-    create: { name: itemInput.category },
+    where: { name: itemInput.categoryName },
+    update: { name: itemInput.categoryName },
+    create: { name: itemInput.categoryName },
     select: { id: true }
   })
 
   const vendor = await prisma.vendor.upsert({
-    where: { name: itemInput.vendor },
-    update: { name: itemInput.vendor },
-    create: { name: itemInput.vendor },
+    where: { name: itemInput.vendorName },
+    update: { name: itemInput.vendorName },
+    create: { name: itemInput.vendorName },
     select: { id: true }
   })
 
@@ -41,7 +41,7 @@ const addItem = async (itemInput: ItemCreateInputRaw): Promise<ItemPublicData> =
     data: {
       ...itemInput,
       id,
-      user: { connect: { id: itemInput.user } },
+      user: { connect: { id: itemInput.userID } },
       category: { connect: { id: category.id } },
       vendor: { connect: { id: vendor.id } }
     },

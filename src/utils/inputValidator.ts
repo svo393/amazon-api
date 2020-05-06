@@ -1,7 +1,7 @@
 import { CategoryCreateInput, CategoryUpdateInput, ItemUpdateInput, UserCreateInput, UserUpdateInput, VendorCreateInput, VendorUpdateInput } from '@prisma/client'
 import R from 'ramda'
 import { ItemCreateInputRaw, PasswordResetInput, UserLoginInput } from '../types'
-import { hasDefinedProps, isBoolean, isEmail, isImage, isInputProvided, isNumber, isPasswordValid, isProvided, isRole, isString, isStringOrArray } from './validatorLib'
+import { hasDefinedProps, isArray, isBoolean, isEmail, isImage, isInputProvided, isItemParameter, isNumber, isPasswordValid, isProvided, isRole, isString, isStringOrArray } from './validatorLib'
 
 const checkNewUser = (object: any): UserCreateInput => {
   const email = R.pipe(
@@ -117,30 +117,30 @@ const checkNewItem = (object: any): ItemCreateInputRaw => {
     isString
   )({ name: 'name', param: object.name })
 
+  const listPrice = R.pipe(
+    isProvided,
+    isNumber
+  )({ name: 'listPrice', param: object.listPrice })
+
   const price = R.pipe(
     isProvided,
     isNumber
   )({ name: 'price', param: object.price })
 
-  const shortDescription = R.pipe(
+  const description = R.pipe(
     isProvided,
     isString
-  )({ name: 'shortDescription', param: object.shortDescription })
+  )({ name: 'description', param: object.description })
 
-  const longDescription = R.pipe(
+  const brandSection = R.pipe(
     isProvided,
     isString
-  )({ name: 'longDescription', param: object.longDescription })
+  )({ name: 'brandSection', param: object.brandSection })
 
   const stock = R.pipe(
     isProvided,
     isNumber
   )({ name: 'stock', param: object.stock })
-
-  const asin = R.pipe(
-    isProvided,
-    isString
-  )({ name: 'asin', param: object.asin })
 
   const media = R.pipe(
     isProvided,
@@ -157,34 +157,43 @@ const checkNewItem = (object: any): ItemCreateInputRaw => {
     isBoolean
   )({ name: 'isAvailable', param: object.isAvailable })
 
-  const user = R.pipe(
+  const userID = R.pipe(
     isProvided,
     isString
-  )({ name: 'user', param: object.user })
+  )({ name: 'userID', param: object.userID })
 
-  const category = R.pipe(
+  const categoryName = R.pipe(
     isProvided,
     isString
-  )({ name: 'category', param: object.category })
+  )({ name: 'categoryName', param: object.categoryName })
 
-  const vendor = R.pipe(
+  const vendorName = R.pipe(
     isProvided,
     isString
-  )({ name: 'vendor', param: object.vendor })
+  )({ name: 'vendorName', param: object.vendorName })
+
+  const itemParameters = R.pipe(
+    isProvided,
+    isArray
+  )({ name: 'itemParameters', param: object.itemParameters })
+
+  itemParameters.param.map((p: object) =>
+    isItemParameter({ name: 'itemParameter', param: p }))
 
   return {
     name: name.param,
+    listPrice: listPrice.param,
     price: price.param,
-    shortDescription: shortDescription.param,
-    longDescription: longDescription.param,
+    description: description.param,
+    brandSection: brandSection.param,
     stock: stock.param,
     isAvailable: isAvailable.param,
-    asin: asin.param,
     media: media.param,
     primaryMedia: primaryMedia.param,
-    user: user.param,
-    category: category.param,
-    vendor: vendor.param
+    userID: userID.param,
+    categoryName: categoryName.param,
+    vendorName: vendorName.param,
+    itemParameters: itemParameters.param
   }
 }
 
@@ -260,7 +269,11 @@ const checkItemUpdate = (object: any): ItemUpdateInput => {
 const checkItemMediaUpload = (object: any): Express.Multer.File[] => {
   isInputProvided(object, 'Missing images')
   isStringOrArray({ name: 'images', param: object })
-  object.map((item: object) => isImage({ name: 'images', param: item }))
+
+  Array.isArray(object)
+    ? object.map((item: object) => isImage({ name: 'image', param: item }))
+    : isImage({ name: 'image', param: object })
+
   return object
 }
 

@@ -40,8 +40,19 @@ export const isString: CP = ({ name, param }) => {
   return { name, param }
 }
 
+export const isArray: CP = ({ name, param }) => {
+  if (!Array.isArray(param)) {
+    throw new StatusError(400, `Incorrect ${name}: ${param}`)
+  }
+  return { name, param }
+}
+
 export const isStringOrArray: CP = ({ name, param }) => {
-  if (typeof (param) !== 'string' && !(param instanceof String) && !Array.isArray(param)) {
+  if (
+    typeof (param) !== 'string' &&
+    !(param instanceof String) &&
+    !Array.isArray(param)
+  ) {
     throw new StatusError(400, `Incorrect ${name}: ${param}`)
   }
   return { name, param }
@@ -85,6 +96,24 @@ export const isPasswordValid: CP = ({ name, param }) => {
 export const isImage: CP = ({ name, param }) => {
   if (!param.mimetype || ![ 'image/png', 'image/jpeg', 'image/webp' ].includes(param.mimetype)) {
     throw new StatusError(400, 'Image files only!')
+  }
+  return { name, param }
+}
+
+export const isItemParameter: CP = ({ name, param }) => {
+  if (
+    !('parameterName' in param) ||
+    !('value' in param) ||
+    !(
+      typeof (param.parameterName) === 'string' ||
+      param.parameterName instanceof String
+    ) ||
+    !(
+      typeof (param.value) === 'string' ||
+       param.value instanceof String
+    )
+  ) {
+    throw new StatusError(400, `Incorrect ${name}: ${param}`)
   }
   return { name, param }
 }

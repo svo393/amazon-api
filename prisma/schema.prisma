@@ -8,32 +8,31 @@ generator client {
 }
 
 model Item {
-  id               String          @id
-  name             String
-  listPrice        Int
-  price            Int
-  shortDescription String
-  longDescription  String
-  stock            Int
-  stars            Int             @default(0)
-  media            Int
-  primaryMedia     Int
-  createdAt        DateTime        @default(now())
-  updatedAt        DateTime        @updatedAt
-  isAvailable      Boolean         @default(true)
-  ratings          Rating[]
-  questions        Question[]
-  user             User            @relation(fields: [userID], references: [id])
-  userID           String
-  category         Category        @relation(fields: [categoryName], references: [name])
-  categoryName     String
-  vendor           Vendor          @relation(fields: [vendorName], references: [name])
-  vendorName       String
-  brandSection     BrandSection    @relation(fields: [brandSectionID], references: [id])
-  brandSectionID   String
-  cartItems        CartItem[]
-  group            ItemGroup[]     @relation(references: [id])
-  itemParameter    ItemParameter[]
+  id             String          @id
+  name           String
+  listPrice      Int
+  price          Int
+  description    String
+  stock          Int
+  stars          Int             @default(0)
+  media          Int
+  primaryMedia   Int
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  isAvailable    Boolean         @default(true)
+  ratings        Rating[]
+  questions      Question[]
+  user           User            @relation(fields: [userID], references: [id])
+  userID         String
+  category       Category        @relation(fields: [categoryName], references: [name])
+  categoryName   String
+  vendor         Vendor          @relation(fields: [vendorName], references: [name])
+  vendorName     String
+  brandSection   BrandSection    @relation(fields: [brandSectionID], references: [id])
+  brandSectionID String
+  cartItems      CartItem[]
+  groupItems     GroupItem[]
+  itemParameters ItemParameter[]
 }
 
 model Category {
@@ -55,16 +54,24 @@ model BrandSection {
   item    Item[]
 }
 
-model ItemGroup {
-  id          String    @default(cuid()) @id
-  parameter   Parameter @relation(fields: [parameterID], references: [name])
-  parameterID String
-  item        Item[]    @relation(references: [id])
+model Group {
+  id        String      @default(cuid()) @id
+  name      String
+  groupItem GroupItem[]
+}
+
+model GroupItem {
+  value   String
+  item    Item   @relation(fields: [itemID], references: [id])
+  itemID  String
+  group   Group  @relation(fields: [groupID], references: [id])
+  groupID String
+
+  @@id([itemID, groupID])
 }
 
 model Parameter {
   name          String          @id
-  group         ItemGroup[]
   itemParameter ItemParameter[]
 }
 

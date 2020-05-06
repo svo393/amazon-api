@@ -16,13 +16,15 @@ export type ItemCreateInputRaw = Omit<Item,
   | 'updatedAt'
   | 'stars'
   | 'id'
-  | 'userID'
-  | 'categoryName'
-  | 'vendorName'
+  | 'brandSectionID'
 > & {
-  user: string;
-  category: string;
-  vendor: string;
+  brandSection: string;
+  itemParameters: [
+    {
+      parameterName: string;
+      value: string;
+    }
+  ];
 }
 
 export type PasswordResetInput = {

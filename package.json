@@ -66,6 +66,7 @@
     "lint": "eslint './src/**/*.ts'",
     "lint:fix": "eslint './src/**/*.ts' --fix",
     "start": "cross-env NODE_ENV=production node build/index.js",
+    "seed": "cross-env NODE_ENV=test jest ./tests/seed.test.ts --verbose --runInBand",
     "test": "cross-env NODE_ENV=test jest --verbose --runInBand",
     "test:vendors": "cross-env NODE_ENV=test jest ./tests/vendorsAPI.test.ts --verbose  --runInBand",
     "test:cats": "cross-env NODE_ENV=test jest ./tests/categoriesAPI.test.ts --verbose  --runInBand",
