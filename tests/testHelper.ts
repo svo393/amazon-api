@@ -21,6 +21,10 @@ export const root = {
 
 export const populateUsers = async (api: supertest.SuperTest<supertest.Test>): Promise<void> => {
   try {
+    await prisma.groupItem.deleteMany({})
+    await prisma.group.deleteMany({})
+    await prisma.itemParameter.deleteMany({})
+    await prisma.parameter.deleteMany({})
     await prisma.item.deleteMany({})
     await prisma.category.deleteMany({})
     await prisma.vendor.deleteMany({})

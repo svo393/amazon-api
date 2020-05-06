@@ -14,7 +14,9 @@ const prisma = new PrismaClient()
 
 const itemFieldSet = {
   questions: true,
-  ratings: true
+  ratings: true,
+  itemParameters: true,
+  groupItems: true
 }
 
 const addItem = async (itemInput: ItemCreateInputRaw): Promise<ItemPublicData> => {
@@ -42,6 +44,25 @@ const addItem = async (itemInput: ItemCreateInputRaw): Promise<ItemPublicData> =
     select: { id: true }
   })
 
+  const addedItem = await prisma.item.create({
+    data: {
+      ...R.omit([
+        'groups',
+        'itemParameters',
+        'categoryName',
+        'vendorName',
+        'userID',
+        'brandSection'
+      ], itemInput),
+      id,
+      brandSection: { connect: { id: brandSection.id } },
+      user: { connect: { id: itemInput.userID } },
+      category: { connect: { name: category.name } },
+      vendor: { connect: { name: vendor.name } }
+    },
+    include: itemFieldSet
+  })
+
   itemInput.itemParameters.map(async (p) => {
     const parameter = await prisma.parameter.upsert({
       where: { name: p.name },
@@ -59,7 +80,7 @@ const addItem = async (itemInput: ItemCreateInputRaw): Promise<ItemPublicData> =
     })
   })
 
-  itemInput.group.map(async (i) => {
+  itemInput.groups.map(async (i) => {
     let group: { id: string }
 
     if (i.itemID) {
@@ -86,18 +107,6 @@ const addItem = async (itemInput: ItemCreateInputRaw): Promise<ItemPublicData> =
         group: { connect: { id: group.id } }
       }
     })
-  })
-
-  const addedItem = await prisma.item.create({
-    data: {
-      ...itemInput,
-      id,
-      brandSection: { connect: { id: brandSection.id } },
-      user: { connect: { id: itemInput.userID } },
-      category: { connect: { name: category.name } },
-      vendor: { connect: { name: vendor.name } }
-    },
-    include: itemFieldSet
   })
 
   await prisma.disconnect()

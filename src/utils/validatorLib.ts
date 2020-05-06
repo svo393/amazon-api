@@ -115,3 +115,19 @@ export const isItemParameter: CP = ({ name, param }) => {
   }
   return { name, param }
 }
+
+export const isGroup: CP = ({ name, param }) => {
+  if (
+    !(
+      typeof (param.name) === 'string' ||
+      param.name instanceof String
+    ) ||
+    !(
+      typeof (param.value) === 'string' ||
+       param.value instanceof String
+    )
+  ) {
+    throw new StatusError(400, `Incorrect ${name}: ${param}`)
+  }
+  return { name, param }
+}

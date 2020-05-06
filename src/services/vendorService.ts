@@ -1,11 +1,14 @@
-import { PrismaClient, Vendor, VendorCreateInput, VendorGetPayload, VendorUpdateInput } from '@prisma/client'
+import { PrismaClient, Vendor, VendorCreateInput, VendorUpdateInput } from '@prisma/client'
+import R from 'ramda'
+import { ItemPublicData } from '../types'
 import StatusError from '../utils/StatusError'
 
 const prisma = new PrismaClient()
 
-type VendorAllData = VendorGetPayload<{
-  include: { items: true };
-}>
+type VendorData = {
+  name: string;
+  items: ItemPublicData[];
+}
 
 const addVendor = async (vendorInput: VendorCreateInput): Promise<Vendor> => {
   const existingVendor = await prisma.vendor.findOne({
@@ -26,15 +29,27 @@ const addVendor = async (vendorInput: VendorCreateInput): Promise<Vendor> => {
   return addedVendor
 }
 
-const getVendors = async (): Promise<VendorAllData[]> => {
+const getVendors = async (): Promise<VendorData[]> => {
   const vendors = await prisma.vendor.findMany({
     include: { items: true }
   })
   await prisma.disconnect()
-  return vendors
+
+  const filteredVendors = vendors.map((v) => ({
+    ...v,
+    items: v.items.map((i) =>
+      R.omit([
+        'createdAt',
+        'updatedAt',
+        'userID'
+      ])(i)
+    )
+  }))
+
+  return filteredVendors
 }
 
-const getVendorByName = async (name: string): Promise<VendorAllData> => {
+const getVendorByName = async (name: string): Promise<VendorData> => {
   const vendor = await prisma.vendor.findOne({
     where: { name },
     include: { items: true }

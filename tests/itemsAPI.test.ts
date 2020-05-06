@@ -38,7 +38,7 @@ describe('Item adding', () => {
 
     const itemsAtEnd = await itemsInDB()
     const descriptions = itemsAtEnd.map((i) => i.description)
-    expect(descriptions).toContain('Very Cool Item')
+    expect(descriptions).toContain(items[0].description)
   })
 
   test('400 if no price', async () => {

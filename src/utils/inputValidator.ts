@@ -1,7 +1,7 @@
 import { CategoryCreateInput, CategoryUpdateInput, ItemUpdateInput, UserCreateInput, UserUpdateInput, VendorCreateInput, VendorUpdateInput } from '@prisma/client'
 import R from 'ramda'
 import { ItemCreateInputRaw, PasswordResetInput, UserLoginInput } from '../types'
-import { hasDefinedProps, isArray, isBoolean, isEmail, isImage, isInputProvided, isItemParameter, isNumber, isPasswordValid, isProvided, isRole, isString, isStringOrArray } from './validatorLib'
+import { hasDefinedProps, isArray, isBoolean, isEmail, isImage, isInputProvided, isItemParameter, isNumber, isPasswordValid, isProvided, isRole, isString, isStringOrArray, isGroup } from './validatorLib'
 
 const checkNewUser = (object: any): UserCreateInput => {
   const email = R.pipe(
@@ -172,6 +172,14 @@ const checkNewItem = (object: any): ItemCreateInputRaw => {
     isString
   )({ name: 'vendorName', param: object.vendorName })
 
+  const groups = R.pipe(
+    isProvided,
+    isArray
+  )({ name: 'groups', param: object.groups })
+
+  groups.param.map((p: object) =>
+    isGroup({ name: 'itemParameter', param: p }))
+
   const itemParameters = R.pipe(
     isProvided,
     isArray
@@ -193,6 +201,7 @@ const checkNewItem = (object: any): ItemCreateInputRaw => {
     userID: userID.param,
     categoryName: categoryName.param,
     vendorName: vendorName.param,
+    groups: groups.param,
     itemParameters: itemParameters.param
   }
 }

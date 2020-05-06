@@ -25,7 +25,7 @@ export type ItemCreateInputRaw = Omit<Item,
     name: string;
     value: string;
   }[];
-  group: {
+  groups: {
     name: string;
     itemID?: string;
     value: string;
