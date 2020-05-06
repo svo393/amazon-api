@@ -10,7 +10,7 @@ type VendorAllData = VendorGetPayload<{
 const addVendor = async (vendorInput: VendorCreateInput): Promise<Vendor> => {
   const existingVendor = await prisma.vendor.findOne({
     where: { name: vendorInput.name },
-    select: { id: true }
+    select: { name: true }
   })
 
   if (existingVendor) {
@@ -34,9 +34,9 @@ const getVendors = async (): Promise<VendorAllData[]> => {
   return vendors
 }
 
-const getVendorByID = async (id: string): Promise<VendorAllData> => {
+const getVendorByName = async (name: string): Promise<VendorAllData> => {
   const vendor = await prisma.vendor.findOne({
-    where: { id },
+    where: { name },
     include: { items: true }
   })
   await prisma.disconnect()
@@ -46,9 +46,9 @@ const getVendorByID = async (id: string): Promise<VendorAllData> => {
   return vendor
 }
 
-const updateVendor = async (vendorInput: VendorUpdateInput, id: string): Promise<VendorAllData> => {
+const updateVendor = async (vendorInput: VendorUpdateInput, name: string): Promise<VendorAllData> => {
   const updatedVendor = await prisma.vendor.update({
-    where: { id },
+    where: { name },
     data: vendorInput,
     include: { items: true }
   })
@@ -62,6 +62,6 @@ const updateVendor = async (vendorInput: VendorUpdateInput, id: string): Promise
 export default {
   addVendor,
   getVendors,
-  getVendorByID,
+  getVendorByName,
   updateVendor
 }

@@ -27,23 +27,75 @@ const addItem = async (itemInput: ItemCreateInputRaw): Promise<ItemPublicData> =
     where: { name: itemInput.categoryName },
     update: { name: itemInput.categoryName },
     create: { name: itemInput.categoryName },
-    select: { id: true }
+    select: { name: true }
   })
 
   const vendor = await prisma.vendor.upsert({
     where: { name: itemInput.vendorName },
     update: { name: itemInput.vendorName },
     create: { name: itemInput.vendorName },
+    select: { name: true }
+  })
+
+  const brandSection = await prisma.brandSection.create({
+    data: { content: itemInput.brandSection },
     select: { id: true }
+  })
+
+  itemInput.itemParameters.map(async (p) => {
+    const parameter = await prisma.parameter.upsert({
+      where: { name: p.name },
+      update: { name: p.name },
+      create: { name: p.name },
+      select: { name: true }
+    })
+
+    await prisma.itemParameter.create({
+      data: {
+        value: p.value,
+        item: { connect: { id } },
+        parameter: { connect: { name: parameter.name } }
+      }
+    })
+  })
+
+  itemInput.group.map(async (i) => {
+    let group: { id: string }
+
+    if (i.itemID) {
+      const groupItems = await prisma.groupItem.findMany({
+        where: { itemID: i.itemID },
+        select: { group: true }
+      })
+
+      const targetGroup = groupItems.find((gi) => gi.group.name === i.name)
+      if (!targetGroup) { throw new StatusError(400, 'Invalid Group') }
+
+      group = targetGroup.group
+    } else {
+      group = await prisma.group.create({
+        data: { name: i.name },
+        select: { id: true }
+      })
+    }
+
+    await prisma.groupItem.create({
+      data: {
+        value: i.value,
+        item: { connect: { id } },
+        group: { connect: { id: group.id } }
+      }
+    })
   })
 
   const addedItem = await prisma.item.create({
     data: {
       ...itemInput,
       id,
+      brandSection: { connect: { id: brandSection.id } },
       user: { connect: { id: itemInput.userID } },
-      category: { connect: { id: category.id } },
-      vendor: { connect: { id: vendor.id } }
+      category: { connect: { name: category.name } },
+      vendor: { connect: { name: vendor.name } }
     },
     include: itemFieldSet
   })
@@ -86,7 +138,6 @@ const getItemByID = async (id: string, res: Response): Promise<ItemPublicData| I
       'updatedAt',
       'userID'
     ], item)
-
   return itemData
 }
 
@@ -98,7 +149,6 @@ const updateItem = async (itemInput: ItemUpdateInput, id: string): Promise<Item>
   await prisma.disconnect()
 
   if (!updatedItem) { throw new StatusError(404, 'Not Found') }
-
   return updatedItem
 }
 
@@ -108,8 +158,12 @@ const storage = multer.diskStorage({
 })
 
 const imagePath = './public/uploads'
-const maxWidth = 500
-const maxHeight = 500
+const maxWidth = 1500
+const maxHeight = 1500
+const previewWidth = 450
+const previewHeight = 450
+const thumbWidth = 40
+const thumbHeight = 40
 
 const multerUpload = multer({ storage })
 
@@ -124,28 +178,57 @@ const uploadImages = (files: Express.Multer.File[], id: string): void => {
         .resize(maxWidth, maxHeight, { fit: 'inside' })
         .jpeg({ progressive: true })
         .toFile(
-          path.resolve(imagePath, `${fileName}.jpg`)
+          path.resolve(imagePath, `${fileName}_${maxWidth}.jpg`)
         )
 
       await image
         .resize(maxWidth, maxHeight, { fit: 'inside' })
         .webp()
         .toFile(
-          path.resolve(imagePath, `${fileName}.webp`)
+          path.resolve(imagePath, `${fileName}_${maxWidth}.webp`)
         )
     } else {
       await image
         .jpeg({ progressive: true })
         .toFile(
-          path.resolve(imagePath, `${fileName}.jpg`)
+          path.resolve(imagePath, `${fileName}_${maxWidth}.jpg`)
         )
 
       await image
         .webp()
         .toFile(
-          path.resolve(imagePath, `${fileName}.webp`)
+          path.resolve(imagePath, `${fileName}_${maxWidth}.webp`)
         )
     }
+
+    await image
+      .resize(previewWidth, previewHeight, { fit: 'inside' })
+      .jpeg({ progressive: true })
+      .toFile(
+        path.resolve(imagePath, `${fileName}_${previewWidth}.jpg`)
+      )
+
+    await image
+      .resize(previewWidth, previewHeight, { fit: 'inside' })
+      .webp()
+      .toFile(
+        path.resolve(imagePath, `${fileName}_${previewWidth}.webp`)
+      )
+
+    await image
+      .resize(thumbWidth, thumbHeight, { fit: 'inside' })
+      .jpeg({ progressive: true })
+      .toFile(
+        path.resolve(imagePath, `${fileName}_${thumbWidth}.jpg`)
+      )
+
+    await image
+      .resize(thumbWidth, thumbHeight, { fit: 'inside' })
+      .webp()
+      .toFile(
+        path.resolve(imagePath, `${fileName}_${thumbWidth}.webp`)
+      )
+
     fs.unlinkSync(file.path)
   })
 }

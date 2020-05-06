@@ -17,15 +17,15 @@ router.get('/', async (_req, res) => {
   res.json(categories)
 })
 
-router.get('/:id', async (req, res) => {
-  const category = await categoryService.getCategoryByID(req.params.id)
+router.get('/:name', async (req, res) => {
+  const category = await categoryService.getCategoryByName(req.params.name)
   res.json(category)
 })
 
-router.put('/:id', async (req, res) => {
+router.put('/:name', async (req, res) => {
   await shield.isAdmin(res)
   const categoryInput = inputValidator.checkCategoryUpdate(req.body)
-  const updatedItem = await categoryService.updateCategory(categoryInput, req.params.id)
+  const updatedItem = await categoryService.updateCategory(categoryInput, req.params.name)
   res.json(updatedItem)
 })
 

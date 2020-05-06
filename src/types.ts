@@ -1,8 +1,10 @@
-import { Item, Question, Rating } from '@prisma/client'
+import { GroupItem, Item, ItemParameter, Question, Rating } from '@prisma/client'
 
 export type ItemAllData = Item & {
   questions: Question[];
   ratings: Rating[];
+  groupItems: GroupItem[];
+  itemParameters: ItemParameter[];
 }
 
 export type ItemPublicData = Omit<ItemAllData,
@@ -19,12 +21,15 @@ export type ItemCreateInputRaw = Omit<Item,
   | 'brandSectionID'
 > & {
   brandSection: string;
-  itemParameters: [
-    {
-      parameterName: string;
-      value: string;
-    }
-  ];
+  itemParameters: {
+    name: string;
+    value: string;
+  }[];
+  group: {
+    name: string;
+    itemID?: string;
+    value: string;
+  }[];
 }
 
 export type PasswordResetInput = {

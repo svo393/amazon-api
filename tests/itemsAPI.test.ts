@@ -1,26 +1,14 @@
 import path from 'path'
 import supertest from 'supertest'
 import app from '../src/app'
-import { ItemCreateInputRaw, ItemPublicData } from '../src/types'
+import { ItemPublicData } from '../src/types'
 import { itemsInDB, loginAs, populateUsers } from './testHelper'
+import { items } from './seedData'
 
 const api = supertest(app)
 const apiURL = '/api/items'
 
-const newItem = (id: string): ItemCreateInputRaw => ({
-  name: 'New Item',
-  price: 13879,
-  shortDescription: 'Cool Item',
-  longDescription: 'Very Cool Item',
-  stock: 34,
-  isAvailable: true,
-  asin: (new Date().getTime()).toString(),
-  media: 5,
-  primaryMedia: 0,
-  user: id,
-  category: 'Great Stuff',
-  vendor: 'Demix'
-})
+const newItem = items[0]
 
 const createOneItem = async (role: string): Promise<{addedItem: ItemPublicData; token: string}> => {
   const { token, id } = await loginAs(role, api)
@@ -28,7 +16,7 @@ const createOneItem = async (role: string): Promise<{addedItem: ItemPublicData; 
   const { body } = await api
     .post(apiURL)
     .set('Cookie', `token=${token}`)
-    .send(newItem(id))
+    .send({ ...newItem, userID: id })
 
   return { addedItem: body, token }
 }
@@ -38,25 +26,29 @@ beforeEach(async () => {
 })
 
 describe('Item adding', () => {
-  test('201', async () => {
+  test.only('201', async () => {
     const { token, id } = await loginAs('root', api)
 
     await api
       .post(apiURL)
       .set('Cookie', `token=${token}`)
-      .send(newItem(id))
+      .send({ ...newItem, userID: id })
       .expect(201)
       .expect('Content-Type', /application\/json/)
 
     const itemsAtEnd = await itemsInDB()
-    const longDescriptions = itemsAtEnd.map((i) => i.longDescription)
-    expect(longDescriptions).toContain('Very Cool Item')
+    const descriptions = itemsAtEnd.map((i) => i.description)
+    expect(descriptions).toContain('Very Cool Item')
   })
 
   test('400 if no price', async () => {
     const { token, id } = await loginAs('root', api)
 
-    const newItemWithoutPrice = { ...newItem(id), price: undefined }
+    const newItemWithoutPrice = {
+      ...newItem,
+      userID: id,
+      price: undefined
+    }
 
     await api
       .post(apiURL)

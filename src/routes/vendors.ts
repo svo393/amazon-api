@@ -17,15 +17,15 @@ router.get('/', async (_req, res) => {
   res.json(vendors)
 })
 
-router.get('/:id', async (req, res) => {
-  const vendor = await vendorService.getVendorByID(req.params.id)
+router.get('/:name', async (req, res) => {
+  const vendor = await vendorService.getVendorByName(req.params.name)
   res.json(vendor)
 })
 
-router.put('/:id', async (req, res) => {
+router.put('/:name', async (req, res) => {
   await shield.isAdmin(res)
   const vendorInput = inputValidator.checkVendorUpdate(req.body)
-  const updatedItem = await vendorService.updateVendor(vendorInput, req.params.id)
+  const updatedItem = await vendorService.updateVendor(vendorInput, req.params.name)
   res.json(updatedItem)
 })
 

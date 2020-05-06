@@ -10,7 +10,7 @@ type CategoryAllData = CategoryGetPayload<{
 const addCategory = async (categoryInput: CategoryCreateInput): Promise<Category> => {
   const existingCategory = await prisma.category.findOne({
     where: { name: categoryInput.name },
-    select: { id: true }
+    select: { name: true }
   })
 
   if (existingCategory) {
@@ -34,9 +34,9 @@ const getCategories = async (): Promise<CategoryAllData[]> => {
   return categories
 }
 
-const getCategoryByID = async (id: string): Promise<CategoryAllData> => {
+const getCategoryByName = async (name: string): Promise<CategoryAllData> => {
   const category = await prisma.category.findOne({
-    where: { id },
+    where: { name },
     include: { items: true, children: true }
   })
   await prisma.disconnect()
@@ -46,9 +46,9 @@ const getCategoryByID = async (id: string): Promise<CategoryAllData> => {
   return category
 }
 
-const updateCategory = async (categoryInput: CategoryUpdateInput, id: string): Promise<CategoryAllData> => {
+const updateCategory = async (categoryInput: CategoryUpdateInput, name: string): Promise<CategoryAllData> => {
   const updatedCategory = await prisma.category.update({
-    where: { id },
+    where: { name },
     data: categoryInput,
     include: { items: true, children: true }
   })
@@ -62,6 +62,6 @@ const updateCategory = async (categoryInput: CategoryUpdateInput, id: string): P
 export default {
   addCategory,
   getCategories,
-  getCategoryByID,
+  getCategoryByName,
   updateCategory
 }

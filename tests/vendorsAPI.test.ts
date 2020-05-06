@@ -1,4 +1,4 @@
-import { VendorCreateInput } from '@prisma/client'
+import { VendorCreateInput, Vendor } from '@prisma/client'
 import supertest from 'supertest'
 import app from '../src/app'
 import { loginAs, populateUsers, vendorsInDB } from './testHelper'
@@ -10,7 +10,7 @@ const newVendor = (): VendorCreateInput => ({
   name: `New Vendor ${(new Date().getTime()).toString()}`
 })
 
-const createOneVendor = async (role: string): Promise<any> => {
+const createOneVendor = async (role: string): Promise<{ addedVendor: Vendor; token: string}> => {
   const { token } = await loginAs(role, api)
 
   const { body } = await api
@@ -63,7 +63,7 @@ describe('Vendor fetching', () => {
     const { addedVendor } = await createOneVendor('admin')
 
     const { body } = await api
-      .get(`${apiURL}/${addedVendor.id}`)
+      .get(`${apiURL}/${addedVendor.name}`)
       .expect(200)
 
     expect(body).toBeDefined()
@@ -75,7 +75,7 @@ describe('Vendor updating', () => {
     const { addedVendor, token } = await createOneVendor('admin')
 
     const { body } = await api
-      .put(`${apiURL}/${addedVendor.id}`)
+      .put(`${apiURL}/${addedVendor.name}`)
       .set('Cookie', `token=${token}`)
       .send({ name: 'Updated Vendor' })
       .expect(200)
@@ -88,7 +88,7 @@ describe('Vendor updating', () => {
     const { token } = await createOneVendor('customer')
 
     await api
-      .put(`${apiURL}/${addedVendor.id}`)
+      .put(`${apiURL}/${addedVendor.name}`)
       .set('Cookie', `token=${token}`)
       .send({ name: 'Updated Vendor' })
       .expect(403)

@@ -1,4 +1,4 @@
-import { CategoryCreateInput } from '@prisma/client'
+import { CategoryCreateInput, Category } from '@prisma/client'
 import supertest from 'supertest'
 import app from '../src/app'
 import { categoriesInDB, loginAs, populateUsers } from './testHelper'
@@ -10,7 +10,7 @@ const newCategory = (): CategoryCreateInput => ({
   name: `New Category ${(new Date().getTime()).toString()}`
 })
 
-const createOneCategory = async (role: string): Promise<any> => {
+const createOneCategory = async (role: string): Promise<{ addedCategory: Category; token: string}> => {
   const { token } = await loginAs(role, api)
 
   const { body } = await api
@@ -63,7 +63,7 @@ describe('Category fetching', () => {
     const { addedCategory } = await createOneCategory('admin')
 
     const { body } = await api
-      .get(`${apiURL}/${addedCategory.id}`)
+      .get(`${apiURL}/${addedCategory.name}`)
       .expect(200)
 
     expect(body).toBeDefined()
@@ -75,7 +75,7 @@ describe('Category updating', () => {
     const { addedCategory, token } = await createOneCategory('admin')
 
     const { body } = await api
-      .put(`${apiURL}/${addedCategory.id}`)
+      .put(`${apiURL}/${addedCategory.name}`)
       .set('Cookie', `token=${token}`)
       .send({ name: 'Updated Category' })
       .expect(200)
@@ -88,7 +88,7 @@ describe('Category updating', () => {
     const { token } = await createOneCategory('customer')
 
     await api
-      .put(`${apiURL}/${addedCategory.id}`)
+      .put(`${apiURL}/${addedCategory.name}`)
       .set('Cookie', `token=${token}`)
       .send({ name: 'Updated Category' })
       .expect(403)

@@ -37,7 +37,7 @@ export const isString: CP = ({ name, param }) => {
   if (typeof (param) !== 'string' && !(param instanceof String)) {
     throw new StatusError(400, `Incorrect ${name}: ${param}`)
   }
-  return { name, param }
+  return { name, param: param.trim() }
 }
 
 export const isArray: CP = ({ name, param }) => {
@@ -102,11 +102,9 @@ export const isImage: CP = ({ name, param }) => {
 
 export const isItemParameter: CP = ({ name, param }) => {
   if (
-    !('parameterName' in param) ||
-    !('value' in param) ||
     !(
-      typeof (param.parameterName) === 'string' ||
-      param.parameterName instanceof String
+      typeof (param.name) === 'string' ||
+      param.name instanceof String
     ) ||
     !(
       typeof (param.value) === 'string' ||
