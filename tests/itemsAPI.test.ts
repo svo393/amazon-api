@@ -25,8 +25,8 @@ beforeEach(async () => {
   await populateUsers(api)
 })
 
-describe('Item adding', () => {
-  test.only('201', async () => {
+describe.only('Item adding', () => {
+  test('201', async () => {
     const { token, id } = await loginAs('root', api)
 
     await api

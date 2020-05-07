@@ -13,6 +13,16 @@ export type ItemPublicData = Omit<ItemAllData,
   | 'userID'
 >
 
+export type ItemListData = Pick<Item,
+    | 'id'
+    | 'name'
+    | 'listPrice'
+    | 'price'
+    | 'stars'
+    | 'primaryMedia'
+    | 'ratingCount'
+  >;
+
 export type ItemCreateInputRaw = Omit<Item,
   | 'createdAt'
   | 'updatedAt'

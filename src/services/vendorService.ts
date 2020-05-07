@@ -1,19 +1,18 @@
 import { PrismaClient, Vendor, VendorCreateInput, VendorUpdateInput } from '@prisma/client'
 import R from 'ramda'
-import { ItemPublicData } from '../types'
+import { ItemListData } from '../types'
 import StatusError from '../utils/StatusError'
 
 const prisma = new PrismaClient()
 
 type VendorData = {
   name: string;
-  items: ItemPublicData[];
+  items: ItemListData[];
 }
 
 const addVendor = async (vendorInput: VendorCreateInput): Promise<Vendor> => {
   const existingVendor = await prisma.vendor.findOne({
-    where: { name: vendorInput.name },
-    select: { name: true }
+    where: { name: vendorInput.name }
   })
 
   if (existingVendor) {
@@ -29,24 +28,11 @@ const addVendor = async (vendorInput: VendorCreateInput): Promise<Vendor> => {
   return addedVendor
 }
 
-const getVendors = async (): Promise<VendorData[]> => {
-  const vendors = await prisma.vendor.findMany({
-    include: { items: true }
-  })
+const getVendors = async (): Promise<Vendor[]> => {
+  const vendors = await prisma.vendor.findMany()
   await prisma.disconnect()
 
-  const filteredVendors = vendors.map((v) => ({
-    ...v,
-    items: v.items.map((i) =>
-      R.omit([
-        'createdAt',
-        'updatedAt',
-        'userID'
-      ])(i)
-    )
-  }))
-
-  return filteredVendors
+  return vendors
 }
 
 const getVendorByName = async (name: string): Promise<VendorData> => {
@@ -58,10 +44,25 @@ const getVendorByName = async (name: string): Promise<VendorData> => {
 
   if (!vendor) { throw new StatusError(404, 'Not Found') }
 
-  return vendor
+  const filteredVendor = {
+    ...vendor,
+    items: vendor.items.map((i) => (
+      R.pick([
+        'id',
+        'name',
+        'listPrice',
+        'price',
+        'stars',
+        'primaryMedia',
+        'ratingCount'
+      ])(i)
+    ))
+  }
+
+  return filteredVendor
 }
 
-const updateVendor = async (vendorInput: VendorUpdateInput, name: string): Promise<VendorAllData> => {
+const updateVendor = async (vendorInput: VendorUpdateInput, name: string): Promise<VendorData> => {
   const updatedVendor = await prisma.vendor.update({
     where: { name },
     data: vendorInput,

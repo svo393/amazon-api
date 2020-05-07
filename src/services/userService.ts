@@ -32,7 +32,7 @@ type UserListData = Omit<User,
   | 'resetTokenExpiry'
 > & {
   ordersCount: number;
-  ratingsCount: number;
+  ratingCount: number;
   questionsCount: number;
 }
 
@@ -157,7 +157,7 @@ const getUsers = async (): Promise<UserListData[]> => {
   const usersWithCounts = users.map((u) => ({
     ...u,
     ordersCount: u.orders.length,
-    ratingsCount: u.ratings.length,
+    ratingCount: u.ratings.length,
     questionsCount: u.questions.length
   }))
 

@@ -19,6 +19,8 @@ export const root = {
   password: '12345678'
 }
 
+export const sleep = (ms: number): Promise<any> => new Promise((resolve) => setTimeout(resolve, ms))
+
 export const populateUsers = async (api: supertest.SuperTest<supertest.Test>): Promise<void> => {
   try {
     await prisma.groupItem.deleteMany({})
@@ -29,6 +31,8 @@ export const populateUsers = async (api: supertest.SuperTest<supertest.Test>): P
     await prisma.category.deleteMany({})
     await prisma.vendor.deleteMany({})
     await prisma.user.deleteMany({})
+
+    await sleep(2000)
 
     await api
       .post('/api/users')

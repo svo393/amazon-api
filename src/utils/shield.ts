@@ -80,15 +80,15 @@ const isCreator = async (res: Response, name: Model, id: string): Promise<void |
     case 'item':
       data = await prisma.item.findOne(params)
       break
-    case 'cartItem':
-      data = await prisma.cartItem.findOne(params)
-      break
+    // case 'cartItem':
+    //   data = await prisma.cartItem.findOne(params)
+    //   break
     case 'order':
       data = await prisma.order.findOne(params)
       break
-    case 'orderItem':
-      data = await prisma.orderItem.findOne(params)
-      break
+    // case 'orderItem':
+    //   data = await prisma.orderItem.findOne(params)
+    //   break
     case 'question':
       data = await prisma.item.findOne(params)
       break
