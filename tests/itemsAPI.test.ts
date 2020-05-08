@@ -2,8 +2,8 @@ import path from 'path'
 import supertest from 'supertest'
 import app from '../src/app'
 import { ItemPublicData } from '../src/types'
-import { itemsInDB, loginAs, populateUsers } from './testHelper'
 import { items } from './seedData'
+import { itemsInDB, loginAs, populateUsers, purge } from './testHelper'
 
 const api = supertest(app)
 const apiURL = '/api/items'
@@ -22,10 +22,11 @@ const createOneItem = async (role: string): Promise<{addedItem: ItemPublicData; 
 }
 
 beforeEach(async () => {
+  await purge()
   await populateUsers(api)
 })
 
-describe.only('Item adding', () => {
+describe('Item adding', () => {
   test('201', async () => {
     const { token, id } = await loginAs('root', api)
 
@@ -57,7 +58,7 @@ describe.only('Item adding', () => {
       .expect(400)
   })
 
-  test('204 upload file if admin or root', async () => {
+  test.only('204 upload file if admin or root', async () => {
     const { token } = await loginAs('admin', api)
     const { addedItem } = await createOneItem('admin')
 

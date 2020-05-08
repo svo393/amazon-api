@@ -29,6 +29,7 @@ export type ItemCreateInputRaw = Omit<Item,
   | 'stars'
   | 'id'
   | 'brandSectionID'
+  | 'ratingCount'
 > & {
   brandSection: string;
   itemParameters: {

@@ -21,7 +21,7 @@ export const root = {
 
 export const sleep = (ms: number): Promise<any> => new Promise((resolve) => setTimeout(resolve, ms))
 
-export const populateUsers = async (api: supertest.SuperTest<supertest.Test>): Promise<void> => {
+export const purge = async (): Promise<void> => {
   try {
     await prisma.groupItem.deleteMany({})
     await prisma.group.deleteMany({})
@@ -31,9 +31,14 @@ export const populateUsers = async (api: supertest.SuperTest<supertest.Test>): P
     await prisma.category.deleteMany({})
     await prisma.vendor.deleteMany({})
     await prisma.user.deleteMany({})
+    await prisma.disconnect()
+  } catch (err) {
+    console.error(err)
+  }
+}
 
-    await sleep(2000)
-
+export const populateUsers = async (api: supertest.SuperTest<supertest.Test>): Promise<void> => {
+  try {
     await api
       .post('/api/users')
       .send(user)
