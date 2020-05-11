@@ -1,6 +1,5 @@
 interface StatusError extends Error {
   statusCode: number;
-  location?: string;
 }
 
 class StatusError extends Error {
