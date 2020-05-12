@@ -58,7 +58,7 @@ describe('Item adding', () => {
       .expect(400)
   })
 
-  test.only('204 upload file if admin or root', async () => {
+  test('204 upload file if admin or root', async () => {
     const { token } = await loginAs('admin', api)
     const { addedItem } = await createOneItem('admin')
 

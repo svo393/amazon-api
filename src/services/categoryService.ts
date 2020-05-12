@@ -46,7 +46,7 @@ const getCategoryByName = async (name: string): Promise<CategoryData> => {
   })
   await prisma.disconnect()
 
-  if (!category) { throw new StatusError(404, 'Not Found') }
+  if (!category) throw new StatusError(404, 'Not Found')
 
   const filteredCategory = {
     ...category,
@@ -74,7 +74,7 @@ const updateCategory = async (categoryInput: CategoryUpdateInput, name: string):
   })
   await prisma.disconnect()
 
-  if (!updatedCategory) { throw new StatusError(404, 'Not Found') }
+  if (!updatedCategory) throw new StatusError(404, 'Not Found')
 
   return updatedCategory
 }

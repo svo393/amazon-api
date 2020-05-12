@@ -18,7 +18,7 @@ const prisma = new PrismaClient()
 export const getUserRole = async (res: Response): Promise<Role | null> => {
   const userID = res.locals.userID
 
-  if (!userID) { return null }
+  if (!userID) return null
 
   const user = await prisma.user.findOne({
     where: { id: userID },
@@ -35,13 +35,13 @@ export const getUserRole = async (res: Response): Promise<Role | null> => {
 }
 
 const isLoggedIn = (res: Response): void => {
-  if (!res.locals.userID) { throw new StatusError(403, 'Forbidden') }
+  if (!res.locals.userID) throw new StatusError(403, 'Forbidden')
 }
 
 const isRoot = async (res: Response): Promise<void> => {
   isLoggedIn(res)
   const role = await getUserRole(res)
-  if (role !== 'ROOT') { throw new StatusError(403, 'Forbidden') }
+  if (role !== 'ROOT') throw new StatusError(403, 'Forbidden')
 }
 
 const isAdmin = async (res: Response): Promise<void> => {
@@ -109,8 +109,8 @@ const isCreator = async (res: Response, name: Model, id: string): Promise<void |
   }
   await prisma.disconnect()
 
-  if (!data) { throw new StatusError(404, 'Not Found') }
-  if (data.user.id !== userID) { throw new StatusError(403, 'Forbidden') }
+  if (!data) throw new StatusError(404, 'Not Found')
+  if (data.user.id !== userID) throw new StatusError(403, 'Forbidden')
 }
 
 export default {

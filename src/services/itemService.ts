@@ -90,7 +90,7 @@ const addItem = async (itemInput: ItemCreateInputRaw): Promise<ItemPublicData> =
       })
 
       const targetGroup = groupItems.find((gi) => gi.group.name === i.name)
-      if (!targetGroup) { throw new StatusError(400, 'Invalid Group') }
+      if (!targetGroup) throw new StatusError(400, 'Invalid Group')
 
       group = targetGroup.group
     } else {
@@ -135,7 +135,7 @@ const getItemByID = async (id: string, res: Response): Promise<ItemPublicData| I
   })
   await prisma.disconnect()
 
-  if (!item) { throw new StatusError(404, 'Not Found') }
+  if (!item) throw new StatusError(404, 'Not Found')
 
   const role = await getUserRole(res)
   const userIsAdminOrRoot = role === 'ADMIN' || role === 'ROOT'
@@ -157,7 +157,7 @@ const updateItem = async (itemInput: ItemUpdateInput, id: string): Promise<Item>
   })
   await prisma.disconnect()
 
-  if (!updatedItem) { throw new StatusError(404, 'Not Found') }
+  if (!updatedItem) throw new StatusError(404, 'Not Found')
   return updatedItem
 }
 

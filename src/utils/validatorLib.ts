@@ -52,9 +52,8 @@ export const isStringOrArray: CP = ({ name, param }) => {
     typeof (param) !== 'string' &&
     !(param instanceof String) &&
     !Array.isArray(param)
-  ) {
-    throw new StatusError(400, `Incorrect ${name}: ${param}`)
-  }
+  ) throw new StatusError(400, `Incorrect ${name}: ${param}`)
+
   return { name, param }
 }
 
@@ -110,9 +109,8 @@ export const isItemParameter: CP = ({ name, param }) => {
       typeof (param.value) === 'string' ||
        param.value instanceof String
     )
-  ) {
-    throw new StatusError(400, `Incorrect ${name}: ${param}`)
-  }
+  ) throw new StatusError(400, `Incorrect ${name}: ${param}`)
+
   return { name, param }
 }
 
@@ -126,8 +124,7 @@ export const isGroup: CP = ({ name, param }) => {
       typeof (param.value) === 'string' ||
        param.value instanceof String
     )
-  ) {
-    throw new StatusError(400, `Incorrect ${name}: ${param}`)
-  }
+  ) throw new StatusError(400, `Incorrect ${name}: ${param}`)
+
   return { name, param }
 }

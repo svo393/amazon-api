@@ -70,7 +70,7 @@ export const getUserByEmail = async (email: string): Promise<User> => {
   const user = await prisma.user.findOne({ where: { email } })
   await prisma.disconnect()
 
-  if (!user) { throw new StatusError(404, 'Not Found') }
+  if (!user) throw new StatusError(404, 'Not Found')
   return user
 }
 

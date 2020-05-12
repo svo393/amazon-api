@@ -42,7 +42,7 @@ const getVendorByName = async (name: string): Promise<VendorData> => {
   })
   await prisma.disconnect()
 
-  if (!vendor) { throw new StatusError(404, 'Not Found') }
+  if (!vendor) throw new StatusError(404, 'Not Found')
 
   const filteredVendor = {
     ...vendor,
@@ -70,7 +70,7 @@ const updateVendor = async (vendorInput: VendorUpdateInput, name: string): Promi
   })
   await prisma.disconnect()
 
-  if (!updatedVendor) { throw new StatusError(404, 'Not Found') }
+  if (!updatedVendor) throw new StatusError(404, 'Not Found')
 
   return updatedVendor
 }

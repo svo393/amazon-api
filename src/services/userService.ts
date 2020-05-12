@@ -232,7 +232,7 @@ const updateUser = async (userInput: UserUpdateInput, id: string): Promise<UserP
 
 const sendPasswordReset = async (email: string): Promise<void> => {
   const user = await prisma.user.findOne({ where: { email } })
-  if (!user) { throw new StatusError(401, 'Invalid email') }
+  if (!user) throw new StatusError(401, 'Invalid email')
 
   const resetToken = (await promisify(randomBytes)(20)).toString('hex')
   const resetTokenExpiry = (Date.now() + 1000 * 60 * 60).toString()
