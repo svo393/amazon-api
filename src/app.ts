@@ -3,21 +3,16 @@ import cors from 'cors'
 import express from 'express'
 import helmet from 'helmet'
 import logger from 'morgan'
+import router from './routes'
 import env from './utils/config'
 import { errorHandler, getUserID, unknownEndpoint } from './utils/middleware'
-
-require('express-async-errors')
-import vendorsRouter from './routes/vendors' // eslint-disable-line
-import categoriesRouter from './routes/categories' // eslint-disable-line
-import itemsRouter from './routes/items' // eslint-disable-line
-import usersRouter from './routes/users' // eslint-disable-line
 
 const app = express()
 app.use(helmet())
 
 app.use(cors({
   credentials: true,
-  origin: 'http://localhost:3000',
+  origin: env.BASE_URL,
   optionsSuccessStatus: 200
 }))
 
@@ -26,11 +21,7 @@ app.use(getUserID)
 app.use(express.json())
 env.NODE_ENV === 'development' && app.use(logger('dev'))
 
-app.use('/api/vendors', vendorsRouter)
-app.use('/api/categories', categoriesRouter)
-app.use('/api/items', itemsRouter)
-app.use('/api/users', usersRouter)
-
+app.use('/api', router)
 app.use(unknownEndpoint)
 app.use(errorHandler)
 

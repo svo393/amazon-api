@@ -24,9 +24,9 @@ const envVars: Config = R.pickAll([
   'MAIL_PASS'
 ], process.env)
 
-envVars.BASE_URL = process.env.NODE_ENV === 'development'
-  ? process.env.DEV_URL
-  : process.env.PROD_URL
+envVars.BASE_URL = process.env.NODE_ENV === 'production'
+  ? process.env.PROD_URL
+  : process.env.DEV_URL
 
 if (R.any(R.isNil)(R.values(envVars))) {
   console.error('Missing environment variables. Shutting down...')
