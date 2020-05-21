@@ -23,7 +23,7 @@ const config = {
       host: '127.0.0.1',
       user: 'mosh',
       password: '123456',
-      database: 'sql_invoicing'
+      database: 'sql_store'
     }
   }
 }

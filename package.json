@@ -52,7 +52,7 @@
     "supertest": "^4.0.2",
     "ts-jest": "^25.4.0",
     "ts-node-dev": "^1.0.0-pre.44",
-    "typescript": "^4.0.0-dev.20200512"
+    "typescript": "^4.0.0-dev.20200519"
   },
   "jest": {
     "preset": "ts-jest",

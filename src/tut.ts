@@ -3,7 +3,15 @@ import knexConfig from '../db/knexfile'
 
 const knex = Knex(knexConfig.test)
 
-const query = knex('invoices as i')
+// const subQuery = knex('customers as c')
+//   .select('customer_id')
+//   .where('points', '>=', 2000)
+
+const query = knex('users')
+
+// .groupBy('customer_id', 'first_name')
+// .count('customer_id')
+// .where('customer_id', 'in', subQuery)
 // .insert([
 //   { id: '1', name: 'John Smith' },
 //   { id: '2', name: 'Jane Smith' }
