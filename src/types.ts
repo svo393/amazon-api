@@ -1,47 +1,47 @@
-// import { GroupItem, Item, ItemParameter, Question, Rating } from '@prisma/client'
+import { GroupItem, Item, ItemParameter, Question as Question1, Rating as Rating1 } from '@prisma/client'
 
-// export type ItemAllData = Item & {
-//   questions: Question[];
-//   ratings: Rating[];
-//   groupItems: GroupItem[];
-//   itemParameters: ItemParameter[];
-// }
+export type ItemAllData = Item & {
+  questions: Question1[];
+  ratings: Rating1[];
+  groupItems: GroupItem[];
+  itemParameters: ItemParameter[];
+}
 
-// export type ItemPublicData = Omit<ItemAllData,
-//   | 'createdAt'
-//   | 'updatedAt'
-//   | 'userID'
-// >
+export type ItemPublicData = Omit<ItemAllData,
+  | 'createdAt'
+  | 'updatedAt'
+  | 'userID'
+>
 
-// export type ItemListData = Pick<Item,
-//     | 'id'
-//     | 'name'
-//     | 'listPrice'
-//     | 'price'
-//     | 'stars'
-//     | 'primaryMedia'
-//     | 'ratingCount'
-//   >;
+export type ItemListData = Pick<Item,
+    | 'id'
+    | 'name'
+    | 'listPrice'
+    | 'price'
+    | 'stars'
+    | 'primaryMedia'
+    | 'ratingCount'
+  >;
 
-// export type ItemCreateInputRaw = Omit<Item,
-//   | 'createdAt'
-//   | 'updatedAt'
-//   | 'stars'
-//   | 'id'
-//   | 'brandSectionID'
-//   | 'ratingCount'
-// > & {
-//   brandSection: string;
-//   itemParameters: {
-//     name: string;
-//     value: string;
-//   }[];
-//   groups: {
-//     name: string;
-//     itemID?: string;
-//     value: string;
-//   }[];
-// }
+export type ItemCreateInputRaw = Omit<Item,
+  | 'createdAt'
+  | 'updatedAt'
+  | 'stars'
+  | 'id'
+  | 'brandSectionID'
+  | 'ratingCount'
+> & {
+  brandSection: string;
+  itemParameters: {
+    name: string;
+    value: string;
+  }[];
+  groups: {
+    name: string;
+    itemID?: string;
+    value: string;
+  }[];
+}
 
 export type Role = {
   roleID: number;
@@ -256,8 +256,11 @@ export type OrderProduct = {
   productID: number;
 }
 
-export type UserLoginInput = {
+export type UserSignupInput = {
   email: string;
   password: string;
+}
+
+export type UserLoginInput = UserSignupInput & {
   remember: boolean;
 }

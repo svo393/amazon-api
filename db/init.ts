@@ -1,32 +1,30 @@
-import Knex from 'knex'
-import env from '../src/utils/config'
 import { invoiceStatuses, orderStatuses, roles, shippingMethods } from '../src/utils/constants'
-import knexConfig from './knexfile'
+import db from '../src/utils/db'
 
-const knex = Knex(knexConfig[env.NODE_ENV as keyof typeof knexConfig])
+export const init = async (): Promise<void> => {
+  await db('roles').del()
 
-const init = async (): Promise<void> => {
-  await knex('roles').del()
-
-  await knex('roles')
+  await db('roles')
     .insert(roles.map((r) => ({ name: r })))
 
-  await knex('shippingMethods').del()
+  await db('shippingMethods').del()
 
-  await knex('shippingMethods')
+  await db('shippingMethods')
     .insert(shippingMethods.map((m) => ({ name: m })))
 
-  await knex('orderStatuses').del()
+  await db('orderStatuses').del()
 
-  await knex('orderStatuses')
+  await db('orderStatuses')
     .insert(orderStatuses.map((s) => ({ name: s })))
 
-  await knex('invoiceStatuses').del()
+  await db('invoiceStatuses').del()
 
-  await knex('invoiceStatuses')
+  await db('invoiceStatuses')
     .insert(invoiceStatuses.map((s) => ({ name: s })))
-
-  process.exit(0) // TODO
 }
 
-init()
+const disconnect = async (): Promise<void> => {
+  await db.destroy()
+}
+
+init().then(() => disconnect())

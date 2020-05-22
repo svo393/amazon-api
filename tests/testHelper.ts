@@ -1,10 +1,12 @@
-import { Category, Item, PrismaClient, User, Vendor } from '@prisma/client'
+import { Category, Item, PrismaClient, User as User1, Vendor } from '@prisma/client'
 import supertest from 'supertest'
+import { User, Role } from '../src/types'
+import db from '../src/utils/db'
 import StatusError from '../src/utils/StatusError'
 
 const prisma = new PrismaClient()
 
-export const user = {
+export const customer = {
   email: 'customer@example.com',
   password: '12345678'
 }
@@ -23,15 +25,28 @@ export const sleep = (ms: number): Promise<any> => new Promise((resolve) => setT
 
 export const purge = async (): Promise<void> => {
   try {
-    await prisma.groupItem.deleteMany({})
-    await prisma.group.deleteMany({})
-    await prisma.itemParameter.deleteMany({})
-    await prisma.parameter.deleteMany({})
-    await prisma.item.deleteMany({})
-    await prisma.category.deleteMany({})
-    await prisma.vendor.deleteMany({})
-    await prisma.user.deleteMany({})
-    await prisma.disconnect()
+    await db('orderProducts').del()
+    await db('invoices').del()
+    await db('orders').del()
+    await db('cartProducts').del()
+    await db('productParameters').del()
+    await db('parameters').del()
+    await db('groupProducts').del()
+    await db('groups').del()
+    await db('listProducts').del()
+    await db('answerComments').del()
+    await db('answers').del()
+    await db('questions').del()
+    await db('ratingComments').del()
+    await db('ratings').del()
+    await db('products').del()
+    await db('brandSections').del()
+    await db('vendors').del()
+    await db('categories').del()
+    await db('lists').del()
+    await db('userAddresses').del()
+    await db('users').del()
+    await db('addresses').del()
   } catch (err) {
     console.error(err)
   }
@@ -41,32 +56,35 @@ export const populateUsers = async (api: supertest.SuperTest<supertest.Test>): P
   try {
     await api
       .post('/api/users')
-      .send(user)
+      .send(customer)
 
     await api
       .post('/api/users')
       .send(admin)
 
-    await prisma.user.update({
-      where: { email: admin.email },
-      data: { role: 'ADMIN' }
-    })
-
     await api
       .post('/api/users')
       .send(root)
 
-    await prisma.user.update({
-      where: { email: root.email },
-      data: { role: 'ROOT' }
-    })
-    await prisma.disconnect()
+    const roleIDs = await db<Role>('roles')
+    const adminRole = roleIDs.find((r) => r.name === 'ADMIN')
+    const rootRole = roleIDs.find((r) => r.name === 'ROOT')
+
+    if (!adminRole || !rootRole) { throw new StatusError() }
+
+    await db('users')
+      .update('roleID', adminRole.roleID)
+      .where('email', admin.email)
+
+    await db('users')
+      .update('roleID', rootRole.roleID)
+      .where('email', root.email)
   } catch (err) {
     console.error(err)
   }
 }
 
-export const getUserByEmail = async (email: string): Promise<User> => {
+export const getUserByEmail = async (email: string): Promise<User1> => {
   const user = await prisma.user.findOne({ where: { email } })
   await prisma.disconnect()
 
@@ -75,8 +93,7 @@ export const getUserByEmail = async (email: string): Promise<User> => {
 }
 
 export const usersInDB = async (): Promise<User[]> => {
-  const users = await prisma.user.findMany()
-  await prisma.disconnect()
+  const users = await db<User>('users')
   return users
 }
 

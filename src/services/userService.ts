@@ -1,14 +1,15 @@
-import { PrismaClient, User, UserCreateInput, UserGetPayload, UserUpdateInput } from '@prisma/client'
+import { PrismaClient, UserCreateInput, UserGetPayload, UserUpdateInput } from '@prisma/client'
 import bcrypt from 'bcrypt'
 import { randomBytes } from 'crypto'
 import { CookieOptions, Response } from 'express'
 import jwt from 'jsonwebtoken'
 import R from 'ramda'
 import { promisify } from 'util'
-import { PasswordResetInput, UserLoginInput } from '../types'
+import { PasswordResetInput, UserLoginInput, UserSignupInput, User, Role } from '../types'
 import env from '../utils/config'
 import { getUserRole } from '../utils/shield'
 import StatusError from '../utils/StatusError'
+import db from '../../src/utils/db'
 
 const prisma = new PrismaClient()
 
@@ -68,42 +69,50 @@ const setTokenCookie = (res: Response, token: string, remember: boolean): void =
   res.cookie('token', token, config)
 }
 
-const addUser = async (userInput: UserCreateInput, res: Response): Promise<UserPersonalData> => {
+const addUser = async (userInput: UserSignupInput, res: Response): Promise<{userID: number; email: string}> => {
   const { email, password } = userInput
 
-  const existingUser = await prisma.user.findOne({
-    where: { email },
-    select: { id: true }
-  })
+  const existingUser = await db<User>('users')
+    .first('userID')
+    .where('email', email)
 
   if (existingUser) {
-    await prisma.disconnect()
     throw new StatusError(409, `User with email "${email}" already exists`)
   }
 
   const passwordHash = await bcrypt.hash(password, 10)
 
-  const addedUser = await prisma.user.create({
-    data: { email, password: passwordHash },
-    include: userFieldSet
-  })
-  await prisma.disconnect()
+  const customerRoleID = await db<Role>('roles')
+    .first('roleID')
+    .where('name', 'CUSTOMER')
+
+  if (!customerRoleID) { throw new StatusError() }
+
+  const addedUser: User = await db<User>('users')
+    .insert({
+      email,
+      password: passwordHash,
+      createdAt: new Date(),
+      roleID: customerRoleID.roleID
+    }, [ 'userID', 'email' ])
+
+  if (!addedUser) { throw new StatusError() }
 
   const token = jwt.sign(
-    { userID: addedUser.id },
+    { userID: addedUser.userID },
     env.JWT_SECRET,
     { expiresIn: '30d' }
   )
 
   setTokenCookie(res, token, true)
 
-  const userData = R.omit([
-    'password',
-    'resetToken',
-    'resetTokenExpiry'
-  ], addedUser)
+  // const userData = R.omit([
+  //   'password',
+  //   'resetToken',
+  //   'resetTokenExpiry'
+  // ], addedUser)
 
-  return userData
+  return addedUser
 }
 
 const loginUser = async (userInput: UserLoginInput, res: Response): Promise<UserPersonalData> => {
@@ -144,36 +153,37 @@ const loginUser = async (userInput: UserLoginInput, res: Response): Promise<User
 }
 
 const getUsers = async (): Promise<UserListData[]> => {
-  const users = await prisma.user.findMany({
-    where: { role: { not: 'ROOT' } },
-    include: {
-      orders: true,
-      ratings: true,
-      questions: true
-    }
-  })
-  await prisma.disconnect()
+  const users = db('users')
+  // const users = await prisma.user.findMany({
+  //   where: { role: { not: 'ROOT' } },
+  //   include: {
+  //     orders: true,
+  //     ratings: true,
+  //     questions: true
+  //   }
+  // })
+  // await prisma.disconnect()
 
-  const usersWithCounts = users.map((u) => ({
-    ...u,
-    ordersCount: u.orders.length,
-    ratingCount: u.ratings.length,
-    questionsCount: u.questions.length
-  }))
+  // const usersWithCounts = users.map((u) => ({
+  //   ...u,
+  //   ordersCount: u.orders.length,
+  //   ratingCount: u.ratings.length,
+  //   questionsCount: u.questions.length
+  // }))
 
-  const usersData = R.map(
-    R.pipe(
-      R.omit([
-        'password',
-        'resetToken',
-        'resetTokenExpiry',
-        'orders',
-        'ratings',
-        'questions'
-      ])
-    ))(usersWithCounts)
+  // const usersData = R.map(
+  //   R.pipe(
+  //     R.omit([
+  //       'password',
+  //       'resetToken',
+  //       'resetTokenExpiry',
+  //       'orders',
+  //       'ratings',
+  //       'questions'
+  //     ])
+  //   ))(usersWithCounts)
 
-  return usersData
+  return users
 }
 
 const getUserByID = async (id: string, res: Response): Promise<UserPersonalData | UserPublicData> => {

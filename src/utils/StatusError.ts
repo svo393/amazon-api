@@ -3,7 +3,7 @@ interface StatusError extends Error {
 }
 
 class StatusError extends Error {
-  constructor (statusCode: number, message: string) {
+  constructor (statusCode = 500, message = 'Internal Server Error') {
     super(message)
     this.statusCode = statusCode
     Error.captureStackTrace(this, StatusError)
