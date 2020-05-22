@@ -72,6 +72,11 @@ export type User = {
   roleID: number;
 }
 
+export type Follower = {
+  userID: number;
+  follows: number;
+}
+
 export type UserAddress = {
   isDefault: boolean;
   userID: number;

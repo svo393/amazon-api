@@ -4,40 +4,43 @@ import { CookieOptions, Response } from 'express'
 import jwt from 'jsonwebtoken'
 import R from 'ramda'
 import { promisify } from 'util'
-import { PasswordResetInput, UserSignupInput, UserLoginInput, User, Role } from '../types'
+import { PasswordResetInput, UserSignupInput, UserLoginInput, User, Role, Order, Rating, Question, Answer } from '../types'
 import env from '../utils/config'
 import { getUserRole } from '../utils/shield'
 import StatusError from '../utils/StatusError'
 import db from '../../src/utils/db'
 
 type UserPersonalData = Omit<User,
- | 'password'
- | 'resetToken'
- | 'resetTokenExpiry'
- | 'isDeleted'
->
+  | 'password'
+  | 'resetToken'
+  | 'resetTokenExpiry'
+  | 'isDeleted'
+  | 'roleID'
+> & {
+  orders: Order[];
+  ratings: Rating[];
+  questions: Question[];
+  answers: Answer[];
+}
 
 type UserListData = Omit<User,
- | 'password'
- | 'resetToken'
- | 'resetTokenExpiry'
- | 'roleID'
+  | 'password'
+  | 'resetToken'
+  | 'resetTokenExpiry'
+  | 'roleID'
 > & {
   role: string;
   orderCount: number;
   ratingCount: number;
   questionCount: number;
+  answerCount: number;
 }
 
 type UserPublicData = Omit<UserPersonalData,
- | 'email'
- | 'createdAt'
- | 'role'
- | 'cart'
- | 'items'
- | 'orders'
- | 'orderItems'
-  >
+  | 'email'
+  | 'createdAt'
+  | 'orders'
+>
 
 const setTokenCookie = (res: Response, token: string, remember: boolean): void => {
   const config: CookieOptions = {
@@ -116,34 +119,58 @@ const loginUser = async (userInput: UserLoginInput, res: Response): Promise<User
 
   setTokenCookie(res, token, remember)
 
+  const orders = await db<Order>('orders')
+    .where('userID', existingUser.userID)
+
+  const ratings = await db<Rating>('ratings')
+    .where('userID', existingUser.userID)
+
+  const questions = await db<Question>('questions')
+    .where('userID', existingUser.userID)
+
+  const answers = await db<Answer>('answers')
+    .where('userID', existingUser.userID)
+
   const userData = R.omit([
     'password',
     'resetToken',
     'resetTokenExpiry',
-    'isDeleted'
+    'isDeleted',
+    'roleID'
   ], existingUser)
 
-  return userData
+  return {
+    ...userData,
+    orders,
+    ratings,
+    questions,
+    answers
+  }
 }
 
 const getUsers = async (): Promise<UserListData[]> => {
-  const rootRoleID = await db<Role>('roles')
+  const rootRole = await db<Role>('roles')
     .first('roleID')
     .where('name', 'ROOT')
 
-  if (!rootRoleID) { throw new StatusError() }
+  if (!rootRole) { throw new StatusError() }
 
   const { rows: users }: {rows: UserListData[]} = await db.raw(
     `SELECT
-      "email", "u"."name", "info", "avatar", "u"."createdAt",
-      "isDeleted", "u"."userID", "rl"."name" as role,
-      COUNT("o"."orderID") as orderCount, COUNT("r"."ratingID") as ratingCount,
-      COUNT("q"."questionID") as questionCount
+      "email", "u"."name", "info", "avatar",
+      "u"."createdAt", "isDeleted", "u"."userID",
+      "rl"."name" as role,
+      COUNT("o"."orderID") as orderCount,
+      COUNT("r"."ratingID") as ratingCount,
+      COUNT("q"."questionID") as questionCount,
+      COUNT("a"."answerID") as answerCount
     FROM users as u
     LEFT JOIN orders as o USING ("userID")
     LEFT JOIN ratings as r USING ("userID")
     LEFT JOIN questions as q USING ("userID")
+    LEFT JOIN answers as a USING ("userID")
     LEFT JOIN roles as rl USING ("roleID")
+    WHERE "u"."roleID" != ${rootRole.roleID}
     GROUP BY "u"."userID", "rl"."name"`
   )
 
@@ -151,38 +178,57 @@ const getUsers = async (): Promise<UserListData[]> => {
   return users
 }
 
-// const getUserByID = async (id: string, res: Response): Promise<UserPersonalData, UserPublicData> => {
-//   const user = await prisma.user.findOne({
-//     where: { id },
-//     include: userFieldSet
-//   })
-//   await prisma.disconnect()
+const getUserByID = async (userID: string, res: Response): Promise<UserPersonalData | UserPublicData> => {
+  const role = await getUserRole(res)
 
-//   if (!user) {
-//     throw new StatusError(404, 'Not Found')
-//   }
-//   const role = await getUserRole(res)
-//   const userHasPermission = role === 'ROOT' || res.locals.userID === id
+  const user = await db<User>('users')
+    .first()
+    .where('userID', userID)
 
-//   const userData = userHasPermission
-//     ? R.omit([
-//       'password',
-//       'resetToken',
-//       'resetTokenExpiry'
-//     ], user)
-//     : R.pick([
-//       'id',
-//       'name',
-//       'avatar',
-//       'ratings',
-//       'ratingComments',
-//       'questions',
-//       'answers',
-//       'answerComments'
-//     ], user)
+  if (!user) { throw new StatusError(404, 'Not Found') }
 
-//   return userData
-// }
+  const userHasPermission = (role && [ 'ROOT', 'ADMIN' ].includes(role)) ||
+  res.locals.userID === userID
+
+  const orders = userHasPermission
+    ? await db<Order>('orders')
+      .where('userID', userID)
+    : undefined
+
+  const ratings = await db<Rating>('ratings')
+    .where('userID', userID)
+
+  const questions = await db<Question>('questions')
+    .where('userID', userID)
+
+  const answers = await db<Answer>('answers')
+    .where('userID', userID)
+
+  const userDataSplitted = userHasPermission
+    ? R.omit([
+      'password',
+      'resetToken',
+      'resetTokenExpiry',
+      'isDeleted',
+      'roleID'
+    ], user)
+    : R.pick([
+      'userID',
+      'name',
+      'avatar',
+      'info'
+    ], user)
+
+  const userData = {
+    ...userDataSplitted,
+    orders,
+    ratings,
+    questions,
+    answers
+  }
+
+  return userData
+}
 
 // const updateUser = async (userInput: UserUpdateInput, id: string): Promise<UserPersonalData> => {
 //   const updatedUser = await prisma.user.update({
@@ -279,8 +325,8 @@ const getUsers = async (): Promise<UserListData[]> => {
 export default {
   addUser,
   loginUser,
-  getUsers
-  // getUserByID,
+  getUsers,
+  getUserByID
   // updateUser,
   // sendPasswordReset,
   // resetPassword

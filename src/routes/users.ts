@@ -34,10 +34,10 @@ router.get('/', async (_req, res) => {
 //   res.json(user)
 // })
 
-// router.get('/:id', async (req, res) => {
-//   const user = await userService.getUserByID(req.params.id, res)
-//   res.json(user)
-// })
+router.get('/:userID', async (req, res) => {
+  const user = await userService.getUserByID(req.params.userID, res)
+  res.json(user)
+})
 
 // router.put('/:id', async (req, res) => {
 //   await shield.isSameUser(req, res)

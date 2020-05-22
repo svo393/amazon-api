@@ -66,7 +66,7 @@ describe('User authorization', () => {
 })
 
 describe('User fetching', () => {
-  test('403 users if not root', async () => {
+  test('403 users if not root or admin', async () => {
     const { token } = await loginAs('customer', api)
 
     await api
@@ -75,8 +75,8 @@ describe('User fetching', () => {
       .expect(403)
   })
 
-  test('200 users if root', async () => {
-    const { token } = await loginAs('root', api)
+  test('200 users if admin', async () => {
+    const { token } = await loginAs('admin', api)
 
     await api
       .get(apiURL)
@@ -84,28 +84,28 @@ describe('User fetching', () => {
       .expect(200)
   })
 
-  test.only('public user if not root', async () => {
+  test('public user if not root or admin', async () => {
     const anotherUser = await getUserByEmail('admin@example.com')
 
     const { body } = await api
-      .get(`${apiURL}/${anotherUser.id}`)
+      .get(`${apiURL}/${anotherUser.userID}`)
       .expect(200)
 
-    expect(Object.keys(body)).toHaveLength(8)
+    expect(Object.keys(body)).toHaveLength(7)
   })
 
-  //   test('full user if root', async () => {
-  //     const { token } = await loginAs('root', api)
+  test('full user if admin', async () => {
+    const { token } = await loginAs('admin', api)
 
-  //     const anotherUser = await getUserByEmail('admin@example.com')
+    const anotherUser = await getUserByEmail('admin@example.com')
 
-  //     const { body } = await api
-  //       .get(`${apiURL}/${anotherUser.id}`)
-  //       .set('Cookie', `token=${token}`)
-  //       .expect(200)
+    const { body } = await api
+      .get(`${apiURL}/${anotherUser.userID}`)
+      .set('Cookie', `token=${token}`)
+      .expect(200)
 
-  //     expect(Object.keys(body)).toHaveLength(15)
-  //   })
+    expect(Object.keys(body)).toHaveLength(10)
+  })
 
   //   test('full user if own profile', async () => {
   //     const { token } = await loginAs('customer', api)

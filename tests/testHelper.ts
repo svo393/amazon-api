@@ -84,9 +84,10 @@ export const populateUsers = async (api: supertest.SuperTest<supertest.Test>): P
   }
 }
 
-export const getUserByEmail = async (email: string): Promise<User1> => {
-  const user = await prisma.user.findOne({ where: { email } })
-  await prisma.disconnect()
+export const getUserByEmail = async (email: string): Promise<User> => {
+  const user = await db<User>('users')
+    .first()
+    .where('email', email)
 
   if (!user) throw new StatusError(404, 'Not Found')
   return user

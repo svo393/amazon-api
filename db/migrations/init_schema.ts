@@ -40,6 +40,21 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .notNullable()
     })
 
+    .createTable('followers', (t) => {
+      t
+        .integer('userID')
+        .references('users.userID')
+        .notNullable()
+
+      t
+        .integer('follows')
+        .references('users.userID')
+        .notNullable()
+    })
+    .alterTable('followers', (t) => {
+      t.primary([ 'userID', 'follows' ])
+    })
+
     .createTable('userAddresses', (t) => {
       t.boolean('isDefault').defaultTo(false).notNullable()
 
@@ -403,6 +418,7 @@ export const down = (knex: Knex): Knex.SchemaBuilder =>
     .dropTableIfExists('categories')
     .dropTableIfExists('lists')
     .dropTableIfExists('userAddresses')
+    .dropTableIfExists('followers')
     .dropTableIfExists('users')
     .dropTableIfExists('addresses')
     .dropTableIfExists('shippingMethods')
