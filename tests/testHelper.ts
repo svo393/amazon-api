@@ -115,7 +115,7 @@ export const vendorsInDB = async (): Promise<Vendor[]> => {
   return vendors
 }
 
-export const loginAs: (role: string, api: supertest.SuperTest<supertest.Test>) => Promise<{token: string; id: string}> =
+export const loginAs: (role: string, api: supertest.SuperTest<supertest.Test>) => Promise<{token: string; userID: number}> =
 async (role, api) => {
   const user = {
     email: `${role}@example.com`,
@@ -128,5 +128,5 @@ async (role, api) => {
     .send(user)
 
   const token = res.header['set-cookie'][0].split('; ')[0].slice(6)
-  return { token, id: res.body.id }
+  return { token, userID: res.body.userID }
 }

@@ -1,7 +1,7 @@
 import supertest from 'supertest'
 import app from '../src/app'
 import db from '../src/utils/db'
-import { populateUsers, purge, usersInDB } from './testHelper'
+import { populateUsers, purge, usersInDB, loginAs } from './testHelper'
 
 const api = supertest(app)
 const apiURL = '/api/users'
@@ -12,7 +12,7 @@ beforeEach(async () => {
 })
 
 describe('User authorization', () => {
-  test.only('201 signup', async () => {
+  test('201 signup', async () => {
     const newUser = {
       email: 'customer2@example.com',
       password: '12345678'
@@ -29,40 +29,40 @@ describe('User authorization', () => {
     expect(emails).toContain('customer2@example.com')
   })
 
-  // test('400 signup if no email', async () => {
-  //   const newUser = {
-  //     password: '12345678'
-  //   }
+  test('400 signup if no email', async () => {
+    const newUser = {
+      password: '12345678'
+    }
 
-  //   await api
-  //     .post(apiURL)
-  //     .send(newUser)
-  //     .expect(400)
-  // })
+    await api
+      .post(apiURL)
+      .send(newUser)
+      .expect(400)
+  })
 
-  // test('204 logout with token deletion', async () => {
-  //   const { token } = await loginAs('customer', api)
+  test('204 logout with token deletion', async () => {
+    const { token } = await loginAs('customer', api)
 
-  //   const resLogout = await api
-  //     .post(`${apiURL}/logout`)
-  //     .set('Cookie', `token=${token}`)
-  //     .expect(204)
+    const resLogout = await api
+      .post(`${apiURL}/logout`)
+      .set('Cookie', `token=${token}`)
+      .expect(204)
 
-  //   expect(resLogout.header['set-cookie'][0].split('; ')[0].slice(6)).toHaveLength(0)
-  // })
+    expect(resLogout.header['set-cookie'][0].split('; ')[0].slice(6)).toHaveLength(0)
+  })
 
-  // test('401 login if invalid password', async () => {
-  //   const user = {
-  //     email: 'customer@example.com',
-  //     password: '123456789',
-  //     remember: true
-  //   }
+  test('401 login if invalid password', async () => {
+    const user = {
+      email: 'customer@example.com',
+      password: '123456789',
+      remember: true
+    }
 
-  //   await api
-  //     .post(`${apiURL}/login`)
-  //     .send(user)
-  //     .expect(401)
-  // })
+    await api
+      .post(`${apiURL}/login`)
+      .send(user)
+      .expect(401)
+  })
 })
 
 // describe('User fetching', () => {

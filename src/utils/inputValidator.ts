@@ -1,9 +1,9 @@
-import { CategoryCreateInput, CategoryUpdateInput, ItemUpdateInput, UserCreateInput, UserUpdateInput, VendorCreateInput, VendorUpdateInput } from '@prisma/client'
+import { CategoryCreateInput, CategoryUpdateInput, ItemUpdateInput, UserUpdateInput, VendorCreateInput, VendorUpdateInput } from '@prisma/client'
 import R from 'ramda'
-import { ItemCreateInputRaw, PasswordResetInput, UserLoginInput } from '../types'
+import { ItemCreateInputRaw, PasswordResetInput, UserLoginInput, UserSignupInput } from '../types'
 import { hasDefinedProps, isArray, isBoolean, isEmail, isImage, isInputProvided, isItemParameter, isNumber, isPasswordValid, isProvided, isRole, isString, isStringOrArray, isGroup } from './validatorLib'
 
-const checkNewUser = (object: any): UserCreateInput => {
+const checkNewUser = (object: any): UserSignupInput => {
   const email = R.pipe(
     isProvided,
     isString,
