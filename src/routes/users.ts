@@ -22,11 +22,11 @@ router.post('/logout', (_req, res) => {
   res.sendStatus(204)
 })
 
-// router.get('/', async (_req, res) => {
-//   await shield.isAdmin(res)
-//   const users = await userService.getUsers()
-//   res.json(users)
-// })
+router.get('/', async (_req, res) => {
+  await shield.isAdmin(res)
+  const users = await userService.getUsers()
+  res.json(users)
+})
 
 // router.get('/me', async (_req, res) => {
 //   shield.isLoggedIn(res)

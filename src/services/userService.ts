@@ -11,30 +11,32 @@ import StatusError from '../utils/StatusError'
 import db from '../../src/utils/db'
 
 type UserPersonalData = Omit<User,
-  | 'password'
-  | 'resetToken'
-  | 'resetTokenExpiry'
-  | 'isDeleted'
+ | 'password'
+ | 'resetToken'
+ | 'resetTokenExpiry'
+ | 'isDeleted'
 >
 
 type UserListData = Omit<User,
-  | 'password'
-  | 'resetToken'
-  | 'resetTokenExpiry'
+ | 'password'
+ | 'resetToken'
+ | 'resetTokenExpiry'
+ | 'roleID'
 > & {
-  ordersCount: number;
+  role: string;
+  orderCount: number;
   ratingCount: number;
-  questionsCount: number;
+  questionCount: number;
 }
 
 type UserPublicData = Omit<UserPersonalData,
-  | 'email'
-  | 'createdAt'
-  | 'role'
-  | 'cart'
-  | 'items'
-  | 'orders'
-  | 'orderItems'
+ | 'email'
+ | 'createdAt'
+ | 'role'
+ | 'cart'
+ | 'items'
+ | 'orders'
+ | 'orderItems'
   >
 
 const setTokenCookie = (res: Response, token: string, remember: boolean): void => {
@@ -57,7 +59,7 @@ const addUser = async (userInput: UserSignupInput, res: Response): Promise<UserS
     .where('email', email)
 
   if (existingUser) {
-    throw new StatusError(409, `User with email "${email}" already exists`)
+    throw new StatusError(409, `User with email '${email}' already exists`)
   }
 
   const passwordHash = await bcrypt.hash(password, 10)
@@ -124,41 +126,32 @@ const loginUser = async (userInput: UserLoginInput, res: Response): Promise<User
   return userData
 }
 
-// const getUsers = async (): Promise<UserListData[]> => {
-//   const users = db('users')
-//   // const users = await prisma.user.findMany({
-//   //   where: { role: { not: 'ROOT' } },
-//   //   include: {
-//   //     orders: true,
-//   //     ratings: true,
-//   //     questions: true
-//   //   }
-//   // })
-//   // await prisma.disconnect()
+const getUsers = async (): Promise<UserListData[]> => {
+  const rootRoleID = await db<Role>('roles')
+    .first('roleID')
+    .where('name', 'ROOT')
 
-//   // const usersWithCounts = users.map((u) => ({
-//   //   ...u,
-//   //   ordersCount: u.orders.length,
-//   //   ratingCount: u.ratings.length,
-//   //   questionsCount: u.questions.length
-//   // }))
+  if (!rootRoleID) { throw new StatusError() }
 
-//   // const usersData = R.map(
-//   //   R.pipe(
-//   //     R.omit([
-//   //       'password',
-//   //       'resetToken',
-//   //       'resetTokenExpiry',
-//   //       'orders',
-//   //       'ratings',
-//   //       'questions'
-//   //     ])
-//   //   ))(usersWithCounts)
+  const { rows: users }: {rows: UserListData[]} = await db.raw(
+    `SELECT
+      "email", "u"."name", "info", "avatar", "u"."createdAt",
+      "isDeleted", "u"."userID", "rl"."name" as role,
+      COUNT("o"."orderID") as orderCount, COUNT("r"."ratingID") as ratingCount,
+      COUNT("q"."questionID") as questionCount
+    FROM users as u
+    LEFT JOIN orders as o USING ("userID")
+    LEFT JOIN ratings as r USING ("userID")
+    LEFT JOIN questions as q USING ("userID")
+    LEFT JOIN roles as rl USING ("roleID")
+    GROUP BY "u"."userID", "rl"."name"`
+  )
 
-//   return users
-// }
+  if (!users) { throw new StatusError(404, 'Not Found') }
+  return users
+}
 
-// const getUserByID = async (id: string, res: Response): Promise<UserPersonalData | UserPublicData> => {
+// const getUserByID = async (id: string, res: Response): Promise<UserPersonalData, UserPublicData> => {
 //   const user = await prisma.user.findOne({
 //     where: { id },
 //     include: userFieldSet
@@ -233,7 +226,7 @@ const loginUser = async (userInput: UserLoginInput, res: Response): Promise<User
 //     //   subject: 'Your Password Reset Token',
 //     //   html: makeANiceEmail(`Your Password Reset Token is Here!
 //     //       <br/>
-//     //       <a href="${env.BASE_URL}/reset-password?resetToken=${resetToken}">
+//     //       <a href='${env.BASE_URL}/reset-password?resetToken=${resetToken}'>
 //     //         Click Here to Reset
 //     //       </a>`)
 //     // })
@@ -285,8 +278,8 @@ const loginUser = async (userInput: UserLoginInput, res: Response): Promise<User
 
 export default {
   addUser,
-  loginUser
-  // getUsers,
+  loginUser,
+  getUsers
   // getUserByID,
   // updateUser,
   // sendPasswordReset,

@@ -1,7 +1,7 @@
 import supertest from 'supertest'
 import app from '../src/app'
 import db from '../src/utils/db'
-import { populateUsers, purge, usersInDB, loginAs } from './testHelper'
+import { populateUsers, purge, usersInDB, loginAs, getUserByEmail } from './testHelper'
 
 const api = supertest(app)
 const apiURL = '/api/users'
@@ -65,59 +65,59 @@ describe('User authorization', () => {
   })
 })
 
-// describe('User fetching', () => {
-//   test('403 users if not root', async () => {
-//     const { token } = await loginAs('customer', api)
+describe('User fetching', () => {
+  test('403 users if not root', async () => {
+    const { token } = await loginAs('customer', api)
 
-//     await api
-//       .get(apiURL)
-//       .set('Cookie', `token=${token}`)
-//       .expect(403)
-//   })
+    await api
+      .get(apiURL)
+      .set('Cookie', `token=${token}`)
+      .expect(403)
+  })
 
-//   test('200 users if root', async () => {
-//     const { token } = await loginAs('root', api)
+  test('200 users if root', async () => {
+    const { token } = await loginAs('root', api)
 
-//     await api
-//       .get(apiURL)
-//       .set('Cookie', `token=${token}`)
-//       .expect(200)
-//   })
+    await api
+      .get(apiURL)
+      .set('Cookie', `token=${token}`)
+      .expect(200)
+  })
 
-//   test('public user if not root', async () => {
-//     const anotherUser = await getUserByEmail('admin@example.com')
+  test.only('public user if not root', async () => {
+    const anotherUser = await getUserByEmail('admin@example.com')
 
-//     const { body } = await api
-//       .get(`${apiURL}/${anotherUser.id}`)
-//       .expect(200)
+    const { body } = await api
+      .get(`${apiURL}/${anotherUser.id}`)
+      .expect(200)
 
-//     expect(Object.keys(body)).toHaveLength(8)
-//   })
+    expect(Object.keys(body)).toHaveLength(8)
+  })
 
-//   test('full user if root', async () => {
-//     const { token } = await loginAs('root', api)
+  //   test('full user if root', async () => {
+  //     const { token } = await loginAs('root', api)
 
-//     const anotherUser = await getUserByEmail('admin@example.com')
+  //     const anotherUser = await getUserByEmail('admin@example.com')
 
-//     const { body } = await api
-//       .get(`${apiURL}/${anotherUser.id}`)
-//       .set('Cookie', `token=${token}`)
-//       .expect(200)
+  //     const { body } = await api
+  //       .get(`${apiURL}/${anotherUser.id}`)
+  //       .set('Cookie', `token=${token}`)
+  //       .expect(200)
+
+  //     expect(Object.keys(body)).toHaveLength(15)
+  //   })
+
+  //   test('full user if own profile', async () => {
+  //     const { token } = await loginAs('customer', api)
+
+  //     const { body } = await api
+  //       .get(`${apiURL}/me`)
+  //       .set('Cookie', `token=${token}`)
+  //       .expect(200)
 
 //     expect(Object.keys(body)).toHaveLength(15)
 //   })
-
-//   test('full user if own profile', async () => {
-//     const { token } = await loginAs('customer', api)
-
-//     const { body } = await api
-//       .get(`${apiURL}/me`)
-//       .set('Cookie', `token=${token}`)
-//       .expect(200)
-
-//     expect(Object.keys(body)).toHaveLength(15)
-//   })
-// })
+})
 
 // describe('User updating', () => {
 //   test('200 if own profile', async () => {

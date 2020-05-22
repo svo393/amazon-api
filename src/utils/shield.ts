@@ -1,6 +1,8 @@
-import { PrismaClient, Role } from '@prisma/client'
+import { PrismaClient } from '@prisma/client'
 import { Response, Request } from 'express'
 import StatusError from './StatusError'
+import db from './db'
+import { User, Role } from '../types'
 
 type Model =
   | 'item'
@@ -15,23 +17,20 @@ type Model =
 
 const prisma = new PrismaClient()
 
-export const getUserRole = async (res: Response): Promise<Role | null> => {
+export const getUserRole = async (res: Response): Promise<string | null> => {
   const userID = res.locals.userID
-
   if (!userID) return null
 
-  const user = await prisma.user.findOne({
-    where: { id: userID },
-    select: { role: true }
-  })
-  await prisma.disconnect()
+  const role: { name: string } | null = await db('users')
+    .first('r.name')
+    .where('userID', userID)
+    .joinRaw('JOIN roles as r USING ("roleID")')
 
-  if (!user) {
+  if (!role) {
     res.clearCookie('token')
     throw new StatusError(403, 'Forbidden')
   }
-
-  return user.role
+  return role.name
 }
 
 const isLoggedIn = (res: Response): void => {
