@@ -75,29 +75,29 @@ describe('Category fetching', () => {
   })
 })
 
-// describe('Category updating', () => {
-//   test('200 if admin or root', async () => {
-//     const { addedCategory, token } = await createOneCategory('admin')
+describe('Category updating', () => {
+  test('200 if admin or root', async () => {
+    const { addedCategory, token } = await createOneCategory('admin')
 
-//     const { body } = await api
-//       .put(`${apiURL}/${addedCategory.name}`)
-//       .set('Cookie', `token=${token}`)
-//       .send({ name: 'Updated Category' })
-//       .expect(200)
+    const { body } = await api
+      .put(`${apiURL}/${addedCategory.categoryID}`)
+      .set('Cookie', `token=${token}`)
+      .send({ name: 'Updated Category' })
+      .expect(200)
 
-//     expect(body.name).toBe('Updated Category')
-//   })
+    expect(body.name).toBe('Updated Category')
+  })
 
-//   test('403 if not admin or root', async () => {
-//     const { addedCategory } = await createOneCategory('admin')
-//     const { token } = await createOneCategory('customer')
+  test('403 if not admin or root', async () => {
+    const { addedCategory } = await createOneCategory('admin')
+    const { token } = await createOneCategory('customer')
 
-//     await api
-//       .put(`${apiURL}/${addedCategory.name}`)
-//       .set('Cookie', `token=${token}`)
-//       .send({ name: 'Updated Category' })
-//       .expect(403)
-//   })
-// })
+    await api
+      .put(`${apiURL}/${addedCategory.categoryID}`)
+      .set('Cookie', `token=${token}`)
+      .send({ name: 'Updated Category' })
+      .expect(403)
+  })
+})
 
 afterAll(async () => await db.destroy())

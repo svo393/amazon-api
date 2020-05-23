@@ -1,6 +1,6 @@
-import { CategoryCreateInput, CategoryUpdateInput, ItemUpdateInput, VendorCreateInput, VendorUpdateInput } from '@prisma/client'
+import { ItemUpdateInput, VendorCreateInput, VendorUpdateInput } from '@prisma/client'
 import R from 'ramda'
-import { ItemCreateInputRaw, PasswordResetInput, UserLoginInput, UserSignupInput, UserUpdateInput } from '../types'
+import { ItemCreateInputRaw, PasswordResetInput, UserLoginInput, UserSignupInput, UserUpdateInput, CategoryCreateInput, CategoryUpdateInput } from '../types'
 import { hasDefinedProps, isArray, isBoolean, isEmail, isGroup, isImage, isInputProvided, isItemParameter, isNumber, isPasswordValid, isProvided, isString, isStringOrArray } from './validatorLib'
 
 const checkNewUser = (object: any): UserSignupInput => {
@@ -291,16 +291,16 @@ const checkNewCategory = (object: any): CategoryCreateInput => {
     isString
   )({ name: 'name', param: object.name })
 
-  const parent = object.parent && isString(
-    { name: 'parent', param: object.parent }
+  const parentCategoryID = object.parentCategoryID && isNumber(
+    { name: 'parentCategoryID', param: object.parentCategoryID }
   )
 
   const categoryInput = {
     name: name.param,
-    parent: parent?.param
+    parentCategoryID: parentCategoryID?.param
   }
 
-  return hasDefinedProps(categoryInput) as CategoryCreateInput
+  return hasDefinedProps(categoryInput)
 }
 
 const checkCategoryUpdate = (object: any): CategoryUpdateInput => {
@@ -310,13 +310,13 @@ const checkCategoryUpdate = (object: any): CategoryUpdateInput => {
     { name: 'name', param: object.name }
   )
 
-  const parent = object.parent && isNumber(
-    { name: 'parent', param: object.parent }
+  const parentCategoryID = object.parentCategoryID && isNumber(
+    { name: 'parentCategoryID', param: object.parentCategoryID }
   )
 
   const categoryInput = {
     name: name?.param,
-    parent: parent?.param
+    parentCategoryID: parentCategoryID?.param
   }
 
   return hasDefinedProps(categoryInput)

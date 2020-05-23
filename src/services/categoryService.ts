@@ -1,5 +1,5 @@
-import { CategoryUpdateInput, PrismaClient } from '@prisma/client'
-import { ItemListData, Category, CategoryCreateInput, Product, Rating } from '../types'
+import { PrismaClient } from '@prisma/client'
+import { ItemListData, Category, CategoryCreateInput, Product, Rating, CategoryUpdateInput } from '../types'
 import StatusError from '../utils/StatusError'
 import db from '../../src/utils/db'
 import R from 'ramda'
@@ -58,7 +58,7 @@ type SingleCategoryData = Category & {
   products: ProductListData[];
 }
 
-const getCategoryByID = async (categoryID: number): Promise<SingleCategoryData | null> => {
+const getCategoryByID = async (categoryID: number): Promise<SingleCategoryData> => {
   const categories = await db<Category>('categories')
   const [ category ] = categories.filter((c) => c.categoryID === categoryID)
   if (!category) throw new StatusError(404, 'Not Found')
@@ -98,22 +98,20 @@ const getCategoryByID = async (categoryID: number): Promise<SingleCategoryData |
   }
 }
 
-// const updateCategory = async (categoryInput: CategoryUpdateInput, name: string): Promise<CategoryData> => {
-//   const updatedCategory = await prisma.category.update({
-//     where: { name },
-//     data: categoryInput,
-//     include: { items: true, children: true }
-//   })
-//   await prisma.disconnect()
+const updateCategory = async (categoryInput: CategoryUpdateInput, categoryID: number): Promise<SingleCategoryData> => {
+  console.info('categoryInput', categoryInput)
 
-//   if (!updatedCategory) throw new StatusError(404, 'Not Found')
+  const [ updatedCategory ] = await db<Category>('categories')
+    .update({ ...categoryInput }, [ 'categoryID' ])
+    .where('categoryID', categoryID)
 
-//   return updatedCategory
-// }
+  if (!updatedCategory) throw new StatusError(404, 'Not Found')
+  return getCategoryByID(updatedCategory.categoryID)
+}
 
 export default {
   addCategory,
   getCategories,
-  getCategoryByID
-  // updateCategory
+  getCategoryByID,
+  updateCategory
 }

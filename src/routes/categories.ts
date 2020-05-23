@@ -7,8 +7,8 @@ const router = Router()
 
 router.post('/', async (req, res) => {
   shield.isAdmin(res)
-  const categoryInput = inputValidator.checkNewCategory(req.body)
-  const addedCategory = await categoryService.addCategory(categoryInput)
+  const categoryCreateInput = inputValidator.checkNewCategory(req.body)
+  const addedCategory = await categoryService.addCategory(categoryCreateInput)
   res.status(201).json(addedCategory)
 })
 
@@ -22,11 +22,11 @@ router.get('/:categoryID', async (req, res) => {
   res.json(category)
 })
 
-// router.put('/:name', async (req, res) => {
-//   shield.isAdmin(res)
-//   const categoryInput = inputValidator.checkCategoryUpdate(req.body)
-//   const updatedItem = await categoryService.updateCategory(categoryInput, req.params.name)
-//   res.json(updatedItem)
-// })
+router.put('/:categoryID', async (req, res) => {
+  shield.isAdmin(res)
+  const categoryUpdateInput = inputValidator.checkCategoryUpdate(req.body)
+  const updatedItem = await categoryService.updateCategory(categoryUpdateInput, Number(req.params.categoryID))
+  res.json(updatedItem)
+})
 
 export default router

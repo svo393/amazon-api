@@ -276,3 +276,8 @@ export type PasswordResetInput = {
 }
 
 export type CategoryCreateInput = Pick<Category, 'name' | 'parentCategoryID'>
+
+export type CategoryUpdateInput = {
+  name?: string;
+  parentCategoryID?: number;
+}

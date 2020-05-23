@@ -17,7 +17,7 @@ export const isProvided: CP = ({ name, param }) => {
   return { name, param }
 }
 
-export const hasDefinedProps = (param: object): object => {
+export const hasDefinedProps = <T>(param: object): T => {
   const strippedObject = JSON.parse(JSON.stringify(param))
 
   if (R.isEmpty(strippedObject)) {

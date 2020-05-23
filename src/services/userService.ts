@@ -212,7 +212,7 @@ type UserUpdatedData = Pick<User,
 }
 
 const updateUser = async (userInput: UserUpdateInput, res: Response, userID: number): Promise<UserUpdatedData> => {
-  const role = res.locals.userRole
+  const role: string | undefined = res.locals.userRole
 
   const [ updatedUser ] = await db<User>('users')
     .update({ ...userInput },

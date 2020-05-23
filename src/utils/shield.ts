@@ -27,7 +27,7 @@ const isRoot = (res: Response): void => {
 
 const isAdmin = (res: Response): void => {
   isLoggedIn(res)
-  const role = res.locals.userRole
+  const role: string | undefined = res.locals.userRole
 
   if (!role || ![ 'ROOT', 'ADMIN' ].includes(role)) {
     throw new StatusError(403, 'Forbidden')
@@ -37,7 +37,7 @@ const isAdmin = (res: Response): void => {
 const isSameUser = (req: Request, res: Response): void => {
   isLoggedIn(res)
 
-  if (res.locals.userID !== req.params.userID && res.locals.userRole !== 'ROOT') {
+  if (res.locals.userID.toString() !== req.params.userID && res.locals.userRole !== 'ROOT') {
     throw new StatusError(403, 'Forbidden')
   }
 }
@@ -87,7 +87,7 @@ const isCreator = async (res: Response, name: Model, id: string): Promise<void |
   await prisma.disconnect()
 
   if (!data) throw new StatusError(404, 'Not Found')
-  if (data.user.id !== res.locals.userID) throw new StatusError(403, 'Forbidden')
+  if (data.user.id !== res.locals.userID.toString()) throw new StatusError(403, 'Forbidden')
 }
 
 export default {
