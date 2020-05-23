@@ -66,8 +66,8 @@ export type User = {
   password: string;
   avatar: boolean;
   createdAt: Date;
-  resetToken?: string;
-  resetTokenExpiry?: string;
+  resetToken?: string | null;
+  resetTokenCreatedAt?: Date | null;
   isDeleted: boolean;
   roleID: number;
 }
@@ -188,11 +188,6 @@ export type AnswerComment = {
   parentAnswerCommentID?: number;
 }
 
-export type PasswordResetInput = {
-  password: string;
-  resetToken: string;
-}
-
 export type ListProduct = {
   listID: number;
   productID: number;
@@ -276,4 +271,9 @@ export type UserUpdateInput = {
   password?: string;
   avatar?: boolean;
   roleID?: number;
+}
+
+export type PasswordResetInput = {
+  password: string;
+  resetToken: string;
 }

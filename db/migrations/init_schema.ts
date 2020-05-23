@@ -31,7 +31,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.boolean('avatar').defaultTo(false).notNullable()
       t.dateTime('createdAt').notNullable()
       t.string('resetToken', 50)
-      t.integer('resetTokenExpiry')
+      t.dateTime('resetTokenCreatedAt')
       t.boolean('isDeleted').defaultTo(false).notNullable()
 
       t

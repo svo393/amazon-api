@@ -5,18 +5,20 @@ import jwt from 'jsonwebtoken'
 import R from 'ramda'
 import { promisify } from 'util'
 import db from '../../src/utils/db'
-import { Answer, Order, Question, Rating, Role, User, UserLoginInput, UserSignupInput, UserUpdateInput } from '../types'
+import { Answer, Order, Question, Rating, Role, User, UserLoginInput, UserSignupInput, UserUpdateInput, PasswordResetInput } from '../types'
 import env from '../utils/config'
-import { makeANiceEmail, transport } from '../utils/mail'
 import StatusError from '../utils/StatusError'
+// import { makeANiceEmail, transport } from '../utils/mail'
 
-type UserPersonalData = Omit<User,
+type UserBaseData = Omit<User,
   | 'password'
   | 'resetToken'
-  | 'resetTokenExpiry'
+  | 'resetTokenCreatedAt'
   | 'isDeleted'
   | 'roleID'
-> & {
+>
+
+type UserPersonalData = UserBaseData & {
   orders: Order[];
   ratings: Rating[];
   questions: Question[];
@@ -26,7 +28,7 @@ type UserPersonalData = Omit<User,
 type UserListData = Omit<User,
   | 'password'
   | 'resetToken'
-  | 'resetTokenExpiry'
+  | 'resetTokenCreatedAt'
   | 'roleID'
 > & {
   role: string;
@@ -102,7 +104,7 @@ const addUser = async (userInput: UserSignupInput, res: Response): Promise<UserS
   return addedUser
 }
 
-const loginUser = async (userInput: UserLoginInput, res: Response): Promise<UserPersonalData> => {
+const loginUser = async (userInput: UserLoginInput, res: Response): Promise<UserBaseData> => {
   const { email, password, remember } = userInput
 
   const existingUser = await db<User>('users')
@@ -127,33 +129,15 @@ const loginUser = async (userInput: UserLoginInput, res: Response): Promise<User
 
   setTokenCookie(res, token, remember)
 
-  const orders = await db<Order>('orders')
-    .where('userID', existingUser.userID)
-
-  const ratings = await db<Rating>('ratings')
-    .where('userID', existingUser.userID)
-
-  const questions = await db<Question>('questions')
-    .where('userID', existingUser.userID)
-
-  const answers = await db<Answer>('answers')
-    .where('userID', existingUser.userID)
-
   const userData = R.omit([
     'password',
     'resetToken',
-    'resetTokenExpiry',
+    'resetTokenCreatedAt',
     'isDeleted',
     'roleID'
   ], existingUser)
 
-  return {
-    ...userData,
-    orders,
-    ratings,
-    questions,
-    answers
-  }
+  return userData
 }
 
 const getUsers = async (): Promise<UserListData[]> => {
@@ -216,7 +200,7 @@ const getUserByID = async (userID: string, res: Response): Promise<UserPersonalD
     ? R.omit([
       'password',
       'resetToken',
-      'resetTokenExpiry',
+      'resetTokenCreatedAt',
       'isDeleted',
       'roleID'
     ], user)
@@ -260,68 +244,58 @@ const sendPasswordReset = async (email: string): Promise<void> => {
   if (!user) throw new StatusError(401, 'Invalid Email')
 
   const resetToken = (await promisify(randomBytes)(20)).toString('hex')
-  const resetTokenExpiry = (Date.now() + 1000 * 60 * 60).toString()
+  const resetTokenCreatedAt = new Date()
 
   await db('users')
-    .update({ resetToken, resetTokenExpiry })
+    .update({ resetToken, resetTokenCreatedAt })
     .where('email', email)
 
-  try {
-    await transport.sendMail({
-      from: 'ecom@example.com',
-      to: email,
-      subject: 'Your Password Reset Token',
-      html: makeANiceEmail(`Your Password Reset Token is Here!
-          <br/>
-          <a href='${env.BASE_URL}/reset-password?resetToken=${resetToken}'>
-            Click Here to Reset
-          </a>`)
-    })
-  } catch (_err) {
-    throw new StatusError(500, 'Error requesting password reset. Please try again later.')
-  }
+  // try {
+  //   await transport.sendMail({
+  //     from: 'ecom@example.com',
+  //     to: email,
+  //     subject: 'Your Password Reset Token',
+  //     html: makeANiceEmail(`Your Password Reset Token is Here!
+  //         <br/>
+  //         <a href='${env.BASE_URL}/reset-password?resetToken=${resetToken}'>
+  //           Click Here to Reset
+  //         </a>`)
+  //   })
+  // } catch (_err) {
+  //   throw new StatusError(500, 'Error requesting password reset. Please try again later.')
+  // }
 }
 
-// const resetPassword = async ({ password, resetToken }: PasswordResetInput, res: Response): Promise<UserPersonalData> => {
-//   const user = await prisma.user.findOne({
-//     where: { resetToken },
-//     select: { id: true, resetTokenExpiry: true }
-//   })
+const resetPassword = async ({ password, resetToken }: PasswordResetInput, res: Response): Promise<UserBaseData> => {
+  const user = await db<User>('users')
+    .first('userID', 'resetTokenCreatedAt')
+    .where('resetToken', resetToken)
 
-//   if (!user?.resetTokenExpiry || parseInt(user.resetTokenExpiry) < Date.now()) {
-//     await prisma.disconnect()
-//     throw new StatusError(401, 'Reset token is invalid or expired')
-//   }
+  if (!user?.resetTokenCreatedAt || Number(user.resetTokenCreatedAt) + 3600000 < Date.now()) {
+    throw new StatusError(401, 'Reset token is invalid or expired')
+  }
 
-//   const passwordHash = await bcrypt.hash(password, 10)
+  const passwordHash = await bcrypt.hash(password, 10)
 
-//   const updatedUser = await prisma.user.update({
-//     where: { id: user.id },
-//     data: {
-//       resetToken: null,
-//       resetTokenExpiry: null,
-//       password: passwordHash
-//     },
-//     include: userFieldSet
-//   })
-//   await prisma.disconnect()
+  const [ updatedUser ] = await db<User>('users')
+    .update({
+      resetToken: null,
+      resetTokenCreatedAt: null,
+      password: passwordHash
+    },
+    [ 'name', 'userID', 'email', 'info', 'avatar', 'createdAt' ])
+    .where('userID', user.userID)
 
-//   const token = jwt.sign(
-//     { userID: updatedUser.id },
-//     env.JWT_SECRET,
-//     { expiresIn: '30d' }
-//   )
+  const token = jwt.sign(
+    { userID: user.userID },
+    env.JWT_SECRET,
+    { expiresIn: '30d' }
+  )
 
-//   setTokenCookie(res, token, true)
+  setTokenCookie(res, token, true)
 
-//   const userData = R.omit([
-//     'password',
-//     'resetToken',
-//     'resetTokenExpiry'
-//   ], updatedUser)
-
-//   return userData
-// }
+  return updatedUser
+}
 
 export default {
   addUser,
@@ -329,6 +303,6 @@ export default {
   getUsers,
   getUserByID,
   updateUser,
-  sendPasswordReset
-  // resetPassword
+  sendPasswordReset,
+  resetPassword
 }

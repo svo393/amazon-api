@@ -157,7 +157,7 @@ describe('User updating', () => {
       .expect(200)
   })
 
-  test.only('204 password reset request', async () => {
+  test('204 password reset request', async () => {
     await api
       .post(`${apiURL}/request-password-reset`)
       .send({ email: 'customer@example.com' })

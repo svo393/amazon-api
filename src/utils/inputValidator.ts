@@ -73,7 +73,7 @@ const checkUserUpdate = (object: any): UserUpdateInput => {
 
   const userInput = {
     name: name?.param,
-    email: email?.param,
+    email: email?.param.toLowerCase(),
     password: password?.param,
     avatar: avatar?.param,
     roleID: roleID?.param

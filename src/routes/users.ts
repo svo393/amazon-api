@@ -52,10 +52,10 @@ router.post('/request-password-reset', async (req, res) => {
   res.sendStatus(204)
 })
 
-// router.post('/reset-password', async (req, res) => {
-//   const userPasswordResetInput = inputValidator.checkUserResetToken(req.body)
-//   const updatedUser = await userService.resetPassword(userPasswordResetInput, res)
-//   res.json(updatedUser)
-// })
+router.post('/reset-password', async (req, res) => {
+  const userPasswordResetInput = inputValidator.checkUserResetToken(req.body)
+  const updatedUser = await userService.resetPassword(userPasswordResetInput, res)
+  res.json(updatedUser)
+})
 
 export default router
