@@ -18,7 +18,7 @@ router.get('/', async (_req, res) => {
 })
 
 router.get('/:categoryID', async (req, res) => {
-  const category = await categoryService.getCategoryByID(req.params.categoryID)
+  const category = await categoryService.getCategoryByID(Number(req.params.categoryID))
   res.json(category)
 })
 

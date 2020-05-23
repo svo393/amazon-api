@@ -35,14 +35,14 @@ router.get('/me', async (_req, res) => {
 })
 
 router.get('/:userID', async (req, res) => {
-  const user = await userService.getUserByID(req.params.userID, res)
+  const user = await userService.getUserByID(Number(req.params.userID), res)
   res.json(user)
 })
 
 router.put('/:userID', async (req, res) => {
   shield.isSameUser(req, res)
   const userUpdateInput = inputValidator.checkUserUpdate(req.body)
-  const updatedUser = await userService.updateUser(userUpdateInput, res, req.params.userID)
+  const updatedUser = await userService.updateUser(userUpdateInput, res, Number(req.params.userID))
   res.json(updatedUser)
 })
 

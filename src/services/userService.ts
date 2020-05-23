@@ -153,7 +153,7 @@ type UserPublicData = Omit<UserPersonalData,
   | 'orders'
 >
 
-const getUserByID = async (userID: string, res: Response): Promise<UserPersonalData | UserPublicData> => {
+const getUserByID = async (userID: number, res: Response): Promise<UserPersonalData | UserPublicData> => {
   const role: string | undefined = res.locals.userRole
 
   const user = await db<User>('users')
@@ -211,7 +211,7 @@ type UserUpdatedData = Pick<User,
   roleID?: number;
 }
 
-const updateUser = async (userInput: UserUpdateInput, res: Response, userID: string): Promise<UserUpdatedData> => {
+const updateUser = async (userInput: UserUpdateInput, res: Response, userID: number): Promise<UserUpdatedData> => {
   const role = res.locals.userRole
 
   const [ updatedUser ] = await db<User>('users')

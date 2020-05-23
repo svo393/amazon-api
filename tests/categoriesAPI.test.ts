@@ -54,7 +54,7 @@ describe('Category adding', () => {
 })
 
 describe('Category fetching', () => {
-  test.only('200 categories', async () => {
+  test('200 categories', async () => {
     await createOneCategory('admin')
 
     const { body } = await api
