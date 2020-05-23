@@ -1,7 +1,7 @@
 import supertest from 'supertest'
 import app from '../src/app'
 import db from '../src/utils/db'
-import { populateUsers, purge, usersInDB, loginAs, getUserByEmail } from './testHelper'
+import { getUserByEmail, loginAs, populateUsers, purge, usersInDB } from './testHelper'
 
 const api = supertest(app)
 const apiURL = '/api/users'

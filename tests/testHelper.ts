@@ -1,6 +1,6 @@
-import { Category, Item, PrismaClient, User as User1, Vendor } from '@prisma/client'
+import { Item, PrismaClient, Vendor } from '@prisma/client'
 import supertest from 'supertest'
-import { User, Role } from '../src/types'
+import { Role, User, Category } from '../src/types'
 import db from '../src/utils/db'
 import StatusError from '../src/utils/StatusError'
 
@@ -94,8 +94,7 @@ export const getUserByEmail = async (email: string): Promise<User> => {
 }
 
 export const usersInDB = async (): Promise<User[]> => {
-  const users = await db<User>('users')
-  return users
+  return await db<User>('users')
 }
 
 export const itemsInDB = async (): Promise<Item[]> => {
@@ -105,9 +104,7 @@ export const itemsInDB = async (): Promise<Item[]> => {
 }
 
 export const categoriesInDB = async (): Promise<Category[]> => {
-  const categories = await prisma.category.findMany()
-  await prisma.disconnect()
-  return categories
+  return await db<Category>('categories')
 }
 
 export const vendorsInDB = async (): Promise<Vendor[]> => {

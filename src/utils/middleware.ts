@@ -12,7 +12,7 @@ type Middleware = (
 ) => void
 
 type DecodedToken = {
-  userID: string;
+  userID: number;
   iat: number;
   exp: number;
 }
@@ -21,7 +21,7 @@ export const getUserID: Middleware = async (req, res, next) => {
   if (req.cookies.token) {
     try {
       const decodedToken = jwt.verify(req.cookies.token, env.JWT_SECRET)
-      res.locals.userID = (decodedToken as DecodedToken).userID
+      res.locals.userID = (decodedToken as DecodedToken).userID.toString()
 
       const role: { name: string } | null = await db('users')
         .first('r.name')

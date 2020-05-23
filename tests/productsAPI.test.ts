@@ -11,12 +11,12 @@ const apiURL = '/api/items'
 const newItem = items[0]
 
 const createOneItem = async (role: string): Promise<{addedItem: ItemPublicData; token: string}> => {
-  const { token, id } = await loginAs(role, api)
+  const { token, userID } = await loginAs(role, api)
 
   const { body } = await api
     .post(apiURL)
     .set('Cookie', `token=${token}`)
-    .send({ ...newItem, userID: id })
+    .send({ ...newItem, userID })
 
   return { addedItem: body, token }
 }
@@ -28,12 +28,12 @@ beforeEach(async () => {
 
 describe('Item adding', () => {
   test('201', async () => {
-    const { token, id } = await loginAs('root', api)
+    const { token, userID } = await loginAs('root', api)
 
     await api
       .post(apiURL)
       .set('Cookie', `token=${token}`)
-      .send({ ...newItem, userID: id })
+      .send({ ...newItem, userID })
       .expect(201)
       .expect('Content-Type', /application\/json/)
 
@@ -43,11 +43,11 @@ describe('Item adding', () => {
   })
 
   test('400 if no price', async () => {
-    const { token, id } = await loginAs('root', api)
+    const { token, userID } = await loginAs('root', api)
 
     const newItemWithoutPrice = {
       ...newItem,
-      userID: id,
+      userID,
       price: undefined
     }
 

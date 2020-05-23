@@ -6,7 +6,7 @@ import shield from '../utils/shield'
 const router = Router()
 
 router.post('/', async (req, res) => {
-  await shield.isAdmin(res)
+  shield.isAdmin(res)
   const categoryInput = inputValidator.checkNewCategory(req.body)
   const addedCategory = await categoryService.addCategory(categoryInput)
   res.status(201).json(addedCategory)
@@ -17,16 +17,16 @@ router.get('/', async (_req, res) => {
   res.json(categories)
 })
 
-router.get('/:name', async (req, res) => {
-  const category = await categoryService.getCategoryByName(req.params.name)
+router.get('/:categoryID', async (req, res) => {
+  const category = await categoryService.getCategoryByID(req.params.categoryID)
   res.json(category)
 })
 
-router.put('/:name', async (req, res) => {
-  await shield.isAdmin(res)
-  const categoryInput = inputValidator.checkCategoryUpdate(req.body)
-  const updatedItem = await categoryService.updateCategory(categoryInput, req.params.name)
-  res.json(updatedItem)
-})
+// router.put('/:name', async (req, res) => {
+//   shield.isAdmin(res)
+//   const categoryInput = inputValidator.checkCategoryUpdate(req.body)
+//   const updatedItem = await categoryService.updateCategory(categoryInput, req.params.name)
+//   res.json(updatedItem)
+// })
 
 export default router

@@ -7,7 +7,6 @@ import R from 'ramda'
 import sharp from 'sharp'
 import { ItemAllData, ItemCreateInputRaw, ItemPublicData } from '../types'
 import { makeID } from '../utils'
-import { getUserRole } from '../utils/shield'
 import StatusError from '../utils/StatusError'
 
 const prisma = new PrismaClient()
@@ -137,7 +136,7 @@ const getItemByID = async (id: string, res: Response): Promise<ItemPublicData| I
 
   if (!item) throw new StatusError(404, 'Not Found')
 
-  const role = await getUserRole(res)
+  const role = res.locals.userRole
   const userIsAdminOrRoot = role === 'ADMIN' || role === 'ROOT'
 
   const itemData = userIsAdminOrRoot

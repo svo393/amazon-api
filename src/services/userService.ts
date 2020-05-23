@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken'
 import R from 'ramda'
 import { promisify } from 'util'
 import db from '../../src/utils/db'
-import { Answer, Order, Question, Rating, Role, User, UserLoginInput, UserSignupInput, UserUpdateInput, PasswordResetInput } from '../types'
+import { Answer, Order, PasswordResetInput, Question, Rating, Role, User, UserLoginInput, UserSignupInput, UserUpdateInput } from '../types'
 import env from '../utils/config'
 import StatusError from '../utils/StatusError'
 // import { makeANiceEmail, transport } from '../utils/mail'
@@ -17,40 +17,6 @@ type UserBaseData = Omit<User,
   | 'isDeleted'
   | 'roleID'
 >
-
-type UserPersonalData = UserBaseData & {
-  orders: Order[];
-  ratings: Rating[];
-  questions: Question[];
-  answers: Answer[];
-}
-
-type UserListData = Omit<User,
-  | 'password'
-  | 'resetToken'
-  | 'resetTokenCreatedAt'
-  | 'roleID'
-> & {
-  role: string;
-  orderCount: number;
-  ratingCount: number;
-  questionCount: number;
-  answerCount: number;
-}
-
-type UserPublicData = Omit<UserPersonalData,
-  | 'email'
-  | 'createdAt'
-  | 'orders'
->
-
-type UserUpdatedData = Pick<User,
-  | 'name'
-  | 'email'
-  | 'avatar'
-> & {
-  roleID?: number;
-}
 
 const setTokenCookie = (res: Response, token: string, remember: boolean): void => {
   const config: CookieOptions = {
@@ -100,7 +66,6 @@ const addUser = async (userInput: UserSignupInput, res: Response): Promise<UserS
   )
 
   setTokenCookie(res, token, true)
-
   return addedUser
 }
 
@@ -129,25 +94,30 @@ const loginUser = async (userInput: UserLoginInput, res: Response): Promise<User
 
   setTokenCookie(res, token, remember)
 
-  const userData = R.omit([
+  return R.omit([
     'password',
     'resetToken',
     'resetTokenCreatedAt',
     'isDeleted',
     'roleID'
   ], existingUser)
+}
 
-  return userData
+type UserListData = Omit<User,
+  | 'password'
+  | 'resetToken'
+  | 'resetTokenCreatedAt'
+  | 'roleID'
+> & {
+  role: string;
+  orderCount: number;
+  ratingCount: number;
+  questionCount: number;
+  answerCount: number;
 }
 
 const getUsers = async (): Promise<UserListData[]> => {
-  const rootRole = await db<Role>('roles')
-    .first('roleID')
-    .where('name', 'ROOT')
-
-  if (!rootRole) { throw new StatusError() }
-
-  const { rows: users }: {rows: UserListData[]} = await db.raw(
+  const { rows: users }: { rows: UserListData[] } = await db.raw(
     `SELECT
       "email", "u"."name", "info", "avatar",
       "u"."createdAt", "isDeleted", "u"."userID",
@@ -162,13 +132,26 @@ const getUsers = async (): Promise<UserListData[]> => {
     LEFT JOIN questions as q USING ("userID")
     LEFT JOIN answers as a USING ("userID")
     LEFT JOIN roles as rl USING ("roleID")
-    WHERE "u"."roleID" != ${rootRole.roleID}
+    WHERE "rl"."name" != 'ROOT'
     GROUP BY "u"."userID", "rl"."name"`
   )
 
   if (!users) { throw new StatusError(404, 'Not Found') }
   return users
 }
+
+type UserPersonalData = UserBaseData & {
+  orders: Order[];
+  ratings: Rating[];
+  questions: Question[];
+  answers: Answer[];
+}
+
+type UserPublicData = Omit<UserPersonalData,
+  | 'email'
+  | 'createdAt'
+  | 'orders'
+>
 
 const getUserByID = async (userID: string, res: Response): Promise<UserPersonalData | UserPublicData> => {
   const role: string | undefined = res.locals.userRole
@@ -211,15 +194,21 @@ const getUserByID = async (userID: string, res: Response): Promise<UserPersonalD
       'info'
     ], user)
 
-  const userData = {
+  return {
     ...userDataSplitted,
     orders,
     ratings,
     questions,
     answers
   }
+}
 
-  return userData
+type UserUpdatedData = Pick<User,
+  | 'name'
+  | 'email'
+  | 'avatar'
+> & {
+  roleID?: number;
 }
 
 const updateUser = async (userInput: UserUpdateInput, res: Response, userID: string): Promise<UserUpdatedData> => {
@@ -293,7 +282,6 @@ const resetPassword = async ({ password, resetToken }: PasswordResetInput, res: 
   )
 
   setTokenCookie(res, token, true)
-
   return updatedUser
 }
 

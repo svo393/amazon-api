@@ -256,10 +256,7 @@ export type OrderProduct = {
   productID: number;
 }
 
-export type UserSignupInput = {
-  email: string;
-  password: string;
-}
+export type UserSignupInput = Pick<User, 'email' | 'password'>
 
 export type UserLoginInput = UserSignupInput & {
   remember: boolean;
@@ -277,3 +274,5 @@ export type PasswordResetInput = {
   password: string;
   resetToken: string;
 }
+
+export type CategoryCreateInput = Pick<Category, 'name' | 'parentCategoryID'>
