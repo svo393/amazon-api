@@ -6,9 +6,9 @@ import shield from '../utils/shield'
 const router = Router()
 
 router.post('/', async (req, res) => {
-  await shield.isAdmin(res)
-  const vendorInput = inputValidator.checkNewVendor(req.body)
-  const addedVendor = await vendorService.addVendor(vendorInput)
+  shield.isAdmin(res)
+  const vendorCreateInput = inputValidator.checkNewVendor(req.body)
+  const addedVendor = await vendorService.addVendor(vendorCreateInput)
   res.status(201).json(addedVendor)
 })
 
@@ -17,15 +17,15 @@ router.get('/', async (_req, res) => {
   res.json(vendors)
 })
 
-router.get('/:name', async (req, res) => {
-  const vendor = await vendorService.getVendorByName(req.params.name)
+router.get('/:vendorID', async (req, res) => {
+  const vendor = await vendorService.getVendorByID(Number(req.params.vendorID))
   res.json(vendor)
 })
 
-router.put('/:name', async (req, res) => {
-  await shield.isAdmin(res)
-  const vendorInput = inputValidator.checkVendorUpdate(req.body)
-  const updatedItem = await vendorService.updateVendor(vendorInput, req.params.name)
+router.put('/:vendorID', async (req, res) => {
+  shield.isAdmin(res)
+  const vendorUpdateInput = inputValidator.checkVendorUpdate(req.body)
+  const updatedItem = await vendorService.updateVendor(vendorUpdateInput, Number(req.params.vendorID))
   res.json(updatedItem)
 })
 

@@ -281,3 +281,16 @@ export type CategoryUpdateInput = {
   name?: string;
   parentCategoryID?: number;
 }
+
+export type VendorInput = Pick<Vendor, 'name'>
+
+export type ProductListData = Pick<Product,
+  | 'productID'
+  | 'title'
+  | 'listPrice'
+  | 'price'
+  | 'primaryMedia'
+  > & {
+    stars: number;
+    ratingCount: number;
+}

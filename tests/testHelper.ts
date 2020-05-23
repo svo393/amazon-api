@@ -1,6 +1,6 @@
-import { Item, PrismaClient, Vendor } from '@prisma/client'
+import { Item, PrismaClient } from '@prisma/client'
 import supertest from 'supertest'
-import { Role, User, Category } from '../src/types'
+import { Role, User, Category, Vendor } from '../src/types'
 import db from '../src/utils/db'
 import StatusError from '../src/utils/StatusError'
 
@@ -108,9 +108,7 @@ export const categoriesInDB = async (): Promise<Category[]> => {
 }
 
 export const vendorsInDB = async (): Promise<Vendor[]> => {
-  const vendors = await prisma.vendor.findMany()
-  await prisma.disconnect()
-  return vendors
+  return await db<Vendor>('vendors')
 }
 
 export const loginAs: (role: string, api: supertest.SuperTest<supertest.Test>) => Promise<{token: string; userID: number}> =

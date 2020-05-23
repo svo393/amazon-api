@@ -1,83 +1,65 @@
-import { PrismaClient, Vendor, VendorCreateInput, VendorUpdateInput } from '@prisma/client'
+import db from '../../src/utils/db'
 import R from 'ramda'
-import { ItemListData } from '../types'
+import { ItemListData, ProductListData, VendorInput, Vendor } from '../types'
 import StatusError from '../utils/StatusError'
 
-const prisma = new PrismaClient()
+const addVendor = async (vendorInput: VendorInput): Promise<Vendor> => {
+  const { name } = vendorInput
 
-type VendorData = {
-  name: string;
-  items: ItemListData[];
-}
-
-const addVendor = async (vendorInput: VendorCreateInput): Promise<Vendor> => {
-  const existingVendor = await prisma.vendor.findOne({
-    where: { name: vendorInput.name }
-  })
+  const existingVendor = await db<Vendor>('vendors')
+    .first('vendorID')
+    .where('name', name)
 
   if (existingVendor) {
-    await prisma.disconnect()
-    throw new StatusError(409, `Vendor with name "${vendorInput.name}" already exists`)
+    throw new StatusError(409, `Vendor with name "${name}" already exists`)
   }
 
-  const addedVendor = await prisma.vendor.create({
-    data: vendorInput
-  })
-  await prisma.disconnect()
+  const [ addedVendor ]: Vendor[] = await db<Vendor>('vendors')
+    .insert(vendorInput, [ '*' ])
 
   return addedVendor
 }
 
 const getVendors = async (): Promise<Vendor[]> => {
-  const vendors = await prisma.vendor.findMany()
-  await prisma.disconnect()
-
-  return vendors
+  return await db<Vendor>('vendors')
 }
 
-const getVendorByName = async (name: string): Promise<VendorData> => {
-  const vendor = await prisma.vendor.findOne({
-    where: { name },
-    include: { items: true }
-  })
-  await prisma.disconnect()
+type SingleVendorData = {
+  name: string;
+  products: ProductListData[];
+}
 
+const getVendorByID = async (vendorID: number): Promise<SingleVendorData> => {
+  const vendors = await db<Vendor>('vendors')
+  const [ vendor ] = vendors.filter((c) => c.vendorID === vendorID)
   if (!vendor) throw new StatusError(404, 'Not Found')
 
-  const filteredVendor = {
-    ...vendor,
-    items: vendor.items.map((i) => (
-      R.pick([
-        'id',
-        'name',
-        'listPrice',
-        'price',
-        'stars',
-        'primaryMedia',
-        'ratingCount'
-      ])(i)
-    ))
-  }
+  const { rows: products }: { rows: ProductListData[] } = await db.raw(
+    `SELECT
+      "p"."title", "listPrice", "price", "primaryMedia", "p"."productID",
+      AVG("r"."stars") as stars,
+      COUNT("r"."ratingID") as ratingCount
+    FROM products as p
+    LEFT JOIN ratings as r USING ("productID")
+    WHERE "vendorID" = ${vendorID}
+    GROUP BY "p"."productID"`
+  )
 
-  return filteredVendor
+  return { ...vendor, products }
 }
 
-const updateVendor = async (vendorInput: VendorUpdateInput, name: string): Promise<VendorData> => {
-  const updatedVendor = await prisma.vendor.update({
-    where: { name },
-    data: vendorInput,
-    include: { items: true }
-  })
-  await prisma.disconnect()
+const updateVendor = async (vendorInput: VendorInput, vendorID: number): Promise<SingleVendorData> => {
+  const [ updatedVendor ] = await db<Vendor>('vendors')
+    .update({ ...vendorInput }, [ 'vendorID' ])
+    .where('vendorID', vendorID)
 
   if (!updatedVendor) throw new StatusError(404, 'Not Found')
-
-  return updatedVendor
+  return getVendorByID(updatedVendor.vendorID)
 }
 
 export default {
   addVendor,
   getVendors,
-  getVendorByName,
+  getVendorByID,
   updateVendor
 }

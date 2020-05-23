@@ -1,10 +1,6 @@
-import { PrismaClient } from '@prisma/client'
-import { ItemListData, Category, CategoryCreateInput, Product, Rating, CategoryUpdateInput } from '../types'
-import StatusError from '../utils/StatusError'
 import db from '../../src/utils/db'
-import R from 'ramda'
-
-const prisma = new PrismaClient()
+import { Category, CategoryCreateInput, CategoryUpdateInput, ProductListData } from '../types'
+import StatusError from '../utils/StatusError'
 
 const addCategory = async (categoryInput: CategoryCreateInput): Promise<Category> => {
   const { name } = categoryInput
@@ -34,17 +30,6 @@ const getCategories = async (): Promise<CategoryBaseData[]> => {
       .filter((i) => i.parentCategoryID === c.categoryID)
       .map((i) => i.categoryID)
   }))
-}
-
-type ProductListData = Pick<Product,
-  | 'productID'
-  | 'title'
-  | 'listPrice'
-  | 'price'
-  | 'primaryMedia'
-  > & {
-    stars: number;
-    ratingCount: number;
 }
 
 type Parent = {
@@ -99,8 +84,6 @@ const getCategoryByID = async (categoryID: number): Promise<SingleCategoryData> 
 }
 
 const updateCategory = async (categoryInput: CategoryUpdateInput, categoryID: number): Promise<SingleCategoryData> => {
-  console.info('categoryInput', categoryInput)
-
   const [ updatedCategory ] = await db<Category>('categories')
     .update({ ...categoryInput }, [ 'categoryID' ])
     .where('categoryID', categoryID)

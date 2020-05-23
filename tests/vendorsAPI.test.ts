@@ -1,12 +1,13 @@
-import { VendorCreateInput, Vendor } from '@prisma/client'
 import supertest from 'supertest'
 import app from '../src/app'
-import { loginAs, populateUsers, vendorsInDB } from './testHelper'
+import db from '../src/utils/db'
+import { Vendor, VendorInput } from '../src/types'
+import { loginAs, populateUsers, purge, vendorsInDB } from './testHelper'
 
 const api = supertest(app)
 const apiURL = '/api/vendors'
 
-const newVendor = (): VendorCreateInput => ({
+const newVendor = (): VendorInput => ({
   name: `New Vendor ${(new Date().getTime()).toString()}`
 })
 
@@ -22,12 +23,13 @@ const createOneVendor = async (role: string): Promise<{ addedVendor: Vendor; tok
 }
 
 beforeEach(async () => {
+  await purge()
   await populateUsers(api)
 })
 
 describe('Vendor adding', () => {
   test('201', async () => {
-    const { token } = await loginAs('root', api)
+    const { token } = await loginAs('admin', api)
 
     await api
       .post(apiURL)
@@ -41,8 +43,11 @@ describe('Vendor adding', () => {
   })
 
   test('403 if not admin or root', async () => {
+    const { token } = await loginAs('customer', api)
+
     await api
       .post(apiURL)
+      .set('Cookie', `token=${token}`)
       .send(newVendor())
       .expect(403)
   })
@@ -63,7 +68,7 @@ describe('Vendor fetching', () => {
     const { addedVendor } = await createOneVendor('admin')
 
     const { body } = await api
-      .get(`${apiURL}/${addedVendor.name}`)
+      .get(`${apiURL}/${addedVendor.vendorID}`)
       .expect(200)
 
     expect(body).toBeDefined()
@@ -75,7 +80,7 @@ describe('Vendor updating', () => {
     const { addedVendor, token } = await createOneVendor('admin')
 
     const { body } = await api
-      .put(`${apiURL}/${addedVendor.name}`)
+      .put(`${apiURL}/${addedVendor.vendorID}`)
       .set('Cookie', `token=${token}`)
       .send({ name: 'Updated Vendor' })
       .expect(200)
@@ -88,9 +93,11 @@ describe('Vendor updating', () => {
     const { token } = await createOneVendor('customer')
 
     await api
-      .put(`${apiURL}/${addedVendor.name}`)
+      .put(`${apiURL}/${addedVendor.vendorID}`)
       .set('Cookie', `token=${token}`)
       .send({ name: 'Updated Vendor' })
       .expect(403)
   })
 })
+
+afterAll(async () => await db.destroy())

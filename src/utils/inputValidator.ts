@@ -1,6 +1,6 @@
-import { ItemUpdateInput, VendorCreateInput, VendorUpdateInput } from '@prisma/client'
+import { ItemUpdateInput } from '@prisma/client'
 import R from 'ramda'
-import { ItemCreateInputRaw, PasswordResetInput, UserLoginInput, UserSignupInput, UserUpdateInput, CategoryCreateInput, CategoryUpdateInput } from '../types'
+import { ItemCreateInputRaw, PasswordResetInput, UserLoginInput, UserSignupInput, UserUpdateInput, CategoryCreateInput, CategoryUpdateInput, VendorInput } from '../types'
 import { hasDefinedProps, isArray, isBoolean, isEmail, isGroup, isImage, isInputProvided, isItemParameter, isNumber, isPasswordValid, isProvided, isString, isStringOrArray } from './validatorLib'
 
 const checkNewUser = (object: any): UserSignupInput => {
@@ -322,7 +322,7 @@ const checkCategoryUpdate = (object: any): CategoryUpdateInput => {
   return hasDefinedProps(categoryInput)
 }
 
-const checkNewVendor = (object: any): VendorCreateInput => {
+const checkNewVendor = (object: any): VendorInput => {
   const name = R.pipe(
     isProvided,
     isString
@@ -332,18 +332,19 @@ const checkNewVendor = (object: any): VendorCreateInput => {
     name: name.param
   }
 
-  return hasDefinedProps(vendorInput) as VendorCreateInput
+  return hasDefinedProps(vendorInput)
 }
 
-const checkVendorUpdate = (object: any): VendorUpdateInput => {
+const checkVendorUpdate = (object: any): VendorInput => {
   isInputProvided(object)
 
-  const name = object.name && isString(
-    { name: 'name', param: object.name }
-  )
+  const name = R.pipe(
+    isProvided,
+    isString
+  )({ name: 'name', param: object.name })
 
   const vendorInput = {
-    name: name?.param
+    name: name.param
   }
 
   return hasDefinedProps(vendorInput)
