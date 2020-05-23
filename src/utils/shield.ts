@@ -1,8 +1,6 @@
 import { PrismaClient } from '@prisma/client'
-import { Response, Request } from 'express'
+import { Request, Response } from 'express'
 import StatusError from './StatusError'
-import db from './db'
-import { User, Role } from '../types'
 
 type Model =
   | 'item'
@@ -17,56 +15,36 @@ type Model =
 
 const prisma = new PrismaClient()
 
-export const getUserRole = async (res: Response): Promise<string | null> => {
-  const userID = res.locals.userID
-  if (!userID) return null
-
-  const role: { name: string } | null = await db('users')
-    .first('r.name')
-    .where('userID', userID)
-    .joinRaw('JOIN roles as r USING ("roleID")')
-
-  if (!role) {
-    res.clearCookie('token')
-    throw new StatusError(403, 'Forbidden')
-  }
-  return role.name
-}
-
 const isLoggedIn = (res: Response): void => {
   if (!res.locals.userID) throw new StatusError(403, 'Forbidden')
 }
 
-const isRoot = async (res: Response): Promise<void> => {
+const isRoot = (res: Response): void => {
   isLoggedIn(res)
-  const role = await getUserRole(res)
-  if (role !== 'ROOT') throw new StatusError(403, 'Forbidden')
+
+  if (res.locals.userRole !== 'ROOT') throw new StatusError(403, 'Forbidden')
 }
 
-const isAdmin = async (res: Response): Promise<void> => {
+const isAdmin = (res: Response): void => {
   isLoggedIn(res)
-  const role = await getUserRole(res)
+  const role = res.locals.userRole
 
   if (!role || ![ 'ROOT', 'ADMIN' ].includes(role)) {
     throw new StatusError(403, 'Forbidden')
   }
 }
 
-const isSameUser = async (req: Request, res: Response): Promise<void> => {
+const isSameUser = (req: Request, res: Response): void => {
   isLoggedIn(res)
-  const role = await getUserRole(res)
 
-  if (res.locals.userID !== req.params.id && role !== 'ROOT') {
+  if (res.locals.userID.toString() !== req.params.userID && res.locals.userRole !== 'ROOT') {
     throw new StatusError(403, 'Forbidden')
   }
 }
 
 const isCreator = async (res: Response, name: Model, id: string): Promise<void | null> => {
   isLoggedIn(res)
-  const userID = res.locals.userID
-  const role = await getUserRole(res)
-
-  if (role === 'ROOT') return null
+  if (res.locals.userRole === 'ROOT') return null
 
   let data
 
@@ -109,7 +87,7 @@ const isCreator = async (res: Response, name: Model, id: string): Promise<void |
   await prisma.disconnect()
 
   if (!data) throw new StatusError(404, 'Not Found')
-  if (data.user.id !== userID) throw new StatusError(403, 'Forbidden')
+  if (data.user.id !== res.locals.userID) throw new StatusError(403, 'Forbidden')
 }
 
 export default {

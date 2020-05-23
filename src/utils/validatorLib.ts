@@ -1,4 +1,3 @@
-import { Role } from '@prisma/client'
 import R from 'ramda'
 import checkEmail from 'validator/lib/isEmail'
 import StatusError from './StatusError'
@@ -74,13 +73,6 @@ export const isBoolean: CP = ({ name, param }) => {
 export const isEmail: CP = ({ name, param }) => {
   if (!checkEmail(param)) {
     throw new StatusError(400, `Incorrect email: ${param}`)
-  }
-  return { name, param }
-}
-
-export const isRole: CP = ({ name, param }) => {
-  if (!Role) {
-    throw new StatusError(400, `Incorrect role: ${param}`)
   }
   return { name, param }
 }

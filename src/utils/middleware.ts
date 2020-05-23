@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken'
 import env from './config'
 import logger from './logger'
 import StatusError from './StatusError'
+import db from './db'
 
 type Middleware = (
   req: Request,
@@ -16,13 +17,25 @@ type DecodedToken = {
   exp: number;
 }
 
-export const getUserID: Middleware = (req, res, next) => {
+export const getUserID: Middleware = async (req, res, next) => {
   if (req.cookies.token) {
     try {
       const decodedToken = jwt.verify(req.cookies.token, env.JWT_SECRET)
       res.locals.userID = (decodedToken as DecodedToken).userID
+
+      const role: { name: string } | null = await db('users')
+        .first('r.name')
+        .where('userID', res.locals.userID)
+        .joinRaw('JOIN roles as r USING ("roleID")')
+
+      if (!role) {
+        res.clearCookie('token')
+        throw new StatusError(403, 'Forbidden')
+      }
+      res.locals.userRole = role.name
     } catch (_err) {
       res.clearCookie('token')
+      throw new StatusError(403, 'Forbidden')
     }
   }
   next()

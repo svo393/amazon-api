@@ -1,7 +1,7 @@
-import { CategoryCreateInput, CategoryUpdateInput, ItemUpdateInput, UserUpdateInput, VendorCreateInput, VendorUpdateInput } from '@prisma/client'
+import { CategoryCreateInput, CategoryUpdateInput, ItemUpdateInput, VendorCreateInput, VendorUpdateInput } from '@prisma/client'
 import R from 'ramda'
-import { ItemCreateInputRaw, PasswordResetInput, UserLoginInput, UserSignupInput } from '../types'
-import { hasDefinedProps, isArray, isBoolean, isEmail, isImage, isInputProvided, isItemParameter, isNumber, isPasswordValid, isProvided, isRole, isString, isStringOrArray, isGroup } from './validatorLib'
+import { ItemCreateInputRaw, PasswordResetInput, UserLoginInput, UserSignupInput, UserUpdateInput } from '../types'
+import { hasDefinedProps, isArray, isBoolean, isEmail, isGroup, isImage, isInputProvided, isItemParameter, isNumber, isPasswordValid, isProvided, isString, isStringOrArray } from './validatorLib'
 
 const checkNewUser = (object: any): UserSignupInput => {
   const email = R.pipe(
@@ -46,6 +46,42 @@ const checkUserLogin = (object: any): UserLoginInput => {
   }
 }
 
+const checkUserUpdate = (object: any): UserUpdateInput => {
+  isInputProvided(object)
+
+  const password = object.password && R.pipe(
+    isString,
+    isPasswordValid
+  )({ name: 'password', param: object.password })
+
+  const email = object.email && R.pipe(
+    isString,
+    isEmail
+  )({ name: 'email', param: object.email })
+
+  const name = object.name && isString(
+    { name: 'name', param: object.name }
+  )
+
+  const avatar = object.avatar && isBoolean(
+    { name: 'avatar', param: object.avatar }
+  )
+
+  const roleID = object.roleID && isNumber(
+    { name: 'roleID', param: object.roleID }
+  )
+
+  const userInput = {
+    name: name?.param,
+    email: email?.param,
+    password: password?.param,
+    avatar: avatar?.param,
+    roleID: roleID?.param
+  }
+
+  return hasDefinedProps(userInput)
+}
+
 const checkUserResetRequest = (object: any): string => {
   const email = R.pipe(
     isProvided,
@@ -72,43 +108,6 @@ const checkUserResetToken = (object: any): PasswordResetInput => {
     resetToken: resetToken.param,
     password: password.param
   }
-}
-
-const checkUserUpdate = (object: any): UserUpdateInput => {
-  isInputProvided(object)
-
-  const password = object.password && R.pipe(
-    isString,
-    isPasswordValid
-  )({ name: 'password', param: object.password })
-
-  const email = object.email && R.pipe(
-    isString,
-    isEmail
-  )({ name: 'email', param: object.email })
-
-  const name = object.name && isString(
-    { name: 'name', param: object.name }
-  )
-
-  const avatar = object.avatar && isBoolean(
-    { name: 'avatar', param: object.avatar }
-  )
-
-  const role = object.role && R.pipe(
-    isString,
-    isRole
-  )({ name: 'role', param: object.role })
-
-  const userInput = {
-    name: name?.param,
-    email: email?.param,
-    password: password?.param,
-    avatar: avatar?.param,
-    role: role?.param
-  }
-
-  return hasDefinedProps(userInput)
 }
 
 const checkNewItem = (object: any): ItemCreateInputRaw => {

@@ -4,11 +4,11 @@ import { CookieOptions, Response } from 'express'
 import jwt from 'jsonwebtoken'
 import R from 'ramda'
 import { promisify } from 'util'
-import { PasswordResetInput, UserSignupInput, UserLoginInput, User, Role, Order, Rating, Question, Answer } from '../types'
-import env from '../utils/config'
-import { getUserRole } from '../utils/shield'
-import StatusError from '../utils/StatusError'
 import db from '../../src/utils/db'
+import { Answer, Order, Question, Rating, Role, User, UserLoginInput, UserSignupInput, UserUpdateInput } from '../types'
+import env from '../utils/config'
+import { makeANiceEmail, transport } from '../utils/mail'
+import StatusError from '../utils/StatusError'
 
 type UserPersonalData = Omit<User,
   | 'password'
@@ -41,6 +41,14 @@ type UserPublicData = Omit<UserPersonalData,
   | 'createdAt'
   | 'orders'
 >
+
+type UserUpdatedData = Pick<User,
+  | 'name'
+  | 'email'
+  | 'avatar'
+> & {
+  roleID?: number;
+}
 
 const setTokenCookie = (res: Response, token: string, remember: boolean): void => {
   const config: CookieOptions = {
@@ -179,7 +187,7 @@ const getUsers = async (): Promise<UserListData[]> => {
 }
 
 const getUserByID = async (userID: string, res: Response): Promise<UserPersonalData | UserPublicData> => {
-  const role = await getUserRole(res)
+  const role: string | undefined = res.locals.userRole
 
   const user = await db<User>('users')
     .first()
@@ -230,56 +238,49 @@ const getUserByID = async (userID: string, res: Response): Promise<UserPersonalD
   return userData
 }
 
-// const updateUser = async (userInput: UserUpdateInput, id: string): Promise<UserPersonalData> => {
-//   const updatedUser = await prisma.user.update({
-//     where: { id },
-//     data: { ...userInput },
-//     include: userFieldSet
-//   })
-//   await prisma.disconnect()
+const updateUser = async (userInput: UserUpdateInput, res: Response, userID: string): Promise<UserUpdatedData> => {
+  const role = res.locals.userRole
 
-//   if (!updatedUser) {
-//     throw new StatusError(404, 'Not Found')
-//   }
+  const [ updatedUser ] = await db<User>('users')
+    .update({ ...userInput },
+      [ 'name', 'email', 'avatar', 'roleID' ])
+    .where('userID', userID)
 
-//   const userData = R.omit([
-//     'password',
-//     'resetToken',
-//     'resetTokenExpiry'
-//   ], updatedUser)
+  if (!updatedUser) { throw new StatusError(404, 'Not Found') }
 
-//   return userData
-// }
+  role !== 'ROOT' && delete updatedUser.roleID
+  return updatedUser
+}
 
-// const sendPasswordReset = async (email: string): Promise<void> => {
-//   const user = await prisma.user.findOne({ where: { email } })
-//   if (!user) throw new StatusError(401, 'Invalid email')
+const sendPasswordReset = async (email: string): Promise<void> => {
+  const user = await db<User>('users')
+    .first()
+    .where('email', email)
 
-//   const resetToken = (await promisify(randomBytes)(20)).toString('hex')
-//   const resetTokenExpiry = (Date.now() + 1000 * 60 * 60).toString()
+  if (!user) throw new StatusError(401, 'Invalid Email')
 
-//   await prisma.user.update({
-//     where: { email },
-//     data: { resetToken, resetTokenExpiry },
-//     select: { id: true }
-//   })
-//   await prisma.disconnect()
+  const resetToken = (await promisify(randomBytes)(20)).toString('hex')
+  const resetTokenExpiry = (Date.now() + 1000 * 60 * 60).toString()
 
-//   try {
-//     // await transport.sendMail({
-//     //   from: 'ecom@example.com',
-//     //   to: email,
-//     //   subject: 'Your Password Reset Token',
-//     //   html: makeANiceEmail(`Your Password Reset Token is Here!
-//     //       <br/>
-//     //       <a href='${env.BASE_URL}/reset-password?resetToken=${resetToken}'>
-//     //         Click Here to Reset
-//     //       </a>`)
-//     // })
-//   } catch (_err) {
-//     throw new StatusError(500, 'Error requesting password reset. Please try again later.')
-//   }
-// }
+  await db('users')
+    .update({ resetToken, resetTokenExpiry })
+    .where('email', email)
+
+  try {
+    await transport.sendMail({
+      from: 'ecom@example.com',
+      to: email,
+      subject: 'Your Password Reset Token',
+      html: makeANiceEmail(`Your Password Reset Token is Here!
+          <br/>
+          <a href='${env.BASE_URL}/reset-password?resetToken=${resetToken}'>
+            Click Here to Reset
+          </a>`)
+    })
+  } catch (_err) {
+    throw new StatusError(500, 'Error requesting password reset. Please try again later.')
+  }
+}
 
 // const resetPassword = async ({ password, resetToken }: PasswordResetInput, res: Response): Promise<UserPersonalData> => {
 //   const user = await prisma.user.findOne({
@@ -326,8 +327,8 @@ export default {
   addUser,
   loginUser,
   getUsers,
-  getUserByID
-  // updateUser,
-  // sendPasswordReset,
+  getUserByID,
+  updateUser,
+  sendPasswordReset
   // resetPassword
 }
