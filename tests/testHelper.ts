@@ -111,6 +111,10 @@ export const vendorsInDB = async (): Promise<Vendor[]> => {
   return await db<Vendor>('vendors')
 }
 
+export const rolesInDB = async (): Promise<Role[]> => {
+  return await db<Role>('roles')
+}
+
 export const loginAs: (role: string, api: supertest.SuperTest<supertest.Test>) => Promise<{token: string; userID: number}> =
 async (role, api) => {
   const user = {

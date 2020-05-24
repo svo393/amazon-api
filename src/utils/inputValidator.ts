@@ -1,6 +1,6 @@
 import { ItemUpdateInput } from '@prisma/client'
 import R from 'ramda'
-import { ItemCreateInputRaw, PasswordResetInput, UserLoginInput, UserSignupInput, UserUpdateInput, CategoryCreateInput, CategoryUpdateInput, VendorInput } from '../types'
+import { ItemCreateInputRaw, PasswordResetInput, UserLoginInput, UserSignupInput, UserUpdateInput, CategoryCreateInput, CategoryUpdateInput, VendorInput, RoleInput } from '../types'
 import { hasDefinedProps, isArray, isBoolean, isEmail, isGroup, isImage, isInputProvided, isItemParameter, isNumber, isPasswordValid, isProvided, isString, isStringOrArray } from './validatorLib'
 
 const checkNewUser = (object: any): UserSignupInput => {
@@ -336,18 +336,24 @@ const checkNewVendor = (object: any): VendorInput => {
 }
 
 const checkVendorUpdate = (object: any): VendorInput => {
-  isInputProvided(object)
+  return checkNewVendor(object)
+}
 
+const checkNewRole = (object: any): RoleInput => {
   const name = R.pipe(
     isProvided,
     isString
   )({ name: 'name', param: object.name })
 
-  const vendorInput = {
+  const roleInput = {
     name: name.param
   }
 
-  return hasDefinedProps(vendorInput)
+  return hasDefinedProps(roleInput)
+}
+
+const checkRoleUpdate = (object: any): RoleInput => {
+  return checkNewRole(object)
 }
 
 export default {
@@ -362,5 +368,7 @@ export default {
   checkNewCategory,
   checkCategoryUpdate,
   checkNewVendor,
-  checkVendorUpdate
+  checkVendorUpdate,
+  checkNewRole,
+  checkRoleUpdate
 }

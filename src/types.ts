@@ -43,6 +43,10 @@ export type ItemCreateInputRaw = Omit<Item,
   }[];
 }
 
+//
+// Types from schema in order of creation
+//
+
 export type Role = {
   roleID: number;
   name: string;
@@ -256,6 +260,10 @@ export type OrderProduct = {
   productID: number;
 }
 
+//
+// Derivative types
+//
+
 export type UserSignupInput = Pick<User, 'email' | 'password'>
 
 export type UserLoginInput = UserSignupInput & {
@@ -284,6 +292,12 @@ export type CategoryUpdateInput = {
 
 export type VendorInput = Pick<Vendor, 'name'>
 
+export type UserSafeData = Omit<User,
+  | 'password'
+  | 'resetToken'
+  | 'resetTokenCreatedAt'
+>
+
 export type ProductListData = Pick<Product,
   | 'productID'
   | 'title'
@@ -294,3 +308,5 @@ export type ProductListData = Pick<Product,
     stars: number;
     ratingCount: number;
 }
+
+export type RoleInput = Pick<Role, 'name'>

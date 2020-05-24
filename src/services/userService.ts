@@ -5,15 +5,12 @@ import jwt from 'jsonwebtoken'
 import R from 'ramda'
 import { promisify } from 'util'
 import db from '../../src/utils/db'
-import { Answer, Order, PasswordResetInput, Question, Rating, Role, User, UserLoginInput, UserSignupInput, UserUpdateInput } from '../types'
+import { Answer, Order, PasswordResetInput, Question, Rating, Role, User, UserLoginInput, UserSafeData, UserSignupInput, UserUpdateInput } from '../types'
 import env from '../utils/config'
 import StatusError from '../utils/StatusError'
 // import { makeANiceEmail, transport } from '../utils/mail'
 
-type UserBaseData = Omit<User,
-  | 'password'
-  | 'resetToken'
-  | 'resetTokenCreatedAt'
+type UserBaseData = Omit<UserSafeData,
   | 'isDeleted'
   | 'roleID'
 >

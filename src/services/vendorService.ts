@@ -1,6 +1,5 @@
 import db from '../../src/utils/db'
-import R from 'ramda'
-import { ItemListData, ProductListData, VendorInput, Vendor } from '../types'
+import { ProductListData, Vendor, VendorInput } from '../types'
 import StatusError from '../utils/StatusError'
 
 const addVendor = async (vendorInput: VendorInput): Promise<Vendor> => {
