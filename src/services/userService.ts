@@ -8,6 +8,7 @@ import db from '../../src/utils/db'
 import { Answer, Order, PasswordResetInput, Question, Rating, Role, User, UserLoginInput, UserSafeData, UserSignupInput, UserUpdateInput } from '../types'
 import env from '../utils/config'
 import StatusError from '../utils/StatusError'
+import shield from '../utils/shield'
 // import { makeANiceEmail, transport } from '../utils/mail'
 
 type UserBaseData = Omit<UserSafeData,
@@ -151,15 +152,13 @@ type UserPublicData = Omit<UserPersonalData,
 >
 
 const getUserByID = async (userID: number, res: Response): Promise<UserPersonalData | UserPublicData> => {
-  const role: string | undefined = res.locals.userRole
-
   const user = await db<User>('users')
     .first()
     .where('userID', userID)
 
   if (!user) { throw new StatusError(404, 'Not Found') }
 
-  const userHasPermission = (role && [ 'ROOT', 'ADMIN' ].includes(role)) ||
+  const userHasPermission = shield.hasRole([ 'ROOT', 'ADMIN' ], res) ||
   res.locals.userID === userID
 
   const orders = userHasPermission

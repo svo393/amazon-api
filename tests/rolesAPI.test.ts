@@ -69,8 +69,6 @@ describe('Roles fetching', () => {
       .set('Cookie', `token=${token}`)
       .expect(200)
 
-    console.info('body', body)
-
     expect(body).toBeDefined()
   })
 })
@@ -90,7 +88,7 @@ describe('Role updating', () => {
 
   test('403 if not root', async () => {
     const { addedRole } = await createOneRole('root')
-    const { token } = await createOneRole('admin')
+    const { token } = await loginAs('admin', api)
 
     await api
       .put(`${apiURL}/${addedRole.roleID}`)

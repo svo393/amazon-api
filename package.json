@@ -77,6 +77,7 @@
     "test": "cross-env NODE_ENV=development jest --verbose --runInBand",
     "test:vendors": "cross-env NODE_ENV=development DEBUG=knex:query jest ./tests/vendorsAPI.test.ts --verbose  --runInBand",
     "test:roles": "cross-env NODE_ENV=development DEBUG=knex:query jest ./tests/rolesAPI.test.ts --verbose  --runInBand",
+    "test:shm": "cross-env NODE_ENV=development DEBUG=knex:query jest ./tests/shippingMethodsAPI.test.ts --verbose  --runInBand",
     "test:cats": "cross-env NODE_ENV=development DEBUG=knex:query jest ./tests/categoriesAPI.test.ts --verbose  --runInBand",
     "test:items": "cross-env NODE_ENV=development jest ./tests/itemsAPI.test.ts --verbose  --runInBand",
     "test:users": "cross-env NODE_ENV=development DEBUG=knex:query jest ./tests/usersAPI.test.ts --verbose  --runInBand",

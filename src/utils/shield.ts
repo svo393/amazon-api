@@ -15,6 +15,11 @@ type Model =
 
 const prisma = new PrismaClient()
 
+const hasRole = (roles: string[], res: Response): boolean => {
+  const role: string | undefined = res.locals.userRole
+  return Boolean(role && roles.includes(role))
+}
+
 const isLoggedIn = (res: Response): void => {
   if (!res.locals.userID) throw new StatusError(403, 'Forbidden')
 }
@@ -95,5 +100,6 @@ export default {
   isAdmin,
   isCreator,
   isRoot,
-  isSameUser
+  isSameUser,
+  hasRole
 }

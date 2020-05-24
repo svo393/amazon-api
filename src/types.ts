@@ -53,13 +53,14 @@ export type Role = {
 }
 
 export type ShippingMethod = {
-  shippindMethodID: number;
+  shippingMethodID: number;
   name: string;
 }
 
 export type Address = {
   addressID: number;
   name: string;
+  shippingMethodID: number;
 }
 
 export type User = {
@@ -310,3 +311,5 @@ export type ProductListData = Pick<Product,
 }
 
 export type RoleInput = Pick<Role, 'name'>
+
+export type ShippingMethodInput = Pick<ShippingMethod, 'name'>
