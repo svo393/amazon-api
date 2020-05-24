@@ -158,10 +158,10 @@ const getUserByID = async (userID: number, res: Response): Promise<UserPersonalD
 
   if (!user) { throw new StatusError(404, 'Not Found') }
 
-  const userHasPermission = shield.hasRole([ 'ROOT', 'ADMIN' ], res) ||
+  const hasPermission = shield.hasRole([ 'ROOT', 'ADMIN' ], res) ||
   res.locals.userID === userID
 
-  const orders = userHasPermission
+  const orders = hasPermission
     ? await db<Order>('orders')
       .where('userID', userID)
     : undefined
@@ -175,7 +175,7 @@ const getUserByID = async (userID: number, res: Response): Promise<UserPersonalD
   const answers = await db<Answer>('answers')
     .where('userID', userID)
 
-  const userDataSplitted = userHasPermission
+  const userDataSplitted = hasPermission
     ? R.omit([
       'password',
       'resetToken',

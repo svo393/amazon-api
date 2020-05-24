@@ -1,34 +1,34 @@
 import { Response } from 'express'
-import { Address, ShippingMethod, ShippingMethodInput } from '../types'
-import { sensitiveShippingMethods } from '../utils/constants'
+import { Address, ShippingMethod as SM, ShippingMethodInput as SMInput } from '../types'
+import { sensitiveShippingMethods as sensitiveSMs } from '../utils/constants'
 import db from '../utils/db'
 import shield from '../utils/shield'
 import StatusError from '../utils/StatusError'
 
-const addShippingMethod = async (shippingMethodInput: ShippingMethodInput): Promise<ShippingMethod> => {
-  const { name } = shippingMethodInput
+const addShippingMethod = async (smInput: SMInput): Promise<SM> => {
+  const { name } = smInput
 
-  const existingShippingMethod = await db<ShippingMethod>('shippingMethods')
+  const existingSM = await db<SM>('shippingMethods')
     .first('shippingMethodID')
     .where('name', name)
 
-  if (existingShippingMethod) {
+  if (existingSM) {
     throw new StatusError(409, `ShippingMethod with name "${name}" already exists`)
   }
 
-  const [ addedShippingMethod ]: ShippingMethod[] = await db<ShippingMethod>('shippingMethods')
-    .insert(shippingMethodInput, [ '*' ])
+  const [ addedSM ]: SM[] = await db<SM>('shippingMethods')
+    .insert(smInput, [ '*' ])
 
-  return addedShippingMethod
+  return addedSM
 }
 
-const getShippingMethods = async (res: Response): Promise<ShippingMethod[]> => {
-  const userHasPermission = shield.hasRole([ 'ROOT', 'ADMIN' ], res)
-  const shippingMethods = await db<ShippingMethod>('shippingMethods')
+const getShippingMethods = async (res: Response): Promise<SM[]> => {
+  const hasPermission = shield.hasRole([ 'ROOT', 'ADMIN' ], res)
+  const sms = await db<SM>('shippingMethods')
 
-  return userHasPermission
-    ? shippingMethods
-    : shippingMethods.filter((sm) => !sensitiveShippingMethods.includes(sm.name))
+  return hasPermission
+    ? sms
+    : sms.filter((sm) => !sensitiveSMs.includes(sm.name))
 }
 
 type SingleShippingMethodData = {
@@ -36,30 +36,30 @@ type SingleShippingMethodData = {
   addresses: Address[];
 }
 
-const getShippingMethodByID = async (res: Response, shippingMethodID: number): Promise<SingleShippingMethodData> => {
-  const userHasPermission = shield.hasRole([ 'ROOT', 'ADMIN' ], res)
-  const shippingMethods = await db<ShippingMethod>('shippingMethods')
+const getShippingMethodByID = async (res: Response, smID: number): Promise<SingleShippingMethodData> => {
+  const hasPermission = shield.hasRole([ 'ROOT', 'ADMIN' ], res)
+  const sms = await db<SM>('shippingMethods')
 
-  const filteredShippindMethods = userHasPermission
-    ? shippingMethods
-    : shippingMethods.filter((sm) => !sensitiveShippingMethods.includes(sm.name))
+  const filteredSMs = hasPermission
+    ? sms
+    : sms.filter((sm) => !sensitiveSMs.includes(sm.name))
 
-  const [ shippingMethod ] = filteredShippindMethods.filter((shm) => shm.shippingMethodID === shippingMethodID)
-  if (!shippingMethod) throw new StatusError(404, 'Not Found')
+  const [ sm ] = filteredSMs.filter((shm) => shm.shippingMethodID === smID)
+  if (!sm) throw new StatusError(404, 'Not Found')
 
   const addresses = await db<Address>('addresses')
-    .where('shippingMethodID', shippingMethodID)
+    .where('shippingMethodID', smID)
 
-  return { ...shippingMethod, addresses }
+  return { ...sm, addresses }
 }
 
-const updateShippingMethod = async (res: Response, shippingMethodInput: ShippingMethodInput, shippingMethodID: number): Promise<SingleShippingMethodData> => {
-  const [ updatedShippingMethod ] = await db<ShippingMethod>('shippingMethods')
-    .update({ ...shippingMethodInput }, [ 'shippingMethodID' ])
-    .where('shippingMethodID', shippingMethodID)
+const updateShippingMethod = async (res: Response, smInput: SMInput, smID: number): Promise<SingleShippingMethodData> => {
+  const [ updatedSM ] = await db<SM>('shippingMethods')
+    .update({ ...smInput }, [ 'shippingMethodID' ])
+    .where('shippingMethodID', smID)
 
-  if (!updatedShippingMethod) throw new StatusError(404, 'Not Found')
-  return getShippingMethodByID(res, updatedShippingMethod.shippingMethodID)
+  if (!updatedSM) throw new StatusError(404, 'Not Found')
+  return getShippingMethodByID(res, updatedSM.shippingMethodID)
 }
 
 export default {
