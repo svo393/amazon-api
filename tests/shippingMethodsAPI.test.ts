@@ -5,13 +5,14 @@ import db from '../src/utils/db'
 import { loginAs, populateUsers, purge, shippingMethodsInDB } from './testHelper'
 
 const api = supertest(app)
-const apiURL = '/api/shipping-methods'
+
+export const apiURL = '/api/shipping-methods'
 
 const newShippingMethod = (): ShippingMethodInput => ({
   name: `New ShippingMethod ${(new Date().getTime()).toString()}`
 })
 
-const createOneShippingMethod = async (shippingMethod: string): Promise<{ addedShippingMethod: ShippingMethod; token: string}> => {
+export const createOneShippingMethod = async (shippingMethod: string): Promise<{ addedShippingMethod: ShippingMethod; token: string}> => {
   const { token } = await loginAs(shippingMethod, api)
 
   const { body } = await api

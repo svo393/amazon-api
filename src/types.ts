@@ -313,3 +313,12 @@ export type ProductListData = Pick<Product,
 export type RoleInput = Pick<Role, 'name'>
 
 export type ShippingMethodInput = Pick<ShippingMethod, 'name'>
+
+export type AddressCreateInput = Pick<Address, 'name' | 'shippingMethodID'>
+
+export type AddressFetchInput = Pick<Address, 'shippingMethodID'>
+
+export type AddressUpdateInput = {
+  name?: string;
+  shippingMethodID?: number;
+}
