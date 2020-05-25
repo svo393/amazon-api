@@ -14,7 +14,7 @@ router.post('/', async (req, res) => {
 
 router.get('/', async (req, res) => {
   const addressFetchInput = inputValidator.checkFetchAddresses(req.query)
-  const addresses = await addressService.getAddresses(addressFetchInput, res)
+  const addresses = await addressService.getAddresses(addressFetchInput)
   res.json(addresses)
 })
 

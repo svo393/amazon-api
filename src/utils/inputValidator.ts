@@ -1,7 +1,7 @@
 import { ItemUpdateInput } from '@prisma/client'
 import R from 'ramda'
-import { CategoryCreateInput, CategoryUpdateInput, ItemCreateInputRaw, PasswordResetInput, RoleInput, ShippingMethodInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput, AddressCreateInput, AddressUpdateInput, AddressTypeInput, AddressFetchInput } from '../types'
-import { hasDefinedProps, isArray, isBoolean, isEmail, isGroup, isImage, isInputProvided, isItemParameter, isNumber, isPasswordValid, isProvided, isString, isStringOrArray } from './validatorLib'
+import { AddressCreateInput, AddressFetchInput, AddressTypeInput, AddressUpdateInput, CategoryCreateInput, CategoryUpdateInput, ItemCreateInputRaw, PasswordResetInput, RoleInput, ShippingMethodInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput } from '../types'
+import { canBeNumber, hasDefinedProps, isArray, isBoolean, isEmail, isGroup, isImage, isInputProvided, isItemParameter, isNumber, isPasswordValid, isProvided, isString, isStringOrArray } from './validatorLib'
 
 const checkNewUser = (object: any): UserSignupInput => {
   const email = R.pipe(
@@ -433,7 +433,7 @@ const checkAddressUpdate = (object: any): AddressUpdateInput => {
     { name: 'name', param: object.name }
   )
 
-  const addressTypeID = object.addressTypeID && isNumber(
+  const addressTypeID = object.addressTypeID && canBeNumber(
     { name: 'addressTypeID', param: object.addressTypeID }
   )
 

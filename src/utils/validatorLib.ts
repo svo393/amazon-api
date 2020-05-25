@@ -57,6 +57,13 @@ export const isStringOrArray: CP = ({ name, param }) => {
 }
 
 export const isNumber: CP = ({ name, param }) => {
+  if (typeof (param) !== 'number') {
+    throw new StatusError(400, `Incorrect ${name}: ${param}`)
+  }
+  return { name, param }
+}
+
+export const canBeNumber: CP = ({ name, param }) => {
   if (typeof (parseInt(param)) !== 'number') {
     throw new StatusError(400, `Incorrect ${name}: ${param}`)
   }
