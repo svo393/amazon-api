@@ -1,9 +1,8 @@
 import supertest from 'supertest'
 import app from '../src/app'
-import { Address, AddressCreateInput, ShippingMethod } from '../src/types'
-import { sensitiveShippingMethods } from '../src/utils/constants'
+import { Address, AddressCreateInput } from '../src/types'
 import { db } from '../src/utils/db'
-import { apiURL as atAPIURL, createOneAddressType } from './addressTypesAPI.test'
+import { createOneAddressType } from './addressTypesAPI.test'
 import { addressesInDB, loginAs, populateUsers, purge } from './testHelper'
 
 const api = supertest(app)

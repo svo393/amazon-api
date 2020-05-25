@@ -332,3 +332,8 @@ export type AddressUpdateInput = {
   name?: string;
   addressTypeID?: number;
 }
+
+export type FollowerFetchInput = {
+  userID?: number;
+  follows?: number;
+}

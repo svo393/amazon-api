@@ -40,7 +40,7 @@ router.get('/:userID', async (req, res) => {
 })
 
 router.put('/:userID', async (req, res) => {
-  shield.isSameUser(req, res)
+  shield.isSameUser(req, res, 'params')
   const userUpdateInput = inputValidator.checkUserUpdate(req.body)
   const updatedUser = await userService.updateUser(userUpdateInput, res, Number(req.params.userID))
   res.json(updatedUser)

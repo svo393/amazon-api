@@ -1,6 +1,6 @@
 import { ItemUpdateInput } from '@prisma/client'
 import R from 'ramda'
-import { AddressCreateInput, AddressFetchInput, AddressTypeInput, AddressUpdateInput, CategoryCreateInput, CategoryUpdateInput, ItemCreateInputRaw, PasswordResetInput, RoleInput, ShippingMethodInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput } from '../types'
+import { AddressCreateInput, AddressFetchInput, AddressTypeInput, CategoryCreateInput, CategoryUpdateInput, Follower, ItemCreateInputRaw, PasswordResetInput, RoleInput, ShippingMethodInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput } from '../types'
 import { canBeNumber, hasDefinedProps, isArray, isBoolean, isEmail, isGroup, isImage, isInputProvided, isItemParameter, isNumber, isPasswordValid, isProvided, isString, isStringOrArray } from './validatorLib'
 
 const checkNewUser = (object: any): UserSignupInput => {
@@ -304,7 +304,7 @@ const checkNewCategory = (object: any): CategoryCreateInput => {
     parentCategoryID: parentCategoryID?.param
   }
 
-  return hasDefinedProps(categoryInput)
+  return categoryInput
 }
 
 const checkCategoryUpdate = (object: any): CategoryUpdateInput => {
@@ -324,7 +324,7 @@ const checkCategoryUpdate = (object: any): CategoryUpdateInput => {
   return hasDefinedProps(categoryInput)
 }
 
-const checkNewVendor = (object: any): VendorInput => {
+const checkVendor = (object: any): VendorInput => {
   const name = R.pipe(
     isProvided,
     isString
@@ -334,14 +334,10 @@ const checkNewVendor = (object: any): VendorInput => {
     name: name.param
   }
 
-  return hasDefinedProps(vendorInput)
+  return vendorInput
 }
 
-const checkVendorUpdate = (object: any): VendorInput => {
-  return checkNewVendor(object)
-}
-
-const checkNewRole = (object: any): RoleInput => {
+const checkRole = (object: any): RoleInput => {
   const name = R.pipe(
     isProvided,
     isString
@@ -351,14 +347,10 @@ const checkNewRole = (object: any): RoleInput => {
     name: name.param
   }
 
-  return hasDefinedProps(roleInput)
+  return roleInput
 }
 
-const checkRoleUpdate = (object: any): RoleInput => {
-  return checkNewRole(object)
-}
-
-const checkNewShippingMethod = (object: any): ShippingMethodInput => {
+const checkShippingMethod = (object: any): ShippingMethodInput => {
   const name = R.pipe(
     isProvided,
     isString
@@ -368,28 +360,20 @@ const checkNewShippingMethod = (object: any): ShippingMethodInput => {
     name: name.param
   }
 
-  return hasDefinedProps(shippingMethodID)
+  return shippingMethodID
 }
 
-const checkShippingMethodUpdate = (object: any): ShippingMethodInput => {
-  return checkNewShippingMethod(object)
-}
-
-const checkNewAddressType = (object: any): AddressTypeInput => {
+const checkAddressType = (object: any): AddressTypeInput => {
   const name = R.pipe(
     isProvided,
     isString
   )({ name: 'name', param: object.name })
 
-  const addresstypeID: AddressTypeInput = {
+  const addressTypeInput: AddressTypeInput = {
     name: name.param
   }
 
-  return hasDefinedProps(addresstypeID)
-}
-
-const checkAddressTypeUpdate = (object: any): AddressTypeInput => {
-  return checkNewAddressType(object)
+  return addressTypeInput
 }
 
 const checkNewAddress = (object: any): AddressCreateInput => {
@@ -408,11 +392,11 @@ const checkNewAddress = (object: any): AddressCreateInput => {
     addressTypeID: addressTypeID.param
   }
 
-  return hasDefinedProps(addressInput)
+  return addressInput
 }
 
 const checkFetchAddresses = (object: any): AddressFetchInput => {
-  const userID = object.userID && isNumber(
+  const userID = object.userID && canBeNumber(
     { name: 'userID', param: object.userID }
   )
 
@@ -421,11 +405,47 @@ const checkFetchAddresses = (object: any): AddressFetchInput => {
   )
 
   const addressInput: AddressFetchInput = {
-    userID: userID?.param,
-    addressTypeID: addressTypeID?.param
+    userID: parseInt(userID?.param),
+    addressTypeID: parseInt(addressTypeID?.param)
   }
 
   return hasDefinedProps(addressInput)
+}
+
+const checkNewFollower = (object: any): Follower => {
+  const userID = R.pipe(
+    isProvided,
+    isNumber
+  )({ name: 'userID', param: object.userID })
+
+  const follows = R.pipe(
+    isProvided,
+    isNumber
+  )({ name: 'follows', param: object.follows })
+
+  const followerInput: Follower = {
+    userID: userID.param,
+    follows: follows.param
+  }
+
+  return followerInput
+}
+
+const checkFetchFollowers = (object: any): FollowerFetchinput => {
+  const userID = object.userID && canBeNumber(
+    { name: 'userID', param: object.userID }
+  )
+
+  const follows = object.follows && canBeNumber(
+    { name: 'follows', param: object.follows }
+  )
+
+  const followerInput: FollowerFetchinput = {
+    userID: parseInt(userID?.param),
+    follows: parseInt(follows?.param)
+  }
+
+  return hasDefinedProps(followerInput)
 }
 
 export default {
@@ -439,14 +459,12 @@ export default {
   checkItemMediaUpload,
   checkNewCategory,
   checkCategoryUpdate,
-  checkNewVendor,
-  checkVendorUpdate,
-  checkNewRole,
-  checkRoleUpdate,
-  checkNewShippingMethod,
-  checkShippingMethodUpdate,
-  checkNewAddressType,
-  checkAddressTypeUpdate,
+  checkVendor,
+  checkRole,
+  checkShippingMethod,
+  checkAddressType,
   checkNewAddress,
-  checkFetchAddresses
+  checkFetchAddresses,
+  checkNewFollower,
+  checkFetchFollowers
 }

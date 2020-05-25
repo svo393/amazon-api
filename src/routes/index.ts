@@ -8,6 +8,7 @@ import rolesRouter from './roles'
 import shippingMethodsRouter from './shippingMethods'
 import addressTypesRouter from './addressTypes'
 import addressesRouter from './addresses'
+import followersRouter from './followers'
 
 export default Router()
   .use('/categories', categoriesRouter)
@@ -18,3 +19,4 @@ export default Router()
   .use('/shipping-methods', shippingMethodsRouter)
   .use('/address-types', addressTypesRouter)
   .use('/addresses', addressesRouter)
+  .use('/followers', followersRouter)

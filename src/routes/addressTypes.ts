@@ -7,7 +7,7 @@ const router = Router()
 
 router.post('/', async (req, res) => {
   shield.isAdmin(res)
-  const addressTypeCreateInput = inputValidator.checkNewAddressType(req.body)
+  const addressTypeCreateInput = inputValidator.checkAddressType(req.body)
   const addedAddressType = await addressTypeService.addAddressType(addressTypeCreateInput)
   res.status(201).json(addedAddressType)
 })
@@ -24,7 +24,7 @@ router.get('/:addressTypeID', async (req, res) => {
 
 router.put('/:addressTypeID', async (req, res) => {
   shield.isAdmin(res)
-  const addressTypeUpdateInput = inputValidator.checkAddressTypeUpdate(req.body)
+  const addressTypeUpdateInput = inputValidator.checkAddressType(req.body)
   const updatedItem = await addressTypeService.updateAddressType(res, addressTypeUpdateInput, Number(req.params.addressTypeID))
   res.json(updatedItem)
 })

@@ -7,7 +7,7 @@ const router = Router()
 
 router.post('/', async (req, res) => {
   shield.isAdmin(res)
-  const vendorCreateInput = inputValidator.checkNewVendor(req.body)
+  const vendorCreateInput = inputValidator.checkVendor(req.body)
   const addedVendor = await vendorService.addVendor(vendorCreateInput)
   res.status(201).json(addedVendor)
 })
@@ -24,7 +24,7 @@ router.get('/:vendorID', async (req, res) => {
 
 router.put('/:vendorID', async (req, res) => {
   shield.isAdmin(res)
-  const vendorUpdateInput = inputValidator.checkVendorUpdate(req.body)
+  const vendorUpdateInput = inputValidator.checkVendor(req.body)
   const updatedItem = await vendorService.updateVendor(vendorUpdateInput, Number(req.params.vendorID))
   res.json(updatedItem)
 })

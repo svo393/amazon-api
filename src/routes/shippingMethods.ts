@@ -7,7 +7,7 @@ const router = Router()
 
 router.post('/', async (req, res) => {
   shield.isAdmin(res)
-  const shippingMethodCreateInput = inputValidator.checkNewShippingMethod(req.body)
+  const shippingMethodCreateInput = inputValidator.checkShippingMethod(req.body)
   const addedShippingMethod = await shippingMethodService.addShippingMethod(shippingMethodCreateInput)
   res.status(201).json(addedShippingMethod)
 })
@@ -24,7 +24,7 @@ router.get('/:shippingMethodID', async (req, res) => {
 
 router.put('/:shippingMethodID', async (req, res) => {
   shield.isAdmin(res)
-  const shippingMethodUpdateInput = inputValidator.checkShippingMethodUpdate(req.body)
+  const shippingMethodUpdateInput = inputValidator.checkShippingMethod(req.body)
   const updatedItem = await shippingMethodService.updateShippingMethod(shippingMethodUpdateInput, Number(req.params.shippingMethodID))
   res.json(updatedItem)
 })

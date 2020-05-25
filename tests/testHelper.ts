@@ -1,6 +1,6 @@
 import { Item, PrismaClient } from '@prisma/client'
 import supertest from 'supertest'
-import { Category, Role, ShippingMethod, User, Vendor, Address, AddressType } from '../src/types'
+import { Address, AddressType, Category, Follower, Role, ShippingMethod, User, Vendor } from '../src/types'
 import { db } from '../src/utils/db'
 import StatusError from '../src/utils/StatusError'
 
@@ -45,8 +45,8 @@ export const purge = async (): Promise<void> => {
     await db('categories').del()
     await db('lists').del()
     await db('userAddresses').del()
+    await db('followers').del()
     await db('users').del()
-    await db('addresses').del()
   } catch (err) {
     console.error(err)
   }
@@ -66,9 +66,9 @@ export const populateUsers = async (api: supertest.SuperTest<supertest.Test>): P
       .post('/api/users')
       .send(root)
 
-    const roleIDs = await db<Role>('roles')
-    const adminRole = roleIDs.find((r) => r.name === 'ADMIN')
-    const rootRole = roleIDs.find((r) => r.name === 'ROOT')
+    const roles = await db<Role>('roles')
+    const adminRole = roles.find((r) => r.name === 'ADMIN')
+    const rootRole = roles.find((r) => r.name === 'ROOT')
 
     if (!adminRole || !rootRole) { throw new StatusError() }
 
@@ -125,6 +125,10 @@ export const shippingMethodsInDB = async (): Promise<ShippingMethod[]> => {
 
 export const addressTypesInDB = async (): Promise<AddressType[]> => {
   return await db<AddressType>('addressTypes')
+}
+
+export const followersInDB = async (): Promise<Follower[]> => {
+  return await db<Follower>('followers')
 }
 
 export const loginAs: (role: string, api: supertest.SuperTest<supertest.Test>) => Promise<{token: string; userID: number}> =

@@ -81,6 +81,7 @@
     "test:addr": "cross-env NODE_ENV=development jest ./tests/addressesAPI.test.ts --verbose  --runInBand",
     "test:sm": "cross-env NODE_ENV=development jest ./tests/shippingMethodsAPI.test.ts --verbose  --runInBand",
     "test:at": "cross-env NODE_ENV=development jest ./tests/addressTypesAPI.test.ts --verbose  --runInBand",
+    "test:follow": "cross-env NODE_ENV=development jest ./tests/followersAPI.test.ts --verbose  --runInBand",
     "test:cats": "cross-env NODE_ENV=development jest ./tests/categoriesAPI.test.ts --verbose  --runInBand",
     "test:items": "cross-env NODE_ENV=development jest ./tests/itemsAPI.test.ts --verbose  --runInBand",
     "test:users": "cross-env NODE_ENV=development jest ./tests/usersAPI.test.ts --verbose  --runInBand",

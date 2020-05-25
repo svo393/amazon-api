@@ -39,10 +39,8 @@ const isAdmin = (res: Response): void => {
   }
 }
 
-const isSameUser = (req: Request, res: Response): void => {
-  isLoggedIn(res)
-
-  if (res.locals.userID.toString() !== req.params.userID && res.locals.userRole !== 'ROOT') {
+const isSameUser = (req: Request, res: Response, target: 'params' | 'query' | 'body'): void => {
+  if (res.locals.userID.toString() !== req[target].userID.toString() && res.locals.userRole !== 'ROOT') {
     throw new StatusError(403, 'Forbidden')
   }
 }

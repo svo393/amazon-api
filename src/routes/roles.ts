@@ -7,7 +7,7 @@ const router = Router()
 
 router.post('/', async (req, res) => {
   shield.isRoot(res)
-  const roleCreateInput = inputValidator.checkNewRole(req.body)
+  const roleCreateInput = inputValidator.checkRole(req.body)
   const addedRole = await roleService.addRole(roleCreateInput)
   res.status(201).json(addedRole)
 })
@@ -26,7 +26,7 @@ router.get('/:roleID', async (req, res) => {
 
 router.put('/:roleID', async (req, res) => {
   shield.isRoot(res)
-  const roleUpdateInput = inputValidator.checkRoleUpdate(req.body)
+  const roleUpdateInput = inputValidator.checkRole(req.body)
   const updatedItem = await roleService.updateRole(roleUpdateInput, Number(req.params.roleID))
   res.json(updatedItem)
 })

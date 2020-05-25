@@ -1,10 +1,5 @@
-import { Response } from 'express'
-import Knex from 'knex'
-import R from 'ramda'
-import { Address, AddressCreateInput, User, UserSafeData, AddressFetchInput } from '../types'
-import { sensitiveShippingMethods } from '../utils/constants'
-import { db, dbTrans } from '../utils/db'
-import shield from '../utils/shield'
+import { Address, AddressCreateInput, AddressFetchInput } from '../types'
+import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
 const addAddress = async (addressInput: AddressCreateInput): Promise<Address> => {
