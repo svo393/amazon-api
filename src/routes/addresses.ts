@@ -18,16 +18,9 @@ router.get('/', async (req, res) => {
   res.json(addresses)
 })
 
-// router.get('/:addressID', async (req, res) => {
-//   const address = await addressService.getAddressByID(Number(req.params.addressID), res)
-//   res.json(address)
-// })
-
-// router.put('/:addressID', async (req, res) => {
-//   shield.isRoot(res)
-//   const addressUpdateInput = inputValidator.checkAddressUpdate(req.body)
-//   const updatedItem = await addressService.updateAddress(addressUpdateInput, Number(req.params.addressID))
-//   res.json(updatedItem)
-// })
+router.get('/:addressID', async (req, res) => {
+  const address = await addressService.getAddressByID(Number(req.params.addressID))
+  res.json(address)
+})
 
 export default router

@@ -416,29 +416,12 @@ const checkFetchAddresses = (object: any): AddressFetchInput => {
     { name: 'userID', param: object.userID }
   )
 
-  const addressTypeID = object.addressTypeID && isNumber(
+  const addressTypeID = object.addressTypeID && canBeNumber(
     { name: 'addressTypeID', param: object.addressTypeID }
   )
 
   const addressInput: AddressFetchInput = {
     userID: userID?.param,
-    addressTypeID: addressTypeID?.param
-  }
-
-  return hasDefinedProps(addressInput)
-}
-
-const checkAddressUpdate = (object: any): AddressUpdateInput => {
-  const name = object.name && isString(
-    { name: 'name', param: object.name }
-  )
-
-  const addressTypeID = object.addressTypeID && canBeNumber(
-    { name: 'addressTypeID', param: object.addressTypeID }
-  )
-
-  const addressInput: AddressUpdateInput = {
-    name: name?.param,
     addressTypeID: addressTypeID?.param
   }
 
@@ -465,6 +448,5 @@ export default {
   checkNewAddressType,
   checkAddressTypeUpdate,
   checkNewAddress,
-  checkFetchAddresses,
-  checkAddressUpdate
+  checkFetchAddresses
 }

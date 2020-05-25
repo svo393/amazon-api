@@ -51,38 +51,13 @@ describe('Address adding', () => {
 })
 
 describe('Addresses fetching', () => {
-  test.only('200 addresses', async () => {
+  test('200 addresses', async () => {
     const { addedAddress } = await createOneAddress('root')
-
-    console.info('addedAddress', addedAddress)
 
     const { body }: { body: Address[] } = await api
       .get(`${apiURL}?addressTypeID=${addedAddress.addressTypeID}`)
       .expect(200)
-
-    console.info('body', body)
-
     expect(body).toBeDefined()
-  })
-
-  test('404 addresses whit sensitive shipping methods if not admin or root', async () => {
-    const { token } = await loginAs('admin', api)
-
-    const shippingMethods: { body: ShippingMethod[]} = await api
-      .get(atAPIURL)
-      .set('Cookie', `token=${token}`)
-
-    const shippingMethod = shippingMethods.body.find((sm) =>
-      sm.name === sensitiveShippingMethods[0])
-
-    if (!shippingMethod) { throw new Error() }
-
-    await createOneAddress('root')
-
-    await api
-      .get(apiURL)
-      .send({ shippingMethodID: shippingMethod.shippingMethodID })
-      .expect(404)
   })
 
   test('200 address', async () => {
@@ -94,31 +69,6 @@ describe('Addresses fetching', () => {
       .expect(200)
 
     expect(body).toBeDefined()
-  })
-})
-
-describe('Address updating', () => {
-  test('200 if root', async () => {
-    const { addedAddress, token } = await createOneAddress('root')
-
-    const { body } = await api
-      .put(`${apiURL}/${addedAddress.addressID}`)
-      .set('Cookie', `token=${token}`)
-      .send({ name: `Updated Address ${(new Date().getTime()).toString()}` })
-      .expect(200)
-
-    expect(body.name).toContain('Updated Address')
-  })
-
-  test('403 if not root', async () => {
-    const { addedAddress } = await createOneAddress('root')
-    const { token } = await loginAs('admin', api)
-
-    await api
-      .put(`${apiURL}/${addedAddress.addressID}`)
-      .set('Cookie', `token=${token}`)
-      .send({ name: `Updated Address ${(new Date().getTime()).toString()}` })
-      .expect(403)
   })
 })
 

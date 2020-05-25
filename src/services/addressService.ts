@@ -41,51 +41,18 @@ const getAddresses = async (addressInput: AddressFetchInput): Promise<(Address &
   }
 }
 
-// type SingleAddressData = {
-//   name: string;
-//   users: UserSafeData[];
-// }
+const getAddressByID = async (addressID: number): Promise<Address> => {
+  const address = await db<Address>('addresses')
+    .first()
+    .where('addressID', addressID)
 
-// // addAddress first
-// const getAddressByID = async (addressID: number, res: Response): Promise<SingleAddressData> => {
-//   const hasPermission = shield.hasRole([ 'ROOT', 'ADMIN' ], res)
+  if (!address) throw new StatusError(404, 'Not Found')
 
-//   const addresses = hasPermission
-//     ? await db<Address>('addresses as a')
-//       .where('addressID', addressID)
-//       .joinRaw('JOIN userAddresses as ua USING ("addressID")')
-//       .join('users as u', 'ua.userID', 'u.userID')
-//     : await db<Address>('addresses')
-//       .where('addressID', addressID)
-
-//   const [ address ] = addresses.filter((c) => c.addressID === addressID)
-//   if (!address) throw new StatusError(404, 'Not Found')
-
-//   const users = await db<User>('users')
-//     .where('addressID', addressID)
-
-//   return {
-//     ...address,
-//     users: R.map(R.omit([
-//       'password',
-//       'resetToken',
-//       'resetTokenCreatedAt'
-//     ]), users)
-//   }
-// }
-
-// const updateAddress = async (addressInput: AddressUpdateInput, addressID: number): Promise<SingleAddressData> => {
-//   const [ updatedAddress ] = await db<Address>('addresses')
-//     .update({ ...addressInput }, [ 'addressID' ])
-//     .where('addressID', addressID)
-
-//   if (!updatedAddress) throw new StatusError(404, 'Not Found')
-//   return getAddressByID(updatedAddress.addressID)
-// }
+  return address
+}
 
 export default {
   addAddress,
-  getAddresses
-  // getAddressByID
-  // updateAddress
+  getAddresses,
+  getAddressByID
 }
