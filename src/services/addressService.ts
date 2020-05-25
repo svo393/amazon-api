@@ -15,8 +15,14 @@ const addAddress = async (addressInput: AddressCreateInput): Promise<Address> =>
     .where('addr', addr)
     .andWhere('addressTypeID', addressTypeID)
 
-  return existingAddress ?? await db('addresses')
-    .insert(addressInput, [ '*' ])
+  let addedAddress
+
+  if (!existingAddress) {
+    [ addedAddress ] = await db('addresses')
+      .insert(addressInput, [ '*' ])
+  }
+
+  return existingAddress ?? addedAddress
 }
 
 const getAddresses = async (addressInput: AddressFetchInput): Promise<(Address & { userID?: number })[] | void> => {

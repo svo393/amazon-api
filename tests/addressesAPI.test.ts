@@ -54,6 +54,8 @@ describe('Addresses fetching', () => {
   test.only('200 addresses', async () => {
     const { addedAddress } = await createOneAddress('root')
 
+    console.info('addedAddress', addedAddress)
+
     const { body }: { body: Address[] } = await api
       .get(`${apiURL}?addressTypeID=${addedAddress.addressTypeID}`)
       .expect(200)
