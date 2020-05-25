@@ -12,16 +12,16 @@ router.post('/', async (req, res) => {
   res.status(201).json(addedAddress)
 })
 
-router.get('/', async (req, res) => {
-  const addressFetchInput = inputValidator.checkFetchAddresses(req.body)
-  const addresses = await addresseservice.getaddresses(addressFetchInput, res)
-  res.json(addresses)
-})
+// router.get('/', async (req, res) => {
+//   const addressFetchInput = inputValidator.checkFetchAddresses(req.body)
+//   const addresses = await addresseservice.getaddresses(addressFetchInput, res)
+//   res.json(addresses)
+// })
 
-router.get('/:addressID', async (req, res) => {
-  const address = await addresseservice.getAddressByID(Number(req.params.addressID), res)
-  res.json(address)
-})
+// router.get('/:addressID', async (req, res) => {
+//   const address = await addresseservice.getAddressByID(Number(req.params.addressID), res)
+//   res.json(address)
+// })
 
 // router.put('/:addressID', async (req, res) => {
 //   shield.isRoot(res)

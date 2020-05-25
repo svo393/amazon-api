@@ -1,6 +1,6 @@
 import { ItemUpdateInput } from '@prisma/client'
 import R from 'ramda'
-import { CategoryCreateInput, CategoryUpdateInput, ItemCreateInputRaw, PasswordResetInput, RoleInput, ShippingMethodInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput, AddressCreateInput, AddressUpdateInput, AddressFetchInput } from '../types'
+import { CategoryCreateInput, CategoryUpdateInput, ItemCreateInputRaw, PasswordResetInput, RoleInput, ShippingMethodInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput, AddressCreateInput, AddressUpdateInput } from '../types'
 import { hasDefinedProps, isArray, isBoolean, isEmail, isGroup, isImage, isInputProvided, isItemParameter, isNumber, isPasswordValid, isProvided, isString, isStringOrArray } from './validatorLib'
 
 const checkNewUser = (object: any): UserSignupInput => {
@@ -373,27 +373,14 @@ const checkNewAddress = (object: any): AddressCreateInput => {
     isString
   )({ name: 'name', param: object.name })
 
-  const shippingMethodID = R.pipe(
+  const addressTypeID = R.pipe(
     isProvided,
     isNumber
-  )({ name: 'shippingMethodID', param: object.shippingMethodID })
+  )({ name: 'addressTypeID', param: object.addressTypeID })
 
   const addressInput = {
     name: name.param,
-    shippingMethodID: shippingMethodID.param
-  }
-
-  return hasDefinedProps(addressInput)
-}
-
-const checkFetchAddresses = (object: any): AddressFetchInput => {
-  const shippingMethodID = R.pipe(
-    isProvided,
-    isNumber
-  )({ name: 'shippingMethodID', param: object.shippingMethodID })
-
-  const addressInput = {
-    shippingMethodID: shippingMethodID.param
+    addressTypeID: addressTypeID.param
   }
 
   return hasDefinedProps(addressInput)
@@ -434,6 +421,5 @@ export default {
   checkNewShippingMethod,
   checkShippingMethodUpdate,
   checkNewAddress,
-  checkFetchAddresses,
   checkAddressUpdate
 }

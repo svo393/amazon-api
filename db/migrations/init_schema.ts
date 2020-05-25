@@ -12,14 +12,22 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.string('name', 50).unique().notNullable()
     })
 
+    .createTable('addressTypes', (t) => {
+      t.increments('addressTypeID')
+      t.string('name', 50).unique().notNullable()
+    })
+
     .createTable('addresses', (t) => {
       t.increments('addressID')
-      t.string('name').unique().notNullable()
+      t.string('addr').notNullable()
 
       t
-        .integer('shippingMethodID')
-        .references('shippingMethods.shippingMethodID')
+        .integer('addressTypeID')
+        .references('addressTypes.addressTypeID')
         .notNullable()
+    })
+    .alterTable('addresses', (t) => {
+      t.unique([ 'addr', 'addressTypeID' ])
     })
 
     .createTable('users', (t) => {

@@ -3,24 +3,24 @@ import app from '../src/app'
 import { Address, AddressCreateInput, ShippingMethod } from '../src/types'
 import { sensitiveShippingMethods } from '../src/utils/constants'
 import { db } from '../src/utils/db'
-import { createOneShippingMethod, apiURL as smAPIURL } from './shippingMethodsAPI.test'
+import { apiURL as smAPIURL } from './shippingMethodsAPI.test'
 import { addressesInDB, loginAs, populateUsers, purge } from './testHelper'
 
 const api = supertest(app)
 const apiURL = '/api/addresses'
 
-const newAddress = (shippingMethodID: number): AddressCreateInput => ({
-  name: `New Address ${(new Date().getTime()).toString()}`,
-  shippingMethodID
+const newAddress = (addressTypeID: number): AddressCreateInput => ({
+  addr: `New Address ${(new Date().getTime()).toString()}`,
+  addressTypeID
 })
 
-const createOneAddress = async (shippingMethodID: number, role: string): Promise<{ addedAddress: Address; token: string}> => {
+const createOneAddress = async (role: string): Promise<{ addedAddress: Address; token: string}> => {
   const { token } = await loginAs(role, api)
 
   const { body } = await api
     .post(apiURL)
     .set('Cookie', `token=${token}`)
-    .send(newAddress(shippingMethodID))
+    .send(newAddress()) // create addresType first
 
   return { addedAddress: body, token }
 }
@@ -33,13 +33,12 @@ beforeEach(async () => {
 describe('Address adding', () => {
   test.only('201', async () => {
     const { token } = await loginAs('root', api)
-    const { addedShippingMethod } = await createOneShippingMethod('root')
     const addressesAtStart = await addressesInDB()
 
     await api
       .post(apiURL)
       .set('Cookie', `token=${token}`)
-      .send(newAddress(addedShippingMethod.shippingMethodID))
+      .send(newAddress())
       .expect(201)
       .expect('Content-Type', /application\/json/)
 
@@ -50,12 +49,10 @@ describe('Address adding', () => {
 
 describe('Addresses fetching', () => {
   test('200 addresses', async () => {
-    const { addedShippingMethod } = await createOneShippingMethod('root')
-    const { addedAddress } = await createOneAddress(addedShippingMethod.shippingMethodID, 'root')
+    const { addedAddress } = await createOneAddress('root')
 
     await api
-      .get(apiURL)
-      .send({ shippingMethodID: addedAddress.shippingMethodID })
+      .get(`${apiURL}/${addedAddress.addressID}`)
       .expect(200)
   })
 
@@ -71,7 +68,7 @@ describe('Addresses fetching', () => {
 
     if (!shippingMethod) { throw new Error() }
 
-    await createOneAddress(shippingMethod.shippingMethodID, 'root')
+    await createOneAddress('root')
 
     await api
       .get(apiURL)
@@ -80,8 +77,7 @@ describe('Addresses fetching', () => {
   })
 
   test('200 address', async () => {
-    const { addedShippingMethod } = await createOneShippingMethod('root')
-    const { addedAddress, token } = await createOneAddress(addedShippingMethod.shippingMethodID, 'root')
+    const { addedAddress, token } = await createOneAddress('root')
 
     const { body } = await api
       .get(`${apiURL}/${addedAddress.addressID}`)
@@ -94,8 +90,7 @@ describe('Addresses fetching', () => {
 
 describe('Address updating', () => {
   test('200 if root', async () => {
-    const { addedShippingMethod } = await createOneShippingMethod('root')
-    const { addedAddress, token } = await createOneAddress(addedShippingMethod.shippingMethodID, 'root')
+    const { addedAddress, token } = await createOneAddress('root')
 
     const { body } = await api
       .put(`${apiURL}/${addedAddress.addressID}`)
@@ -107,8 +102,7 @@ describe('Address updating', () => {
   })
 
   test('403 if not root', async () => {
-    const { addedShippingMethod } = await createOneShippingMethod('root')
-    const { addedAddress } = await createOneAddress(addedShippingMethod.shippingMethodID, 'root')
+    const { addedAddress } = await createOneAddress('root')
     const { token } = await loginAs('admin', api)
 
     await api
