@@ -1,5 +1,5 @@
 import { Role, User, RoleInput, UserSafeData } from '../types'
-import db from '../utils/db'
+import { db } from '../utils/db'
 import R from 'ramda'
 import StatusError from '../utils/StatusError'
 

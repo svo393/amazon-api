@@ -1,5 +1,5 @@
 import { invoiceStatuses, orderStatuses, roles, shippingMethods } from '../src/utils/constants'
-import db from '../src/utils/db'
+import { db } from '../src/utils/db'
 
 export const init = async (): Promise<void> => {
   await db('roles').del()

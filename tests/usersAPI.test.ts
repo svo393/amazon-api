@@ -1,6 +1,6 @@
 import supertest from 'supertest'
 import app from '../src/app'
-import db from '../src/utils/db'
+import { db } from '../src/utils/db'
 import { getUserByEmail, loginAs, populateUsers, purge, usersInDB } from './testHelper'
 
 const api = supertest(app)

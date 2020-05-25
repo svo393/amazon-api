@@ -1,6 +1,6 @@
 import supertest from 'supertest'
 import app from '../src/app'
-import db from '../src/utils/db'
+import { db } from '../src/utils/db'
 import { Role, RoleInput } from '../src/types'
 import { loginAs, populateUsers, purge, rolesInDB } from './testHelper'
 

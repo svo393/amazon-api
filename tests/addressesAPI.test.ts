@@ -2,7 +2,7 @@ import supertest from 'supertest'
 import app from '../src/app'
 import { Address, AddressCreateInput, ShippingMethod } from '../src/types'
 import { sensitiveShippingMethods } from '../src/utils/constants'
-import db from '../src/utils/db'
+import { db } from '../src/utils/db'
 import { createOneShippingMethod, apiURL as smAPIURL } from './shippingMethodsAPI.test'
 import { addressesInDB, loginAs, populateUsers, purge } from './testHelper'
 
@@ -31,7 +31,7 @@ beforeEach(async () => {
 })
 
 describe('Address adding', () => {
-  test('201', async () => {
+  test.only('201', async () => {
     const { token } = await loginAs('root', api)
     const { addedShippingMethod } = await createOneShippingMethod('root')
     const addressesAtStart = await addressesInDB()
@@ -79,7 +79,7 @@ describe('Addresses fetching', () => {
       .expect(404)
   })
 
-  test.only('200 address', async () => {
+  test('200 address', async () => {
     const { addedShippingMethod } = await createOneShippingMethod('root')
     const { addedAddress, token } = await createOneAddress(addedShippingMethod.shippingMethodID, 'root')
 

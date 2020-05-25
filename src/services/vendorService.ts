@@ -1,4 +1,4 @@
-import db from '../../src/utils/db'
+import { db } from '../../src/utils/db'
 import { ProductListData, Vendor, VendorInput } from '../types'
 import StatusError from '../utils/StatusError'
 

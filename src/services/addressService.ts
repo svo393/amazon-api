@@ -1,12 +1,12 @@
-import { Address, User, UserSafeData, AddressCreateInput, AddressUpdateInput, AddressFetchInput, ShippingMethod } from '../types'
-import db from '../utils/db'
-import { sensitiveShippingMethods } from '../utils/constants'
-import R from 'ramda'
-import StatusError from '../utils/StatusError'
-import shield from '../utils/shield'
 import { Response } from 'express'
+import R from 'ramda'
+import { Address, AddressCreateInput, AddressFetchInput, User, UserAddress, UserSafeData } from '../types'
+import { sensitiveShippingMethods } from '../utils/constants'
+import { db } from '../utils/db'
+import shield from '../utils/shield'
+import StatusError from '../utils/StatusError'
 
-const addAddress = async (addressInput: AddressCreateInput): Promise<Address> => {
+const addAddress = async (addressInput: AddressCreateInput, res: Response): Promise<any> => {
   const { name } = addressInput
 
   const existingAddress = await db<Address>('addresses')
@@ -17,10 +17,20 @@ const addAddress = async (addressInput: AddressCreateInput): Promise<Address> =>
     throw new StatusError(409, `Address with name "${name}" already exists`)
   }
 
-  const [ addedAddress ]: Address[] = await db<Address>('addresses')
-    .insert(addressInput, [ '*' ])
+  return await db.transaction(async (trx) => {
+    const [ addedAddress ]: Address[] = await trx
+      .insert(addressInput, [ '*' ])
+      .into('addresses')
 
-  return addedAddress
+    await trx
+      .insert({
+        userID: res.locals.userID,
+        addressID: addedAddress.addressID
+      }, [ '*' ])
+      .into('userAddresses')
+
+    return addedAddress
+  })
 }
 
 const getaddresses = async (addressInput: AddressFetchInput, res: Response): Promise<Address[]> => {
@@ -45,6 +55,7 @@ type SingleAddressData = {
   users: UserSafeData[];
 }
 
+// addAddress first
 const getAddressByID = async (addressID: number, res: Response): Promise<SingleAddressData> => {
   const hasPermission = shield.hasRole([ 'ROOT', 'ADMIN' ], res)
 

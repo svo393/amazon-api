@@ -6,8 +6,9 @@ import shield from '../utils/shield'
 const router = Router()
 
 router.post('/', async (req, res) => {
+  shield.isLoggedIn(res)
   const addressCreateInput = inputValidator.checkNewAddress(req.body)
-  const addedAddress = await addresseservice.addAddress(addressCreateInput)
+  const addedAddress = await addresseservice.addAddress(addressCreateInput, res)
   res.status(201).json(addedAddress)
 })
 
@@ -18,7 +19,6 @@ router.get('/', async (req, res) => {
 })
 
 router.get('/:addressID', async (req, res) => {
-  shield.isRoot(res)
   const address = await addresseservice.getAddressByID(Number(req.params.addressID), res)
   res.json(address)
 })

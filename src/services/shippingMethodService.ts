@@ -1,7 +1,7 @@
 import { Response } from 'express'
 import { Address, ShippingMethod as SM, ShippingMethodInput as SMInput } from '../types'
 import { sensitiveShippingMethods as sensitiveSMs } from '../utils/constants'
-import db from '../utils/db'
+import { db } from '../utils/db'
 import shield from '../utils/shield'
 import StatusError from '../utils/StatusError'
 

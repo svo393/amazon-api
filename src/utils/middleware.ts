@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken'
 import env from './config'
 import logger from './logger'
 import StatusError from './StatusError'
-import db from './db'
+import { db } from './db'
 
 type Middleware = (
   req: Request,

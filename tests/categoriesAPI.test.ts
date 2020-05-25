@@ -1,6 +1,6 @@
 import supertest from 'supertest'
 import app from '../src/app'
-import db from '../src/utils/db'
+import { db } from '../src/utils/db'
 import { categoriesInDB, loginAs, populateUsers, purge } from './testHelper'
 import { CategoryCreateInput, Category } from '../src/types'
 

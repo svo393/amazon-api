@@ -1,7 +1,7 @@
 import { Item, PrismaClient } from '@prisma/client'
 import supertest from 'supertest'
 import { Category, Role, ShippingMethod, User, Vendor, Address } from '../src/types'
-import db from '../src/utils/db'
+import { db } from '../src/utils/db'
 import StatusError from '../src/utils/StatusError'
 
 const prisma = new PrismaClient()
