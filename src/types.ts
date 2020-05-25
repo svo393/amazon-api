@@ -319,9 +319,16 @@ export type RoleInput = Pick<Role, 'name'>
 
 export type ShippingMethodInput = Pick<ShippingMethod, 'name'>
 
+export type AddressTypeInput = Pick<AddressType, 'name'>
+
 export type AddressCreateInput = Pick<Address, 'addr' | 'addressTypeID'>
+
+export type AddressFetchInput = {
+  userID?: number;
+  addressTypeID?: number;
+}
 
 export type AddressUpdateInput = {
   name?: string;
-  shippingMethodID?: number;
+  addressTypeID?: number;
 }

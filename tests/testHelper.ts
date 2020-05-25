@@ -1,6 +1,6 @@
 import { Item, PrismaClient } from '@prisma/client'
 import supertest from 'supertest'
-import { Category, Role, ShippingMethod, User, Vendor, Address } from '../src/types'
+import { Category, Role, ShippingMethod, User, Vendor, Address, AddressType } from '../src/types'
 import { db } from '../src/utils/db'
 import StatusError from '../src/utils/StatusError'
 
@@ -121,6 +121,10 @@ export const addressesInDB = async (): Promise<Address[]> => {
 
 export const shippingMethodsInDB = async (): Promise<ShippingMethod[]> => {
   return await db<ShippingMethod>('shippingMethods')
+}
+
+export const addressTypesInDB = async (): Promise<AddressType[]> => {
+  return await db<AddressType>('addressTypes')
 }
 
 export const loginAs: (role: string, api: supertest.SuperTest<supertest.Test>) => Promise<{token: string; userID: number}> =

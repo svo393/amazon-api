@@ -1,54 +1,39 @@
 import { Response } from 'express'
 import Knex from 'knex'
 import R from 'ramda'
-import { Address, AddressCreateInput, User, UserSafeData } from '../types'
+import { Address, AddressCreateInput, User, UserSafeData, AddressFetchInput } from '../types'
 import { sensitiveShippingMethods } from '../utils/constants'
 import { db, dbTrans } from '../utils/db'
 import shield from '../utils/shield'
 import StatusError from '../utils/StatusError'
 
-const addAddress = async (addressInput: AddressCreateInput, res: Response): Promise<Address> => {
-  const { addr } = addressInput
+const addAddress = async (addressInput: AddressCreateInput): Promise<Address> => {
+  const { addr, addressTypeID } = addressInput
 
-  let address = await db<Address>('addresses')
+  const existingAddress = await db<Address>('addresses')
     .first()
     .where('addr', addr)
+    .andWhere('addressTypeID', addressTypeID)
 
-  return await dbTrans(async (trx: Knex.Transaction) => {
-    if (!address) {
-      [ address ] = await trx
-        .insert(addressInput, [ '*' ])
-        .into('addresses')
-    }
-
-    if (!address) throw new StatusError()
-
-    await trx
-      .insert({
-        userID: res.locals.userID,
-        addressID: address.addressID
-      }, [ '*' ])
-      .into('userAddresses')
-    return address
-  })
+  return existingAddress ?? await db('addresses')
+    .insert(addressInput, [ '*' ])
 }
 
-// const getaddresses = async (addressInput: AddressFetchInput, res: Response): Promise<Address[]> => {
-//   const { shippingMethodID } = addressInput
+const getAddresses = async (addressInput: AddressFetchInput): Promise<(Address & { userID?: number })[] | void> => {
+  const { userID, addressTypeID } = addressInput
 
-//   const addresses: (Address & { smName: string })[] = await db('shippingMethods as sm')
-//     .select('a.addressID', 'a.name', 'sm.shippingMethodID', 'sm.name as smName')
-//     .where('shippingMethodID', shippingMethodID)
-//     .joinRaw('JOIN addresses as a USING ("shippingMethodID")')
+  if (addressTypeID) {
+    return await db('addresses')
+      .where('addressTypeID', addressTypeID)
+  }
 
-//   const hasPermission = shield.hasRole([ 'ROOT', 'ADMIN' ], res)
-
-//   if (!hasPermission && sensitiveShippingMethods.includes(addresses[0].smName)) {
-//     throw new StatusError(404, 'Not Found')
-//   }
-
-//   return addresses
-// }
+  if (userID) {
+    return await db('addresses as a')
+      .select('a.addressID', 'a.addr', 'a.addressTypeID', 'ua.userID')
+      .joinRaw('JOIN userAdresses as ua USING (addressID)')
+      .where('ua.userID', userID)
+  }
+}
 
 // type SingleAddressData = {
 //   name: string;
@@ -93,8 +78,8 @@ const addAddress = async (addressInput: AddressCreateInput, res: Response): Prom
 // }
 
 export default {
-  addAddress
-  // getaddresses,
+  addAddress,
+  getAddresses
   // getAddressByID
   // updateAddress
 }

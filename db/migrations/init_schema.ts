@@ -429,5 +429,6 @@ export const down = (knex: Knex): Knex.SchemaBuilder =>
     .dropTableIfExists('followers')
     .dropTableIfExists('users')
     .dropTableIfExists('addresses')
+    .dropTableIfExists('addressTypes')
     .dropTableIfExists('shippingMethods')
     .dropTableIfExists('roles')

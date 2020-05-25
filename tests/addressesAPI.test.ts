@@ -3,16 +3,19 @@ import app from '../src/app'
 import { Address, AddressCreateInput, ShippingMethod } from '../src/types'
 import { sensitiveShippingMethods } from '../src/utils/constants'
 import { db } from '../src/utils/db'
-import { apiURL as smAPIURL } from './shippingMethodsAPI.test'
+import { apiURL as atAPIURL, createOneAddressType } from './addressTypesAPI.test'
 import { addressesInDB, loginAs, populateUsers, purge } from './testHelper'
 
 const api = supertest(app)
 const apiURL = '/api/addresses'
 
-const newAddress = (addressTypeID: number): AddressCreateInput => ({
-  addr: `New Address ${(new Date().getTime()).toString()}`,
-  addressTypeID
-})
+const newAddress = async (): Promise<AddressCreateInput> => {
+  const { addedAddressType } = await createOneAddressType('root')
+  return {
+    addr: `New Address ${(new Date().getTime()).toString()}`,
+    addressTypeID: addedAddressType.addressTypeID
+  }
+}
 
 const createOneAddress = async (role: string): Promise<{ addedAddress: Address; token: string}> => {
   const { token } = await loginAs(role, api)
@@ -20,7 +23,7 @@ const createOneAddress = async (role: string): Promise<{ addedAddress: Address; 
   const { body } = await api
     .post(apiURL)
     .set('Cookie', `token=${token}`)
-    .send(newAddress()) // create addresType first
+    .send(await newAddress())
 
   return { addedAddress: body, token }
 }
@@ -31,14 +34,14 @@ beforeEach(async () => {
 })
 
 describe('Address adding', () => {
-  test.only('201', async () => {
+  test('201', async () => {
     const { token } = await loginAs('root', api)
     const addressesAtStart = await addressesInDB()
 
     await api
       .post(apiURL)
       .set('Cookie', `token=${token}`)
-      .send(newAddress())
+      .send(await newAddress())
       .expect(201)
       .expect('Content-Type', /application\/json/)
 
@@ -48,19 +51,23 @@ describe('Address adding', () => {
 })
 
 describe('Addresses fetching', () => {
-  test('200 addresses', async () => {
+  test.only('200 addresses', async () => {
     const { addedAddress } = await createOneAddress('root')
 
-    await api
-      .get(`${apiURL}/${addedAddress.addressID}`)
+    const { body }: { body: Address[] } = await api
+      .get(`${apiURL}?addressTypeID=${addedAddress.addressTypeID}`)
       .expect(200)
+
+    console.info('body', body)
+
+    expect(body).toBeDefined()
   })
 
   test('404 addresses whit sensitive shipping methods if not admin or root', async () => {
     const { token } = await loginAs('admin', api)
 
     const shippingMethods: { body: ShippingMethod[]} = await api
-      .get(smAPIURL)
+      .get(atAPIURL)
       .set('Cookie', `token=${token}`)
 
     const shippingMethod = shippingMethods.body.find((sm) =>

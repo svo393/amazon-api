@@ -1,6 +1,6 @@
 import { ItemUpdateInput } from '@prisma/client'
 import R from 'ramda'
-import { CategoryCreateInput, CategoryUpdateInput, ItemCreateInputRaw, PasswordResetInput, RoleInput, ShippingMethodInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput, AddressCreateInput, AddressUpdateInput } from '../types'
+import { CategoryCreateInput, CategoryUpdateInput, ItemCreateInputRaw, PasswordResetInput, RoleInput, ShippingMethodInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput, AddressCreateInput, AddressUpdateInput, AddressTypeInput, AddressFetchInput } from '../types'
 import { hasDefinedProps, isArray, isBoolean, isEmail, isGroup, isImage, isInputProvided, isItemParameter, isNumber, isPasswordValid, isProvided, isString, isStringOrArray } from './validatorLib'
 
 const checkNewUser = (object: any): UserSignupInput => {
@@ -16,10 +16,12 @@ const checkNewUser = (object: any): UserSignupInput => {
     isPasswordValid
   )({ name: 'password', param: object.password })
 
-  return {
+  const userInput: UserSignupInput = {
     email: email.param.toLowerCase(),
     password: password.param
   }
+
+  return userInput
 }
 
 const checkUserLogin = (object: any): UserLoginInput => {
@@ -39,11 +41,13 @@ const checkUserLogin = (object: any): UserLoginInput => {
     isBoolean
   )({ name: 'remember', param: object.remember })
 
-  return {
+  const userInput: UserLoginInput = {
     email: email.param.toLowerCase(),
     password: password.param,
     remember: remember.param
   }
+
+  return userInput
 }
 
 const checkUserUpdate = (object: any): UserUpdateInput => {
@@ -69,7 +73,7 @@ const checkUserUpdate = (object: any): UserUpdateInput => {
     { name: 'roleID', param: object.roleID }
   )
 
-  const userInput = {
+  const userInput: UserUpdateInput = {
     name: name?.param,
     email: email?.param.toLowerCase(),
     password: password?.param,
@@ -102,10 +106,12 @@ const checkUserResetToken = (object: any): PasswordResetInput => {
     isPasswordValid
   )({ name: 'password', param: object.password })
 
-  return {
+  const userInput: PasswordResetInput = {
     resetToken: resetToken.param,
     password: password.param
   }
+
+  return userInput
 }
 
 const checkNewItem = (object: any): ItemCreateInputRaw => {
@@ -185,7 +191,7 @@ const checkNewItem = (object: any): ItemCreateInputRaw => {
   itemParameters.param.map((p: object) =>
     isItemParameter({ name: 'itemParameter', param: p }))
 
-  return {
+  const userInput: ItemCreateInputRaw = {
     name: name.param,
     listPrice: listPrice.param,
     price: price.param,
@@ -201,6 +207,8 @@ const checkNewItem = (object: any): ItemCreateInputRaw => {
     groups: groups.param,
     itemParameters: itemParameters.param
   }
+
+  return userInput
 }
 
 const checkItemUpdate = (object: any): ItemUpdateInput => {
@@ -291,7 +299,7 @@ const checkNewCategory = (object: any): CategoryCreateInput => {
     { name: 'parentCategoryID', param: object.parentCategoryID }
   )
 
-  const categoryInput = {
+  const categoryInput: CategoryCreateInput = {
     name: name.param,
     parentCategoryID: parentCategoryID?.param
   }
@@ -308,7 +316,7 @@ const checkCategoryUpdate = (object: any): CategoryUpdateInput => {
     { name: 'parentCategoryID', param: object.parentCategoryID }
   )
 
-  const categoryInput = {
+  const categoryInput: CategoryUpdateInput = {
     name: name?.param,
     parentCategoryID: parentCategoryID?.param
   }
@@ -322,7 +330,7 @@ const checkNewVendor = (object: any): VendorInput => {
     isString
   )({ name: 'name', param: object.name })
 
-  const vendorInput = {
+  const vendorInput: VendorInput = {
     name: name.param
   }
 
@@ -339,7 +347,7 @@ const checkNewRole = (object: any): RoleInput => {
     isString
   )({ name: 'name', param: object.name })
 
-  const roleInput = {
+  const roleInput: RoleInput = {
     name: name.param
   }
 
@@ -356,7 +364,7 @@ const checkNewShippingMethod = (object: any): ShippingMethodInput => {
     isString
   )({ name: 'name', param: object.name })
 
-  const shippingMethodID = {
+  const shippingMethodID: ShippingMethodInput = {
     name: name.param
   }
 
@@ -367,20 +375,54 @@ const checkShippingMethodUpdate = (object: any): ShippingMethodInput => {
   return checkNewShippingMethod(object)
 }
 
-const checkNewAddress = (object: any): AddressCreateInput => {
+const checkNewAddressType = (object: any): AddressTypeInput => {
   const name = R.pipe(
     isProvided,
     isString
   )({ name: 'name', param: object.name })
+
+  const addresstypeID: AddressTypeInput = {
+    name: name.param
+  }
+
+  return hasDefinedProps(addresstypeID)
+}
+
+const checkAddressTypeUpdate = (object: any): AddressTypeInput => {
+  return checkNewAddressType(object)
+}
+
+const checkNewAddress = (object: any): AddressCreateInput => {
+  const addr = R.pipe(
+    isProvided,
+    isString
+  )({ name: 'addr', param: object.addr })
 
   const addressTypeID = R.pipe(
     isProvided,
     isNumber
   )({ name: 'addressTypeID', param: object.addressTypeID })
 
-  const addressInput = {
-    name: name.param,
+  const addressInput: AddressCreateInput = {
+    addr: addr.param,
     addressTypeID: addressTypeID.param
+  }
+
+  return hasDefinedProps(addressInput)
+}
+
+const checkFetchAddresses = (object: any): AddressFetchInput => {
+  const userID = object.userID && isNumber(
+    { name: 'userID', param: object.userID }
+  )
+
+  const addressTypeID = object.addressTypeID && isNumber(
+    { name: 'addressTypeID', param: object.addressTypeID }
+  )
+
+  const addressInput: AddressFetchInput = {
+    userID: userID?.param,
+    addressTypeID: addressTypeID?.param
   }
 
   return hasDefinedProps(addressInput)
@@ -391,13 +433,13 @@ const checkAddressUpdate = (object: any): AddressUpdateInput => {
     { name: 'name', param: object.name }
   )
 
-  const shippingMethodID = object.shippingMethodID && isNumber(
-    { name: 'shippingMethodID', param: object.shippingMethodID }
+  const addressTypeID = object.addressTypeID && isNumber(
+    { name: 'addressTypeID', param: object.addressTypeID }
   )
 
-  const addressInput = {
+  const addressInput: AddressUpdateInput = {
     name: name?.param,
-    shippingMethodID: shippingMethodID?.param
+    addressTypeID: addressTypeID?.param
   }
 
   return hasDefinedProps(addressInput)
@@ -420,6 +462,9 @@ export default {
   checkRoleUpdate,
   checkNewShippingMethod,
   checkShippingMethodUpdate,
+  checkNewAddressType,
+  checkAddressTypeUpdate,
   checkNewAddress,
+  checkFetchAddresses,
   checkAddressUpdate
 }

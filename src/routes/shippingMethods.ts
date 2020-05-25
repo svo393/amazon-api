@@ -13,19 +13,19 @@ router.post('/', async (req, res) => {
 })
 
 router.get('/', async (_req, res) => {
-  const shippingMethods = await shippingMethodService.getShippingMethods(res)
+  const shippingMethods = await shippingMethodService.getShippingMethods()
   res.json(shippingMethods)
 })
 
 router.get('/:shippingMethodID', async (req, res) => {
-  const shippingMethod = await shippingMethodService.getShippingMethodByID(res, Number(req.params.shippingMethodID))
+  const shippingMethod = await shippingMethodService.getShippingMethodByID(Number(req.params.shippingMethodID))
   res.json(shippingMethod)
 })
 
 router.put('/:shippingMethodID', async (req, res) => {
   shield.isAdmin(res)
   const shippingMethodUpdateInput = inputValidator.checkShippingMethodUpdate(req.body)
-  const updatedItem = await shippingMethodService.updateShippingMethod(res, shippingMethodUpdateInput, Number(req.params.shippingMethodID))
+  const updatedItem = await shippingMethodService.updateShippingMethod(shippingMethodUpdateInput, Number(req.params.shippingMethodID))
   res.json(updatedItem)
 })
 

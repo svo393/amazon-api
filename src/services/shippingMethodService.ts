@@ -1,8 +1,5 @@
-import { Response } from 'express'
-import { Address, ShippingMethod as SM, ShippingMethodInput as SMInput } from '../types'
-import { sensitiveShippingMethods as sensitiveSMs } from '../utils/constants'
+import { ShippingMethod as SM, ShippingMethodInput as SMInput } from '../types'
 import { db } from '../utils/db'
-import shield from '../utils/shield'
 import StatusError from '../utils/StatusError'
 
 const addShippingMethod = async (smInput: SMInput): Promise<SM> => {
@@ -22,44 +19,26 @@ const addShippingMethod = async (smInput: SMInput): Promise<SM> => {
   return addedSM
 }
 
-const getShippingMethods = async (res: Response): Promise<SM[]> => {
-  const hasPermission = shield.hasRole([ 'ROOT', 'ADMIN' ], res)
-  const sms = await db<SM>('shippingMethods')
-
-  return hasPermission
-    ? sms
-    : sms.filter((sm) => !sensitiveSMs.includes(sm.name))
+const getShippingMethods = async (): Promise<SM[]> => {
+  return await db<SM>('shippingMethods')
 }
 
-type SingleShippingMethodData = {
-  name: string;
-  addresses: Address[];
-}
-
-const getShippingMethodByID = async (res: Response, smID: number): Promise<SingleShippingMethodData> => {
-  const hasPermission = shield.hasRole([ 'ROOT', 'ADMIN' ], res)
-  const sms = await db<SM>('shippingMethods')
-
-  const filteredSMs = hasPermission
-    ? sms
-    : sms.filter((sm) => !sensitiveSMs.includes(sm.name))
-
-  const [ sm ] = filteredSMs.filter((shm) => shm.shippingMethodID === smID)
-  if (!sm) throw new StatusError(404, 'Not Found')
-
-  const addresses = await db<Address>('addresses')
+const getShippingMethodByID = async (smID: number): Promise<SM> => {
+  const sm = await db<SM>('shippingMethods')
+    .first()
     .where('shippingMethodID', smID)
 
-  return { ...sm, addresses }
+  if (!sm) throw new StatusError(404, 'Not Found')
+  return sm
 }
 
-const updateShippingMethod = async (res: Response, smInput: SMInput, smID: number): Promise<SingleShippingMethodData> => {
+const updateShippingMethod = async (smInput: SMInput, smID: number): Promise<SM> => {
   const [ updatedSM ] = await db<SM>('shippingMethods')
-    .update({ ...smInput }, [ 'shippingMethodID' ])
+    .update({ ...smInput }, [ 'shippingMethodID', 'name' ])
     .where('shippingMethodID', smID)
 
   if (!updatedSM) throw new StatusError(404, 'Not Found')
-  return getShippingMethodByID(res, updatedSM.shippingMethodID)
+  return updatedSM
 }
 
 export default {

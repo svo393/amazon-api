@@ -6,14 +6,14 @@ import { loginAs, populateUsers, purge, shippingMethodsInDB } from './testHelper
 
 const api = supertest(app)
 
-export const apiURL = '/api/shipping-methods'
+const apiURL = '/api/shipping-methods'
 
 const newShippingMethod = (): ShippingMethodInput => ({
   name: `New ShippingMethod ${(new Date().getTime()).toString()}`
 })
 
-export const createOneShippingMethod = async (shippingMethod: string): Promise<{ addedShippingMethod: ShippingMethod; token: string}> => {
-  const { token } = await loginAs(shippingMethod, api)
+const createOneShippingMethod = async (role: string): Promise<{ addedShippingMethod: ShippingMethod; token: string}> => {
+  const { token } = await loginAs(role, api)
 
   const { body } = await api
     .post(apiURL)
@@ -56,13 +56,12 @@ describe('ShippingMethod adding', () => {
 })
 
 describe('ShippingMethods fetching', () => {
-  test('200 shippingMethods without sensitive info if not root ar admin', async () => {
+  test('200 shippingMethods', async () => {
     const { body }: { body: ShippingMethod[] } = await api
       .get(apiURL)
       .expect(200)
 
-    const emails = body.map((sm) => sm.name)
-    expect(emails).not.toContain('DOOR')
+    expect(body).toBeDefined()
   })
 
   test('200 shippingMethod', async () => {
