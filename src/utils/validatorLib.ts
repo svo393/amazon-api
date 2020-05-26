@@ -98,7 +98,7 @@ export const isImage: CP = ({ name, param }) => {
   return { name, param }
 }
 
-export const isItemParameter: CP = ({ name, param }) => {
+export const isProductParameter: CP = ({ name, param }) => {
   if (
     !(
       typeof (param.name) === 'string' ||

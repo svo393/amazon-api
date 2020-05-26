@@ -21,7 +21,7 @@ router.get('/', async (req, res) => {
 
 router.put('/:addressID/:userID', async (req, res) => {
   shield.isSameUser(req, res, 'params')
-  const userAddressUpdateInput = inputValidator.checkUpdateUserAddresses(req.body)
+  const userAddressUpdateInput = inputValidator.checkUserAddressesUpdate(req.body)
   const userAddresses = await userAddressService.updateUserAddress(userAddressUpdateInput, Number(req.params.addressID), Number(req.params.userID))
   res.json(userAddresses)
 })

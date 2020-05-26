@@ -1,68 +1,60 @@
-import { Item, ItemUpdateInput, PrismaClient } from '@prisma/client'
 import { Response } from 'express'
 import fs from 'fs'
 import multer from 'multer'
 import path from 'path'
 import R from 'ramda'
 import sharp from 'sharp'
-import { ItemAllData, ItemCreateInputRaw, ItemPublicData } from '../types'
+import { ProductPublicData, ProductCreateInput } from '../types'
 import { makeID } from '../utils'
 import StatusError from '../utils/StatusError'
 
-const prisma = new PrismaClient()
-
-const itemFieldSet = {
+const productFieldSet = {
   questions: true,
   ratings: true,
-  itemParameters: true,
-  groupItems: true
+  productParameters: true,
+  groupProducts: true
 }
 
-const addItem = async (itemInput: ItemCreateInputRaw): Promise<ItemPublicData> => {
-  const items = await prisma.item.findMany({ select: { id: true } })
-  const itemIDs = items.map((item) => item.id)
-  let id = makeID(7)
-  while (itemIDs.includes(id)) { id = makeID(7) }
-
+const addProduct = async (productInput: ProductCreateInput): Promise<ProductPublicData> => {
   const category = await prisma.category.upsert({
-    where: { name: itemInput.categoryName },
-    update: { name: itemInput.categoryName },
-    create: { name: itemInput.categoryName },
+    where: { name: productInput.categoryName },
+    update: { name: productInput.categoryName },
+    create: { name: productInput.categoryName },
     select: { name: true }
   })
 
   const vendor = await prisma.vendor.upsert({
-    where: { name: itemInput.vendorName },
-    update: { name: itemInput.vendorName },
-    create: { name: itemInput.vendorName },
+    where: { name: productInput.vendorName },
+    update: { name: productInput.vendorName },
+    create: { name: productInput.vendorName },
     select: { name: true }
   })
 
   const brandSection = await prisma.brandSection.create({
-    data: { content: itemInput.brandSection },
+    data: { content: productInput.brandSection },
     select: { id: true }
   })
 
-  const addedItem = await prisma.item.create({
+  const addedProduct = await prisma.product.create({
     data: {
       ...R.omit([
         'groups',
-        'itemParameters',
+        'productParameters',
         'categoryName',
         'vendorName',
         'userID',
         'brandSection'
-      ], itemInput),
+      ], productInput),
       id,
       brandSection: { connect: { id: brandSection.id } },
-      user: { connect: { id: itemInput.userID } },
+      user: { connect: { id: productInput.userID } },
       category: { connect: { name: category.name } },
       vendor: { connect: { name: vendor.name } }
     },
-    include: itemFieldSet
+    include: productFieldSet
   })
 
-  itemInput.itemParameters.map(async (p) => {
+  productInput.productParameters.map(async (p) => {
     const parameter = await prisma.parameter.upsert({
       where: { name: p.name },
       update: { name: p.name },
@@ -70,25 +62,25 @@ const addItem = async (itemInput: ItemCreateInputRaw): Promise<ItemPublicData> =
       select: { name: true }
     })
 
-    await prisma.itemParameter.create({
+    await prisma.productParameter.create({
       data: {
         value: p.value,
-        item: { connect: { id } },
+        product: { connect: { id } },
         parameter: { connect: { name: parameter.name } }
       }
     })
   })
 
-  itemInput.groups.map(async (i) => {
+  productInput.groups.map(async (i) => {
     let group: { id: string }
 
-    if (i.itemID) {
-      const groupItems = await prisma.groupItem.findMany({
-        where: { itemID: i.itemID },
+    if (i.productID) {
+      const groupProducts = await prisma.groupProduct.findMany({
+        where: { productID: i.productID },
         select: { group: true }
       })
 
-      const targetGroup = groupItems.find((gi) => gi.group.name === i.name)
+      const targetGroup = groupProducts.find((gi) => gi.group.name === i.name)
       if (!targetGroup) throw new StatusError(400, 'Invalid Group')
 
       group = targetGroup.group
@@ -99,10 +91,10 @@ const addItem = async (itemInput: ItemCreateInputRaw): Promise<ItemPublicData> =
       })
     }
 
-    await prisma.groupItem.create({
+    await prisma.groupProduct.create({
       data: {
         value: i.value,
-        item: { connect: { id } },
+        product: { connect: { id } },
         group: { connect: { id: group.id } }
       }
     })
@@ -110,142 +102,142 @@ const addItem = async (itemInput: ItemCreateInputRaw): Promise<ItemPublicData> =
 
   await prisma.disconnect()
 
-  const itemData = R.omit([
+  const productData = R.omit([
     'createdAt',
     'updatedAt',
     'userID'
-  ], addedItem)
+  ], addedProduct)
 
-  return itemData
+  return productData
 }
 
-const getItems = async (): Promise<ItemPublicData[]> => {
-  const items = await prisma.item.findMany({
-    include: itemFieldSet
-  })
-  await prisma.disconnect()
-  return items
-}
+// const getProducts = async (): Promise<ProductPublicData[]> => {
+//   const products = await prisma.product.findMany({
+//     include: productFieldSet
+//   })
+//   await prisma.disconnect()
+//   return products
+// }
 
-const getItemByID = async (id: string, res: Response): Promise<ItemPublicData| ItemAllData> => {
-  const item = await prisma.item.findOne({
-    where: { id },
-    include: itemFieldSet
-  })
-  await prisma.disconnect()
+// const getProductByID = async (id: string, res: Response): Promise<ProductPublicData| ProductAllData> => {
+//   const product = await prisma.product.findOne({
+//     where: { id },
+//     include: productFieldSet
+//   })
+//   await prisma.disconnect()
 
-  if (!item) throw new StatusError(404, 'Not Found')
+//   if (!product) throw new StatusError(404, 'Not Found')
 
-  const role = res.locals.userRole
-  const userIsAdminOrRoot = role === 'ADMIN' || role === 'ROOT'
+//   const role = res.locals.userRole
+//   const userIsAdminOrRoot = role === 'ADMIN' || role === 'ROOT'
 
-  const itemData = userIsAdminOrRoot
-    ? item
-    : R.omit([
-      'createdAt',
-      'updatedAt',
-      'userID'
-    ], item)
-  return itemData
-}
+//   const productData = userIsAdminOrRoot
+//     ? product
+//     : R.omit([
+//       'createdAt',
+//       'updatedAt',
+//       'userID'
+//     ], product)
+//   return productData
+// }
 
-const updateItem = async (itemInput: ItemUpdateInput, id: string): Promise<Item> => {
-  const updatedItem = await prisma.item.update({
-    where: { id },
-    data: itemInput
-  })
-  await prisma.disconnect()
+// const updateProduct = async (productInput: ProductUpdateInput, id: string): Promise<Product> => {
+//   const updatedProduct = await prisma.product.update({
+//     where: { id },
+//     data: productInput
+//   })
+//   await prisma.disconnect()
 
-  if (!updatedItem) throw new StatusError(404, 'Not Found')
-  return updatedItem
-}
+//   if (!updatedProduct) throw new StatusError(404, 'Not Found')
+//   return updatedProduct
+// }
 
-const storage = multer.diskStorage({
-  destination: './tmp',
-  filename (_req, file, cb) { cb(null, file.originalname) }
-})
+// const storage = multer.diskStorage({
+//   destination: './tmp',
+//   filename (_req, file, cb) { cb(null, file.originalname) }
+// })
 
-const imagePath = './public/uploads'
-const maxWidth = 1500
-const maxHeight = 1500
-const previewWidth = 450
-const previewHeight = 450
-const thumbWidth = 40
-const thumbHeight = 40
+// const imagePath = './public/uploads'
+// const maxWidth = 1500
+// const maxHeight = 1500
+// const previewWidth = 450
+// const previewHeight = 450
+// const thumbWidth = 40
+// const thumbHeight = 40
 
-const multerUpload = multer({ storage })
+// const multerUpload = multer({ storage })
 
-const uploadImages = (files: Express.Multer.File[], id: string): void => {
-  files.map(async (file, index) => {
-    const image = sharp(file.path)
-    const info = await image.metadata()
-    const fileName = `${id}_${index}`
+// const uploadImages = (files: Express.Multer.File[], id: string): void => {
+//   files.map(async (file, index) => {
+//     const image = sharp(file.path)
+//     const info = await image.metadata()
+//     const fileName = `${id}_${index}`
 
-    if ((info.width as number) > maxWidth || (info.height as number) > maxHeight) {
-      await image
-        .resize(maxWidth, maxHeight, { fit: 'inside' })
-        .jpeg({ progressive: true })
-        .toFile(
-          path.resolve(imagePath, `${fileName}_${maxWidth}.jpg`)
-        )
+//     if ((info.width as number) > maxWidth || (info.height as number) > maxHeight) {
+//       await image
+//         .resize(maxWidth, maxHeight, { fit: 'inside' })
+//         .jpeg({ progressive: true })
+//         .toFile(
+//           path.resolve(imagePath, `${fileName}_${maxWidth}.jpg`)
+//         )
 
-      await image
-        .resize(maxWidth, maxHeight, { fit: 'inside' })
-        .webp()
-        .toFile(
-          path.resolve(imagePath, `${fileName}_${maxWidth}.webp`)
-        )
-    } else {
-      await image
-        .jpeg({ progressive: true })
-        .toFile(
-          path.resolve(imagePath, `${fileName}_${maxWidth}.jpg`)
-        )
+//       await image
+//         .resize(maxWidth, maxHeight, { fit: 'inside' })
+//         .webp()
+//         .toFile(
+//           path.resolve(imagePath, `${fileName}_${maxWidth}.webp`)
+//         )
+//     } else {
+//       await image
+//         .jpeg({ progressive: true })
+//         .toFile(
+//           path.resolve(imagePath, `${fileName}_${maxWidth}.jpg`)
+//         )
 
-      await image
-        .webp()
-        .toFile(
-          path.resolve(imagePath, `${fileName}_${maxWidth}.webp`)
-        )
-    }
+//       await image
+//         .webp()
+//         .toFile(
+//           path.resolve(imagePath, `${fileName}_${maxWidth}.webp`)
+//         )
+//     }
 
-    await image
-      .resize(previewWidth, previewHeight, { fit: 'inside' })
-      .jpeg({ progressive: true })
-      .toFile(
-        path.resolve(imagePath, `${fileName}_${previewWidth}.jpg`)
-      )
+//     await image
+//       .resize(previewWidth, previewHeight, { fit: 'inside' })
+//       .jpeg({ progressive: true })
+//       .toFile(
+//         path.resolve(imagePath, `${fileName}_${previewWidth}.jpg`)
+//       )
 
-    await image
-      .resize(previewWidth, previewHeight, { fit: 'inside' })
-      .webp()
-      .toFile(
-        path.resolve(imagePath, `${fileName}_${previewWidth}.webp`)
-      )
+//     await image
+//       .resize(previewWidth, previewHeight, { fit: 'inside' })
+//       .webp()
+//       .toFile(
+//         path.resolve(imagePath, `${fileName}_${previewWidth}.webp`)
+//       )
 
-    await image
-      .resize(thumbWidth, thumbHeight, { fit: 'inside' })
-      .jpeg({ progressive: true })
-      .toFile(
-        path.resolve(imagePath, `${fileName}_${thumbWidth}.jpg`)
-      )
+//     await image
+//       .resize(thumbWidth, thumbHeight, { fit: 'inside' })
+//       .jpeg({ progressive: true })
+//       .toFile(
+//         path.resolve(imagePath, `${fileName}_${thumbWidth}.jpg`)
+//       )
 
-    await image
-      .resize(thumbWidth, thumbHeight, { fit: 'inside' })
-      .webp()
-      .toFile(
-        path.resolve(imagePath, `${fileName}_${thumbWidth}.webp`)
-      )
+//     await image
+//       .resize(thumbWidth, thumbHeight, { fit: 'inside' })
+//       .webp()
+//       .toFile(
+//         path.resolve(imagePath, `${fileName}_${thumbWidth}.webp`)
+//       )
 
-    fs.unlinkSync(file.path)
-  })
-}
+//     fs.unlinkSync(file.path)
+//   })
+// }
 
 export default {
-  addItem,
-  getItems,
-  getItemByID,
-  updateItem,
+  addProduct,
+  getProducts,
+  getProductByID,
+  updateProduct,
   multerUpload,
   uploadImages
 }

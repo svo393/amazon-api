@@ -1,7 +1,6 @@
-import { ItemUpdateInput } from '@prisma/client'
 import R from 'ramda'
-import { AddressCreateInput, AddressFetchInput, AddressTypeInput, CategoryCreateInput, CategoryUpdateInput, Follower, FollowerFetchInput, ItemCreateInputRaw, ListCreateInput, ListFetchInput, PasswordRequestInput, PasswordResetInput, RoleInput, ShippingMethodInput, UserAddressCreateInput, UserAddressFetchInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput } from '../types'
-import { canBeNumber, hasDefinedProps, isArray, isBoolean, isEmail, isGroup, isImage, isInputProvided, isItemParameter, isNumber, isPasswordValid, isProvided, isString, isStringOrArray } from './validatorLib'
+import { AddressCreateInput, AddressFetchInput, AddressTypeInput, CategoryCreateInput, CategoryUpdateInput, Follower, FollowerFetchInput, ListCreateInput, ListFetchInput, PasswordRequestInput, PasswordResetInput, RoleInput, ShippingMethodInput, UserAddressCreateInput, UserAddressFetchInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput, ProductCreateInput } from '../types'
+import { canBeNumber, hasDefinedProps, isArray, isBoolean, isEmail, isGroup, isImage, isInputProvided, isNumber, isPasswordValid, isProductParameter, isProvided, isString, isStringOrArray } from './validatorLib'
 
 const checkNewUser = (object: any): UserSignupInput => {
   const email = R.pipe(
@@ -113,11 +112,11 @@ const checkUserResetToken = (object: any): PasswordResetInput => {
   return userInput
 }
 
-const checkNewItem = (object: any): ItemCreateInputRaw => {
-  const name = R.pipe(
+const checkNewProduct = (object: any): ProductCreateInput => {
+  const title = R.pipe(
     isProvided,
     isString
-  )({ name: 'name', param: object.name })
+  )({ name: 'title', param: object.title })
 
   const listPrice = R.pipe(
     isProvided,
@@ -134,10 +133,9 @@ const checkNewItem = (object: any): ItemCreateInputRaw => {
     isString
   )({ name: 'description', param: object.description })
 
-  const brandSection = R.pipe(
-    isProvided,
-    isString
-  )({ name: 'brandSection', param: object.brandSection })
+  const brandSection = object.brandSection && isString(
+    { name: 'brandSection', param: object.brandSection }
+  )
 
   const stock = R.pipe(
     isProvided,
@@ -159,132 +157,126 @@ const checkNewItem = (object: any): ItemCreateInputRaw => {
     isBoolean
   )({ name: 'isAvailable', param: object.isAvailable })
 
-  const userID = R.pipe(
+  const categoryID = R.pipe(
     isProvided,
-    isString
-  )({ name: 'userID', param: object.userID })
+    isNumber
+  )({ name: 'categoryID', param: object.categoryID })
 
-  const categoryName = R.pipe(
+  const vendorID = R.pipe(
     isProvided,
-    isString
-  )({ name: 'categoryName', param: object.categoryName })
+    isNumber
+  )({ name: 'vendorID', param: object.vendorID })
 
-  const vendorName = R.pipe(
-    isProvided,
-    isString
-  )({ name: 'vendorName', param: object.vendorName })
+  // const groups = R.pipe(
+  //   isProvided,
+  //   isArray
+  // )({ name: 'groups', param: object.groups })
 
-  const groups = R.pipe(
-    isProvided,
-    isArray
-  )({ name: 'groups', param: object.groups })
+  // groups.param.map((p: object) =>
+  //   isGroup({ name: 'productParameter', param: p }))
 
-  groups.param.map((p: object) =>
-    isGroup({ name: 'itemParameter', param: p }))
+  // const productParameters = R.pipe(
+  //   isProvided,
+  //   isArray
+  // )({ name: 'productParameters', param: object.productParameters })
 
-  const itemParameters = R.pipe(
-    isProvided,
-    isArray
-  )({ name: 'itemParameters', param: object.itemParameters })
+  // productParameters.param.map((p: object) =>
+  //   isProductParameter({ name: 'productParameter', param: p }))
 
-  itemParameters.param.map((p: object) =>
-    isItemParameter({ name: 'itemParameter', param: p }))
-
-  const userInput: ItemCreateInputRaw = {
-    name: name.param,
+  const productInput: ProductCreateInput = {
+    title: title.param,
     listPrice: listPrice.param,
     price: price.param,
     description: description.param,
-    brandSection: brandSection.param,
+    brandSection: brandSection?.param,
     stock: stock.param,
     isAvailable: isAvailable.param,
     media: media.param,
     primaryMedia: primaryMedia.param,
-    userID: userID.param,
-    categoryName: categoryName.param,
-    vendorName: vendorName.param,
-    groups: groups.param,
-    itemParameters: itemParameters.param
+    categoryID: categoryID.param,
+    vendorID: vendorID.param
+    // groups: groups.param,
+    // productParameters: productParameters.param
   }
-  return userInput
+  return productInput
 }
 
-const checkItemUpdate = (object: any): ItemUpdateInput => {
-  const name = object.name && isString(
-    { name: 'name', param: object.name }
-  )
+// const checkProductUpdate = (object: any): ProductUpdateInput => {
+//   const name = object.name && isString(
+//     { name: 'name', param: object.name }
+//   )
 
-  const price = object.price && isNumber(
-    { name: 'price', param: object.price }
-  )
+//   const price = object.price && isNumber(
+//     { name: 'price', param: object.price }
+//   )
 
-  const shortDescription = object.shortDescription && isString(
-    { name: 'shortDescription', param: object.shortDescription }
-  )
+//   const shortDescription = object.shortDescription && isString(
+//     { name: 'shortDescription', param: object.shortDescription }
+//   )
 
-  const longDescription = object.longDescription && isString(
-    { name: 'longDescription', param: object.longDescription }
-  )
+//   const longDescription = object.longDescription && isString(
+//     { name: 'longDescription', param: object.longDescription }
+//   )
 
-  const stock = object.stock && isNumber(
-    { name: 'stock', param: object.stock }
-  )
+//   const stock = object.stock && isNumber(
+//     { name: 'stock', param: object.stock }
+//   )
 
-  const asin = object.asin && isString(
-    { name: 'asin', param: object.asin }
-  )
+//   const asin = object.asin && isString(
+//     { name: 'asin', param: object.asin }
+//   )
 
-  const media = object.media && isNumber(
-    { name: 'media', param: object.media }
-  )
+//   const media = object.media && isNumber(
+//     { name: 'media', param: object.media }
+//   )
 
-  const primaryMedia = object.primaryMedia && isNumber(
-    { name: 'primaryMedia', param: object.primaryMedia }
-  )
+//   const primaryMedia = object.primaryMedia && isNumber(
+//     { name: 'primaryMedia', param: object.primaryMedia }
+//   )
 
-  const isAvailable = object.isAvailable && isBoolean(
-    { name: 'isAvailable', param: object.isAvailable }
-  )
+//   const isAvailable = object.isAvailable && isBoolean(
+//     { name: 'isAvailable', param: object.isAvailable }
+//   )
 
-  const questions = object.questions && isString(
-    { name: 'questions', param: object.questions }
-  )
+//   const questions = object.questions && isString(
+//     { name: 'questions', param: object.questions }
+//   )
 
-  const category = object.category && isString(
-    { name: 'category', param: object.category }
-  )
+//   const category = object.category && isString(
+//     { name: 'category', param: object.category }
+//   )
 
-  const vendor = object.vendor && isString(
-    { name: 'vendor', param: object.vendor }
-  )
+//   const vendor = object.vendor && isString(
+//     { name: 'vendor', param: object.vendor }
+//   )
 
-  const itemInput = {
-    name: name?.param,
-    price: price?.param,
-    shortDescription: shortDescription?.param,
-    longDescription: longDescription?.param,
-    stock: stock?.param,
-    asin: asin?.param,
-    media: media?.param,
-    primaryMedia: primaryMedia?.param,
-    isAvailable: isAvailable?.param,
-    questions: questions?.param,
-    category: category?.param,
-    vendor: vendor?.param
-  }
-  return hasDefinedProps(itemInput)
-}
+//   const productInput = {
+//     name: name?.param,
+//     price: price?.param,
+//     shortDescription: shortDescription?.param,
+//     longDescription: longDescription?.param,
+//     stock: stock?.param,
+//     asin: asin?.param,
+//     media: media?.param,
+//     primaryMedia: primaryMedia?.param,
+//     isAvailable: isAvailable?.param,
+//     questions: questions?.param,
+//     category: category?.param,
+//     vendor: vendor?.param
+//   }
+//   return hasDefinedProps(productInput)
+// }
 
-const checkItemMediaUpload = (object: any): Express.Multer.File[] => {
-  isInputProvided(object, 'Missing images')
-  isStringOrArray({ name: 'images', param: object })
+// const checkProductMediaUpload = (object: any): Express.Multer.File[] => {
+//   isInputProvided(object, 'Missing images')
+//   isStringOrArray({ name: 'images', param: object })
 
-  Array.isArray(object)
-    ? object.map((item: object) => isImage({ name: 'image', param: item }))
-    : isImage({ name: 'image', param: object })
+//   Array.isArray(object)
+//     ? object.map((product: object) => isImage({ name: 'image', param: product }))
+//     : isImage({ name: 'image', param: object })
 
-  return object
-}
+//   return object
+// }
 
 const checkNewCategory = (object: any): CategoryCreateInput => {
   const name = R.pipe(
@@ -475,7 +467,7 @@ const checkUserAddressesFetch = (object: any): UserAddressFetchInput => {
   return userAddressInput
 }
 
-const checkUpdateUserAddresses = (object: any): UserAddressUpdateInput => {
+const checkUserAddressesUpdate = (object: any): UserAddressUpdateInput => {
   const isDefault = R.pipe(
     isProvided,
     isBoolean
@@ -529,9 +521,9 @@ export default {
   checkUserUpdate,
   checkUserResetRequest,
   checkUserResetToken,
-  checkNewItem,
-  checkItemUpdate,
-  checkItemMediaUpload,
+  checkNewProduct,
+  // checkProductUpdate,
+  // checkProductMediaUpload,
   checkNewCategory,
   checkCategoryUpdate,
   checkVendor,
@@ -544,7 +536,7 @@ export default {
   checkFollowersFetch,
   checkNewUserAddress,
   checkUserAddressesFetch,
-  checkUpdateUserAddresses,
+  checkUserAddressesUpdate,
   checkNewList,
   checkListsFetch,
   checkListUpdate

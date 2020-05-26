@@ -1,48 +1,3 @@
-import { GroupItem, Item, ItemParameter, Question as Question1, Rating as Rating1 } from '@prisma/client'
-
-export type ItemAllData = Item & {
-  questions: Question1[];
-  ratings: Rating1[];
-  groupItems: GroupItem[];
-  itemParameters: ItemParameter[];
-}
-
-export type ItemPublicData = Omit<ItemAllData,
-  | 'createdAt'
-  | 'updatedAt'
-  | 'userID'
->
-
-export type ItemListData = Pick<Item,
-    | 'id'
-    | 'name'
-    | 'listPrice'
-    | 'price'
-    | 'stars'
-    | 'primaryMedia'
-    | 'ratingCount'
-  >;
-
-export type ItemCreateInputRaw = Omit<Item,
-  | 'createdAt'
-  | 'updatedAt'
-  | 'stars'
-  | 'id'
-  | 'brandSectionID'
-  | 'ratingCount'
-> & {
-  brandSection: string;
-  itemParameters: {
-    name: string;
-    value: string;
-  }[];
-  groups: {
-    name: string;
-    itemID?: string;
-    value: string;
-  }[];
-}
-
 //
 // Types from schema in order of creation
 //
@@ -116,17 +71,16 @@ export type Product = {
   listPrice: number;
   price: number;
   description: string;
+  brandSection?: string;
   stock: number;
   media: number;
   primaryMedia: number;
-  brandSection: string;
   createdAt: Date;
   updatedAt: Date;
   isAvailable: boolean;
   userID: number;
   categoryID: number;
   vendorID: number;
-  brandSectionID: number;
 }
 
 export type Rating = {
@@ -349,3 +303,53 @@ export type UserAddressCreateInput =
 export type UserAddressUpdateInput = Pick<UserAddress, 'isDefault'>
 
 export type UserAddressFetchInput = Pick<UserAddress, 'userID'>
+
+export type ProductCreateInput = Omit<Product,
+  | 'productID'
+  | 'createdAt'
+  | 'updatedAt'
+  | 'userID'
+>
+
+export type ProductPublicData = Omit<Product,
+  | 'createdAt'
+  | 'updatedAt'
+  | 'userID'
+>
+
+// export type ItemAllData = Item & {
+//   questions: Question1[];
+//   ratings: Rating1[];
+//   groupItems: GroupItem[];
+//   itemParameters: ItemParameter[];
+// }
+
+// export type ItemListData = Pick<Item,
+//     | 'id'
+//     | 'name'
+//     | 'listPrice'
+//     | 'price'
+//     | 'stars'
+//     | 'primaryMedia'
+//     | 'ratingCount'
+//   >;
+
+// export type ItemCreateInputRaw = Omit<Item,
+//   | 'createdAt'
+//   | 'updatedAt'
+//   | 'stars'
+//   | 'id'
+//   | 'brandSectionID'
+//   | 'ratingCount'
+// > & {
+//   brandSection: string;
+//   itemParameters: {
+//     name: string;
+//     value: string;
+//   }[];
+//   groups: {
+//     name: string;
+//     itemID?: string;
+//     value: string;
+//   }[];
+// }
