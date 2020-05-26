@@ -17,7 +17,7 @@ const addFollower = async (followerInput: Follower): Promise<Follower> => {
       .insert(followerInput, [ '*' ])
   }
 
-  return existingFollower ?? addedFollower
+  return existingFollower ?? addedFollower as Follower
 }
 
 const getFollowers = async (followerInput: FollowerFetchInput): Promise<Follower[] | void> => {

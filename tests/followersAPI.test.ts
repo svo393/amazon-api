@@ -28,6 +28,7 @@ describe('Follower adding', () => {
   test('201', async () => {
     const user1 = await getUserByEmail('admin@example.com')
     const { userID: user2ID, token } = await loginAs('customer', api)
+
     const followersAtStart = await followersInDB()
 
     await api

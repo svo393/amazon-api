@@ -47,7 +47,7 @@ const addUser = async (userInput: UserSignupInput, res: Response): Promise<UserS
 
   if (!customerRoleID) { throw new StatusError() }
 
-  const addedUser: UserSignupData = await db<User>('users')
+  const [ addedUser ]: UserSignupData[] = await db<User>('users')
     .insert({
       email,
       password: passwordHash,

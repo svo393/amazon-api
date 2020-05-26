@@ -13,7 +13,7 @@ router.post('/', async (req, res) => {
 })
 
 router.get('/', async (req, res) => {
-  const followerFetchInput = inputValidator.checkFetchFollowers(req.query)
+  const followerFetchInput = inputValidator.checkFollowersFetch(req.query)
   const followeres = await followerService.getFollowers(followerFetchInput)
   res.json(followeres)
 })

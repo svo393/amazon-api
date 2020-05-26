@@ -1,6 +1,6 @@
 import { ItemUpdateInput } from '@prisma/client'
 import R from 'ramda'
-import { AddressCreateInput, AddressFetchInput, AddressTypeInput, CategoryCreateInput, CategoryUpdateInput, Follower, ItemCreateInputRaw, PasswordResetInput, RoleInput, ShippingMethodInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput } from '../types'
+import { AddressCreateInput, AddressFetchInput, AddressTypeInput, CategoryCreateInput, CategoryUpdateInput, Follower, ItemCreateInputRaw, PasswordResetInput, RoleInput, ShippingMethodInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput, FollowerFetchInput, UserAddress, UserAddressCreateInput } from '../types'
 import { canBeNumber, hasDefinedProps, isArray, isBoolean, isEmail, isGroup, isImage, isInputProvided, isItemParameter, isNumber, isPasswordValid, isProvided, isString, isStringOrArray } from './validatorLib'
 
 const checkNewUser = (object: any): UserSignupInput => {
@@ -377,6 +377,10 @@ const checkAddressType = (object: any): AddressTypeInput => {
 }
 
 const checkNewAddress = (object: any): AddressCreateInput => {
+  const isDefault = object.isDefault && isBoolean(
+    { name: 'isDefault', param: object.isDefault }
+  )
+
   const addr = R.pipe(
     isProvided,
     isString
@@ -388,6 +392,7 @@ const checkNewAddress = (object: any): AddressCreateInput => {
   )({ name: 'addressTypeID', param: object.addressTypeID })
 
   const addressInput: AddressCreateInput = {
+    isDefault: isDefault?.param,
     addr: addr.param,
     addressTypeID: addressTypeID.param
   }
@@ -395,7 +400,7 @@ const checkNewAddress = (object: any): AddressCreateInput => {
   return addressInput
 }
 
-const checkFetchAddresses = (object: any): AddressFetchInput => {
+const checkAddressesFetch = (object: any): AddressFetchInput => {
   const userID = object.userID && canBeNumber(
     { name: 'userID', param: object.userID }
   )
@@ -431,7 +436,7 @@ const checkNewFollower = (object: any): Follower => {
   return followerInput
 }
 
-const checkFetchFollowers = (object: any): FollowerFetchinput => {
+const checkFollowersFetch = (object: any): FollowerFetchInput => {
   const userID = object.userID && canBeNumber(
     { name: 'userID', param: object.userID }
   )
@@ -440,13 +445,54 @@ const checkFetchFollowers = (object: any): FollowerFetchinput => {
     { name: 'follows', param: object.follows }
   )
 
-  const followerInput: FollowerFetchinput = {
+  const followerInput: FollowerFetchInput = {
     userID: parseInt(userID?.param),
     follows: parseInt(follows?.param)
   }
 
   return hasDefinedProps(followerInput)
 }
+
+const checkNewUserAddress = (object: any): UserAddressCreateInput => {
+  const isDefault = object.isDefault && isBoolean(
+    { name: 'isDefault', param: object.isDefault }
+  )
+
+  const userID = R.pipe(
+    isProvided,
+    isNumber
+  )({ name: 'userID', param: object.userID })
+
+  const addressID = R.pipe(
+    isProvided,
+    isNumber
+  )({ name: 'addressID', param: object.addressID })
+
+  const userAddressInput: UserAddressCreateInput = {
+    isDefault: isDefault?.param,
+    userID: userID.param,
+    addressID: addressID.param
+  }
+
+  return userAddressInput
+}
+
+// const checkUserAddressesFetch = (object: any): UserAddressFetchInput => {
+//   const userID = object.userID && canBeNumber(
+//     { name: 'userID', param: object.userID }
+//   )
+
+//   const follows = object.follows && canBeNumber(
+//     { name: 'follows', param: object.follows }
+//   )
+
+//   const userAddressInput: UserAddressFetchInput = {
+//     userID: parseInt(userID?.param),
+//     follows: parseInt(follows?.param)
+//   }
+
+//   return hasDefinedProps(userAddressInput)
+// }
 
 export default {
   checkNewUser,
@@ -464,7 +510,8 @@ export default {
   checkShippingMethod,
   checkAddressType,
   checkNewAddress,
-  checkFetchAddresses,
+  checkAddressesFetch,
   checkNewFollower,
-  checkFetchFollowers
+  checkFollowersFetch,
+  checkNewUserAddress
 }

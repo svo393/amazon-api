@@ -8,12 +8,12 @@ const router = Router()
 router.post('/', async (req, res) => {
   shield.isLoggedIn(res)
   const addressCreateInput = inputValidator.checkNewAddress(req.body)
-  const addedAddress = await addressService.addAddress(addressCreateInput)
+  const addedAddress = await addressService.addAddress(addressCreateInput, res)
   res.status(201).json(addedAddress)
 })
 
 router.get('/', async (req, res) => {
-  const addressFetchInput = inputValidator.checkFetchAddresses(req.query)
+  const addressFetchInput = inputValidator.checkAddressesFetch(req.query)
   const addresses = await addressService.getAddresses(addressFetchInput)
   res.json(addresses)
 })

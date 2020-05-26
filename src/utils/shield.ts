@@ -40,6 +40,10 @@ const isAdmin = (res: Response): void => {
 }
 
 const isSameUser = (req: Request, res: Response, target: 'params' | 'query' | 'body'): void => {
+  console.info('target', target)
+  console.info(res.locals.userID.toString())
+  console.info(req[target].userID.toString())
+
   if (res.locals.userID.toString() !== req[target].userID.toString() && res.locals.userRole !== 'ROOT') {
     throw new StatusError(403, 'Forbidden')
   }

@@ -321,7 +321,9 @@ export type ShippingMethodInput = Pick<ShippingMethod, 'name'>
 
 export type AddressTypeInput = Pick<AddressType, 'name'>
 
-export type AddressCreateInput = Pick<Address, 'addr' | 'addressTypeID'>
+export type AddressCreateInput = Pick<Address, 'addr' | 'addressTypeID'> & {
+  isDefault?: boolean;
+}
 
 export type AddressFetchInput = {
   userID?: number;
@@ -334,6 +336,16 @@ export type AddressUpdateInput = {
 }
 
 export type FollowerFetchInput = {
+  userID?: number;
+  follows?: number;
+}
+
+export type UserAddressCreateInput =
+  Pick<UserAddress, 'userID' | 'addressID'> & {
+  isDefault?: boolean;
+}
+
+export type UserAddressFetchInput = {
   userID?: number;
   follows?: number;
 }

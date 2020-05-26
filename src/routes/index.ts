@@ -9,6 +9,7 @@ import shippingMethodsRouter from './shippingMethods'
 import addressTypesRouter from './addressTypes'
 import addressesRouter from './addresses'
 import followersRouter from './followers'
+import userAddressesRouter from './userAddresses'
 
 export default Router()
   .use('/categories', categoriesRouter)
@@ -20,3 +21,4 @@ export default Router()
   .use('/address-types', addressTypesRouter)
   .use('/addresses', addressesRouter)
   .use('/followers', followersRouter)
+  .use('/user-addresses', userAddressesRouter)
