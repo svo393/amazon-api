@@ -40,7 +40,6 @@ export const purge = async (): Promise<void> => {
     await db('ratingComments').del()
     await db('ratings').del()
     await db('products').del()
-    await db('brandSections').del()
     await db('vendors').del()
     await db('categories').del()
     await db('lists').del()

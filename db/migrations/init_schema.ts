@@ -107,11 +107,6 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.string('name', 50).unique().notNullable()
     })
 
-    .createTable('brandSections', (t) => {
-      t.increments('brandSectionID')
-      t.string('content', 65535).notNullable()
-    })
-
     .createTable('products', (t) => {
       t.increments('productID')
       t.string('title').notNullable()
@@ -121,6 +116,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.integer('stock').notNullable().unsigned()
       t.integer('media').notNullable().unsigned()
       t.integer('primaryMedia').notNullable().unsigned()
+      t.string('brandSection', 65535)
       t.dateTime('createdAt').notNullable()
       t.dateTime('updatedAt').notNullable()
       t.boolean('isAvailable').defaultTo(true).notNullable()
@@ -140,10 +136,6 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .integer('vendorID')
         .references('vendors.vendorID')
         .notNullable()
-
-      t
-        .integer('brandSectionID')
-        .references('brandSections.brandSectionID')
     })
 
     .createTable('ratings', (t) => {
@@ -421,7 +413,6 @@ export const down = (knex: Knex): Knex.SchemaBuilder =>
     .dropTableIfExists('ratingComments')
     .dropTableIfExists('ratings')
     .dropTableIfExists('products')
-    .dropTableIfExists('brandSections')
     .dropTableIfExists('vendors')
     .dropTableIfExists('categories')
     .dropTableIfExists('lists')

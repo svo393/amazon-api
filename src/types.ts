@@ -110,11 +110,6 @@ export type Vendor = {
   name: string;
 }
 
-export type BrandSection = {
-  brandSectionID: number;
-  content: string;
-}
-
 export type Product = {
   productID: number;
   title: string;
@@ -124,6 +119,7 @@ export type Product = {
   stock: number;
   media: number;
   primaryMedia: number;
+  brandSection: string;
   createdAt: Date;
   updatedAt: Date;
   isAvailable: boolean;
