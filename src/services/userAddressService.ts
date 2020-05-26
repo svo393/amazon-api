@@ -1,4 +1,4 @@
-import { UserAddress, UserAddressFetchInput, UserAddressCreateInput } from '../types'
+import { UserAddress, UserAddressFetchInput, UserAddressCreateInput, UserAddressUpdateInput } from '../types'
 import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
@@ -18,31 +18,37 @@ const addUserAddress = async (userAddressInput: UserAddressCreateInput): Promise
   return addedUserAddress
 }
 
-// const getUserAddresss = async (userAddressInput: UserAddressFetchInput): Promise<UserAddress[] | void> => {
-//   const { userID, follows } = userAddressInput
+const getUserAddresses = async (userAddressInput: UserAddressFetchInput): Promise<UserAddress[]> => {
+  const { userID } = userAddressInput
 
-//   if (follows) {
-//     return await db('userAddresses')
-//       .where('follows', follows)
-//   }
+  return await db('userAddresses')
+    .where('userID', userID)
+}
 
-//   if (userID) {
-//     return await db('userAddresses')
-//       .where('userID', userID)
-//   }
-// }
+const updateUserAddress = async (userAddressInput: UserAddressUpdateInput, addressID: number, userID: number): Promise<UserAddress> => {
+  const { isDefault } = userAddressInput
 
-// const deleteUserAddress = async (userID: number, follows: number): Promise<void> => {
-//   const deleteCount = await db<UserAddress>('userAddresses')
-//     .del()
-//     .where('userID', userID)
-//     .andWhere('follows', follows)
+  const [ updatedUserAddress ]: UserAddress[] = await db<UserAddress>('userAddresses')
+    .update({ isDefault }, [ '*' ])
+    .where('userID', userID)
+    .andWhere('addressID', addressID)
 
-//   if (deleteCount === 0) throw new StatusError(404, 'Not Found')
-// }
+  if (!updatedUserAddress) throw new StatusError(404, 'Not Found')
+  return updatedUserAddress
+}
+
+const deleteUserAddress = async (addressID: number, userID: number): Promise<void> => {
+  const deleteCount = await db<UserAddress>('userAddresses')
+    .del()
+    .where('userID', userID)
+    .andWhere('addressID', addressID)
+
+  if (deleteCount === 0) throw new StatusError(404, 'Not Found')
+}
 
 export default {
-  addUserAddress
-  // getUserAddresss,
-  // deleteUserAddress
+  addUserAddress,
+  getUserAddresses,
+  updateUserAddress,
+  deleteUserAddress
 }

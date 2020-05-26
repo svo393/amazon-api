@@ -284,6 +284,8 @@ export type UserUpdateInput = {
   roleID?: number;
 }
 
+export type PasswordRequestInput = Pick<User, 'email'>
+
 export type PasswordResetInput = {
   password: string;
   resetToken: string;
@@ -344,8 +346,6 @@ export type UserAddressCreateInput =
   Pick<UserAddress, 'userID' | 'addressID'> & {
   isDefault?: boolean;
 }
+export type UserAddressUpdateInput = Pick<UserAddress, 'isDefault'>
 
-export type UserAddressFetchInput = {
-  userID?: number;
-  follows?: number;
-}
+export type UserAddressFetchInput = Pick<UserAddress, 'userID'>

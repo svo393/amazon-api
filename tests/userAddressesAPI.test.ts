@@ -2,21 +2,20 @@ import supertest from 'supertest'
 import app from '../src/app'
 import { UserAddress } from '../src/types'
 import { db } from '../src/utils/db'
-import { userAddressesInDB, getUserByEmail, loginAs, populateUsers, purge } from './testHelper'
+import { userAddressesInDB, loginAs, populateUsers, purge } from './testHelper'
 import { createOneAddress } from './addressesAPI.test'
 
 const api = supertest(app)
 const apiURL = '/api/user-addresses'
 
 const createOneUserAddress = async (): Promise<UserAddress & { token: string}> => {
-  const user1 = await getUserByEmail('admin@example.com')
-  const { userID: user2ID, token } = await loginAs('customer', api)
+  const { addedAddress } = await createOneAddress('admin')
+  const { userID, token } = await loginAs('customer', api)
 
   const { body }: { body: UserAddress } = await api
     .post(apiURL)
     .set('Cookie', `token=${token}`)
-    .send({ userID: user2ID, follows: user1.userID })
-
+    .send({ userID, addressID: addedAddress.addressID })
   return { ...body, token }
 }
 
@@ -44,36 +43,52 @@ describe('UserAddress adding', () => {
   })
 })
 
-// describe('UserAddresss fetching', () => {
-//   test('200 userAddresses', async () => {
-//     const { follows } = await createOneUserAddress()
+describe('UserAddresss fetching', () => {
+  test('200 userAddresses', async () => {
+    const { userID, token } = await createOneUserAddress()
 
-//     const { body }: { body: UserAddress[] } = await api
-//       .get(`${apiURL}?follows=${follows}`)
-//       .expect(200)
-//     expect(body).toBeDefined()
-//   })
-// })
+    const { body }: { body: UserAddress[] } = await api
+      .get(`${apiURL}?userID=${userID}`)
+      .set('Cookie', `token=${token}`)
+      .expect(200)
 
-// describe('UserAddresss deleting', () => {
-//   test('204 if same user', async () => {
-//     const { userID, follows, token } = await createOneUserAddress()
+    expect(body).toBeDefined()
+  })
+})
 
-//     await api
-//       .delete(`${apiURL}/${userID}/${follows}`)
-//       .set('Cookie', `token=${token}`)
-//       .expect(204)
-//   })
+describe('UserAddresss updating', () => {
+  test('200 if same user', async () => {
+    const { userID, addressID, token } = await createOneUserAddress()
 
-//   test('403 if another same user', async () => {
-//     const { userID, follows } = await createOneUserAddress()
-//     const { token } = await loginAs('admin', api)
+    const { body }: { body: UserAddress } = await api
+      .put(`${apiURL}/${addressID}/${userID}`)
+      .set('Cookie', `token=${token}`)
+      .send({ isDefault: true })
+      .expect(200)
 
-//     await api
-//       .delete(`${apiURL}/${userID}/${follows}`)
-//       .set('Cookie', `token=${token}`)
-//       .expect(403)
-//   })
-// })
+    expect(body.isDefault).toBe(true)
+  })
+})
+
+describe('UserAddresss deleting', () => {
+  test('204 if same user', async () => {
+    const { userID, addressID, token } = await createOneUserAddress()
+
+    await api
+      .delete(`${apiURL}/${addressID}/${userID}`)
+      .set('Cookie', `token=${token}`)
+      .expect(204)
+  })
+
+  test('403 if another user', async () => {
+    const { userID, addressID } = await createOneUserAddress()
+    const { token } = await loginAs('admin', api)
+
+    await api
+      .delete(`${apiURL}/${addressID}/${userID}`)
+      .set('Cookie', `token=${token}`)
+      .expect(403)
+  })
+})
 
 afterAll(async () => await db.destroy())

@@ -12,24 +12,24 @@ router.post('/', async (req, res) => {
   res.status(201).json(addedUserAddress)
 })
 
-// router.get('/', async (req, res) => {
-//   shield.isSameUser(req, res, 'query')
-//   const userAddressFetchInput = inputValidator.checkFetchUserAddresses(req.query)
-//   const userAddresses = await userAddressService.getUserAddresss(userAddressFetchInput)
-//   res.json(userAddresses)
-// })
+router.get('/', async (req, res) => {
+  shield.isSameUserOrAdmin(req, res, 'query')
+  const userAddressFetchInput = inputValidator.checkUserAddressesFetch(req.query)
+  const userAddresses = await userAddressService.getUserAddresses(userAddressFetchInput)
+  res.json(userAddresses)
+})
 
-// router.put('/', async (req, res) => {
-//   shield.isSameUser(req, res, 'query')
-//   const userAddressUpdateInput = inputValidator.checkUpdateUserAddresses(req.query)
-//   const userAddresses = await userAddressService.getUserAddresss(userAddressUpdateInput)
-//   res.json(userAddresses)
-// })
+router.put('/:addressID/:userID', async (req, res) => {
+  shield.isSameUser(req, res, 'params')
+  const userAddressUpdateInput = inputValidator.checkUpdateUserAddresses(req.body)
+  const userAddresses = await userAddressService.updateUserAddress(userAddressUpdateInput, Number(req.params.addressID), Number(req.params.userID))
+  res.json(userAddresses)
+})
 
-// router.delete('/:userID/:follows', async (req, res) => {
-//   shield.isSameUser(req, res, 'params')
-//   await userAddressService.deleteUserAddress(Number(req.params.userID), Number(req.params.follows))
-//   res.status(204).end()
-// })
+router.delete('/:addressID/:userID', async (req, res) => {
+  shield.isSameUser(req, res, 'params')
+  await userAddressService.deleteUserAddress(Number(req.params.addressID), Number(req.params.userID))
+  res.status(204).end()
+})
 
 export default router

@@ -26,7 +26,6 @@ const isLoggedIn = (res: Response): void => {
 
 const isRoot = (res: Response): void => {
   isLoggedIn(res)
-
   if (res.locals.userRole !== 'ROOT') throw new StatusError(403, 'Forbidden')
 }
 
@@ -34,19 +33,27 @@ const isAdmin = (res: Response): void => {
   isLoggedIn(res)
   const role: string | undefined = res.locals.userRole
 
-  if (!role || ![ 'ROOT', 'ADMIN' ].includes(role)) {
+  if (!role || ![ 'ROOT', 'ADMIN' ].includes(role)) { throw new StatusError(403, 'Forbidden') }
+}
+
+const isSameUser = (req: Request, res: Response, target: 'params' | 'query' | 'body'): void => {
+  isLoggedIn(res)
+
+  if (
+    res.locals.userID.toString() !== req[target].userID.toString() &&
+    res.locals.userRole !== 'ROOT'
+  ) {
     throw new StatusError(403, 'Forbidden')
   }
 }
 
-const isSameUser = (req: Request, res: Response, target: 'params' | 'query' | 'body'): void => {
-  console.info('target', target)
-  console.info(res.locals.userID.toString())
-  console.info(req[target].userID.toString())
+const isSameUserOrAdmin = (req: Request, res: Response, target: 'params' | 'query' | 'body'): void => {
+  isLoggedIn(res)
 
-  if (res.locals.userID.toString() !== req[target].userID.toString() && res.locals.userRole !== 'ROOT') {
-    throw new StatusError(403, 'Forbidden')
-  }
+  if (
+    res.locals.userID.toString() !== req[target].userID.toString() &&
+    ![ 'ROOT', 'ADMIN' ].includes(res.locals.userRole)
+  ) throw new StatusError(403, 'Forbidden')
 }
 
 const isCreator = async (res: Response, name: Model, id: string): Promise<void | null> => {
@@ -103,5 +110,6 @@ export default {
   isCreator,
   isRoot,
   isSameUser,
-  hasRole
+  hasRole,
+  isSameUserOrAdmin
 }

@@ -1,6 +1,6 @@
 import { ItemUpdateInput } from '@prisma/client'
 import R from 'ramda'
-import { AddressCreateInput, AddressFetchInput, AddressTypeInput, CategoryCreateInput, CategoryUpdateInput, Follower, ItemCreateInputRaw, PasswordResetInput, RoleInput, ShippingMethodInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput, FollowerFetchInput, UserAddress, UserAddressCreateInput } from '../types'
+import { AddressCreateInput, AddressFetchInput, AddressTypeInput, CategoryCreateInput, CategoryUpdateInput, Follower, FollowerFetchInput, ItemCreateInputRaw, PasswordRequestInput, PasswordResetInput, RoleInput, ShippingMethodInput, UserAddress, UserAddressCreateInput, UserAddressFetchInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput, UserAddressUpdateInput } from '../types'
 import { canBeNumber, hasDefinedProps, isArray, isBoolean, isEmail, isGroup, isImage, isInputProvided, isItemParameter, isNumber, isPasswordValid, isProvided, isString, isStringOrArray } from './validatorLib'
 
 const checkNewUser = (object: any): UserSignupInput => {
@@ -20,7 +20,6 @@ const checkNewUser = (object: any): UserSignupInput => {
     email: email.param.toLowerCase(),
     password: password.param
   }
-
   return userInput
 }
 
@@ -46,7 +45,6 @@ const checkUserLogin = (object: any): UserLoginInput => {
     password: password.param,
     remember: remember.param
   }
-
   return userInput
 }
 
@@ -80,18 +78,20 @@ const checkUserUpdate = (object: any): UserUpdateInput => {
     avatar: avatar?.param,
     roleID: roleID?.param
   }
-
   return hasDefinedProps(userInput)
 }
 
-const checkUserResetRequest = (object: any): string => {
+const checkUserResetRequest = (object: any): PasswordRequestInput => {
   const email = R.pipe(
     isProvided,
     isString,
     isEmail
   )({ name: 'email', param: object.email })
 
-  return email.param.toLowerCase()
+  const userInput: PasswordRequestInput = {
+    email: email.param.toLowerCase()
+  }
+  return userInput
 }
 
 const checkUserResetToken = (object: any): PasswordResetInput => {
@@ -110,7 +110,6 @@ const checkUserResetToken = (object: any): PasswordResetInput => {
     resetToken: resetToken.param,
     password: password.param
   }
-
   return userInput
 }
 
@@ -207,7 +206,6 @@ const checkNewItem = (object: any): ItemCreateInputRaw => {
     groups: groups.param,
     itemParameters: itemParameters.param
   }
-
   return userInput
 }
 
@@ -274,7 +272,6 @@ const checkItemUpdate = (object: any): ItemUpdateInput => {
     category: category?.param,
     vendor: vendor?.param
   }
-
   return hasDefinedProps(itemInput)
 }
 
@@ -303,7 +300,6 @@ const checkNewCategory = (object: any): CategoryCreateInput => {
     name: name.param,
     parentCategoryID: parentCategoryID?.param
   }
-
   return categoryInput
 }
 
@@ -320,7 +316,6 @@ const checkCategoryUpdate = (object: any): CategoryUpdateInput => {
     name: name?.param,
     parentCategoryID: parentCategoryID?.param
   }
-
   return hasDefinedProps(categoryInput)
 }
 
@@ -333,7 +328,6 @@ const checkVendor = (object: any): VendorInput => {
   const vendorInput: VendorInput = {
     name: name.param
   }
-
   return vendorInput
 }
 
@@ -346,7 +340,6 @@ const checkRole = (object: any): RoleInput => {
   const roleInput: RoleInput = {
     name: name.param
   }
-
   return roleInput
 }
 
@@ -359,7 +352,6 @@ const checkShippingMethod = (object: any): ShippingMethodInput => {
   const shippingMethodID: ShippingMethodInput = {
     name: name.param
   }
-
   return shippingMethodID
 }
 
@@ -372,7 +364,6 @@ const checkAddressType = (object: any): AddressTypeInput => {
   const addressTypeInput: AddressTypeInput = {
     name: name.param
   }
-
   return addressTypeInput
 }
 
@@ -396,7 +387,6 @@ const checkNewAddress = (object: any): AddressCreateInput => {
     addr: addr.param,
     addressTypeID: addressTypeID.param
   }
-
   return addressInput
 }
 
@@ -413,7 +403,6 @@ const checkAddressesFetch = (object: any): AddressFetchInput => {
     userID: parseInt(userID?.param),
     addressTypeID: parseInt(addressTypeID?.param)
   }
-
   return hasDefinedProps(addressInput)
 }
 
@@ -432,7 +421,6 @@ const checkNewFollower = (object: any): Follower => {
     userID: userID.param,
     follows: follows.param
   }
-
   return followerInput
 }
 
@@ -449,7 +437,6 @@ const checkFollowersFetch = (object: any): FollowerFetchInput => {
     userID: parseInt(userID?.param),
     follows: parseInt(follows?.param)
   }
-
   return hasDefinedProps(followerInput)
 }
 
@@ -473,26 +460,32 @@ const checkNewUserAddress = (object: any): UserAddressCreateInput => {
     userID: userID.param,
     addressID: addressID.param
   }
-
   return userAddressInput
 }
 
-// const checkUserAddressesFetch = (object: any): UserAddressFetchInput => {
-//   const userID = object.userID && canBeNumber(
-//     { name: 'userID', param: object.userID }
-//   )
+const checkUserAddressesFetch = (object: any): UserAddressFetchInput => {
+  const userID = R.pipe(
+    isProvided,
+    canBeNumber
+  )({ name: 'userID', param: object.userID })
 
-//   const follows = object.follows && canBeNumber(
-//     { name: 'follows', param: object.follows }
-//   )
+  const userAddressInput: UserAddressFetchInput = {
+    userID: parseInt(userID.param)
+  }
+  return userAddressInput
+}
 
-//   const userAddressInput: UserAddressFetchInput = {
-//     userID: parseInt(userID?.param),
-//     follows: parseInt(follows?.param)
-//   }
+const checkUpdateUserAddresses = (object: any): UserAddressUpdateInput => {
+  const isDefault = R.pipe(
+    isProvided,
+    isBoolean
+  )({ name: 'isDefault', param: object.isDefault })
 
-//   return hasDefinedProps(userAddressInput)
-// }
+  const userAddressInput: UserAddressUpdateInput = {
+    isDefault: isDefault.param
+  }
+  return userAddressInput
+}
 
 export default {
   checkNewUser,
@@ -513,5 +506,7 @@ export default {
   checkAddressesFetch,
   checkNewFollower,
   checkFollowersFetch,
-  checkNewUserAddress
+  checkNewUserAddress,
+  checkUserAddressesFetch,
+  checkUpdateUserAddresses
 }

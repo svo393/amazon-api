@@ -64,7 +64,7 @@ describe('Followers deleting', () => {
       .expect(204)
   })
 
-  test('403 if another same user', async () => {
+  test('403 if another user', async () => {
     const { userID, follows } = await createOneFollower()
     const { token } = await loginAs('admin', api)
 

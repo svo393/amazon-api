@@ -5,10 +5,10 @@ import jwt from 'jsonwebtoken'
 import R from 'ramda'
 import { promisify } from 'util'
 import { db } from '../../src/utils/db'
-import { Answer, Order, PasswordResetInput, Question, Rating, Role, User, UserLoginInput, UserSafeData, UserSignupInput, UserUpdateInput } from '../types'
+import { Answer, Order, PasswordRequestInput, PasswordResetInput, Question, Rating, Role, User, UserLoginInput, UserSafeData, UserSignupInput, UserUpdateInput } from '../types'
 import env from '../utils/config'
-import StatusError from '../utils/StatusError'
 import shield from '../utils/shield'
+import StatusError from '../utils/StatusError'
 // import { makeANiceEmail, transport } from '../utils/mail'
 
 type UserBaseData = Omit<UserSafeData,
@@ -221,7 +221,9 @@ const updateUser = async (userInput: UserUpdateInput, res: Response, userID: num
   return updatedUser
 }
 
-const sendPasswordReset = async (email: string): Promise<void> => {
+const sendPasswordReset = async (userInput: PasswordRequestInput): Promise<void> => {
+  const { email } = userInput
+
   const user = await db<User>('users')
     .first()
     .where('email', email)
