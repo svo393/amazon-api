@@ -1,6 +1,6 @@
 import { ItemUpdateInput } from '@prisma/client'
 import R from 'ramda'
-import { AddressCreateInput, AddressFetchInput, AddressTypeInput, CategoryCreateInput, CategoryUpdateInput, Follower, FollowerFetchInput, ItemCreateInputRaw, PasswordRequestInput, PasswordResetInput, RoleInput, ShippingMethodInput, UserAddress, UserAddressCreateInput, UserAddressFetchInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput, UserAddressUpdateInput } from '../types'
+import { AddressCreateInput, AddressFetchInput, AddressTypeInput, CategoryCreateInput, CategoryUpdateInput, Follower, FollowerFetchInput, ItemCreateInputRaw, ListCreateInput, ListFetchInput, PasswordRequestInput, PasswordResetInput, RoleInput, ShippingMethodInput, UserAddressCreateInput, UserAddressFetchInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput } from '../types'
 import { canBeNumber, hasDefinedProps, isArray, isBoolean, isEmail, isGroup, isImage, isInputProvided, isItemParameter, isNumber, isPasswordValid, isProvided, isString, isStringOrArray } from './validatorLib'
 
 const checkNewUser = (object: any): UserSignupInput => {
@@ -487,6 +487,42 @@ const checkUpdateUserAddresses = (object: any): UserAddressUpdateInput => {
   return userAddressInput
 }
 
+const checkNewList = (object: any): ListCreateInput => {
+  const name = R.pipe(
+    isProvided,
+    isString
+  )({ name: 'name', param: object.name })
+
+  const vendorInput: ListCreateInput = {
+    name: name.param
+  }
+  return vendorInput
+}
+
+const checkListsFetch = (object: any): ListFetchInput => {
+  const userID = R.pipe(
+    isProvided,
+    canBeNumber
+  )({ name: 'userID', param: object.userID })
+
+  const listInput: ListFetchInput = {
+    userID: parseInt(userID.param)
+  }
+  return listInput
+}
+
+const checkListUpdate = (object: any): ListCreateInput => {
+  const name = R.pipe(
+    isProvided,
+    isString
+  )({ name: 'name', param: object.name })
+
+  const listInput: ListCreateInput = {
+    name: name.param
+  }
+  return listInput
+}
+
 export default {
   checkNewUser,
   checkUserLogin,
@@ -508,5 +544,8 @@ export default {
   checkFollowersFetch,
   checkNewUserAddress,
   checkUserAddressesFetch,
-  checkUpdateUserAddresses
+  checkUpdateUserAddresses,
+  checkNewList,
+  checkListsFetch,
+  checkListUpdate
 }

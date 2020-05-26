@@ -16,6 +16,7 @@ const createOneUserAddress = async (): Promise<UserAddress & { token: string}> =
     .post(apiURL)
     .set('Cookie', `token=${token}`)
     .send({ userID, addressID: addedAddress.addressID })
+
   return { ...body, token }
 }
 

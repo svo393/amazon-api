@@ -300,6 +300,10 @@ export type CategoryUpdateInput = {
 
 export type VendorInput = Pick<Vendor, 'name'>
 
+export type ListCreateInput = Pick<List, 'name'>
+
+export type ListFetchInput = Pick<List, 'userID'>
+
 export type UserSafeData = Omit<User,
   | 'password'
   | 'resetToken'

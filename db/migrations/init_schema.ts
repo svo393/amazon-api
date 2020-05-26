@@ -90,7 +90,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .notNullable()
     })
     .alterTable('lists', (t) => {
-      t.unique([ 'userID', 'listID' ])
+      t.unique([ 'userID', 'name' ])
     })
 
     .createTable('categories', (t) => {
