@@ -21,7 +21,7 @@ const createOneFollower = async (): Promise<Follower & { token: string}> => {
 
 beforeEach(async () => {
   await purge()
-  await populateUsers(api)
+  await populateUsers()
 })
 
 describe('Follower adding', () => {

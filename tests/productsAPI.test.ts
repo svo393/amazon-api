@@ -1,38 +1,16 @@
 import path from 'path'
 import supertest from 'supertest'
 import app from '../src/app'
-import { ProductPublicData } from '../src/types'
 import { db } from '../src/utils/db'
-import { createOneCategory } from './categoriesAPI.test'
 import { products } from './seedData'
-import { loginAs, populateUsers, productsInDB, purge } from './testHelper'
-import { createOneVendor } from './vendorsAPI.test'
+import { apiURLs, createOneCategory, createOneProduct, createOneVendor, loginAs, newProduct, populateUsers, productsInDB, purge } from './testHelper'
 
 const api = supertest(app)
-const apiURL = '/api/products'
-
-const newProduct = products[0]
-
-const createOneProduct = async (role: string, vendorName?: string, categoryName?: string, parentCategoryID?: number): Promise<{addedProduct: ProductPublicData; token: string}> => {
-  const { addedCategory } = await createOneCategory(role, categoryName, parentCategoryID)
-  const { addedVendor } = await createOneVendor(role, vendorName)
-  const { token, userID } = await loginAs(role, api)
-
-  const { body } = await api
-    .post(apiURL)
-    .set('Cookie', `token=${token}`)
-    .send({
-      ...newProduct,
-      userID,
-      categoryID: addedCategory.categoryID,
-      vendorID: addedVendor.vendorID
-    })
-  return { addedProduct: body, token }
-}
+const apiURL = apiURLs.products
 
 beforeEach(async () => {
   await purge()
-  await populateUsers(api)
+  await populateUsers()
 })
 
 describe('Product adding', () => {
@@ -105,6 +83,17 @@ describe('Product adding', () => {
 
     await api
       .post(`${apiURL}/${addedProduct.productID}/upload`)
+      .set('Cookie', `token=${token}`)
+      .expect(400)
+  })
+
+  test('400 upload file if wrong type', async () => {
+    const { addedProduct } = await createOneProduct('admin')
+    const { token } = await loginAs('admin', api)
+
+    await api
+      .post(`${apiURL}/${addedProduct.productID}/upload`)
+      .attach('productMedia', path.join(__dirname, 'test-non-image.json'))
       .set('Cookie', `token=${token}`)
       .expect(400)
   })

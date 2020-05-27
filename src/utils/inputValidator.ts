@@ -1,5 +1,5 @@
 import R from 'ramda'
-import { AddressCreateInput, AddressFetchInput, AddressTypeInput, CategoryCreateInput, CategoryUpdateInput, Follower, FollowerFetchInput, ListCreateInput, ListFetchInput, PasswordRequestInput, PasswordResetInput, RoleInput, ShippingMethodInput, UserAddressCreateInput, UserAddressFetchInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput, ProductCreateInput, ProductUpdateInput } from '../types'
+import { AddressCreateInput, AddressFetchInput, AddressTypeInput, CategoryCreateInput, CategoryUpdateInput, Follower, FollowerFetchInput, ListCreateInput, ListFetchInput, PasswordRequestInput, PasswordResetInput, RoleInput, ShippingMethodInput, UserAddressCreateInput, UserAddressFetchInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput, ProductCreateInput, ProductUpdateInput, ListProduct, ListProductFetchInput } from '../types'
 import { canBeNumber, hasDefinedProps, isArray, isBoolean, isEmail, isGroup, isImage, isInputProvided, isNumber, isPasswordValid, isProductParameter, isProvided, isString, isStringOrArray } from './validatorLib'
 
 const checkNewUser = (object: any): UserSignupInput => {
@@ -504,6 +504,36 @@ const checkListUpdate = (object: any): ListCreateInput => {
   return listInput
 }
 
+const checkListProduct = (object: any): ListProduct => {
+  const listID = R.pipe(
+    isProvided,
+    isNumber
+  )({ name: 'listID', param: object.listID })
+
+  const productID = R.pipe(
+    isProvided,
+    isNumber
+  )({ name: 'productID', param: object.productID })
+
+  const listProductInput: ListProduct = {
+    listID: listID.param,
+    productID: productID.param
+  }
+  return listProductInput
+}
+
+const checkListProductsFetch = (object: any): ListProductFetchInput => {
+  const listID = R.pipe(
+    isProvided,
+    canBeNumber
+  )({ name: 'listID', param: object.listID })
+
+  const listProductInput: ListProductFetchInput = {
+    listID: parseInt(listID.param)
+  }
+  return listProductInput
+}
+
 export default {
   checkNewUser,
   checkUserLogin,
@@ -528,5 +558,7 @@ export default {
   checkUserAddressesUpdate,
   checkNewList,
   checkListsFetch,
-  checkListUpdate
+  checkListUpdate,
+  checkListProduct,
+  checkListProductsFetch
 }

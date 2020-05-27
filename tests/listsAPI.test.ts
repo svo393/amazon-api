@@ -1,30 +1,15 @@
 import supertest from 'supertest'
 import app from '../src/app'
-import { List, ListCreateInput } from '../src/types'
+import { List } from '../src/types'
 import { db } from '../src/utils/db'
-import { listsInDB, getUserByEmail, loginAs, populateUsers, purge } from './testHelper'
+import { createOneList, listsInDB, loginAs, newList, populateUsers, purge, apiURLs } from './testHelper'
 
 const api = supertest(app)
-const apiURL = '/api/lists'
-
-const newList = (): ListCreateInput => ({
-  name: `New List ${(new Date().getTime()).toString()}`
-})
-
-const createOneList = async (): Promise<List & { token: string}> => {
-  const { token } = await loginAs('customer', api)
-
-  const { body }: { body: List } = await api
-    .post(apiURL)
-    .set('Cookie', `token=${token}`)
-    .send(newList())
-
-  return { ...body, token }
-}
+const apiURL = apiURLs.lists
 
 beforeEach(async () => {
   await purge()
-  await populateUsers(api)
+  await populateUsers()
 })
 
 describe('List adding', () => {

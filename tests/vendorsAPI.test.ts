@@ -1,30 +1,14 @@
 import supertest from 'supertest'
 import app from '../src/app'
 import { db } from '../src/utils/db'
-import { Vendor, VendorInput } from '../src/types'
-import { loginAs, populateUsers, purge, vendorsInDB } from './testHelper'
+import { apiURLs, createOneVendor, loginAs, newVendor, populateUsers, purge, vendorsInDB } from './testHelper'
 
 const api = supertest(app)
-const apiURL = '/api/vendors'
-
-const newVendor = (name?: string): VendorInput => ({
-  name: name ?? `New Vendor ${(new Date().getTime()).toString()}`
-})
-
-export const createOneVendor = async (role: string, name?: string): Promise<{ addedVendor: Vendor; token: string}> => {
-  const { token } = await loginAs(role, api)
-
-  const { body } = await api
-    .post(apiURL)
-    .set('Cookie', `token=${token}`)
-    .send(newVendor(name))
-
-  return { addedVendor: body, token }
-}
+const apiURL = apiURLs.vendors
 
 beforeEach(async () => {
   await purge()
-  await populateUsers(api)
+  await populateUsers()
 })
 
 describe('Vendor adding', () => {

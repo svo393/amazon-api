@@ -25,7 +25,7 @@ export const createOneAddressType = async (addressType: string): Promise<{ added
 
 beforeEach(async () => {
   await purge()
-  await populateUsers(api)
+  await populateUsers()
 })
 
 describe('AddressType adding', () => {

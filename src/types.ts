@@ -339,6 +339,8 @@ export type ProductAllData = Product & {
   ratingCount: number;
 }
 
+export type ListProductFetchInput = Pick<ListProduct, 'listID'>
+
 // export type ItemCreateInputRaw = Omit<Item,
 //   | 'productCreatedAt'
 //   | 'productUpdatedAt'

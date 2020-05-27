@@ -8,7 +8,7 @@ const apiURL = '/api/users'
 
 beforeEach(async () => {
   await purge()
-  await populateUsers(api)
+  await populateUsers()
 })
 
 describe('User authorization', () => {

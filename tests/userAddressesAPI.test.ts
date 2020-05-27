@@ -22,7 +22,7 @@ const createOneUserAddress = async (): Promise<UserAddress & { token: string}> =
 
 beforeEach(async () => {
   await purge()
-  await populateUsers(api)
+  await populateUsers()
 })
 
 describe('UserAddress adding', () => {

@@ -25,7 +25,7 @@ const createOneShippingMethod = async (role: string): Promise<{ addedShippingMet
 
 beforeEach(async () => {
   await purge()
-  await populateUsers(api)
+  await populateUsers()
 })
 
 describe('ShippingMethod adding', () => {

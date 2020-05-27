@@ -24,7 +24,7 @@ const createOneRole = async (role: string): Promise<{ addedRole: Role; token: st
 
 beforeEach(async () => {
   await purge()
-  await populateUsers(api)
+  await populateUsers()
 })
 
 describe('Role adding', () => {

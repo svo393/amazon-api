@@ -11,6 +11,7 @@ import addressesRouter from './addresses'
 import followersRouter from './followers'
 import userAddressesRouter from './userAddresses'
 import listsRouter from './lists'
+import listProductsRouter from './listProducts'
 
 export default Router()
   .use('/categories', categoriesRouter)
@@ -24,3 +25,4 @@ export default Router()
   .use('/followers', followersRouter)
   .use('/user-addresses', userAddressesRouter)
   .use('/lists', listsRouter)
+  .use('/list-products', listProductsRouter)

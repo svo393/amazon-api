@@ -31,7 +31,7 @@ export const createOneAddress = async (role: string): Promise<{ addedAddress: Ad
 
 beforeEach(async () => {
   await purge()
-  await populateUsers(api)
+  await populateUsers()
 })
 
 describe('Address adding', () => {

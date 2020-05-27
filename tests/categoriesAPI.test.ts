@@ -1,31 +1,14 @@
 import supertest from 'supertest'
 import app from '../src/app'
 import { db } from '../src/utils/db'
-import { categoriesInDB, loginAs, populateUsers, purge } from './testHelper'
-import { CategoryCreateInput, Category } from '../src/types'
+import { categoriesInDB, createOneCategory, loginAs, newCategory, populateUsers, purge } from './testHelper'
 
 const api = supertest(app)
 const apiURL = '/api/categories'
 
-const newCategory = (name?: string, parentCategoryID?: number): CategoryCreateInput => ({
-  name: name ?? `New Category ${Date.now().toString()}`,
-  parentCategoryID
-})
-
-export const createOneCategory = async (role: string, name?: string, parentCategoryID?: number): Promise<{ addedCategory: Category; token: string}> => {
-  const { token } = await loginAs(role, api)
-
-  const { body } = await api
-    .post(apiURL)
-    .set('Cookie', `token=${token}`)
-    .send(newCategory(name, parentCategoryID))
-
-  return { addedCategory: body, token }
-}
-
 beforeEach(async () => {
   await purge()
-  await populateUsers(api)
+  await populateUsers()
 })
 
 describe('Category adding', () => {
