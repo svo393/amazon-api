@@ -123,7 +123,17 @@ const previewHeight = 450
 const thumbWidth = 40
 const thumbHeight = 40
 
-const multerUpload = multer({ storage })
+const multerUpload = multer({
+  storage,
+  fileFilter: (_req, file, cb) => {
+    if ([ 'image/png', 'image/jpg', 'image/jpeg', 'image/webp' ].includes(file.mimetype)) {
+      cb(null, true)
+    } else {
+      cb(null, false)
+      return cb(new StatusError(400, 'Only .png, .jpg, .jpeg and .webp formats allowed'))
+    }
+  }
+})
 
 const uploadImages = (files: Express.Multer.File[], productID: number): void => {
   files.map(async (file, index) => {

@@ -19,6 +19,10 @@ type DecodedToken = {
 
 type Target = 'params' | 'query' | 'body'
 
+type Entities =
+  | 'lists'
+  | 'products'
+
 export const isLoggedIn: Middleware = (_req, res, next) => {
   if (!res.locals.userID) throw new StatusError(403, 'Forbidden')
   next()
@@ -75,6 +79,25 @@ export const isSameUserOrAdmin = (target: Target): Middleware => {
       (userID.toString() !== req[target].userID.toString() &&
       ![ 'ROOT', 'ADMIN' ].includes(res.locals.userRole))
     ) {
+      throw new StatusError(403, 'Forbidden')
+    }
+    next()
+  }
+  return fn
+}
+
+export const isCreator = (entity: Entities, idName: string, target: Target): Middleware => {
+  const fn: Middleware = async (req, res, next) => {
+    if (!res.locals.userID) throw new StatusError(403, 'Forbidden')
+    if (res.locals.userRole === 'ROOT') return next()
+
+    const data = await db(entity)
+      .first('userID')
+      .where(idName, req[target][idName])
+
+    if (!data) throw new StatusError(404, 'Not Found')
+
+    if (data.userID.toString() !== res.locals.userID.toString()) {
       throw new StatusError(403, 'Forbidden')
     }
     next()

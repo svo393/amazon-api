@@ -1,8 +1,7 @@
 import Router from 'express'
 import productService from '../services/productService'
 import inputValidator from '../utils/inputValidator'
-import { isAdmin, isLoggedIn } from '../utils/middleware'
-import shield from '../utils/shield'
+import { isAdmin, isCreator } from '../utils/middleware'
 
 const router = Router()
 
@@ -22,8 +21,7 @@ router.get('/:productID', async (req, res) => {
   res.json(product)
 })
 
-router.put('/:productID', isLoggedIn, async (req, res) => {
-  await shield.isCreator(res, 'products', 'productID', Number(req.params.productID))
+router.put('/:productID', isCreator('products', 'productID', 'params'), async (req, res) => {
   const productInput = inputValidator.checkProductUpdate(req.body)
   const updatedProduct = await productService.updateProduct(productInput, Number(req.params.productID))
   res.json(updatedProduct)

@@ -7,7 +7,6 @@ import { promisify } from 'util'
 import { db } from '../../src/utils/db'
 import { Answer, Order, PasswordRequestInput, PasswordResetInput, Question, Rating, Role, User, UserLoginInput, UserSafeData, UserSignupInput, UserUpdateInput } from '../types'
 import env from '../utils/config'
-import shield from '../utils/shield'
 import StatusError from '../utils/StatusError'
 // import { makeANiceEmail, transport } from '../utils/mail'
 
@@ -154,7 +153,7 @@ const getUserByID = async (userID: number, res: Response): Promise<UserPersonalD
 
   if (!user) { throw new StatusError(404, 'Not Found') }
 
-  const hasPermission = shield.hasRole([ 'ROOT', 'ADMIN' ], res) ||
+  const hasPermission = [ 'ROOT', 'ADMIN' ].includes(res.locals.userRole) ||
   res.locals.userID === userID
 
   const orders = hasPermission

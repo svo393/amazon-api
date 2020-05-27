@@ -264,11 +264,6 @@ const checkProductUpdate = (object: any): ProductUpdateInput => {
 const checkProductMediaUpload = (object: any): Express.Multer.File[] => {
   isInputProvided(object, 'Missing images')
   isStringOrArray({ name: 'images', param: object })
-
-  Array.isArray(object)
-    ? object.map((product: object) => isImage({ name: 'image', param: product }))
-    : isImage({ name: 'image', param: object })
-
   return object
 }
 

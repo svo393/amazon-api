@@ -2,7 +2,6 @@ import { Response } from 'express'
 import { Address, AddressType as AT, AddressTypeInput as ATInput } from '../types'
 import { sensitiveAddressTypes as sensitiveATs } from '../utils/constants'
 import { db } from '../utils/db'
-import shield from '../utils/shield'
 import StatusError from '../utils/StatusError'
 
 const addAddressType = async (atInput: ATInput): Promise<AT> => {
@@ -32,7 +31,7 @@ type SingleAddressTypeData = {
 }
 
 const getAddressTypeByID = async (res: Response, atID: number): Promise<SingleAddressTypeData> => {
-  const hasPermission = shield.hasRole([ 'ROOT', 'ADMIN' ], res)
+  const hasPermission = [ 'ROOT', 'ADMIN' ].includes(res.locals.userRole)
   const ats = await db<AT>('addressTypes')
 
   const filteredATs = hasPermission
