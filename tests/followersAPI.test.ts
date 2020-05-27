@@ -2,22 +2,10 @@ import supertest from 'supertest'
 import app from '../src/app'
 import { Follower } from '../src/types'
 import { db } from '../src/utils/db'
-import { followersInDB, getUserByEmail, loginAs, populateUsers, purge } from './testHelper'
+import { apiURLs, createOneFollower, followersInDB, getUserByEmail, loginAs, populateUsers, purge } from './testHelper'
 
 const api = supertest(app)
-const apiURL = '/api/followers'
-
-const createOneFollower = async (): Promise<Follower & { token: string}> => {
-  const user1 = await getUserByEmail('admin@example.com')
-  const { userID: user2ID, token } = await loginAs('customer', api)
-
-  const { body }: { body: Follower } = await api
-    .post(apiURL)
-    .set('Cookie', `token=${token}`)
-    .send({ userID: user2ID, follows: user1.userID })
-
-  return { ...body, token }
-}
+const apiURL = apiURLs.followers
 
 beforeEach(async () => {
   await purge()

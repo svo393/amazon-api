@@ -1,10 +1,10 @@
 import supertest from 'supertest'
 import app from '../src/app'
 import { db } from '../src/utils/db'
-import { getUserByEmail, loginAs, populateUsers, purge, usersInDB } from './testHelper'
+import { apiURLs, getUserByEmail, loginAs, populateUsers, purge, usersInDB } from './testHelper'
 
 const api = supertest(app)
-const apiURL = '/api/users'
+const apiURL = apiURLs.users
 
 beforeEach(async () => {
   await purge()

@@ -1,10 +1,10 @@
 import supertest from 'supertest'
 import app from '../src/app'
 import { db } from '../src/utils/db'
-import { categoriesInDB, createOneCategory, loginAs, newCategory, populateUsers, purge } from './testHelper'
+import { apiURLs, categoriesInDB, createOneCategory, loginAs, newCategory, populateUsers, purge } from './testHelper'
 
 const api = supertest(app)
-const apiURL = '/api/categories'
+const apiURL = apiURLs.categories
 
 beforeEach(async () => {
   await purge()

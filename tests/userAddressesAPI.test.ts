@@ -2,23 +2,10 @@ import supertest from 'supertest'
 import app from '../src/app'
 import { UserAddress } from '../src/types'
 import { db } from '../src/utils/db'
-import { userAddressesInDB, loginAs, populateUsers, purge } from './testHelper'
-import { createOneAddress } from './addressesAPI.test'
+import { apiURLs, createOneAddress, createOneUserAddress, loginAs, populateUsers, purge, userAddressesInDB } from './testHelper'
 
 const api = supertest(app)
-const apiURL = '/api/user-addresses'
-
-const createOneUserAddress = async (): Promise<UserAddress & { token: string}> => {
-  const { addedAddress } = await createOneAddress('admin')
-  const { userID, token } = await loginAs('customer', api)
-
-  const { body }: { body: UserAddress } = await api
-    .post(apiURL)
-    .set('Cookie', `token=${token}`)
-    .send({ userID, addressID: addedAddress.addressID })
-
-  return { ...body, token }
-}
+const apiURL = apiURLs.userAddresses
 
 beforeEach(async () => {
   await purge()

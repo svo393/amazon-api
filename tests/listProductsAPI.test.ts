@@ -12,7 +12,7 @@ beforeEach(async () => {
 })
 
 describe('ListProduct adding', () => {
-  test.only('201', async () => {
+  test('201', async () => {
     const { listID, token } = await createOneList()
     const { addedProduct } = await createOneProduct('admin')
 

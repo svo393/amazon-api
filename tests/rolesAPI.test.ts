@@ -1,26 +1,10 @@
 import supertest from 'supertest'
 import app from '../src/app'
 import { db } from '../src/utils/db'
-import { Role, RoleInput } from '../src/types'
-import { loginAs, populateUsers, purge, rolesInDB } from './testHelper'
+import { apiURLs, createOneRole, loginAs, newRole, populateUsers, purge, rolesInDB } from './testHelper'
 
 const api = supertest(app)
-const apiURL = '/api/roles'
-
-const newRole = (): RoleInput => ({
-  name: `New Role ${(new Date().getTime()).toString()}`
-})
-
-const createOneRole = async (role: string): Promise<{ addedRole: Role; token: string}> => {
-  const { token } = await loginAs(role, api)
-
-  const { body } = await api
-    .post(apiURL)
-    .set('Cookie', `token=${token}`)
-    .send(newRole())
-
-  return { addedRole: body, token }
-}
+const apiURL = apiURLs.roles
 
 beforeEach(async () => {
   await purge()

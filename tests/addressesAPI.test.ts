@@ -1,33 +1,11 @@
-
 import supertest from 'supertest'
 import app from '../src/app'
-import { Address, AddressCreateInput } from '../src/types'
+import { Address } from '../src/types'
 import { db } from '../src/utils/db'
-import { createOneAddressType } from './addressTypesAPI.test'
-import { addressesInDB, loginAs, populateUsers, purge } from './testHelper'
+import { addressesInDB, apiURLs, createOneAddress, loginAs, newAddress, populateUsers, purge } from './testHelper'
 
 const api = supertest(app)
-const apiURL = '/api/addresses'
-
-const newAddress = async (): Promise<AddressCreateInput> => {
-  const { addedAddressType } = await createOneAddressType('root')
-  return {
-    addr: `New Address ${(new Date().getTime()).toString()}`,
-    addressTypeID: addedAddressType.addressTypeID,
-    isDefault: true
-  }
-}
-
-export const createOneAddress = async (role: string): Promise<{ addedAddress: Address; token: string}> => {
-  const { token } = await loginAs(role, api)
-
-  const { body } = await api
-    .post(apiURL)
-    .set('Cookie', `token=${token}`)
-    .send(await newAddress())
-
-  return { addedAddress: body, token }
-}
+const apiURL = apiURLs.addresses
 
 beforeEach(async () => {
   await purge()

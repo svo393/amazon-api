@@ -1,27 +1,12 @@
 import supertest from 'supertest'
 import app from '../src/app'
-import { ShippingMethod, ShippingMethodInput } from '../src/types'
+import { ShippingMethod } from '../src/types'
 import { db } from '../src/utils/db'
-import { loginAs, populateUsers, purge, shippingMethodsInDB } from './testHelper'
+import { apiURLs, createOneShippingMethod, loginAs, newShippingMethod, populateUsers, purge, shippingMethodsInDB } from './testHelper'
 
 const api = supertest(app)
 
-const apiURL = '/api/shipping-methods'
-
-const newShippingMethod = (): ShippingMethodInput => ({
-  name: `New ShippingMethod ${(new Date().getTime()).toString()}`
-})
-
-const createOneShippingMethod = async (role: string): Promise<{ addedShippingMethod: ShippingMethod; token: string}> => {
-  const { token } = await loginAs(role, api)
-
-  const { body } = await api
-    .post(apiURL)
-    .set('Cookie', `token=${token}`)
-    .send(newShippingMethod())
-
-  return { addedShippingMethod: body, token }
-}
+const apiURL = apiURLs.shippingMethods
 
 beforeEach(async () => {
   await purge()

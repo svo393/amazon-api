@@ -1,6 +1,6 @@
 import supertest from 'supertest'
 import app from '../src/app'
-import { Address, AddressType, Category, Follower, List, ListCreateInput, ListProduct, Product, Role, ShippingMethod, User, UserAddress, Vendor, ProductPublicData, VendorInput, CategoryCreateInput } from '../src/types'
+import { Address, AddressCreateInput, AddressType, AddressTypeInput, Category, CategoryCreateInput, Follower, List, ListCreateInput, ListProduct, Product, ProductPublicData, Role, RoleInput, ShippingMethod, ShippingMethodInput, User, UserAddress, Vendor, VendorInput } from '../src/types'
 import { db } from '../src/utils/db'
 import StatusError from '../src/utils/StatusError'
 import { products } from './seedData'
@@ -170,6 +170,95 @@ export const listProductsInDB = async (): Promise<ListProduct[]> => {
 
 export const userAddressesInDB = async (): Promise<UserAddress[]> => {
   return await db<UserAddress>('userAddresses')
+}
+
+export const newAddressType = (): AddressTypeInput => ({
+  name: `New AddressType ${(new Date().getTime()).toString()}`
+})
+
+export const newRole = (): RoleInput => ({
+  name: `New Role ${(new Date().getTime()).toString()}`
+})
+
+export const createOneRole = async (role: string): Promise<{ addedRole: Role; token: string}> => {
+  const { token } = await loginAs(role, api)
+
+  const { body } = await api
+    .post(apiURLs.roles)
+    .set('Cookie', `token=${token}`)
+    .send(newRole())
+
+  return { addedRole: body, token }
+}
+
+export const newShippingMethod = (): ShippingMethodInput => ({
+  name: `New ShippingMethod ${(new Date().getTime()).toString()}`
+})
+
+export const createOneShippingMethod = async (role: string): Promise<{ addedShippingMethod: ShippingMethod; token: string}> => {
+  const { token } = await loginAs(role, api)
+
+  const { body } = await api
+    .post(apiURLs.shippingMethods)
+    .set('Cookie', `token=${token}`)
+    .send(newShippingMethod())
+
+  return { addedShippingMethod: body, token }
+}
+
+export const createOneAddressType = async (addressType: string): Promise<{ addedAddressType: AddressType; token: string}> => {
+  const { token } = await loginAs(addressType, api)
+
+  const { body } = await api
+    .post(apiURLs.addressTypes)
+    .set('Cookie', `token=${token}`)
+    .send(newAddressType())
+
+  return { addedAddressType: body, token }
+}
+
+export const newAddress = async (): Promise<AddressCreateInput> => {
+  const { addedAddressType } = await createOneAddressType('root')
+  return {
+    addr: `New Address ${(new Date().getTime()).toString()}`,
+    addressTypeID: addedAddressType.addressTypeID,
+    isDefault: true
+  }
+}
+
+export const createOneFollower = async (): Promise<Follower & { token: string}> => {
+  const user1 = await getUserByEmail('admin@example.com')
+  const { userID: user2ID, token } = await loginAs('customer', api)
+
+  const { body }: { body: Follower } = await api
+    .post(apiURLs.followers)
+    .set('Cookie', `token=${token}`)
+    .send({ userID: user2ID, follows: user1.userID })
+
+  return { ...body, token }
+}
+
+export const createOneAddress = async (role: string): Promise<{ addedAddress: Address; token: string}> => {
+  const { token } = await loginAs(role, api)
+
+  const { body } = await api
+    .post(apiURLs.addresses)
+    .set('Cookie', `token=${token}`)
+    .send(await newAddress())
+
+  return { addedAddress: body, token }
+}
+
+export const createOneUserAddress = async (): Promise<UserAddress & { token: string}> => {
+  const { addedAddress } = await createOneAddress('admin')
+  const { userID, token } = await loginAs('customer', api)
+
+  const { body }: { body: UserAddress } = await api
+    .post(apiURLs.userAddresses)
+    .set('Cookie', `token=${token}`)
+    .send({ userID, addressID: addedAddress.addressID })
+
+  return { ...body, token }
 }
 
 export const newList = (): ListCreateInput => ({
