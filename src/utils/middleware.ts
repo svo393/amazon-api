@@ -17,6 +17,71 @@ type DecodedToken = {
   exp: number;
 }
 
+type Target = 'params' | 'query' | 'body'
+
+export const isLoggedIn: Middleware = (_req, res, next) => {
+  if (!res.locals.userID) throw new StatusError(403, 'Forbidden')
+  next()
+}
+
+export const isAdmin: Middleware = (_req, res, next) => {
+  const role: string | undefined = res.locals.userRole
+
+  if (
+    !res.locals.userID ||
+    !role ||
+    ![ 'ROOT', 'ADMIN' ].includes(role)
+  ) {
+    throw new StatusError(403, 'Forbidden')
+  }
+  next()
+}
+
+export const isRoot: Middleware = (_req, res, next) => {
+  const role: string | undefined = res.locals.userRole
+
+  if (
+    !res.locals.userID ||
+    !role ||
+    role !== 'ROOT'
+  ) {
+    throw new StatusError(403, 'Forbidden')
+  }
+  next()
+}
+
+export const isSameUser = (target: Target): Middleware => {
+  const fn: Middleware = (req, res, next) => {
+    const userID: string | undefined = res.locals.userID
+
+    if (
+      !userID ||
+      (userID.toString() !== req[target].userID.toString() &&
+      res.locals.userRole !== 'ROOT')
+    ) {
+      throw new StatusError(403, 'Forbidden')
+    }
+    next()
+  }
+  return fn
+}
+
+export const isSameUserOrAdmin = (target: Target): Middleware => {
+  const fn: Middleware = (req, res, next) => {
+    const userID: string | undefined = res.locals.userID
+
+    if (
+      !userID ||
+      (userID.toString() !== req[target].userID.toString() &&
+      ![ 'ROOT', 'ADMIN' ].includes(res.locals.userRole))
+    ) {
+      throw new StatusError(403, 'Forbidden')
+    }
+    next()
+  }
+  return fn
+}
+
 export const getUserID: Middleware = async (req, res, next) => {
   if (req.cookies.token) {
     try {

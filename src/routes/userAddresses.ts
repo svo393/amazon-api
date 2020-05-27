@@ -1,33 +1,29 @@
 import Router from 'express'
 import userAddressService from '../services/userAddressService'
 import inputValidator from '../utils/inputValidator'
-import shield from '../utils/shield'
+import { isSameUser, isSameUserOrAdmin } from '../utils/middleware'
 
 const router = Router()
 
-router.post('/', async (req, res) => {
-  shield.isSameUser(req, res, 'body')
+router.post('/', isSameUser('body'), async (req, res) => {
   const userAddressCreateInput = inputValidator.checkNewUserAddress(req.body)
   const addedUserAddress = await userAddressService.addUserAddress(userAddressCreateInput)
   res.status(201).json(addedUserAddress)
 })
 
-router.get('/', async (req, res) => {
-  shield.isSameUserOrAdmin(req, res, 'query')
+router.get('/', isSameUserOrAdmin('query'), async (req, res) => {
   const userAddressFetchInput = inputValidator.checkUserAddressesFetch(req.query)
   const userAddresses = await userAddressService.getUserAddresses(userAddressFetchInput)
   res.json(userAddresses)
 })
 
-router.put('/:addressID/:userID', async (req, res) => {
-  shield.isSameUser(req, res, 'params')
+router.put('/:addressID/:userID', isSameUser('params'), async (req, res) => {
   const userAddressUpdateInput = inputValidator.checkUserAddressesUpdate(req.body)
   const userAddresses = await userAddressService.updateUserAddress(userAddressUpdateInput, Number(req.params.addressID), Number(req.params.userID))
   res.json(userAddresses)
 })
 
-router.delete('/:addressID/:userID', async (req, res) => {
-  shield.isSameUser(req, res, 'params')
+router.delete('/:addressID/:userID', isSameUser('params'), async (req, res) => {
   await userAddressService.deleteUserAddress(Number(req.params.addressID), Number(req.params.userID))
   res.status(204).end()
 })

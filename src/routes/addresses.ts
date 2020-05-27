@@ -1,12 +1,11 @@
 import Router from 'express'
 import addressService from '../services/addressService'
 import inputValidator from '../utils/inputValidator'
-import shield from '../utils/shield'
+import { isLoggedIn } from '../utils/middleware'
 
 const router = Router()
 
-router.post('/', async (req, res) => {
-  shield.isLoggedIn(res)
+router.post('/', isLoggedIn, async (req, res) => {
   const addressCreateInput = inputValidator.checkNewAddress(req.body)
   const addedAddress = await addressService.addAddress(addressCreateInput, res)
   res.status(201).json(addedAddress)

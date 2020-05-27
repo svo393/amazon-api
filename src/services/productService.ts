@@ -4,11 +4,10 @@ import multer from 'multer'
 import path from 'path'
 import R from 'ramda'
 import sharp from 'sharp'
-import { ProductPublicData, ProductCreateInput, Category, Product, ProductAllData, ProductListData, ProductUpdateInput } from '../types'
-import { makeID } from '../utils'
-import StatusError from '../utils/StatusError'
+import { Product, ProductAllData, ProductCreateInput, ProductListData, ProductPublicData, ProductUpdateInput } from '../types'
 import { db } from '../utils/db'
 import { getProductsQuery } from '../utils/queries'
+import StatusError from '../utils/StatusError'
 
 const addProduct = async (productInput: ProductCreateInput, res: Response): Promise<ProductPublicData> => {
   const now = new Date()

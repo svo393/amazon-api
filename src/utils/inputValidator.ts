@@ -262,7 +262,6 @@ const checkProductUpdate = (object: any): ProductUpdateInput => {
 }
 
 const checkProductMediaUpload = (object: any): Express.Multer.File[] => {
-  console.info('object', object)
   isInputProvided(object, 'Missing images')
   isStringOrArray({ name: 'images', param: object })
 

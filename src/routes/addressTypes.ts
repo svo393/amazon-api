@@ -1,12 +1,11 @@
 import Router from 'express'
 import addressTypeService from '../services/addressTypeService'
 import inputValidator from '../utils/inputValidator'
-import shield from '../utils/shield'
+import { isAdmin } from '../utils/middleware'
 
 const router = Router()
 
-router.post('/', async (req, res) => {
-  shield.isAdmin(res)
+router.post('/', isAdmin, async (req, res) => {
   const addressTypeCreateInput = inputValidator.checkAddressType(req.body)
   const addedAddressType = await addressTypeService.addAddressType(addressTypeCreateInput)
   res.status(201).json(addedAddressType)
@@ -22,8 +21,7 @@ router.get('/:addressTypeID', async (req, res) => {
   res.json(addressType)
 })
 
-router.put('/:addressTypeID', async (req, res) => {
-  shield.isAdmin(res)
+router.put('/:addressTypeID', isAdmin, async (req, res) => {
   const addressTypeUpdateInput = inputValidator.checkAddressType(req.body)
   const updatedItem = await addressTypeService.updateAddressType(res, addressTypeUpdateInput, Number(req.params.addressTypeID))
   res.json(updatedItem)

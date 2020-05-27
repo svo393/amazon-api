@@ -1,12 +1,11 @@
 import Router from 'express'
 import shippingMethodService from '../services/shippingMethodService'
 import inputValidator from '../utils/inputValidator'
-import shield from '../utils/shield'
+import { isAdmin } from '../utils/middleware'
 
 const router = Router()
 
-router.post('/', async (req, res) => {
-  shield.isAdmin(res)
+router.post('/', isAdmin, async (req, res) => {
   const shippingMethodCreateInput = inputValidator.checkShippingMethod(req.body)
   const addedShippingMethod = await shippingMethodService.addShippingMethod(shippingMethodCreateInput)
   res.status(201).json(addedShippingMethod)
@@ -22,8 +21,7 @@ router.get('/:shippingMethodID', async (req, res) => {
   res.json(shippingMethod)
 })
 
-router.put('/:shippingMethodID', async (req, res) => {
-  shield.isAdmin(res)
+router.put('/:shippingMethodID', isAdmin, async (req, res) => {
   const shippingMethodUpdateInput = inputValidator.checkShippingMethod(req.body)
   const updatedItem = await shippingMethodService.updateShippingMethod(shippingMethodUpdateInput, Number(req.params.shippingMethodID))
   res.json(updatedItem)

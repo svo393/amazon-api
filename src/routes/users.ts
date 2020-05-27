@@ -1,7 +1,7 @@
 import Router from 'express'
 import userService from '../services/userService'
 import inputValidator from '../utils/inputValidator'
-import shield from '../utils/shield'
+import { isAdmin, isLoggedIn, isSameUser } from '../utils/middleware'
 
 const router = Router()
 
@@ -22,14 +22,12 @@ router.post('/logout', (_req, res) => {
   res.sendStatus(204)
 })
 
-router.get('/', async (_req, res) => {
-  shield.isAdmin(res)
+router.get('/', isAdmin, async (_req, res) => {
   const users = await userService.getUsers()
   res.json(users)
 })
 
-router.get('/me', async (_req, res) => {
-  shield.isLoggedIn(res)
+router.get('/me', isLoggedIn, async (_req, res) => {
   const user = await userService.getUserByID(res.locals.userID, res)
   res.json(user)
 })
@@ -39,8 +37,7 @@ router.get('/:userID', async (req, res) => {
   res.json(user)
 })
 
-router.put('/:userID', async (req, res) => {
-  shield.isSameUser(req, res, 'params')
+router.put('/:userID', isSameUser('params'), async (req, res) => {
   const userUpdateInput = inputValidator.checkUserUpdate(req.body)
   const updatedUser = await userService.updateUser(userUpdateInput, res, Number(req.params.userID))
   res.json(updatedUser)
