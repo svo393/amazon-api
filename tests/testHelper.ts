@@ -1,10 +1,7 @@
-import { Item, PrismaClient } from '@prisma/client'
 import supertest from 'supertest'
 import { Address, AddressType, Category, Follower, List, Product, Role, ShippingMethod, User, UserAddress, Vendor } from '../src/types'
 import { db } from '../src/utils/db'
 import StatusError from '../src/utils/StatusError'
-
-const prisma = new PrismaClient()
 
 export const customer = {
   email: 'customer@example.com',
@@ -94,12 +91,6 @@ export const getUserByEmail = async (email: string): Promise<User> => {
 
 export const usersInDB = async (): Promise<User[]> => {
   return await db<User>('users')
-}
-
-export const itemsInDB = async (): Promise<Item[]> => {
-  const items = await prisma.item.findMany()
-  await prisma.disconnect()
-  return items
 }
 
 export const categoriesInDB = async (): Promise<Category[]> => {
