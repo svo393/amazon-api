@@ -4,7 +4,7 @@ import multer from 'multer'
 import path from 'path'
 import R from 'ramda'
 import sharp from 'sharp'
-import { ProductPublicData, ProductCreateInput, Category, Product, ProductAllData, ProductListData } from '../types'
+import { ProductPublicData, ProductCreateInput, Category, Product, ProductAllData, ProductListData, ProductUpdateInput } from '../types'
 import { makeID } from '../utils'
 import StatusError from '../utils/StatusError'
 import { db } from '../utils/db'
@@ -102,103 +102,101 @@ const getProductByID = async (productID: number, res: Response): Promise<Product
     ], product)
 }
 
-// const updateProduct = async (productInput: ProductUpdateInput, id: string): Promise<Product> => {
-//   const updatedProduct = await prisma.product.update({
-//     where: { id },
-//     data: productInput
-//   })
-//   await prisma.disconnect()
+const updateProduct = async (productInput: ProductUpdateInput, productID: number): Promise<Product> => {
+  const [ updatedProduct ]: Product[] = await db<Product>('products')
+    .update({ ...productInput }, [ '*' ])
+    .where('productID', productID)
 
-//   if (!updatedProduct) throw new StatusError(404, 'Not Found')
-//   return updatedProduct
-// }
+  if (!updatedProduct) throw new StatusError(404, 'Not Found')
+  return updatedProduct
+}
 
-// const storage = multer.diskStorage({
-//   destination: './tmp',
-//   filename (_req, file, cb) { cb(null, file.originalname) }
-// })
+const storage = multer.diskStorage({
+  destination: './tmp',
+  filename (_req, file, cb) { cb(null, file.originalname) }
+})
 
-// const imagePath = './public/uploads'
-// const maxWidth = 1500
-// const maxHeight = 1500
-// const previewWidth = 450
-// const previewHeight = 450
-// const thumbWidth = 40
-// const thumbHeight = 40
+const imagePath = './public/uploads'
+const maxWidth = 1500
+const maxHeight = 1500
+const previewWidth = 450
+const previewHeight = 450
+const thumbWidth = 40
+const thumbHeight = 40
 
-// const multerUpload = multer({ storage })
+const multerUpload = multer({ storage })
 
-// const uploadImages = (files: Express.Multer.File[], id: string): void => {
-//   files.map(async (file, index) => {
-//     const image = sharp(file.path)
-//     const info = await image.metadata()
-//     const fileName = `${id}_${index}`
+const uploadImages = (files: Express.Multer.File[], productID: number): void => {
+  files.map(async (file, index) => {
+    const image = sharp(file.path)
+    const info = await image.metadata()
+    const fileName = `${productID}_${index}`
 
-//     if ((info.width as number) > maxWidth || (info.height as number) > maxHeight) {
-//       await image
-//         .resize(maxWidth, maxHeight, { fit: 'inside' })
-//         .jpeg({ progressive: true })
-//         .toFile(
-//           path.resolve(imagePath, `${fileName}_${maxWidth}.jpg`)
-//         )
+    if ((info.width as number) > maxWidth || (info.height as number) > maxHeight) {
+      await image
+        .resize(maxWidth, maxHeight, { fit: 'inside' })
+        .jpeg({ progressive: true })
+        .toFile(
+          path.resolve(imagePath, `${fileName}_${maxWidth}.jpg`)
+        )
 
-//       await image
-//         .resize(maxWidth, maxHeight, { fit: 'inside' })
-//         .webp()
-//         .toFile(
-//           path.resolve(imagePath, `${fileName}_${maxWidth}.webp`)
-//         )
-//     } else {
-//       await image
-//         .jpeg({ progressive: true })
-//         .toFile(
-//           path.resolve(imagePath, `${fileName}_${maxWidth}.jpg`)
-//         )
+      await image
+        .resize(maxWidth, maxHeight, { fit: 'inside' })
+        .webp()
+        .toFile(
+          path.resolve(imagePath, `${fileName}_${maxWidth}.webp`)
+        )
+    } else {
+      await image
+        .jpeg({ progressive: true })
+        .toFile(
+          path.resolve(imagePath, `${fileName}_${maxWidth}.jpg`)
+        )
 
-//       await image
-//         .webp()
-//         .toFile(
-//           path.resolve(imagePath, `${fileName}_${maxWidth}.webp`)
-//         )
-//     }
+      await image
+        .webp()
+        .toFile(
+          path.resolve(imagePath, `${fileName}_${maxWidth}.webp`)
+        )
+    }
 
-//     await image
-//       .resize(previewWidth, previewHeight, { fit: 'inside' })
-//       .jpeg({ progressive: true })
-//       .toFile(
-//         path.resolve(imagePath, `${fileName}_${previewWidth}.jpg`)
-//       )
+    await image
+      .resize(previewWidth, previewHeight, { fit: 'inside' })
+      .jpeg({ progressive: true })
+      .toFile(
+        path.resolve(imagePath, `${fileName}_${previewWidth}.jpg`)
+      )
 
-//     await image
-//       .resize(previewWidth, previewHeight, { fit: 'inside' })
-//       .webp()
-//       .toFile(
-//         path.resolve(imagePath, `${fileName}_${previewWidth}.webp`)
-//       )
+    await image
+      .resize(previewWidth, previewHeight, { fit: 'inside' })
+      .webp()
+      .toFile(
+        path.resolve(imagePath, `${fileName}_${previewWidth}.webp`)
+      )
 
-//     await image
-//       .resize(thumbWidth, thumbHeight, { fit: 'inside' })
-//       .jpeg({ progressive: true })
-//       .toFile(
-//         path.resolve(imagePath, `${fileName}_${thumbWidth}.jpg`)
-//       )
+    await image
+      .resize(thumbWidth, thumbHeight, { fit: 'inside' })
+      .jpeg({ progressive: true })
+      .toFile(
+        path.resolve(imagePath, `${fileName}_${thumbWidth}.jpg`)
+      )
 
-//     await image
-//       .resize(thumbWidth, thumbHeight, { fit: 'inside' })
-//       .webp()
-//       .toFile(
-//         path.resolve(imagePath, `${fileName}_${thumbWidth}.webp`)
-//       )
+    await image
+      .resize(thumbWidth, thumbHeight, { fit: 'inside' })
+      .webp()
+      .toFile(
+        path.resolve(imagePath, `${fileName}_${thumbWidth}.webp`)
+      )
 
-//     fs.unlinkSync(file.path)
-//   })
-// }
+    fs.unlinkSync(file.path)
+  })
+}
 
 export default {
   addProduct,
   getProducts,
-  getProductByID
-  // updateProduct,
-  // multerUpload,
-  // uploadImages
+  getProductByID,
+  updateProduct,
+  multerUpload,
+  uploadImages
 }

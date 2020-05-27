@@ -27,7 +27,7 @@ export const hasDefinedProps = <T>(param: object): T => {
 }
 
 export const isInputProvided = (param: object, msg = 'Missing user input'): void => {
-  if (R.isEmpty(param)) {
+  if (R.isEmpty(param) || R.isNil(param)) {
     throw new StatusError(400, msg)
   }
 }

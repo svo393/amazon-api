@@ -2,10 +2,10 @@ import path from 'path'
 import supertest from 'supertest'
 import app from '../src/app'
 import { ProductPublicData } from '../src/types'
-import { products } from './seedData'
-import { productsInDB, loginAs, populateUsers, purge } from './testHelper'
 import { db } from '../src/utils/db'
 import { createOneCategory } from './categoriesAPI.test'
+import { products } from './seedData'
+import { loginAs, populateUsers, productsInDB, purge } from './testHelper'
 import { createOneVendor } from './vendorsAPI.test'
 
 const api = supertest(app)
@@ -58,53 +58,56 @@ describe('Product adding', () => {
     expect(descriptions).toContain(products[0].description)
   })
 
-  // test('400 if no price', async () => {
-  //   const { token, userID } = await loginAs('root', api)
+  test('400 if no price', async () => {
+    const { addedCategory } = await createOneCategory('admin', 'Desktops')
+    const { addedVendor } = await createOneVendor('admin', 'Acer')
+    const { token, userID } = await loginAs('root', api)
 
-  //   const newProductWithoutPrice = {
-  //     ...newProduct,
-  //     userID,
-  //     price: undefined
-  //   }
+    await api
+      .post(apiURL)
+      .set('Cookie', `token=${token}`)
+      .send({
+        ...newProduct,
+        userID,
+        categoryID: addedCategory.categoryID,
+        vendorID: addedVendor.vendorID,
+        price: undefined
+      })
+      .expect(400)
+  })
 
-  //   await api
-  //     .post(apiURL)
-  //     .set('Cookie', `token=${token}`)
-  //     .send(newProductWithoutPrice)
-  //     .expect(400)
-  // })
+  test('204 upload file if admin or root', async () => {
+    const { addedProduct } = await createOneProduct('admin')
+    const { token } = await loginAs('admin', api)
 
-  // test('204 upload file if admin or root', async () => {
-  //   const { token } = await loginAs('admin', api)
-  //   const { addedProduct } = await createOneProduct('admin')
+    await api
+      .post(`${apiURL}/${addedProduct.productID}/upload`)
+      .set('Cookie', `token=${token}`)
+      .attach('productMedia', path.join(__dirname, 'test-image.png'))
+      .attach('productMedia', path.join(__dirname, 'test-image2.png'))
+      .expect(204)
+  })
 
-  //   await api
-  //     .post(`${apiURL}/${addedProduct.id}/upload`)
-  //     .set('Cookie', `token=${token}`)
-  //     .attach('productMedia', path.join(__dirname, 'test-image.png'))
-  //     .attach('productMedia', path.join(__dirname, 'test-image2.png'))
-  //     .expect(204)
-  // })
+  test('403 upload file if not admin or root', async () => {
+    const { addedProduct } = await createOneProduct('root')
+    const { token } = await loginAs('customer', api)
 
-  // test('403 upload file if not admin or root', async () => {
-  //   const { addedProduct } = await createOneProduct('root')
+    await api
+      .post(`${apiURL}/${addedProduct.productID}/upload`)
+      .set('Cookie', `token=${token}`)
+      .attach('productMedia', path.join(__dirname, 'test-image.png'))
+      .expect(403)
+  })
 
-  //   await api
-  //     .post(`${apiURL}/${addedProduct.id}/upload`)
-  //     .attach('productMedia', path.join(__dirname, 'test-image.png'))
-  //     .attach('productMedia', path.join(__dirname, 'test-image2.png'))
-  //     .expect(403)
-  // })
+  test('400 upload file if no file', async () => {
+    const { addedProduct } = await createOneProduct('admin')
+    const { token } = await loginAs('admin', api)
 
-  // test('400 upload file if no file', async () => {
-  //   const { token } = await loginAs('admin', api)
-  //   const { addedProduct } = await createOneProduct('admin')
-
-  //   await api
-  //     .post(`${apiURL}/${addedProduct.id}/upload`)
-  //     .set('Cookie', `token=${token}`)
-  //     .expect(400)
-  // })
+    await api
+      .post(`${apiURL}/${addedProduct.productID}/upload`)
+      .set('Cookie', `token=${token}`)
+      .expect(400)
+  })
 })
 
 describe('Product fetching', () => {
@@ -139,29 +142,29 @@ describe('Product fetching', () => {
   })
 })
 
-// describe('Product updating', () => {
-//   test('200 if own product', async () => {
-//     const { addedProduct, token } = await createOneProduct('root')
+describe('Product updating', () => {
+  test('200 if own product', async () => {
+    const { addedProduct, token } = await createOneProduct('root')
 
-//     const { body } = await api
-//       .put(`${apiURL}/${addedProduct.id}`)
-//       .set('Cookie', `token=${token}`)
-//       .send({ name: 'Updated Product' })
-//       .expect(200)
+    const { body } = await api
+      .put(`${apiURL}/${addedProduct.productID}`)
+      .set('Cookie', `token=${token}`)
+      .send({ title: 'Updated Product' })
+      .expect(200)
 
-//     expect(body.name).toBe('Updated Product')
-//   })
+    expect(body.title).toBe('Updated Product')
+  })
 
-//   test('403 if another user\'s product', async () => {
-//     const { token } = await createOneProduct('admin')
-//     const { addedProduct: anotherAddedProduct } = await createOneProduct('root')
+  test('403 if another user\'s product', async () => {
+    const { token } = await createOneProduct('admin')
+    const { addedProduct: anotherAddedProduct } = await createOneProduct('root')
 
-//     await api
-//       .put(`${apiURL}/${anotherAddedProduct.id}`)
-//       .set('Cookie', `token=${token}`)
-//       .send({ name: 'Updated Product' })
-//       .expect(403)
-//   })
-// })
+    await api
+      .put(`${apiURL}/${anotherAddedProduct.productID}`)
+      .set('Cookie', `token=${token}`)
+      .send({ name: 'Updated Product' })
+      .expect(403)
+  })
+})
 
 afterAll(async () => await db.destroy())

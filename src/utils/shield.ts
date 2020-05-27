@@ -4,6 +4,7 @@ import StatusError from './StatusError'
 
 type Entities =
   | 'lists'
+  | 'products'
 
 const hasRole = (roles: string[], res: Response): boolean => {
   const role: string | undefined = res.locals.userRole

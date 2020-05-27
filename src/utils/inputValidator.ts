@@ -1,5 +1,5 @@
 import R from 'ramda'
-import { AddressCreateInput, AddressFetchInput, AddressTypeInput, CategoryCreateInput, CategoryUpdateInput, Follower, FollowerFetchInput, ListCreateInput, ListFetchInput, PasswordRequestInput, PasswordResetInput, RoleInput, ShippingMethodInput, UserAddressCreateInput, UserAddressFetchInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput, ProductCreateInput } from '../types'
+import { AddressCreateInput, AddressFetchInput, AddressTypeInput, CategoryCreateInput, CategoryUpdateInput, Follower, FollowerFetchInput, ListCreateInput, ListFetchInput, PasswordRequestInput, PasswordResetInput, RoleInput, ShippingMethodInput, UserAddressCreateInput, UserAddressFetchInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput, ProductCreateInput, ProductUpdateInput } from '../types'
 import { canBeNumber, hasDefinedProps, isArray, isBoolean, isEmail, isGroup, isImage, isInputProvided, isNumber, isPasswordValid, isProductParameter, isProvided, isString, isStringOrArray } from './validatorLib'
 
 const checkNewUser = (object: any): UserSignupInput => {
@@ -200,82 +200,78 @@ const checkNewProduct = (object: any): ProductCreateInput => {
   return productInput
 }
 
-// const checkProductUpdate = (object: any): ProductUpdateInput => {
-//   const name = object.name && isString(
-//     { name: 'name', param: object.name }
-//   )
+const checkProductUpdate = (object: any): ProductUpdateInput => {
+  const title = object.title && isString(
+    { name: 'title', param: object.title }
+  )
 
-//   const price = object.price && isNumber(
-//     { name: 'price', param: object.price }
-//   )
+  const listPrice = object.listPrice && isNumber(
+    { name: 'listPrice', param: object.listPrice }
+  )
 
-//   const shortDescription = object.shortDescription && isString(
-//     { name: 'shortDescription', param: object.shortDescription }
-//   )
+  const price = object.price && isNumber(
+    { name: 'price', param: object.price }
+  )
 
-//   const longDescription = object.longDescription && isString(
-//     { name: 'longDescription', param: object.longDescription }
-//   )
+  const description = object.description && isString(
+    { name: 'description', param: object.description }
+  )
 
-//   const stock = object.stock && isNumber(
-//     { name: 'stock', param: object.stock }
-//   )
+  const brandSection = object.brandSection && isString(
+    { name: 'brandSection', param: object.brandSection }
+  )
 
-//   const asin = object.asin && isString(
-//     { name: 'asin', param: object.asin }
-//   )
+  const stock = object.stock && isNumber(
+    { name: 'stock', param: object.stock }
+  )
 
-//   const media = object.media && isNumber(
-//     { name: 'media', param: object.media }
-//   )
+  const media = object.media && isNumber(
+    { name: 'media', param: object.media }
+  )
 
-//   const primaryMedia = object.primaryMedia && isNumber(
-//     { name: 'primaryMedia', param: object.primaryMedia }
-//   )
+  const primaryMedia = object.primaryMedia && isNumber(
+    { name: 'primaryMedia', param: object.primaryMedia }
+  )
 
-//   const isAvailable = object.isAvailable && isBoolean(
-//     { name: 'isAvailable', param: object.isAvailable }
-//   )
+  const isAvailable = object.isAvailable && isBoolean(
+    { name: 'isAvailable', param: object.isAvailable }
+  )
 
-//   const questions = object.questions && isString(
-//     { name: 'questions', param: object.questions }
-//   )
+  const categoryID = object.categoryID && isNumber(
+    { name: 'categoryID', param: object.categoryID }
+  )
 
-//   const category = object.category && isString(
-//     { name: 'category', param: object.category }
-//   )
+  const vendorID = object.vendorID && isNumber(
+    { name: 'vendorID', param: object.vendorID }
+  )
 
-//   const vendor = object.vendor && isString(
-//     { name: 'vendor', param: object.vendor }
-//   )
+  const productInput: ProductUpdateInput = {
+    title: title?.param,
+    listPrice: listPrice?.param,
+    price: price?.param,
+    description: description?.param,
+    brandSection: brandSection?.param,
+    stock: stock?.param,
+    media: media?.param,
+    primaryMedia: primaryMedia?.param,
+    isAvailable: isAvailable?.param,
+    categoryID: categoryID?.param,
+    vendorID: vendorID?.param
+  }
+  return hasDefinedProps(productInput)
+}
 
-//   const productInput = {
-//     name: name?.param,
-//     price: price?.param,
-//     shortDescription: shortDescription?.param,
-//     longDescription: longDescription?.param,
-//     stock: stock?.param,
-//     asin: asin?.param,
-//     media: media?.param,
-//     primaryMedia: primaryMedia?.param,
-//     isAvailable: isAvailable?.param,
-//     questions: questions?.param,
-//     category: category?.param,
-//     vendor: vendor?.param
-//   }
-//   return hasDefinedProps(productInput)
-// }
+const checkProductMediaUpload = (object: any): Express.Multer.File[] => {
+  console.info('object', object)
+  isInputProvided(object, 'Missing images')
+  isStringOrArray({ name: 'images', param: object })
 
-// const checkProductMediaUpload = (object: any): Express.Multer.File[] => {
-//   isInputProvided(object, 'Missing images')
-//   isStringOrArray({ name: 'images', param: object })
+  Array.isArray(object)
+    ? object.map((product: object) => isImage({ name: 'image', param: product }))
+    : isImage({ name: 'image', param: object })
 
-//   Array.isArray(object)
-//     ? object.map((product: object) => isImage({ name: 'image', param: product }))
-//     : isImage({ name: 'image', param: object })
-
-//   return object
-// }
+  return object
+}
 
 const checkNewCategory = (object: any): CategoryCreateInput => {
   const name = R.pipe(
@@ -521,8 +517,8 @@ export default {
   checkUserResetRequest,
   checkUserResetToken,
   checkNewProduct,
-  // checkProductUpdate,
-  // checkProductMediaUpload,
+  checkProductUpdate,
+  checkProductMediaUpload,
   checkNewCategory,
   checkCategoryUpdate,
   checkVendor,

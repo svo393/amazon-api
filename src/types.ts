@@ -303,6 +303,20 @@ export type ProductCreateInput = Omit<Product,
   isAvailable?: boolean;
 }
 
+export type ProductUpdateInput = {
+  title: string;
+  listPrice: number;
+  price: number;
+  description: string;
+  brandSection: string;
+  stock: number;
+  media: number;
+  primaryMedia: number;
+  isAvailable: boolean;
+  categoryID: number;
+  vendorID: number;
+}
+
 export type ProductPublicData = Omit<Product,
   | 'productCreatedAt'
   | 'productUpdatedAt'

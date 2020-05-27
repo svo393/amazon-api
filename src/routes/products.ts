@@ -22,18 +22,18 @@ router.get('/:productID', async (req, res) => {
   res.json(product)
 })
 
-// router.put('/:id', async (req, res) => {
-//   await shield.isCreator(res, 'product', req.params.id)
-//   const productInput = inputValidator.checkProductUpdate(req.body)
-//   const updatedProduct = await productService.updateProduct(productInput, req.params.id)
-//   res.json(updatedProduct)
-// })
+router.put('/:productID', async (req, res) => {
+  await shield.isCreator(res, 'products', 'productID', Number(req.params.productID))
+  const productInput = inputValidator.checkProductUpdate(req.body)
+  const updatedProduct = await productService.updateProduct(productInput, Number(req.params.productID))
+  res.json(updatedProduct)
+})
 
-// router.post('/:id/upload', productService.multerUpload.array('productMedia', 10), async (req, res) => {
-//   shield.isAdmin(res)
-//   const productMedia = inputValidator.checkProductMediaUpload(req.files)
-//   productService.uploadImages(productMedia, req.params.id)
-//   res.sendStatus(204)
-// })
+router.post('/:productID/upload', productService.multerUpload.array('productMedia', 10), (req, res) => {
+  shield.isAdmin(res)
+  const productMedia = inputValidator.checkProductMediaUpload(req.files)
+  productService.uploadImages(productMedia, Number(req.params.productID))
+  res.sendStatus(204)
+})
 
 export default router
