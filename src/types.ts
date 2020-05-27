@@ -83,6 +83,11 @@ export type Product = {
   vendorID: number;
 }
 
+export type ListProduct = {
+  listID: number;
+  productID: number;
+}
+
 export type Rating = {
   ratingID: number;
   ratingCreatedAt: Date;
@@ -146,11 +151,6 @@ export type AnswerComment = {
   userID: number;
   answerID: number;
   parentAnswerCommentID?: number;
-}
-
-export type ListProduct = {
-  listID: number;
-  productID: number;
 }
 
 export type Group = {
@@ -360,3 +360,11 @@ export type ListProductFetchInput = Pick<ListProduct, 'listID'>
 //     value: string;
 //   }[];
 // }
+
+export type RatingCreateInput = Pick<Rating,
+  | 'title'
+  | 'review'
+  | 'media'
+  | 'stars'
+  | 'productID'
+>

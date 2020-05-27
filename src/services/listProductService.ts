@@ -10,7 +10,7 @@ const addListProduct = async (listProductInput: ListProduct): Promise<ListProduc
     .where('listID', listID)
     .andWhere('productID', productID)
 
-  if (existingUA) throw new StatusError(409, 'The product already added to the list')
+  if (existingUA) throw new StatusError(409, 'This product already added to the list')
 
   const [ addedUA ]: ListProduct[] = await db<ListProduct>('listProducts')
     .insert(listProductInput, [ '*' ])

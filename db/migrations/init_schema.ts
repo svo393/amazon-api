@@ -138,6 +138,21 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .notNullable()
     })
 
+    .createTable('listProducts', (t) => {
+      t
+        .integer('listID')
+        .references('lists.listID')
+        .notNullable()
+
+      t
+        .integer('productID')
+        .references('products.productID')
+        .notNullable()
+    })
+    .alterTable('listProducts', (t) => {
+      t.primary([ 'listID', 'productID' ])
+    })
+
     .createTable('ratings', (t) => {
       t.increments('ratingID')
       t.dateTime('ratingCreatedAt').notNullable()
@@ -250,21 +265,6 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t
         .integer('parentAnswerCommentID')
         .references('answerComments.answerCommentID')
-    })
-
-    .createTable('listProducts', (t) => {
-      t
-        .integer('listID')
-        .references('lists.listID')
-        .notNullable()
-
-      t
-        .integer('productID')
-        .references('products.productID')
-        .notNullable()
-    })
-    .alterTable('listProducts', (t) => {
-      t.primary([ 'listID', 'productID' ])
     })
 
     .createTable('groups', (t) => {
@@ -406,12 +406,12 @@ export const down = (knex: Knex): Knex.SchemaBuilder =>
     .dropTableIfExists('parameters')
     .dropTableIfExists('groupProducts')
     .dropTableIfExists('groups')
-    .dropTableIfExists('listProducts')
     .dropTableIfExists('answerComments')
     .dropTableIfExists('answers')
     .dropTableIfExists('questions')
     .dropTableIfExists('ratingComments')
     .dropTableIfExists('ratings')
+    .dropTableIfExists('listProducts')
     .dropTableIfExists('products')
     .dropTableIfExists('vendors')
     .dropTableIfExists('categories')

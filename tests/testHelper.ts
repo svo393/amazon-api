@@ -1,6 +1,6 @@
 import supertest from 'supertest'
 import app from '../src/app'
-import { Address, AddressCreateInput, AddressType, AddressTypeInput, Category, CategoryCreateInput, Follower, List, ListCreateInput, ListProduct, Product, ProductPublicData, Role, RoleInput, ShippingMethod, ShippingMethodInput, User, UserAddress, Vendor, VendorInput } from '../src/types'
+import { Address, AddressCreateInput, AddressType, AddressTypeInput, Category, CategoryCreateInput, Follower, List, ListCreateInput, ListProduct, Product, ProductPublicData, Role, RoleInput, ShippingMethod, ShippingMethodInput, User, UserAddress, Vendor, VendorInput, Rating, RatingCreateInput } from '../src/types'
 import { db } from '../src/utils/db'
 import StatusError from '../src/utils/StatusError'
 import { products } from './seedData'
@@ -19,7 +19,8 @@ export const apiURLs = {
   followers: '/api/followers',
   userAddresses: '/api/user-addresses',
   lists: '/api/lists',
-  listProducts: '/api/list-products'
+  listProducts: '/api/list-products',
+  ratings: '/api/ratings'
 }
 
 export const customer = {
@@ -162,6 +163,10 @@ export const listsInDB = async (): Promise<List[]> => {
 
 export const productsInDB = async (): Promise<Product[]> => {
   return await db<Product>('products')
+}
+
+export const ratingsInDB = async (): Promise<Rating[]> => {
+  return await db<Rating>('ratings')
 }
 
 export const listProductsInDB = async (): Promise<ListProduct[]> => {
@@ -337,3 +342,21 @@ export const createOneListProduct = async (): Promise<ListProduct & { token: str
 
   return { ...body, token, userID }
 }
+
+export const newRating = (productID: number): RatingCreateInput => ({
+  title: `New Rating ${(new Date().getTime()).toString()}`,
+  stars: 4,
+  productID
+})
+
+// export const createOneRating = async (): Promise<Rating> => {
+//   const { token } = await loginAs('customer', api)
+//   const { addedProduct } = await createOneProduct('admin')
+
+//   const { body }: { body: Rating } = await api
+//     .post(apiURLs.ratings)
+//     .set('Cookie', `token=${token}`)
+//     .send(newRating(addedProduct.productID))
+
+//   return body
+// }

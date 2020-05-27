@@ -1,5 +1,5 @@
 import R from 'ramda'
-import { AddressCreateInput, AddressFetchInput, AddressTypeInput, CategoryCreateInput, CategoryUpdateInput, Follower, FollowerFetchInput, ListCreateInput, ListFetchInput, PasswordRequestInput, PasswordResetInput, RoleInput, ShippingMethodInput, UserAddressCreateInput, UserAddressFetchInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput, ProductCreateInput, ProductUpdateInput, ListProduct, ListProductFetchInput } from '../types'
+import { AddressCreateInput, AddressFetchInput, AddressTypeInput, CategoryCreateInput, CategoryUpdateInput, Follower, FollowerFetchInput, ListCreateInput, ListFetchInput, PasswordRequestInput, PasswordResetInput, RoleInput, ShippingMethodInput, UserAddressCreateInput, UserAddressFetchInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput, ProductCreateInput, ProductUpdateInput, ListProduct, ListProductFetchInput, RatingCreateInput } from '../types'
 import { canBeNumber, hasDefinedProps, isArray, isBoolean, isEmail, isGroup, isImage, isInputProvided, isNumber, isPasswordValid, isProductParameter, isProvided, isString, isStringOrArray } from './validatorLib'
 
 const checkNewUser = (object: any): UserSignupInput => {
@@ -534,6 +534,39 @@ const checkListProductsFetch = (object: any): ListProductFetchInput => {
   return listProductInput
 }
 
+const checkNewRating = (object: any): RatingCreateInput => {
+  const title = object.title && isString(
+    { name: 'title', param: object.title }
+  )
+
+  const review = object.review && isString(
+    { name: 'review', param: object.review }
+  )
+
+  const media = object.media && isNumber(
+    { name: 'media', param: object.media }
+  )
+
+  const stars = R.pipe(
+    isProvided,
+    isNumber
+  )({ name: 'stars', param: object.stars })
+
+  const productID = R.pipe(
+    isProvided,
+    isNumber
+  )({ name: 'productID', param: object.productID })
+
+  const ratingInput: RatingCreateInput = {
+    title: title?.param,
+    review: review?.param,
+    media: media?.param,
+    stars: stars.param,
+    productID: parseInt(productID.param)
+  }
+  return ratingInput
+}
+
 export default {
   checkNewUser,
   checkUserLogin,
@@ -560,5 +593,6 @@ export default {
   checkListsFetch,
   checkListUpdate,
   checkListProduct,
-  checkListProductsFetch
+  checkListProductsFetch,
+  checkNewRating
 }
