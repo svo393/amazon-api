@@ -8,19 +8,19 @@ const router = Router()
 router.post('/', async (req, res) => {
   shield.isAdmin(res)
   const productInput = inputValidator.checkNewProduct(req.body)
-  const addedProduct = await productService.addProduct(productInput)
+  const addedProduct = await productService.addProduct(productInput, res)
   res.status(201).json(addedProduct)
 })
 
-// router.get('/', async (_req, res) => {
-//   const products = await productService.getProducts()
-//   res.json(products)
-// })
+router.get('/', async (_req, res) => {
+  const products = await productService.getProducts()
+  res.json(products)
+})
 
-// router.get('/:id', async (req, res) => {
-//   const product = await productService.getProductByID(req.params.id, res)
-//   res.json(product)
-// })
+router.get('/:productID', async (req, res) => {
+  const product = await productService.getProductByID(Number(req.params.productID), res)
+  res.json(product)
+})
 
 // router.put('/:id', async (req, res) => {
 //   await shield.isCreator(res, 'product', req.params.id)

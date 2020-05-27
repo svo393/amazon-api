@@ -85,7 +85,7 @@
     "test:follow": "cross-env NODE_ENV=development jest ./tests/followersAPI.test.ts --verbose  --runInBand",
     "test:useraddr": "cross-env NODE_ENV=development jest ./tests/userAddressesAPI.test.ts --verbose  --runInBand",
     "test:cats": "cross-env NODE_ENV=development jest ./tests/categoriesAPI.test.ts --verbose  --runInBand",
-    "test:items": "cross-env NODE_ENV=development jest ./tests/itemsAPI.test.ts --verbose  --runInBand",
+    "test:products": "cross-env NODE_ENV=development jest ./tests/productsAPI.test.ts --verbose  --runInBand",
     "test:users": "cross-env NODE_ENV=development jest ./tests/usersAPI.test.ts --verbose  --runInBand",
     "test:dev": "cross-env NODE_ENV=development jest --verbose --runInBand --watch",
     "tsc": "rm -rf build && tsc"

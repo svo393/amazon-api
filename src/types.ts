@@ -30,7 +30,7 @@ export type User = {
   email: string;
   password: string;
   avatar: boolean;
-  createdAt: Date;
+  userCreatedAt: Date;
   resetToken?: string | null;
   resetTokenCreatedAt?: Date | null;
   isDeleted: boolean;
@@ -75,8 +75,8 @@ export type Product = {
   stock: number;
   media: number;
   primaryMedia: number;
-  createdAt: Date;
-  updatedAt: Date;
+  productCreatedAt: Date;
+  productUpdatedAt: Date;
   isAvailable: boolean;
   userID: number;
   categoryID: number;
@@ -85,8 +85,8 @@ export type Product = {
 
 export type Rating = {
   ratingID: number;
-  createdAt: Date;
-  updatedAt: Date;
+  ratingCreatedAt: Date;
+  ratingUpdatedAt: Date;
   title?: string;
   review?: string;
   media?: number;
@@ -100,8 +100,8 @@ export type Rating = {
 
 export type RatingComment = {
   ratingCommentID: number;
-  createdAt: Date;
-  updatedAt: Date;
+  ratingCommentCreatedAt: Date;
+  ratingCommentUpdatedAt: Date;
   content: string;
   media?: number;
   isVerified: boolean;
@@ -112,8 +112,8 @@ export type RatingComment = {
 
 export type Question = {
   questionID: number;
-  createdAt: Date;
-  updatedAt: Date;
+  questionCreatedAt: Date;
+  questionUpdatedAt: Date;
   content: string;
   media?: number;
   likes: number;
@@ -125,8 +125,8 @@ export type Question = {
 
 export type Answer = {
   answerID: number;
-  createdAt: Date;
-  updatedAt: Date;
+  answerCreatedAt: Date;
+  answerUpdatedAt: Date;
   content: string;
   media?: number;
   likes: number;
@@ -138,8 +138,8 @@ export type Answer = {
 
 export type AnswerComment = {
   answerCommentID: number;
-  createdAt: Date;
-  updatedAt: Date;
+  answerCommentCreatedAt: Date;
+  answerCommentUpdatedAt: Date;
   content: string;
   media?: number;
   isVerified: boolean;
@@ -189,8 +189,8 @@ export type OrderStatus = {
 export type Order = {
   orderID: number;
   address: string;
-  createdAt: Date;
-  updatedAt: Date;
+  orderCreatedAt: Date;
+  orderUpdatedAt: Date;
   userID: number;
   orderStatusID: number;
   shippingMethodID: number;
@@ -204,7 +204,7 @@ export type InvoiceStatus = {
 export type Invoice = {
   invoiceID: number;
   amount: number;
-  createdAt: Date;
+  invoiceCreatedAt: Date;
   orderID: number;
   invoiceStatusID: number;
 }
@@ -260,17 +260,6 @@ export type UserSafeData = Omit<User,
   | 'resetTokenCreatedAt'
 >
 
-export type ProductListData = Pick<Product,
-  | 'productID'
-  | 'title'
-  | 'listPrice'
-  | 'price'
-  | 'primaryMedia'
-  > & {
-    stars: number;
-    ratingCount: number;
-}
-
 export type RoleInput = Pick<Role, 'name'>
 
 export type ShippingMethodInput = Pick<ShippingMethod, 'name'>
@@ -306,37 +295,39 @@ export type UserAddressFetchInput = Pick<UserAddress, 'userID'>
 
 export type ProductCreateInput = Omit<Product,
   | 'productID'
-  | 'createdAt'
-  | 'updatedAt'
+  | 'productCreatedAt'
+  | 'productUpdatedAt'
   | 'userID'
->
+  | 'isAvailable'
+> & {
+  isAvailable?: boolean;
+}
 
 export type ProductPublicData = Omit<Product,
-  | 'createdAt'
-  | 'updatedAt'
+  | 'productCreatedAt'
+  | 'productUpdatedAt'
   | 'userID'
 >
 
-// export type ItemAllData = Item & {
-//   questions: Question1[];
-//   ratings: Rating1[];
-//   groupItems: GroupItem[];
-//   itemParameters: ItemParameter[];
-// }
+export type ProductListData = Pick<Product,
+| 'productID'
+| 'title'
+| 'listPrice'
+| 'price'
+| 'primaryMedia'
+> & {
+  stars: number;
+  ratingCount: number;
+}
 
-// export type ItemListData = Pick<Item,
-//     | 'id'
-//     | 'name'
-//     | 'listPrice'
-//     | 'price'
-//     | 'stars'
-//     | 'primaryMedia'
-//     | 'ratingCount'
-//   >;
+export type ProductAllData = Product & {
+  stars: number;
+  ratingCount: number;
+}
 
 // export type ItemCreateInputRaw = Omit<Item,
-//   | 'createdAt'
-//   | 'updatedAt'
+//   | 'productCreatedAt'
+//   | 'productUpdatedAt'
 //   | 'stars'
 //   | 'id'
 //   | 'brandSectionID'

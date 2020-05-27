@@ -4,142 +4,103 @@ import multer from 'multer'
 import path from 'path'
 import R from 'ramda'
 import sharp from 'sharp'
-import { ProductPublicData, ProductCreateInput } from '../types'
+import { ProductPublicData, ProductCreateInput, Category, Product, ProductAllData, ProductListData } from '../types'
 import { makeID } from '../utils'
 import StatusError from '../utils/StatusError'
+import { db } from '../utils/db'
+import { getProductsQuery } from '../utils/queries'
 
-const productFieldSet = {
-  questions: true,
-  ratings: true,
-  productParameters: true,
-  groupProducts: true
-}
+const addProduct = async (productInput: ProductCreateInput, res: Response): Promise<ProductPublicData> => {
+  const now = new Date()
 
-const addProduct = async (productInput: ProductCreateInput): Promise<ProductPublicData> => {
-  const category = await prisma.category.upsert({
-    where: { name: productInput.categoryName },
-    update: { name: productInput.categoryName },
-    create: { name: productInput.categoryName },
-    select: { name: true }
-  })
+  const [ addedProduct ]: Product[] = await db<Product>('products')
+    .insert({
+      ...productInput,
+      userID: res.locals.userID,
+      productCreatedAt: now,
+      productUpdatedAt: now
+    }, [ '*' ])
 
-  const vendor = await prisma.vendor.upsert({
-    where: { name: productInput.vendorName },
-    update: { name: productInput.vendorName },
-    create: { name: productInput.vendorName },
-    select: { name: true }
-  })
+  // productInput.productParameters.map(async (p) => {
+  //   const parameter = await prisma.parameter.upsert({
+  //     where: { name: p.name },
+  //     update: { name: p.name },
+  //     create: { name: p.name },
+  //     select: { name: true }
+  //   })
 
-  const brandSection = await prisma.brandSection.create({
-    data: { content: productInput.brandSection },
-    select: { id: true }
-  })
+  //   await prisma.productParameter.create({
+  //     data: {
+  //       value: p.value,
+  //       product: { connect: { id } },
+  //       parameter: { connect: { name: parameter.name } }
+  //     }
+  //   })
+  // })
 
-  const addedProduct = await prisma.product.create({
-    data: {
-      ...R.omit([
-        'groups',
-        'productParameters',
-        'categoryName',
-        'vendorName',
-        'userID',
-        'brandSection'
-      ], productInput),
-      id,
-      brandSection: { connect: { id: brandSection.id } },
-      user: { connect: { id: productInput.userID } },
-      category: { connect: { name: category.name } },
-      vendor: { connect: { name: vendor.name } }
-    },
-    include: productFieldSet
-  })
+  // productInput.groups.map(async (i) => {
+  //   let group: { id: string }
 
-  productInput.productParameters.map(async (p) => {
-    const parameter = await prisma.parameter.upsert({
-      where: { name: p.name },
-      update: { name: p.name },
-      create: { name: p.name },
-      select: { name: true }
-    })
+  //   if (i.productID) {
+  //     const groupProducts = await prisma.groupProduct.findMany({
+  //       where: { productID: i.productID },
+  //       select: { group: true }
+  //     })
 
-    await prisma.productParameter.create({
-      data: {
-        value: p.value,
-        product: { connect: { id } },
-        parameter: { connect: { name: parameter.name } }
-      }
-    })
-  })
+  //     const targetGroup = groupProducts.find((gi) => gi.group.name === i.name)
+  //     if (!targetGroup) throw new StatusError(400, 'Invalid Group')
 
-  productInput.groups.map(async (i) => {
-    let group: { id: string }
+  //     group = targetGroup.group
+  //   } else {
+  //     group = await prisma.group.create({
+  //       data: { name: i.name },
+  //       select: { id: true }
+  //     })
+  //   }
 
-    if (i.productID) {
-      const groupProducts = await prisma.groupProduct.findMany({
-        where: { productID: i.productID },
-        select: { group: true }
-      })
+  //   await prisma.groupProduct.create({
+  //     data: {
+  //       value: i.value,
+  //       product: { connect: { id } },
+  //       group: { connect: { id: group.id } }
+  //     }
+  //   })
+  // })
 
-      const targetGroup = groupProducts.find((gi) => gi.group.name === i.name)
-      if (!targetGroup) throw new StatusError(400, 'Invalid Group')
-
-      group = targetGroup.group
-    } else {
-      group = await prisma.group.create({
-        data: { name: i.name },
-        select: { id: true }
-      })
-    }
-
-    await prisma.groupProduct.create({
-      data: {
-        value: i.value,
-        product: { connect: { id } },
-        group: { connect: { id: group.id } }
-      }
-    })
-  })
-
-  await prisma.disconnect()
-
-  const productData = R.omit([
-    'createdAt',
-    'updatedAt',
+  return R.omit([
+    'productCreatedAt',
+    'productUpdatedAt',
     'userID'
   ], addedProduct)
-
-  return productData
 }
 
-// const getProducts = async (): Promise<ProductPublicData[]> => {
-//   const products = await prisma.product.findMany({
-//     include: productFieldSet
-//   })
-//   await prisma.disconnect()
-//   return products
-// }
+export const getProducts = async (): Promise<ProductListData[]> => {
+  return await getProductsQuery
+}
 
-// const getProductByID = async (id: string, res: Response): Promise<ProductPublicData| ProductAllData> => {
-//   const product = await prisma.product.findOne({
-//     where: { id },
-//     include: productFieldSet
-//   })
-//   await prisma.disconnect()
+const getProductByID = async (productID: number, res: Response): Promise<ProductListData| ProductAllData> => {
+  const [ product ] = await db<Product>('products as p')
+    .select('p.productID', 'p.title', 'listPrice', 'price',
+      'primaryMedia', 'productCreatedAt', 'productUpdatedAt', 'p.userID')
+    .avg('stars as stars')
+    .count('r.ratingID as ratingCount')
+    .leftJoin('ratings as r', 'p.productID', 'r.productID')
+    .where('p.productID', productID)
+    .groupBy('p.productID')
 
-//   if (!product) throw new StatusError(404, 'Not Found')
+  if (!product) throw new StatusError(404, 'Not Found')
 
-//   const role = res.locals.userRole
-//   const userIsAdminOrRoot = role === 'ADMIN' || role === 'ROOT'
+  const role: string | undefined = res.locals.userRole
+  const hasPermission = role && [ 'ROOT', 'ADMIN' ].includes(role)
 
-//   const productData = userIsAdminOrRoot
-//     ? product
-//     : R.omit([
-//       'createdAt',
-//       'updatedAt',
-//       'userID'
-//     ], product)
-//   return productData
-// }
+  return hasPermission
+    ? product
+    : R.omit([
+      'productCreatedAt',
+      'productUpdatedAt',
+      'userID'
+    ], product)
+}
 
 // const updateProduct = async (productInput: ProductUpdateInput, id: string): Promise<Product> => {
 //   const updatedProduct = await prisma.product.update({
@@ -236,8 +197,8 @@ const addProduct = async (productInput: ProductCreateInput): Promise<ProductPubl
 export default {
   addProduct,
   getProducts,
-  getProductByID,
-  updateProduct,
-  multerUpload,
-  uploadImages
+  getProductByID
+  // updateProduct,
+  // multerUpload,
+  // uploadImages
 }

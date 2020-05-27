@@ -152,10 +152,9 @@ const checkNewProduct = (object: any): ProductCreateInput => {
     isNumber
   )({ name: 'primaryMedia', param: object.primaryMedia })
 
-  const isAvailable = R.pipe(
-    isProvided,
-    isBoolean
-  )({ name: 'isAvailable', param: object.isAvailable })
+  const isAvailable = object.isAvailable && isBoolean(
+    { name: 'isAvailable', param: object.isAvailable }
+  )
 
   const categoryID = R.pipe(
     isProvided,
@@ -190,7 +189,7 @@ const checkNewProduct = (object: any): ProductCreateInput => {
     description: description.param,
     brandSection: brandSection?.param,
     stock: stock.param,
-    isAvailable: isAvailable.param,
+    isAvailable: isAvailable?.param,
     media: media.param,
     primaryMedia: primaryMedia.param,
     categoryID: categoryID.param,

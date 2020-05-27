@@ -51,7 +51,7 @@ const addUser = async (userInput: UserSignupInput, res: Response): Promise<UserS
     .insert({
       email,
       password: passwordHash,
-      createdAt: new Date(),
+      userCreatedAt: new Date(),
       roleID: customerRoleID.roleID
     }, [ 'userID', 'email' ])
 
@@ -115,24 +115,20 @@ type UserListData = Omit<User,
 }
 
 const getUsers = async (): Promise<UserListData[]> => {
-  const { rows: users }: { rows: UserListData[] } = await db.raw(
-    `SELECT
-      "email", "u"."name", "info", "avatar",
-      "u"."createdAt", "isDeleted", "u"."userID",
-      "rl"."name" as role,
-      COUNT("o"."orderID") as orderCount,
-      COUNT("r"."ratingID") as ratingCount,
-      COUNT("q"."questionID") as questionCount,
-      COUNT("a"."answerID") as answerCount
-    FROM users as u
-    LEFT JOIN orders as o USING ("userID")
-    LEFT JOIN ratings as r USING ("userID")
-    LEFT JOIN questions as q USING ("userID")
-    LEFT JOIN answers as a USING ("userID")
-    LEFT JOIN roles as rl USING ("roleID")
-    WHERE "rl"."name" != 'ROOT'
-    GROUP BY "u"."userID", "rl"."name"`
-  )
+  const users: UserListData[] = await db('users as u')
+    .select('email', 'u.name', 'info', 'avatar', 'userCreatedAt',
+      'isDeleted', 'u.userID', 'rl.name as role')
+    .count('o.orderID as orderCount')
+    .count('r.ratingID as ratingCount')
+    .count('q.questionID as questionCount')
+    .count('a.answerID as answerCount')
+    .leftJoin('orders as o', 'u.userID', 'o.userID')
+    .leftJoin('ratings as r', 'u.userID', 'r.userID')
+    .leftJoin('questions as q', 'u.userID', 'q.userID')
+    .leftJoin('answers as a', 'u.userID', 'a.userID')
+    .leftJoin('roles as rl', 'u.roleID', 'rl.roleID')
+    .where('rl.name', '!=', 'ROOT')
+    .groupBy('u.userID', 'rl.name')
 
   if (!users) { throw new StatusError(404, 'Not Found') }
   return users
@@ -147,7 +143,7 @@ type UserPersonalData = UserBaseData & {
 
 type UserPublicData = Omit<UserPersonalData,
   | 'email'
-  | 'createdAt'
+  | 'userCreatedAt'
   | 'orders'
 >
 
@@ -270,7 +266,7 @@ const resetPassword = async ({ password, resetToken }: PasswordResetInput, res: 
       resetTokenCreatedAt: null,
       password: passwordHash
     },
-    [ 'name', 'userID', 'email', 'info', 'avatar', 'createdAt' ])
+    [ 'name', 'userID', 'email', 'info', 'avatar', 'userCreatedAt' ])
     .where('userID', user.userID)
 
   const token = jwt.sign(

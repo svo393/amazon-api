@@ -1,6 +1,7 @@
 import { db } from '../../src/utils/db'
-import { ProductListData, Vendor, VendorInput } from '../types'
+import { Product, ProductListData, Vendor, VendorInput } from '../types'
 import StatusError from '../utils/StatusError'
+import { getProductsQuery } from '../utils/queries'
 
 const addVendor = async (vendorInput: VendorInput): Promise<Vendor> => {
   const { name } = vendorInput
@@ -33,16 +34,8 @@ const getVendorByID = async (vendorID: number): Promise<SingleVendorData> => {
   const [ vendor ] = vendors.filter((c) => c.vendorID === vendorID)
   if (!vendor) throw new StatusError(404, 'Not Found')
 
-  const { rows: products }: { rows: ProductListData[] } = await db.raw(
-    `SELECT
-      "p"."title", "listPrice", "price", "primaryMedia", "p"."productID",
-      AVG("r"."stars") as stars,
-      COUNT("r"."ratingID") as ratingCount
-    FROM products as p
-    LEFT JOIN ratings as r USING ("productID")
-    WHERE "vendorID" = ${vendorID}
-    GROUP BY "p"."productID"`
-  )
+  const products: ProductListData[] = await getProductsQuery
+    .where('vendorID', vendorID)
 
   return { ...vendor, products }
 }

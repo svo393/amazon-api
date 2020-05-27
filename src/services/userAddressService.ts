@@ -1,40 +1,40 @@
-import { UserAddress, UserAddressFetchInput, UserAddressCreateInput, UserAddressUpdateInput } from '../types'
+import { UserAddress, UserAddressFetchInput as UAFetchInput, UserAddressCreateInput as UACreateInput, UserAddressUpdateInput as UAUpdateInput } from '../types'
 import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
-const addUserAddress = async (userAddressInput: UserAddressCreateInput): Promise<UserAddress> => {
-  const { userID, addressID } = userAddressInput
+const addUserAddress = async (UAInput: UACreateInput): Promise<UserAddress> => {
+  const { userID, addressID } = UAInput
 
-  const existingUserAddress = await db<UserAddress>('userAddresses')
+  const existingUA = await db<UserAddress>('userAddresses')
     .first()
     .where('userID', userID)
     .andWhere('addressID', addressID)
 
-  if (existingUserAddress) throw new StatusError(409, 'Address already added')
+  if (existingUA) throw new StatusError(409, 'Address already added')
 
-  const [ addedUserAddress ]: UserAddress[] = await db<UserAddress>('userAddresses')
-    .insert(userAddressInput, [ '*' ])
+  const [ addedUA ]: UserAddress[] = await db<UserAddress>('userAddresses')
+    .insert(UAInput, [ '*' ])
 
-  return addedUserAddress
+  return addedUA
 }
 
-const getUserAddresses = async (userAddressInput: UserAddressFetchInput): Promise<UserAddress[]> => {
-  const { userID } = userAddressInput
+const getUserAddresses = async (UAInput: UAFetchInput): Promise<UserAddress[]> => {
+  const { userID } = UAInput
 
   return await db('userAddresses')
     .where('userID', userID)
 }
 
-const updateUserAddress = async (userAddressInput: UserAddressUpdateInput, addressID: number, userID: number): Promise<UserAddress> => {
-  const { isDefault } = userAddressInput
+const updateUserAddress = async (UAInput: UAUpdateInput, addressID: number, userID: number): Promise<UserAddress> => {
+  const { isDefault } = UAInput
 
-  const [ updatedUserAddress ]: UserAddress[] = await db<UserAddress>('userAddresses')
+  const [ updatedUA ]: UserAddress[] = await db<UserAddress>('userAddresses')
     .update({ isDefault }, [ '*' ])
     .where('userID', userID)
     .andWhere('addressID', addressID)
 
-  if (!updatedUserAddress) throw new StatusError(404, 'Not Found')
-  return updatedUserAddress
+  if (!updatedUA) throw new StatusError(404, 'Not Found')
+  return updatedUA
 }
 
 const deleteUserAddress = async (addressID: number, userID: number): Promise<void> => {

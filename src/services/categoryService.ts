@@ -1,6 +1,7 @@
 import { db } from '../../src/utils/db'
-import { Category, CategoryCreateInput, CategoryUpdateInput, ProductListData } from '../types'
+import { Category, CategoryCreateInput, CategoryUpdateInput, Product, ProductListData } from '../types'
 import StatusError from '../utils/StatusError'
+import { getProductsQuery } from '../utils/queries'
 
 const addCategory = async (categoryInput: CategoryCreateInput): Promise<Category> => {
   const { name } = categoryInput
@@ -64,16 +65,8 @@ const getCategoryByID = async (categoryID: number): Promise<SingleCategoryData> 
     .filter((c) => c.parentCategoryID === categoryID)
     .map((c) => c.categoryID)
 
-  const { rows: products }: { rows: ProductListData[] } = await db.raw(
-    `SELECT
-      "p"."title", "listPrice", "price", "primaryMedia", "p"."productID",
-      AVG("r"."stars") as stars,
-      COUNT("r"."ratingID") as ratingCount
-    FROM products as p
-    LEFT JOIN ratings as r USING ("productID")
-    WHERE "categoryID" = ${categoryID}
-    GROUP BY "p"."productID"`
-  )
+  const products: ProductListData[] = await getProductsQuery
+    .where('categoryID', categoryID)
 
   return {
     ...category,

@@ -37,7 +37,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.string('email').unique().notNullable()
       t.string('password').notNullable()
       t.boolean('avatar').defaultTo(false).notNullable()
-      t.dateTime('createdAt').notNullable()
+      t.dateTime('userCreatedAt').notNullable()
       t.string('resetToken', 50)
       t.dateTime('resetTokenCreatedAt')
       t.boolean('isDeleted').defaultTo(false).notNullable()
@@ -117,8 +117,8 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.integer('stock').notNullable().unsigned()
       t.integer('media').notNullable().unsigned()
       t.integer('primaryMedia').notNullable().unsigned()
-      t.dateTime('createdAt').notNullable()
-      t.dateTime('updatedAt').notNullable()
+      t.dateTime('productCreatedAt').notNullable()
+      t.dateTime('productUpdatedAt').notNullable()
       t.boolean('isAvailable').defaultTo(true).notNullable()
       t.boolean('isDeleted').defaultTo(false).notNullable()
 
@@ -140,8 +140,8 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
 
     .createTable('ratings', (t) => {
       t.increments('ratingID')
-      t.dateTime('createdAt').notNullable()
-      t.dateTime('updatedAt').notNullable()
+      t.dateTime('ratingCreatedAt').notNullable()
+      t.dateTime('ratingUpdatedAt').notNullable()
       t.string('title')
       t.string('review', 65535)
       t.integer('media').unsigned()
@@ -166,8 +166,8 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
 
     .createTable('ratingComments', (t) => {
       t.increments('ratingCommentID')
-      t.dateTime('createdAt').notNullable()
-      t.dateTime('updatedAt').notNullable()
+      t.dateTime('ratingCommentCreatedAt').notNullable()
+      t.dateTime('ratingCommentUpdatedAt').notNullable()
       t.string('content', 65535).notNullable()
       t.integer('media').unsigned()
       t.boolean('isVerified').defaultTo(false).notNullable()
@@ -189,8 +189,8 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
 
     .createTable('questions', (t) => {
       t.increments('questionID')
-      t.dateTime('createdAt').notNullable()
-      t.dateTime('updatedAt').notNullable()
+      t.dateTime('questionCreatedAt').notNullable()
+      t.dateTime('questionUpdatedAt').notNullable()
       t.string('content', 65535).unique().notNullable()
       t.integer('media').unsigned()
       t.integer('likes').notNullable().unsigned().defaultTo(0)
@@ -210,8 +210,8 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
 
     .createTable('answers', (t) => {
       t.increments('answerID')
-      t.dateTime('createdAt').notNullable()
-      t.dateTime('updatedAt').notNullable()
+      t.dateTime('answerCreatedAt').notNullable()
+      t.dateTime('answerUpdatedAt').notNullable()
       t.string('content', 65535).unique().notNullable()
       t.integer('media').unsigned()
       t.integer('likes').notNullable().unsigned().defaultTo(0)
@@ -231,8 +231,8 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
 
     .createTable('answerComments', (t) => {
       t.increments('answerCommentID')
-      t.dateTime('createdAt').notNullable()
-      t.dateTime('updatedAt').notNullable()
+      t.dateTime('answerCommentCreatedAt').notNullable()
+      t.dateTime('answerCommentUpdatedAt').notNullable()
       t.string('content', 65535).notNullable()
       t.integer('media').unsigned()
       t.boolean('isVerified').defaultTo(false).notNullable()
@@ -336,8 +336,8 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
     .createTable('orders', (t) => {
       t.increments('orderID')
       t.string('address').notNullable()
-      t.dateTime('createdAt').notNullable()
-      t.dateTime('updatedAt').notNullable()
+      t.dateTime('orderCreatedAt').notNullable()
+      t.dateTime('orderUpdatedAt').notNullable()
 
       t
         .integer('userID')
@@ -363,7 +363,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
     .createTable('invoices', (t) => {
       t.increments('invoiceID')
       t.integer('amount').notNullable().unsigned()
-      t.dateTime('createdAt').notNullable()
+      t.dateTime('invoiceCreatedAt').notNullable()
 
       t
         .integer('orderID')

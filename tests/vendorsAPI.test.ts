@@ -7,17 +7,17 @@ import { loginAs, populateUsers, purge, vendorsInDB } from './testHelper'
 const api = supertest(app)
 const apiURL = '/api/vendors'
 
-const newVendor = (): VendorInput => ({
-  name: `New Vendor ${(new Date().getTime()).toString()}`
+const newVendor = (name?: string): VendorInput => ({
+  name: name ?? `New Vendor ${(new Date().getTime()).toString()}`
 })
 
-const createOneVendor = async (role: string): Promise<{ addedVendor: Vendor; token: string}> => {
+export const createOneVendor = async (role: string, name?: string): Promise<{ addedVendor: Vendor; token: string}> => {
   const { token } = await loginAs(role, api)
 
   const { body } = await api
     .post(apiURL)
     .set('Cookie', `token=${token}`)
-    .send(newVendor())
+    .send(newVendor(name))
 
   return { addedVendor: body, token }
 }
@@ -90,7 +90,7 @@ describe('Vendor updating', () => {
 
   test('403 if not admin or root', async () => {
     const { addedVendor } = await createOneVendor('admin')
-    const { token } = await createOneVendor('customer')
+    const { token } = await loginAs('customer', api)
 
     await api
       .put(`${apiURL}/${addedVendor.vendorID}`)

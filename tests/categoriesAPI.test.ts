@@ -7,17 +7,18 @@ import { CategoryCreateInput, Category } from '../src/types'
 const api = supertest(app)
 const apiURL = '/api/categories'
 
-const newCategory = (): CategoryCreateInput => ({
-  name: `New Category ${Date.now().toString()}`
+const newCategory = (name?: string, parentCategoryID?: number): CategoryCreateInput => ({
+  name: name ?? `New Category ${Date.now().toString()}`,
+  parentCategoryID
 })
 
-const createOneCategory = async (role: string): Promise<{ addedCategory: Category; token: string}> => {
+export const createOneCategory = async (role: string, name?: string, parentCategoryID?: number): Promise<{ addedCategory: Category; token: string}> => {
   const { token } = await loginAs(role, api)
 
   const { body } = await api
     .post(apiURL)
     .set('Cookie', `token=${token}`)
-    .send(newCategory())
+    .send(newCategory(name, parentCategoryID))
 
   return { addedCategory: body, token }
 }
@@ -90,7 +91,7 @@ describe('Category updating', () => {
 
   test('403 if not admin or root', async () => {
     const { addedCategory } = await createOneCategory('admin')
-    const { token } = await createOneCategory('customer')
+    const { token } = await loginAs('customer', api)
 
     await api
       .put(`${apiURL}/${addedCategory.categoryID}`)
