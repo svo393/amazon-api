@@ -20,7 +20,7 @@ const addProduct = async (productInput: ProductCreateInput, res: Response): Prom
       productUpdatedAt: now
     }, [ '*' ])
 
-  // productInput.productParameters.map(async (p) => {
+  // productInput.productParameters.map(async (p) => { // TODO
   //   const parameter = await prisma.parameter.upsert({
   //     where: { name: p.name },
   //     update: { name: p.name },

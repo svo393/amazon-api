@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { AddressCreateInput, AddressTypeInput, CategoryCreateInput, CategoryUpdateInput, ListCreateInput, PasswordRequestInput, PasswordResetInput, ProductCreateInput, ProductUpdateInput, RatingCreateInput, RatingUpdateInput, RoleInput, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput, RatingCommentCreateInput, RatingCommentUpdateInput } from '../types'
+import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CategoryCreateInput, CategoryUpdateInput, ListCreateInput, PasswordRequestInput, PasswordResetInput, ProductCreateInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, RoleInput, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput } from '../types'
 import { hasDefinedProps, isBoolean, isEmail, isInputProvided, isNumber, isPasswordValid, isProvided, isString, isStringOrArray } from './validatorLib'
 
 const checkNewUser = ({ body }: Request): UserSignupInput => {
@@ -534,6 +534,128 @@ const checkRatingCommentUpdate = ({ body }: Request): RatingCommentUpdateInput =
   return ratingCommentInput
 }
 
+const checkNewQuestion = ({ body }: Request): QuestionCreateInput => {
+  const content = R.pipe(
+    isProvided,
+    isString
+  )({ name: 'content', param: body.content })
+
+  const media = body.media && isNumber(
+    { name: 'media', param: body.media }
+  )
+
+  const productID = R.pipe(
+    isProvided,
+    isNumber
+  )({ name: 'productID', param: body.productID })
+
+  const questionInput: QuestionCreateInput = {
+    content: content.param,
+    media: media?.param,
+    productID: productID.param
+  }
+  return questionInput
+}
+
+const checkQuestionUpdate = ({ body }: Request): QuestionUpdateInput => {
+  const content = body.content && isString(
+    { name: 'content', param: body.content }
+  )
+
+  const media = body.media && isNumber(
+    { name: 'media', param: body.media }
+  )
+
+  const questionInput: QuestionUpdateInput = {
+    content: content?.param,
+    media: media?.param
+  }
+  return hasDefinedProps(questionInput)
+}
+
+const checkNewAnswer = ({ body }: Request): AnswerCreateInput => {
+  const content = R.pipe(
+    isProvided,
+    isString
+  )({ name: 'content', param: body.content })
+
+  const media = body.media && isNumber(
+    { name: 'media', param: body.media }
+  )
+
+  const questionID = R.pipe(
+    isProvided,
+    isNumber
+  )({ name: 'questionID', param: body.questionID })
+
+  const answerInput: AnswerCreateInput = {
+    content: content.param,
+    media: media?.param,
+    questionID: questionID.param
+  }
+  return answerInput
+}
+
+const checkAnswerUpdate = ({ body }: Request): AnswerUpdateInput => {
+  const content = body.content && isString(
+    { name: 'content', param: body.content }
+  )
+
+  const media = body.media && isNumber(
+    { name: 'media', param: body.media }
+  )
+
+  const answerInput: AnswerUpdateInput = {
+    content: content?.param,
+    media: media?.param
+  }
+  return hasDefinedProps(answerInput)
+}
+
+const checkNewAnswerComment = ({ body }: Request): AnswerCommentCreateInput => {
+  const content = R.pipe(
+    isProvided,
+    isString
+  )({ name: 'content', param: body.content })
+
+  const media = body.media && isNumber(
+    { name: 'media', param: body.media }
+  )
+
+  const answerID = R.pipe(
+    isProvided,
+    isNumber
+  )({ name: 'answerID', param: body.answerID })
+
+  const parentAnswerCommentID = body.media && isNumber(
+    { name: 'parentAnswerCommentID', param: body.parentAnswerCommentID }
+  )
+
+  const answerCommentInput: AnswerCommentCreateInput = {
+    content: content.param,
+    media: media?.param,
+    answerID: answerID.param,
+    parentAnswerCommentID: parentAnswerCommentID?.param
+  }
+  return answerCommentInput
+}
+
+const checkAnswerCommentUpdate = ({ body }: Request): AnswerCommentUpdateInput => {
+  const content = body.content && isString(
+    { name: 'content', param: body.content }
+  )
+
+  const media = body.media && isNumber(
+    { name: 'media', param: body.media }
+  )
+
+  const answerCommentInput: AnswerCommentUpdateInput = {
+    content: content?.param,
+    media: media?.param
+  }
+  return answerCommentInput
+}
+
 export default {
   checkNewUser,
   checkUserLogin,
@@ -557,5 +679,11 @@ export default {
   checkNewRating,
   checkRatingUpdate,
   checkNewRatingComment,
-  checkRatingCommentUpdate
+  checkRatingCommentUpdate,
+  checkNewQuestion,
+  checkQuestionUpdate,
+  checkNewAnswer,
+  checkAnswerUpdate,
+  checkNewAnswerComment,
+  checkAnswerCommentUpdate
 }

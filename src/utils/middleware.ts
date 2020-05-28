@@ -25,6 +25,9 @@ type Entities =
   | 'products'
   | 'ratings'
   | 'ratingComments'
+  | 'questions'
+  | 'answers'
+  | 'answerComments'
 
 export const isLoggedIn: Middleware = (_req, res, next) => {
   if (!res.locals.userID) throw new StatusError(403, 'Forbidden')

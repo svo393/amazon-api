@@ -1,6 +1,6 @@
 import supertest from 'supertest'
 import app from '../src/app'
-import { Address, AddressCreateInput, AddressType, AddressTypeInput, Category, CategoryCreateInput, Follower, List, ListCreateInput, ListProduct, Product, ProductPublicData, Rating, RatingComment, RatingCommentCreateInput, RatingCreateInput, Role, RoleInput, ShippingMethod, ShippingMethodInput, User, UserAddress, Vendor, VendorInput } from '../src/types'
+import { Address, AddressCreateInput, AddressType, AddressTypeInput, Answer, AnswerComment, AnswerCommentCreateInput, AnswerCreateInput, Category, CategoryCreateInput, Follower, List, ListCreateInput, ListProduct, Product, ProductPublicData, Question, QuestionCreateInput, Rating, RatingComment, RatingCommentCreateInput, RatingCreateInput, Role, RoleInput, ShippingMethod, ShippingMethodInput, User, UserAddress, Vendor, VendorInput } from '../src/types'
 import { apiURLs } from '../src/utils/constants'
 import { db } from '../src/utils/db'
 import StatusError from '../src/utils/StatusError'
@@ -156,6 +156,18 @@ export const ratingsInDB = async (): Promise<Rating[]> => {
 
 export const ratingCommentsInDB = async (): Promise<RatingComment[]> => {
   return await db<RatingComment>('ratingComments')
+}
+
+export const answerCommentsInDB = async (): Promise<AnswerComment[]> => {
+  return await db<AnswerComment>('answerComments')
+}
+
+export const questionsInDB = async (): Promise<Question[]> => {
+  return await db<Question>('questions')
+}
+
+export const answersInDB = async (): Promise<Answer[]> => {
+  return await db<Answer>('answers')
 }
 
 export const listProductsInDB = async (): Promise<ListProduct[]> => {
@@ -363,6 +375,57 @@ export const createOneRatingComment = async (): Promise<RatingComment & { token:
     .post(`${apiURLs.ratings}/comments`)
     .set('Cookie', `token=${token}`)
     .send(newRatingComment(ratingID))
+
+  return { ...body, token }
+}
+
+export const newQuestion = (productID: number): QuestionCreateInput => ({
+  content: `New Question ${(new Date().getTime()).toString()}`,
+  productID
+})
+
+export const createOneQuestion = async (): Promise<Question & { token: string }> => {
+  const { token } = await loginAs('customer', api)
+  const { addedProduct } = await createOneProduct('admin')
+
+  const { body }: { body: Question } = await api
+    .post(apiURLs.questions)
+    .set('Cookie', `token=${token}`)
+    .send(newQuestion(addedProduct.productID))
+
+  return { ...body, token }
+}
+
+export const newAnswer = (questionID: number): AnswerCreateInput => ({
+  content: `New Answer ${(new Date().getTime()).toString()}`,
+  questionID
+})
+
+export const createOneAnswer = async (): Promise<Answer & { token: string }> => {
+  const { token } = await loginAs('customer', api)
+  const { questionID } = await createOneQuestion()
+
+  const { body }: { body: Answer } = await api
+    .post(`${apiURLs.questions}/answers`)
+    .set('Cookie', `token=${token}`)
+    .send(newAnswer(questionID))
+
+  return { ...body, token }
+}
+
+export const newAnswerComment = (answerID: number): AnswerCommentCreateInput => ({
+  content: `New AnswerComment ${(new Date().getTime()).toString()}`,
+  answerID
+})
+
+export const createOneAnswerComment = async (): Promise<AnswerComment & { token: string }> => {
+  const { token } = await loginAs('customer', api)
+  const { answerID } = await createOneAnswer()
+
+  const { body }: { body: AnswerComment } = await api
+    .post(`${apiURLs.answers}/comments`)
+    .set('Cookie', `token=${token}`)
+    .send(newAnswerComment(answerID))
 
   return { ...body, token }
 }

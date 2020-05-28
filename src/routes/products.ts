@@ -1,5 +1,6 @@
 import Router from 'express'
 import productService from '../services/productService'
+import questionService from '../services/questionService'
 import ratingService from '../services/ratingService'
 import inputValidator from '../utils/inputValidator'
 import { isAdmin, isCreator } from '../utils/middleware'
@@ -37,6 +38,11 @@ router.post('/:productID/upload', isAdmin, productService.multerUpload.array('pr
 router.get('/:productID/ratings', async (req, res) => {
   const ratings = await ratingService.getRatingsByProduct(req)
   res.json(ratings)
+})
+
+router.get('/:productID/questions', async (req, res) => {
+  const questions = await questionService.getQuestionsByProduct(req)
+  res.json(questions)
 })
 
 export default router

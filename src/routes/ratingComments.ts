@@ -16,4 +16,9 @@ router.put('/:ratingCommentID', isCreator('ratingComments', 'ratingCommentID', '
   res.json(updatedRatingComment)
 })
 
+router.delete('/:ratingCommentID', isCreator('ratingComments', 'ratingCommentID', 'params'), async (req, res) => {
+  await ratingCommentService.deleteRatingComment(req)
+  res.status(204).end()
+})
+
 export default router

@@ -76,25 +76,25 @@ describe('RatingComment updating', () => {
   })
 })
 
-// describe('RatingComments deleting', () => {
-//   test('204 if same user', async () => {
-//     const { ratingCommentID, token } = await createOneRatingComment()
+describe('RatingComments deleting', () => {
+  test('204 if same user', async () => {
+    const { ratingCommentID, token } = await createOneRatingComment()
 
-//     await api
-//       .delete(`${apiURL}/${ratingCommentID}`)
-//       .set('Cookie', `token=${token}`)
-//       .expect(204)
-//   })
+    await api
+      .delete(`${apiURL}/${ratingCommentID}`)
+      .set('Cookie', `token=${token}`)
+      .expect(204)
+  })
 
-//   test('403 if another user', async () => {
-//     const { ratingCommentID } = await createOneRatingComment()
-//     const { token } = await loginAs('admin', api)
+  test('403 if another user', async () => {
+    const { ratingCommentID } = await createOneRatingComment()
+    const { token } = await loginAs('admin', api)
 
-//     await api
-//       .delete(`${apiURL}/${ratingCommentID}`)
-//       .set('Cookie', `token=${token}`)
-//       .expect(403)
-//   })
-// })
+    await api
+      .delete(`${apiURL}/${ratingCommentID}`)
+      .set('Cookie', `token=${token}`)
+      .expect(403)
+  })
+})
 
 afterAll(async () => await db.destroy())

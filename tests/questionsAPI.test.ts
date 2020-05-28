@@ -2,17 +2,17 @@ import supertest from 'supertest'
 import app from '../src/app'
 import { apiURLs } from '../src/utils/constants'
 import { db } from '../src/utils/db'
-import { createOneProduct, createOneRating, loginAs, newRating, populateUsers, purge, ratingsInDB } from './testHelper'
+import { createOneProduct, createOneQuestion, loginAs, newQuestion, populateUsers, purge, questionsInDB } from './testHelper'
 
 const api = supertest(app)
-const apiURL = apiURLs.ratings
+const apiURL = apiURLs.questions
 
 beforeEach(async () => {
   await purge()
   await populateUsers()
 })
 
-describe('Rating adding', () => {
+describe('Question adding', () => {
   test('201', async () => {
     const { token } = await loginAs('customer', api)
     const { addedProduct } = await createOneProduct('admin')
@@ -20,92 +20,92 @@ describe('Rating adding', () => {
     await api
       .post(apiURL)
       .set('Cookie', `token=${token}`)
-      .send(newRating(addedProduct.productID))
+      .send(newQuestion(addedProduct.productID))
       .expect(201)
       .expect('Content-Type', /application\/json/)
 
-    const ratingsAtEnd = await ratingsInDB()
-    expect(ratingsAtEnd).toHaveLength(1)
+    const questionsAtEnd = await questionsInDB()
+    expect(questionsAtEnd).toHaveLength(1)
   })
 })
 
-describe('Rating fetching', () => {
-  test('200 ratings by user', async () => {
-    const { userID } = await createOneRating()
+describe('Question fetching', () => {
+  test('200 questions by user', async () => {
+    const { userID } = await createOneQuestion()
 
     const { body } = await api
-      .get(`${apiURLs.users}/${userID}/ratings`)
+      .get(`${apiURLs.users}/${userID}/questions`)
       .expect(200)
 
     expect(body).toBeDefined()
   })
 
-  test('200 ratings by product', async () => {
-    const { productID } = await createOneRating()
+  test('200 questions by product', async () => {
+    const { productID } = await createOneQuestion()
 
     const { body } = await api
-      .get(`${apiURLs.products}/${productID}/ratings`)
+      .get(`${apiURLs.products}/${productID}/questions`)
       .expect(200)
 
     expect(body).toBeDefined()
   })
 
-  test('200 rating', async () => {
-    const { ratingID } = await createOneRating()
+  test('200 question', async () => {
+    const { questionID } = await createOneQuestion()
 
     const { body } = await api
-      .get(`${apiURL}/${ratingID}`)
+      .get(`${apiURL}/${questionID}`)
       .expect(200)
 
     expect(body).toBeDefined()
   })
 })
 
-describe('Rating updating', () => {
+describe('Question updating', () => {
   test('200 if creator', async () => {
-    const { ratingID, token } = await createOneRating()
+    const { questionID, token } = await createOneQuestion()
 
     const { body } = await api
-      .put(`${apiURL}/${ratingID}`)
+      .put(`${apiURL}/${questionID}`)
       .set('Cookie', `token=${token}`)
-      .send({ title: 'Updated Rating' })
+      .send({ content: 'Updated Question' })
       .expect(200)
 
-    expect(body.title).toBe('Updated Rating')
+    expect(body.content).toBe('Updated Question')
   })
 
   test('403 if not creator', async () => {
-    const { ratingID } = await createOneRating()
+    const { questionID } = await createOneQuestion()
     const { token } = await loginAs('admin', api)
 
     await api
-      .put(`${apiURL}/${ratingID}`)
+      .put(`${apiURL}/${questionID}`)
       .set('Cookie', `token=${token}`)
-      .send({ title: 'Updated Rating' })
+      .send({ content: 'Updated Question' })
       .expect(403)
   })
 })
 
-describe('Ratings deleting', () => {
+describe('Questions deleting', () => {
   test('204 if same user and 404 fetching', async () => {
-    const { ratingID, token } = await createOneRating()
+    const { questionID, token } = await createOneQuestion()
 
     await api
-      .delete(`${apiURL}/${ratingID}`)
+      .delete(`${apiURL}/${questionID}`)
       .set('Cookie', `token=${token}`)
       .expect(204)
 
     await api
-      .get(`${apiURL}/${ratingID}`)
+      .get(`${apiURL}/${questionID}`)
       .expect(404)
   })
 
   test('403 if another user', async () => {
-    const { ratingID } = await createOneRating()
+    const { questionID } = await createOneQuestion()
     const { token } = await loginAs('admin', api)
 
     await api
-      .delete(`${apiURL}/${ratingID}`)
+      .delete(`${apiURL}/${questionID}`)
       .set('Cookie', `token=${token}`)
       .expect(403)
   })

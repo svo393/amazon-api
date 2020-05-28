@@ -39,4 +39,10 @@ router.get('/:ratingID/comments', async (req, res) => {
   res.json(ratingComments)
 })
 
+// router.post('/:ratingID/upload', isAdmin, ratingCommentService.multerUpload.array('ratingMedia', 10), (req, res) => { // TODO
+//   const ratingMedia = inputValidator.checkratingMediaUpload(req)
+//   ratingCommentService.uploadImages(ratingMedia, req)
+//   res.status(204).end()
+// })
+
 export default router

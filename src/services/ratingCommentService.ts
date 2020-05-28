@@ -40,23 +40,18 @@ const updateRatingComment = async (ratingCommentInput: RatingCommentUpdateInput,
   return updatedRC
 }
 
-// const getRatingCommentsByProduct = async (req: Request): Promise<RatingComment[]> => {
-//   return await db('ratingComments')
-//     .where('productID', req.params.productID)
-// }
+const deleteRatingComment = async (req: Request): Promise<void> => {
+  const deleteCount = await db<RatingComment>('ratingComments')
+    .del()
+    .where('ratingCommentID', req.params.ratingCommentID)
 
-// const deleteRatingComment = async (req: Request): Promise<void> => {
-//   const deleteCount = await db<RatingComment>('ratingComments')
-//     .del()
-//     .where('ratingCommentID', req.params.ratingCommentID)
-
-//   if (deleteCount === 0) throw new StatusError(404, 'Not Found')
-// }
+  if (deleteCount === 0) throw new StatusError(404, 'Not Found')
+}
 
 export default {
   addRatingComment,
   getCommentsByRating,
   getRatingCommentByID,
-  updateRatingComment
-  // deleteRatingComment
+  updateRatingComment,
+  deleteRatingComment
 }

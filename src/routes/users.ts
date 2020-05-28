@@ -2,6 +2,7 @@ import Router from 'express'
 import addressService from '../services/addressService'
 import followerService from '../services/followerService'
 import listService from '../services/listService'
+import questionService from '../services/questionService'
 import ratingService from '../services/ratingService'
 import userAddressService from '../services/userAddressService'
 import userService from '../services/userService'
@@ -90,6 +91,11 @@ router.get('/:userID/lists', isSameUserOrAdmin('params'), async (req, res) => {
 router.get('/:userID/ratings', async (req, res) => {
   const ratings = await ratingService.getRatingsByUser(req)
   res.json(ratings)
+})
+
+router.get('/:userID/questions', async (req, res) => {
+  const questions = await questionService.getQuestionsByUser(req)
+  res.json(questions)
 })
 
 router.post('/:userID/follows/:anotherUserID', isSameUser('params'), async (req, res) => {

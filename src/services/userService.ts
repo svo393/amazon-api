@@ -243,7 +243,7 @@ const sendPasswordReset = async (userInput: PasswordRequestInput): Promise<void>
     .update({ resetToken, resetTokenCreatedAt })
     .where('email', email)
 
-  // try {
+  // try { // TODO
   //   await transport.sendMail({
   //     from: 'ecom@example.com',
   //     to: email,

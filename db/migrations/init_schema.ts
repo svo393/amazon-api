@@ -103,6 +103,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t
         .integer('parentCategoryID')
         .references('categories.categoryID')
+        .onDelete('SET NULL')
     })
 
     .createTable('vendors', (t) => {
@@ -145,11 +146,13 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .integer('listID')
         .references('lists.listID')
         .notNullable()
+        .onDelete('CASCADE')
 
       t
         .integer('productID')
         .references('products.productID')
         .notNullable()
+        .onDelete('CASCADE')
     })
     .alterTable('listProducts', (t) => {
       t.primary([ 'listID', 'productID' ])
@@ -177,6 +180,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .integer('productID')
         .references('products.productID')
         .notNullable()
+        .onDelete('CASCADE')
     })
     .alterTable('ratings', (t) => {
       t.unique([ 'userID', 'productID' ])
@@ -200,10 +204,12 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .integer('ratingID')
         .references('ratings.ratingID')
         .notNullable()
+        .onDelete('CASCADE')
 
       t
         .integer('parentRatingCommentID')
         .references('ratingComments.ratingCommentID')
+        .onDelete('SET NULL')
     })
 
     .createTable('questions', (t) => {
@@ -226,6 +232,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .integer('productID')
         .references('products.productID')
         .notNullable()
+        .onDelete('CASCADE')
     })
 
     .createTable('answers', (t) => {
@@ -248,6 +255,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .integer('questionID')
         .references('questions.questionID')
         .notNullable()
+        .onDelete('CASCADE')
     })
 
     .createTable('answerComments', (t) => {
@@ -268,10 +276,12 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .integer('answerID')
         .references('answers.answerID')
         .notNullable()
+        .onDelete('CASCADE')
 
       t
         .integer('parentAnswerCommentID')
         .references('answerComments.answerCommentID')
+        .onDelete('SET NULL')
     })
 
     .createTable('groups', (t) => {
@@ -286,11 +296,13 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .integer('groupID')
         .references('groups.groupID')
         .notNullable()
+        .onDelete('CASCADE')
 
       t
         .integer('productID')
         .references('products.productID')
         .notNullable()
+        .onDelete('CASCADE')
     })
     .alterTable('groupProducts', (t) => {
       t.primary([ 'groupID', 'productID' ])
@@ -308,11 +320,13 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .integer('parameterID')
         .references('parameters.parameterID')
         .notNullable()
+        .onDelete('CASCADE')
 
       t
         .integer('productID')
         .references('products.productID')
         .notNullable()
+        .onDelete('CASCADE')
     })
     .alterTable('productParameters', (t) => {
       t.primary([ 'parameterID', 'productID' ])
@@ -331,6 +345,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .integer('productID')
         .references('products.productID')
         .notNullable()
+        .onDelete('CASCADE')
     })
     .alterTable('cartProducts', (t) => {
       t.primary([ 'userID', 'productID' ])
@@ -392,6 +407,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .integer('orderID')
         .references('orders.orderID')
         .notNullable()
+        .onDelete('CASCADE')
 
       t
         .integer('productID')

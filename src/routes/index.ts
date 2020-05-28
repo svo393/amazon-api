@@ -1,18 +1,21 @@
 import { Router } from 'express'
 import 'express-async-errors'
+import { apiURLs } from '../utils/constants'
 import addressesRouter from './addresses'
 import addressTypesRouter from './addressTypes'
+import answerCommentsRouter from './answerComments'
+import answersRouter from './answers'
 import categoriesRouter from './categories'
 import listsRouter from './lists'
 import productsRouter from './products'
-import ratingsRouter from './ratings'
+import questionsRouter from './questions'
 import ratingCommentsRouter from './ratingComments'
+import ratingsRouter from './ratings'
 import rolesRouter from './roles'
 import shippingMethodsRouter from './shippingMethods'
 import userAddressesRouter from './userAddresses'
 import usersRouter from './users'
 import vendorsRouter from './vendors'
-import { apiURLs } from '../utils/constants'
 
 export default Router()
   .use(apiURLs.categories, categoriesRouter)
@@ -26,4 +29,7 @@ export default Router()
   .use(apiURLs.userAddresses, userAddressesRouter)
   .use(apiURLs.lists, listsRouter)
   .use(apiURLs.ratings, ratingsRouter)
+  .use(apiURLs.questions, questionsRouter)
   .use(apiURLs.ratingComments, ratingCommentsRouter)
+  .use(apiURLs.answers, answersRouter)
+  .use(apiURLs.answerComments, answerCommentsRouter)

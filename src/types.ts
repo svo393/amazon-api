@@ -190,7 +190,7 @@ export type Order = {
   address: string;
   orderCreatedAt: Date;
   orderUpdatedAt: Date;
-  userID: number;
+  userID: number | null;
   orderStatusID: number;
   shippingMethodID: number;
 }
@@ -382,6 +382,43 @@ export type RatingCommentCreateInput = Pick<RatingComment,
 >
 
 export type RatingCommentUpdateInput = Pick<RatingComment,
+  | 'media'
+> & {
+  content?: string;
+}
+
+export type QuestionCreateInput = Pick<Question,
+  | 'content'
+  | 'media'
+  | 'productID'
+>
+
+export type QuestionUpdateInput = Pick<Question,
+  | 'media'
+> & {
+  content?: string;
+}
+
+export type AnswerCreateInput = Pick<Answer,
+  | 'content'
+  | 'media'
+  | 'questionID'
+>
+
+export type AnswerUpdateInput = Pick<Answer,
+  | 'media'
+> & {
+  content?: string;
+}
+
+export type AnswerCommentCreateInput = Pick<AnswerComment,
+  | 'content'
+  | 'media'
+  | 'answerID'
+  | 'parentAnswerCommentID'
+>
+
+export type AnswerCommentUpdateInput = Pick<AnswerComment,
   | 'media'
 > & {
   content?: string;
