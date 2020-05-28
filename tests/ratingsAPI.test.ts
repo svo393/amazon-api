@@ -1,7 +1,7 @@
 import supertest from 'supertest'
 import app from '../src/app'
 import { db } from '../src/utils/db'
-import { apiURLs, createOneProduct, loginAs, newRating, populateUsers, purge, ratingsInDB } from './testHelper'
+import { apiURLs, createOneProduct, createOneRating, loginAs, newRating, populateUsers, purge, ratingsInDB } from './testHelper'
 
 const api = supertest(app)
 const apiURL = apiURLs.ratings
@@ -28,51 +28,61 @@ describe('Rating adding', () => {
   })
 })
 
-// describe('Rating fetching', () => {
-//   test('200 ratings', async () => {
-//     await createOneRating()
+describe('Rating fetching', () => {
+  test('200 ratings by user', async () => {
+    const { userID } = await createOneRating()
 
-//     const { body } = await api
-//       .get(apiURL)
-//       .expect(200)
+    const { body } = await api
+      .get(`${apiURLs.users}/${userID}/ratings`)
+      .expect(200)
 
-//     expect(body).toBeDefined()
-//   })
+    expect(body).toBeDefined()
+  })
 
-//   test('200 rating', async () => {
-//     const { addedRating } = await createOneRating('admin')
+  test('200 ratings by product', async () => {
+    const { productID } = await createOneRating()
 
-//     const { body } = await api
-//       .get(`${apiURL}/${addedRating.ratingID}`)
-//       .expect(200)
+    const { body } = await api
+      .get(`${apiURLs.products}/${productID}/ratings`)
+      .expect(200)
 
-//     expect(body).toBeDefined()
-//   })
-// })
+    expect(body).toBeDefined()
+  })
 
-// describe('Rating updating', () => {
-//   test('200 if admin or root', async () => {
-//     const { addedRating, token } = await createOneRating('admin')
+  test('200 rating', async () => {
+    const { ratingID } = await createOneRating()
 
-//     const { body } = await api
-//       .put(`${apiURL}/${addedRating.ratingID}`)
-//       .set('Cookie', `token=${token}`)
-//       .send({ name: 'Updated Rating' })
-//       .expect(200)
+    const { body } = await api
+      .get(`${apiURL}/${ratingID}`)
+      .expect(200)
 
-//     expect(body.name).toBe('Updated Rating')
-//   })
+    expect(body).toBeDefined()
+  })
+})
 
-//   test('403 if not admin or root', async () => {
-//     const { addedRating } = await createOneRating('admin')
-//     const { token } = await loginAs('customer', api)
+describe('Rating updating', () => {
+  test('200 if creator', async () => {
+    const { ratingID, token } = await createOneRating()
 
-//     await api
-//       .put(`${apiURL}/${addedRating.ratingID}`)
-//       .set('Cookie', `token=${token}`)
-//       .send({ name: 'Updated Rating' })
-//       .expect(403)
-//   })
-// })
+    const { body } = await api
+      .put(`${apiURL}/${ratingID}`)
+      .set('Cookie', `token=${token}`)
+      .send({ isDeleted: true })
+      .expect(200)
+
+    expect(body.isDeleted).toBe(true)
+  })
+
+  test('403 if not creator', async () => {
+    const { ratingID } = await createOneRating()
+    const { token } = await loginAs('admin', api)
+
+    await api
+      .put(`${apiURL}/${ratingID}`)
+      .set('Cookie', `token=${token}`)
+      .send({ title: 'Updated Rating' })
+      .expect(403)
+  })
+})
 
 afterAll(async () => await db.destroy())

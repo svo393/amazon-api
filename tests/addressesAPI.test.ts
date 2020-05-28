@@ -30,20 +30,21 @@ describe('Address adding', () => {
 })
 
 describe('Addresses fetching', () => {
-  test('200 addresses', async () => {
-    const { addedAddress } = await createOneAddress('root')
+  test('200 addresses by user', async () => {
+    const { userID, token } = await createOneAddress('root')
 
     const { body }: { body: Address[] } = await api
-      .get(`${apiURL}?addressTypeID=${addedAddress.addressTypeID}`)
+      .get(`${apiURLs.users}/${userID}/addresses`)
+      .set('Cookie', `token=${token}`)
       .expect(200)
     expect(body).toBeDefined()
   })
 
-  test('200 address', async () => {
+  test('200 addresses by type', async () => {
     const { addedAddress, token } = await createOneAddress('root')
 
-    const { body } = await api
-      .get(`${apiURL}/${addedAddress.addressID}`)
+    const { body }: { body: Address[] } = await api
+      .get(`${apiURLs.addressTypes}/${addedAddress.addressTypeID}/addresses`)
       .set('Cookie', `token=${token}`)
       .expect(200)
 

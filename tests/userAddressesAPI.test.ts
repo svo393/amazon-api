@@ -31,25 +31,12 @@ describe('UserAddress adding', () => {
   })
 })
 
-describe('UserAddresss fetching', () => {
-  test('200 userAddresses', async () => {
-    const { userID, token } = await createOneUserAddress()
-
-    const { body }: { body: UserAddress[] } = await api
-      .get(`${apiURL}?userID=${userID}`)
-      .set('Cookie', `token=${token}`)
-      .expect(200)
-
-    expect(body).toBeDefined()
-  })
-})
-
-describe('UserAddresss updating', () => {
+describe('UserAddress updating', () => {
   test('200 if same user', async () => {
     const { userID, addressID, token } = await createOneUserAddress()
 
     const { body }: { body: UserAddress } = await api
-      .put(`${apiURL}/${addressID}/${userID}`)
+      .put(`${apiURLs.users}/${userID}/addresses/${addressID}`)
       .set('Cookie', `token=${token}`)
       .send({ isDefault: true })
       .expect(200)
@@ -58,7 +45,7 @@ describe('UserAddresss updating', () => {
   })
 })
 
-describe('UserAddresss deleting', () => {
+describe('UserAddress deleting', () => {
   test('204 if same user', async () => {
     const { userID, addressID, token } = await createOneUserAddress()
 

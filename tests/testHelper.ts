@@ -16,7 +16,6 @@ export const apiURLs = {
   shippingMethods: '/api/shipping-methods',
   addressTypes: '/api/address-types',
   addresses: '/api/addresses',
-  followers: '/api/followers',
   userAddresses: '/api/user-addresses',
   lists: '/api/lists',
   ratings: '/api/ratings'
@@ -230,27 +229,27 @@ export const newAddress = async (): Promise<AddressCreateInput> => {
   }
 }
 
-export const createOneFollower = async (): Promise<Follower & { token: string}> => {
-  const user1 = await getUserByEmail('admin@example.com')
-  const { userID: user2ID, token } = await loginAs('customer', api)
+export const createOneFollower = async (): Promise<Follower & { token: string }> => {
+  const { token, userID } = await loginAs('root', api)
+  const { userID: follows } = await loginAs('customer', api)
 
   const { body }: { body: Follower } = await api
-    .post(apiURLs.followers)
+    .post(`${apiURLs.users}/${userID}/follows/${follows}`)
     .set('Cookie', `token=${token}`)
-    .send({ userID: user2ID, follows: user1.userID })
+    .send({ userID, follows })
 
   return { ...body, token }
 }
 
-export const createOneAddress = async (role: string): Promise<{ addedAddress: Address; token: string}> => {
-  const { token } = await loginAs(role, api)
+export const createOneAddress = async (role: string): Promise<{ addedAddress: Address; token: string; userID: number}> => {
+  const { token, userID } = await loginAs(role, api)
 
   const { body } = await api
     .post(apiURLs.addresses)
     .set('Cookie', `token=${token}`)
     .send(await newAddress())
 
-  return { addedAddress: body, token }
+  return { addedAddress: body, token, userID }
 }
 
 export const createOneUserAddress = async (): Promise<UserAddress & { token: string}> => {
@@ -348,14 +347,14 @@ export const newRating = (productID: number): RatingCreateInput => ({
   productID
 })
 
-// export const createOneRating = async (): Promise<Rating> => {
-//   const { token } = await loginAs('customer', api)
-//   const { addedProduct } = await createOneProduct('admin')
+export const createOneRating = async (): Promise<Rating & { token: string }> => {
+  const { token } = await loginAs('customer', api)
+  const { addedProduct } = await createOneProduct('admin')
 
-//   const { body }: { body: Rating } = await api
-//     .post(apiURLs.ratings)
-//     .set('Cookie', `token=${token}`)
-//     .send(newRating(addedProduct.productID))
+  const { body }: { body: Rating } = await api
+    .post(apiURLs.ratings)
+    .set('Cookie', `token=${token}`)
+    .send(newRating(addedProduct.productID))
 
-//   return body
-// }
+  return { ...body, token }
+}

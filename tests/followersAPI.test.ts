@@ -5,7 +5,7 @@ import { db } from '../src/utils/db'
 import { apiURLs, createOneFollower, followersInDB, getUserByEmail, loginAs, populateUsers, purge } from './testHelper'
 
 const api = supertest(app)
-const apiURL = apiURLs.followers
+const apiURL = apiURLs.users
 
 beforeEach(async () => {
   await purge()
@@ -14,15 +14,15 @@ beforeEach(async () => {
 
 describe('Follower adding', () => {
   test('201', async () => {
-    const user1 = await getUserByEmail('admin@example.com')
-    const { userID: user2ID, token } = await loginAs('customer', api)
+    const { token, userID } = await loginAs('root', api)
+    const { userID: follows } = await loginAs('customer', api)
 
     const followersAtStart = await followersInDB()
 
     await api
-      .post(apiURL)
+      .post(`${apiURLs.users}/${userID}/follows/${follows}`)
       .set('Cookie', `token=${token}`)
-      .send({ userID: user2ID, follows: user1.userID })
+      .send({ userID, follows })
       .expect(201)
       .expect('Content-Type', /application\/json/)
 
@@ -32,11 +32,20 @@ describe('Follower adding', () => {
 })
 
 describe('Followers fetching', () => {
-  test('200 followers', async () => {
+  test('200 followers by user', async () => {
     const { follows } = await createOneFollower()
 
     const { body }: { body: Follower[] } = await api
-      .get(`${apiURL}?follows=${follows}`)
+      .get(`${apiURL}/${follows}/followers`)
+      .expect(200)
+    expect(body).toBeDefined()
+  })
+
+  test('200 followed by user', async () => {
+    const { userID } = await createOneFollower()
+
+    const { body }: { body: Follower[] } = await api
+      .get(`${apiURL}/${userID}/follows`)
       .expect(200)
     expect(body).toBeDefined()
   })
@@ -47,7 +56,7 @@ describe('Followers deleting', () => {
     const { userID, follows, token } = await createOneFollower()
 
     await api
-      .delete(`${apiURLs.users}/${userID}/followers/${follows}`)
+      .delete(`${apiURL}/${userID}/follows/${follows}`)
       .set('Cookie', `token=${token}`)
       .expect(204)
   })
@@ -57,7 +66,7 @@ describe('Followers deleting', () => {
     const { token } = await loginAs('admin', api)
 
     await api
-      .delete(`${apiURLs.users}/${userID}/followers/${follows}`)
+      .delete(`${apiURL}/${userID}/follows/${follows}`)
       .set('Cookie', `token=${token}`)
       .expect(403)
   })

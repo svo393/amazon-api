@@ -1,4 +1,4 @@
-import { Response } from 'express'
+import { Response, Request } from 'express'
 import { List, ListCreateInput, ListFetchInput } from '../types'
 import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
@@ -22,11 +22,9 @@ const addList = async (listInput: ListCreateInput, res: Response): Promise<List>
   return addedList
 }
 
-const getLists = async (listInput: ListFetchInput): Promise<List[]> => {
-  const { userID } = listInput
-
+const getListsByUser = async (req: Request): Promise<List[]> => {
   return await db('lists')
-    .where('userID', userID)
+    .where('userID', req.params.userID)
 }
 
 const getListByID = async (listID: number): Promise<List> => {
@@ -57,7 +55,7 @@ const deleteList = async (listID: number): Promise<void> => {
 
 export default {
   addList,
-  getLists,
+  getListsByUser,
   getListByID,
   updateList,
   deleteList

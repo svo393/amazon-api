@@ -21,12 +21,12 @@ export const hasDefinedProps = <T>(param: object): T => {
   const strippedObject = JSON.parse(JSON.stringify(param))
 
   if (R.isEmpty(strippedObject)) {
-    throw new StatusError(400, 'Invalid user input')
+    throw new StatusError(400, 'Invalid input')
   }
   return strippedObject
 }
 
-export const isInputProvided = (param: object, msg = 'Missing user input'): void => {
+export const isInputProvided = (param: object, msg = 'Missing input'): void => {
   if (R.isEmpty(param) || R.isNil(param)) {
     throw new StatusError(400, msg)
   }

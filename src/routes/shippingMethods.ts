@@ -6,7 +6,7 @@ import { isAdmin } from '../utils/middleware'
 const router = Router()
 
 router.post('/', isAdmin, async (req, res) => {
-  const shippingMethodCreateInput = inputValidator.checkShippingMethod(req.body)
+  const shippingMethodCreateInput = inputValidator.checkShippingMethod(req)
   const addedShippingMethod = await shippingMethodService.addShippingMethod(shippingMethodCreateInput)
   res.status(201).json(addedShippingMethod)
 })
@@ -22,7 +22,7 @@ router.get('/:shippingMethodID', async (req, res) => {
 })
 
 router.put('/:shippingMethodID', isAdmin, async (req, res) => {
-  const shippingMethodUpdateInput = inputValidator.checkShippingMethod(req.body)
+  const shippingMethodUpdateInput = inputValidator.checkShippingMethod(req)
   const updatedItem = await shippingMethodService.updateShippingMethod(shippingMethodUpdateInput, Number(req.params.shippingMethodID))
   res.json(updatedItem)
 })

@@ -1,5 +1,5 @@
-import { Response } from 'express'
-import { Rating, RatingCreateInput } from '../types'
+import { Response, Request } from 'express'
+import { Rating, RatingCreateInput, RatingUpdateInput } from '../types'
 import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
@@ -16,43 +16,50 @@ const addRating = async (ratingInput: RatingCreateInput, res: Response): Promise
   }
 
   const now = new Date()
-  return db('ratings')
+
+  const [ addedRating ]: Rating[] = await db('ratings')
     .insert({
       ...ratingInput,
       userID: res.locals.userID,
       ratingCreatedAt: now,
       ratingUpdatedAt: now
     }, [ '*' ])
+
+  return addedRating
 }
 
-// const getRatings = async (ratingInput: RatingFetchInput): Promise<(Rating & { userID?: number })[] | void> => {
-//   const { userID, ratingTypeID } = ratingInput
+const getRatingsByUser = async (req: Request): Promise<Rating[] | void> => {
+  return await db('ratings')
+    .where('userID', req.params.userID)
+}
 
-//   if (ratingTypeID) {
-//     return await db('ratings')
-//       .where('ratingTypeID', ratingTypeID)
-//   }
+const getRatingsByProduct = async (req: Request): Promise<Rating[] | void> => {
+  return await db('ratings')
+    .where('productID', req.params.productID)
+}
 
-//   if (userID) {
-//     return await db('ratings as a')
-//       .select('a.ratingID', 'a.addr', 'a.ratingTypeID', 'ua.userID')
-//       .joinRaw('JOIN userAdresses as ua USING (ratingID)')
-//       .where('ua.userID', userID)
-//   }
-// }
+const getRatingByID = async (req: Request): Promise<Rating> => {
+  const rating = await db<Rating>('ratings')
+    .first()
+    .where('ratingID', req.params.ratingID)
 
-// const getRatingByID = async (ratingID: number): Promise<Rating> => {
-//   const rating = await db<Rating>('ratings')
-//     .first()
-//     .where('ratingID', ratingID)
+  if (!rating) throw new StatusError(404, 'Not Found')
+  return rating
+}
 
-//   if (!rating) throw new StatusError(404, 'Not Found')
+const updateRating = async (ratingInput: RatingUpdateInput, req: Request): Promise<Rating> => {
+  const [ updatedRating ]: Rating[] = await db<Rating>('ratings')
+    .update({ ...ratingInput }, [ '*' ])
+    .where('ratingID', req.params.ratingID)
 
-//   return rating
-// }
+  if (!updatedRating) throw new StatusError(404, 'Not Found')
+  return updatedRating
+}
 
 export default {
-  addRating
-  // getRatings,
-  // getRatingByID
+  addRating,
+  getRatingsByUser,
+  getRatingsByProduct,
+  getRatingByID,
+  updateRating
 }

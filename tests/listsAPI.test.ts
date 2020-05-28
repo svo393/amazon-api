@@ -31,11 +31,11 @@ describe('List adding', () => {
 })
 
 describe('Lists fetching', () => {
-  test('200 lists', async () => {
+  test('200 lists by user', async () => {
     const { userID, token } = await createOneList()
 
     const { body }: { body: List[] } = await api
-      .get(`${apiURL}?userID=${userID}`)
+      .get(`${apiURLs.users}/${userID}/lists`)
       .set('Cookie', `token=${token}`)
       .expect(200)
     expect(body).toBeDefined()

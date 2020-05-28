@@ -6,7 +6,7 @@ import { isAdmin } from '../utils/middleware'
 const router = Router()
 
 router.post('/', isAdmin, async (req, res) => {
-  const categoryCreateInput = inputValidator.checkNewCategory(req.body)
+  const categoryCreateInput = inputValidator.checkNewCategory(req)
   const addedCategory = await categoryService.addCategory(categoryCreateInput)
   res.status(201).json(addedCategory)
 })
@@ -22,7 +22,7 @@ router.get('/:categoryID', async (req, res) => {
 })
 
 router.put('/:categoryID', isAdmin, async (req, res) => {
-  const categoryUpdateInput = inputValidator.checkCategoryUpdate(req.body)
+  const categoryUpdateInput = inputValidator.checkCategoryUpdate(req)
   const updatedItem = await categoryService.updateCategory(categoryUpdateInput, Number(req.params.categoryID))
   res.json(updatedItem)
 })

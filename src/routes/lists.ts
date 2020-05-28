@@ -1,21 +1,15 @@
 import Router from 'express'
-import listService from '../services/listService'
 import listProductsService from '../services/listProductService'
+import listService from '../services/listService'
 import inputValidator from '../utils/inputValidator'
-import { isCreator, isLoggedIn, isSameUserOrAdmin } from '../utils/middleware'
+import { isCreator, isLoggedIn } from '../utils/middleware'
 
 const router = Router()
 
 router.post('/', isLoggedIn, async (req, res) => {
-  const listCreateInput = inputValidator.checkNewList(req.body)
+  const listCreateInput = inputValidator.checkNewList(req)
   const addedList = await listService.addList(listCreateInput, res)
   res.status(201).json(addedList)
-})
-
-router.get('/', isSameUserOrAdmin('query'), async (req, res) => {
-  const listFetchInput = inputValidator.checkListsFetch(req.query)
-  const lists = await listService.getLists(listFetchInput)
-  res.json(lists)
 })
 
 router.get('/:listID', isCreator('lists', 'listID', 'params'), async (req, res) => {
@@ -24,7 +18,7 @@ router.get('/:listID', isCreator('lists', 'listID', 'params'), async (req, res) 
 })
 
 router.put('/:listID', isCreator('lists', 'listID', 'params'), async (req, res) => {
-  const listUpdateInput = inputValidator.checkListUpdate(req.body)
+  const listUpdateInput = inputValidator.checkListUpdate(req)
   const updatedItem = await listService.updateList(listUpdateInput, Number(req.params.listID))
   res.json(updatedItem)
 })

@@ -116,7 +116,7 @@ type UserListData = Omit<User,
 const getUsers = async (): Promise<UserListData[]> => {
   const users: UserListData[] = await db('users as u')
     .select('email', 'u.name', 'info', 'avatar', 'userCreatedAt',
-      'isDeleted', 'u.userID', 'rl.name as role')
+      'u.isDeleted', 'u.userID', 'rl.name as role')
     .count('o.orderID as orderCount')
     .count('r.ratingID as ratingCount')
     .count('q.questionID as questionCount')

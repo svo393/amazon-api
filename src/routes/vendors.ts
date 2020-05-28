@@ -6,7 +6,7 @@ import { isAdmin } from '../utils/middleware'
 const router = Router()
 
 router.post('/', isAdmin, async (req, res) => {
-  const vendorCreateInput = inputValidator.checkVendor(req.body)
+  const vendorCreateInput = inputValidator.checkVendor(req)
   const addedVendor = await vendorService.addVendor(vendorCreateInput)
   res.status(201).json(addedVendor)
 })
@@ -22,7 +22,7 @@ router.get('/:vendorID', async (req, res) => {
 })
 
 router.put('/:vendorID', isAdmin, async (req, res) => {
-  const vendorUpdateInput = inputValidator.checkVendor(req.body)
+  const vendorUpdateInput = inputValidator.checkVendor(req)
   const updatedItem = await vendorService.updateVendor(vendorUpdateInput, Number(req.params.vendorID))
   res.json(updatedItem)
 })

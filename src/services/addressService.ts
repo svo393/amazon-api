@@ -1,4 +1,4 @@
-import { Response } from 'express'
+import { Response, Request } from 'express'
 import Knex from 'knex'
 import R from 'ramda'
 import { Address, AddressCreateInput, AddressFetchInput, UserAddress } from '../types'
@@ -65,26 +65,21 @@ const addAddress = async (addressInput: AddressCreateInput, res: Response): Prom
   return curUA
 }
 
-const getAddresses = async (addressInput: AddressFetchInput): Promise<(Address & { userID?: number })[] | void> => {
-  const { userID, addressTypeID } = addressInput
-
-  if (addressTypeID) {
-    return await db('addresses')
-      .where('addressTypeID', addressTypeID)
-  }
-
-  if (userID) {
-    return await db('addresses as a')
-      .select('a.addressID', 'a.addr', 'a.addressTypeID', 'ua.userID')
-      .joinRaw('JOIN userAdresses as ua USING (addressID)')
-      .where('ua.userID', userID)
-  }
+const getAddressesByUser = async (req: Request): Promise<(Address & UserAddress)[]> => {
+  return await db('userAddresses as ua')
+    .where('userID', req.params.userID)
+    .join('addresses as a', 'ua.addressID', 'a.addressID')
 }
 
-const getAddressByID = async (addressID: number): Promise<Address> => {
+const getAddressesByType = async (req: Request): Promise<Address[]> => {
+  return await db('addresses')
+    .where('addressTypeID', req.params.addressTypeID)
+}
+
+const getAddressByID = async (req: Request): Promise<Address> => {
   const address = await db<Address>('addresses')
     .first()
-    .where('addressID', addressID)
+    .where('addressID', req.params.addressID)
 
   if (!address) throw new StatusError(404, 'Not Found')
 
@@ -93,6 +88,7 @@ const getAddressByID = async (addressID: number): Promise<Address> => {
 
 export default {
   addAddress,
-  getAddresses,
+  getAddressesByUser,
+  getAddressesByType,
   getAddressByID
 }

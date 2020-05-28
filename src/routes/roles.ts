@@ -6,7 +6,7 @@ import { isRoot } from '../utils/middleware'
 const router = Router()
 
 router.post('/', isRoot, async (req, res) => {
-  const roleCreateInput = inputValidator.checkRole(req.body)
+  const roleCreateInput = inputValidator.checkRole(req)
   const addedRole = await roleService.addRole(roleCreateInput)
   res.status(201).json(addedRole)
 })
@@ -22,7 +22,7 @@ router.get('/:roleID', isRoot, async (req, res) => {
 })
 
 router.put('/:roleID', isRoot, async (req, res) => {
-  const roleUpdateInput = inputValidator.checkRole(req.body)
+  const roleUpdateInput = inputValidator.checkRole(req)
   const updatedItem = await roleService.updateRole(roleUpdateInput, Number(req.params.roleID))
   res.json(updatedItem)
 })

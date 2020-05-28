@@ -22,6 +22,7 @@ type Target = 'params' | 'query' | 'body'
 type Entities =
   | 'lists'
   | 'products'
+  | 'ratings'
 
 export const isLoggedIn: Middleware = (_req, res, next) => {
   if (!res.locals.userID) throw new StatusError(403, 'Forbidden')

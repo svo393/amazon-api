@@ -1,50 +1,48 @@
-import { Follower, FollowerFetchInput } from '../types'
+import { Request } from 'express'
+import { Follower } from '../types'
 import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
-const addFollower = async (followerInput: Follower): Promise<Follower> => {
-  const { userID, follows } = followerInput
+const addFollower = async (req: Request): Promise<Follower> => {
+  const { userID, anotherUserID } = req.params
 
   const existingFollower = await db<Follower>('followers')
     .first()
     .where('userID', userID)
-    .andWhere('follows', follows)
+    .andWhere('follows', anotherUserID)
 
-  let addedFollower
-
-  if (!existingFollower) {
-    [ addedFollower ] = await db('followers')
-      .insert(followerInput, [ '*' ])
+  if (existingFollower) {
+    throw new StatusError(409, 'You\'are already following this user')
   }
 
-  return existingFollower ?? addedFollower as Follower
+  const [ addedFollower ]: Follower[] = await db('followers')
+    .insert({ userID, follows: anotherUserID }, [ '*' ])
+
+  return addedFollower
 }
 
-const getFollowers = async (followerInput: FollowerFetchInput): Promise<Follower[] | void> => {
-  const { userID, follows } = followerInput
-
-  if (follows) {
-    return await db('followers')
-      .where('follows', follows)
-  }
-
-  if (userID) {
-    return await db('followers')
-      .where('userID', userID)
-  }
+const getFollowersByUser = async (req: Request): Promise<Follower[]> => {
+  return await db('followers')
+    .where('follows', req.params.userID)
 }
 
-const deleteFollower = async (userID: number, follows: number): Promise<void> => {
+const getFollowedByUser = async (req: Request): Promise<Follower[]> => {
+  return await db('followers')
+    .where('userID', req.params.userID)
+}
+
+const deleteFollower = async (req: Request): Promise<void> => {
   const deleteCount = await db<Follower>('followers')
     .del()
-    .where('userID', userID)
-    .andWhere('follows', follows)
+    .where('userID', req.params.userID)
+    .andWhere('follows', req.params.anotherUserID)
 
   if (deleteCount === 0) throw new StatusError(404, 'Not Found')
 }
 
 export default {
   addFollower,
-  getFollowers,
+  getFollowersByUser,
+  getFollowedByUser,
   deleteFollower
 }

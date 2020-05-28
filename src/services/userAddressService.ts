@@ -18,13 +18,6 @@ const addUserAddress = async (UAInput: UACreateInput): Promise<UserAddress> => {
   return addedUA
 }
 
-const getUserAddresses = async (UAInput: UAFetchInput): Promise<UserAddress[]> => {
-  const { userID } = UAInput
-
-  return await db('userAddresses')
-    .where('userID', userID)
-}
-
 const updateUserAddress = async (UAInput: UAUpdateInput, addressID: number, userID: number): Promise<UserAddress> => {
   const { isDefault } = UAInput
 
@@ -48,7 +41,6 @@ const deleteUserAddress = async (addressID: number, userID: number): Promise<voi
 
 export default {
   addUserAddress,
-  getUserAddresses,
   updateUserAddress,
   deleteUserAddress
 }

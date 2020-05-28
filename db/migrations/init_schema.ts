@@ -164,6 +164,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.integer('likes').notNullable().unsigned().defaultTo(0)
       t.integer('dislikes').notNullable().unsigned().defaultTo(0)
       t.boolean('isVerified').defaultTo(false).notNullable()
+      t.boolean('isDeleted').defaultTo(false).notNullable()
 
       t
         .integer('userID')
@@ -186,6 +187,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.string('content', 65535).notNullable()
       t.integer('media').unsigned()
       t.boolean('isVerified').defaultTo(false).notNullable()
+      t.boolean('isDeleted').defaultTo(false).notNullable()
 
       t
         .integer('userID')
@@ -211,6 +213,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.integer('likes').notNullable().unsigned().defaultTo(0)
       t.integer('dislikes').notNullable().unsigned().defaultTo(0)
       t.boolean('isVerified').defaultTo(false).notNullable()
+      t.boolean('isDeleted').defaultTo(false).notNullable()
 
       t
         .integer('userID')
@@ -232,6 +235,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.integer('likes').notNullable().unsigned().defaultTo(0)
       t.integer('dislikes').notNullable().unsigned().defaultTo(0)
       t.boolean('isVerified').defaultTo(false).notNullable()
+      t.boolean('isDeleted').defaultTo(false).notNullable()
 
       t
         .integer('userID')
@@ -251,6 +255,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.string('content', 65535).notNullable()
       t.integer('media').unsigned()
       t.boolean('isVerified').defaultTo(false).notNullable()
+      t.boolean('isDeleted').defaultTo(false).notNullable()
 
       t
         .integer('userID')

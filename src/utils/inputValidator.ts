@@ -1,19 +1,20 @@
 import R from 'ramda'
-import { AddressCreateInput, AddressFetchInput, AddressTypeInput, CategoryCreateInput, CategoryUpdateInput, Follower, FollowerFetchInput, ListCreateInput, ListFetchInput, PasswordRequestInput, PasswordResetInput, ProductCreateInput, ProductUpdateInput, RatingCreateInput, RoleInput, ShippingMethodInput, UserAddressCreateInput, UserAddressFetchInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput } from '../types'
+import { AddressCreateInput, AddressFetchInput, AddressTypeInput, CategoryCreateInput, CategoryUpdateInput, Follower, FollowerFetchInput, ListCreateInput, ListFetchInput, PasswordRequestInput, PasswordResetInput, ProductCreateInput, ProductUpdateInput, RatingCreateInput, RatingUpdateInput, RoleInput, ShippingMethodInput, UserAddressCreateInput, UserAddressFetchInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput } from '../types'
 import { canBeNumber, hasDefinedProps, isBoolean, isEmail, isInputProvided, isNumber, isPasswordValid, isProvided, isString, isStringOrArray } from './validatorLib'
+import { Request } from 'express'
 
-const checkNewUser = (object: any): UserSignupInput => {
+const checkNewUser = ({ body }: Request): UserSignupInput => {
   const email = R.pipe(
     isProvided,
     isString,
     isEmail
-  )({ name: 'email', param: object.email })
+  )({ name: 'email', param: body.email })
 
   const password = R.pipe(
     isProvided,
     isString,
     isPasswordValid
-  )({ name: 'password', param: object.password })
+  )({ name: 'password', param: body.password })
 
   const userInput: UserSignupInput = {
     email: email.param.toLowerCase(),
@@ -22,22 +23,22 @@ const checkNewUser = (object: any): UserSignupInput => {
   return userInput
 }
 
-const checkUserLogin = (object: any): UserLoginInput => {
+const checkUserLogin = ({ body }: Request): UserLoginInput => {
   const email = R.pipe(
     isProvided,
     isString,
     isEmail
-  )({ name: 'email', param: object.email })
+  )({ name: 'email', param: body.email })
 
   const password = R.pipe(
     isProvided,
     isString
-  )({ name: 'password', param: object.password })
+  )({ name: 'password', param: body.password })
 
   const remember = R.pipe(
     isProvided,
     isBoolean
-  )({ name: 'remember', param: object.remember })
+  )({ name: 'remember', param: body.remember })
 
   const userInput: UserLoginInput = {
     email: email.param.toLowerCase(),
@@ -47,27 +48,31 @@ const checkUserLogin = (object: any): UserLoginInput => {
   return userInput
 }
 
-const checkUserUpdate = (object: any): UserUpdateInput => {
-  const password = object.password && R.pipe(
+const checkUserUpdate = ({ body }: Request): UserUpdateInput => {
+  const password = body.password && R.pipe(
     isString,
     isPasswordValid
-  )({ name: 'password', param: object.password })
+  )({ name: 'password', param: body.password })
 
-  const email = object.email && R.pipe(
+  const email = body.email && R.pipe(
     isString,
     isEmail
-  )({ name: 'email', param: object.email })
+  )({ name: 'email', param: body.email })
 
-  const name = object.name && isString(
-    { name: 'name', param: object.name }
+  const name = body.name && isString(
+    { name: 'name', param: body.name }
   )
 
-  const avatar = object.avatar && isBoolean(
-    { name: 'avatar', param: object.avatar }
+  const avatar = body.avatar && isBoolean(
+    { name: 'avatar', param: body.avatar }
   )
 
-  const roleID = object.roleID && isNumber(
-    { name: 'roleID', param: object.roleID }
+  const roleID = body.roleID && isNumber(
+    { name: 'roleID', param: body.roleID }
+  )
+
+  const isDeleted = body.isDeleted && isBoolean(
+    { name: 'isDeleted', param: body.isDeleted }
   )
 
   const userInput: UserUpdateInput = {
@@ -75,17 +80,18 @@ const checkUserUpdate = (object: any): UserUpdateInput => {
     email: email?.param.toLowerCase(),
     password: password?.param,
     avatar: avatar?.param,
+    isDeleted: isDeleted?.param,
     roleID: roleID?.param
   }
   return hasDefinedProps(userInput)
 }
 
-const checkUserResetRequest = (object: any): PasswordRequestInput => {
+const checkUserResetRequest = ({ body }: Request): PasswordRequestInput => {
   const email = R.pipe(
     isProvided,
     isString,
     isEmail
-  )({ name: 'email', param: object.email })
+  )({ name: 'email', param: body.email })
 
   const userInput: PasswordRequestInput = {
     email: email.param.toLowerCase()
@@ -93,17 +99,17 @@ const checkUserResetRequest = (object: any): PasswordRequestInput => {
   return userInput
 }
 
-const checkUserResetToken = (object: any): PasswordResetInput => {
+const checkUserResetToken = ({ body }: Request): PasswordResetInput => {
   const resetToken = R.pipe(
     isProvided,
     isString
-  )({ name: 'resetToken', param: object.resetToken })
+  )({ name: 'resetToken', param: body.resetToken })
 
   const password = R.pipe(
     isProvided,
     isString,
     isPasswordValid
-  )({ name: 'password', param: object.password })
+  )({ name: 'password', param: body.password })
 
   const userInput: PasswordResetInput = {
     resetToken: resetToken.param,
@@ -112,74 +118,74 @@ const checkUserResetToken = (object: any): PasswordResetInput => {
   return userInput
 }
 
-const checkNewProduct = (object: any): ProductCreateInput => {
+const checkNewProduct = ({ body }: Request): ProductCreateInput => {
   const title = R.pipe(
     isProvided,
     isString
-  )({ name: 'title', param: object.title })
+  )({ name: 'title', param: body.title })
 
   const listPrice = R.pipe(
     isProvided,
     isNumber
-  )({ name: 'listPrice', param: object.listPrice })
+  )({ name: 'listPrice', param: body.listPrice })
 
   const price = R.pipe(
     isProvided,
     isNumber
-  )({ name: 'price', param: object.price })
+  )({ name: 'price', param: body.price })
 
   const description = R.pipe(
     isProvided,
     isString
-  )({ name: 'description', param: object.description })
+  )({ name: 'description', param: body.description })
 
-  const brandSection = object.brandSection && isString(
-    { name: 'brandSection', param: object.brandSection }
+  const brandSection = body.brandSection && isString(
+    { name: 'brandSection', param: body.brandSection }
   )
 
   const stock = R.pipe(
     isProvided,
     isNumber
-  )({ name: 'stock', param: object.stock })
+  )({ name: 'stock', param: body.stock })
 
   const media = R.pipe(
     isProvided,
     isNumber
-  )({ name: 'media', param: object.media })
+  )({ name: 'media', param: body.media })
 
   const primaryMedia = R.pipe(
     isProvided,
     isNumber
-  )({ name: 'primaryMedia', param: object.primaryMedia })
+  )({ name: 'primaryMedia', param: body.primaryMedia })
 
-  const isAvailable = object.isAvailable && isBoolean(
-    { name: 'isAvailable', param: object.isAvailable }
+  const isAvailable = body.isAvailable && isBoolean(
+    { name: 'isAvailable', param: body.isAvailable }
   )
 
   const categoryID = R.pipe(
     isProvided,
     isNumber
-  )({ name: 'categoryID', param: object.categoryID })
+  )({ name: 'categoryID', param: body.categoryID })
 
   const vendorID = R.pipe(
     isProvided,
     isNumber
-  )({ name: 'vendorID', param: object.vendorID })
+  )({ name: 'vendorID', param: body.vendorID })
 
   // const groups = R.pipe(
   //   isProvided,
   //   isArray
-  // )({ name: 'groups', param: object.groups })
+  // )({ name: 'groups', param: body.groups })
 
-  // groups.param.map((p: object) =>
+  // groups.param.map((p: body) =>
   //   isGroup({ name: 'productParameter', param: p }))
 
   // const productParameters = R.pipe(
   //   isProvided,
   //   isArray
-  // )({ name: 'productParameters', param: object.productParameters })
+  // )({ name: 'productParameters', param: body.productParameters })
 
-  // productParameters.param.map((p: object) =>
+  // productParameters.param.map((p: body) =>
   //   isProductParameter({ name: 'productParameter', param: p }))
 
   const productInput: ProductCreateInput = {
@@ -200,49 +206,53 @@ const checkNewProduct = (object: any): ProductCreateInput => {
   return productInput
 }
 
-const checkProductUpdate = (object: any): ProductUpdateInput => {
-  const title = object.title && isString(
-    { name: 'title', param: object.title }
+const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
+  const title = body.title && isString(
+    { name: 'title', param: body.title }
   )
 
-  const listPrice = object.listPrice && isNumber(
-    { name: 'listPrice', param: object.listPrice }
+  const listPrice = body.listPrice && isNumber(
+    { name: 'listPrice', param: body.listPrice }
   )
 
-  const price = object.price && isNumber(
-    { name: 'price', param: object.price }
+  const price = body.price && isNumber(
+    { name: 'price', param: body.price }
   )
 
-  const description = object.description && isString(
-    { name: 'description', param: object.description }
+  const description = body.description && isString(
+    { name: 'description', param: body.description }
   )
 
-  const brandSection = object.brandSection && isString(
-    { name: 'brandSection', param: object.brandSection }
+  const brandSection = body.brandSection && isString(
+    { name: 'brandSection', param: body.brandSection }
   )
 
-  const stock = object.stock && isNumber(
-    { name: 'stock', param: object.stock }
+  const stock = body.stock && isNumber(
+    { name: 'stock', param: body.stock }
   )
 
-  const media = object.media && isNumber(
-    { name: 'media', param: object.media }
+  const media = body.media && isNumber(
+    { name: 'media', param: body.media }
   )
 
-  const primaryMedia = object.primaryMedia && isNumber(
-    { name: 'primaryMedia', param: object.primaryMedia }
+  const primaryMedia = body.primaryMedia && isNumber(
+    { name: 'primaryMedia', param: body.primaryMedia }
   )
 
-  const isAvailable = object.isAvailable && isBoolean(
-    { name: 'isAvailable', param: object.isAvailable }
+  const isAvailable = body.isAvailable && isBoolean(
+    { name: 'isAvailable', param: body.isAvailable }
   )
 
-  const categoryID = object.categoryID && isNumber(
-    { name: 'categoryID', param: object.categoryID }
+  const categoryID = body.categoryID && isNumber(
+    { name: 'categoryID', param: body.categoryID }
   )
 
-  const vendorID = object.vendorID && isNumber(
-    { name: 'vendorID', param: object.vendorID }
+  const vendorID = body.vendorID && isNumber(
+    { name: 'vendorID', param: body.vendorID }
+  )
+
+  const isDeleted = body.isDeleted && isBoolean(
+    { name: 'isDeleted', param: body.isDeleted }
   )
 
   const productInput: ProductUpdateInput = {
@@ -255,26 +265,27 @@ const checkProductUpdate = (object: any): ProductUpdateInput => {
     media: media?.param,
     primaryMedia: primaryMedia?.param,
     isAvailable: isAvailable?.param,
+    isDeleted: isDeleted?.param,
     categoryID: categoryID?.param,
     vendorID: vendorID?.param
   }
   return hasDefinedProps(productInput)
 }
 
-const checkProductMediaUpload = (object: any): Express.Multer.File[] => {
-  isInputProvided(object, 'Missing images')
-  isStringOrArray({ name: 'images', param: object })
-  return object
+const checkProductMediaUpload = ({ files }: Request): Express.Multer.File[] => {
+  isInputProvided(files, 'Missing images')
+  isStringOrArray({ name: 'images', param: files })
+  return files as Express.Multer.File[]
 }
 
-const checkNewCategory = (object: any): CategoryCreateInput => {
+const checkNewCategory = ({ body }: Request): CategoryCreateInput => {
   const name = R.pipe(
     isProvided,
     isString
-  )({ name: 'name', param: object.name })
+  )({ name: 'name', param: body.name })
 
-  const parentCategoryID = object.parentCategoryID && isNumber(
-    { name: 'parentCategoryID', param: object.parentCategoryID }
+  const parentCategoryID = body.parentCategoryID && isNumber(
+    { name: 'parentCategoryID', param: body.parentCategoryID }
   )
 
   const categoryInput: CategoryCreateInput = {
@@ -284,13 +295,13 @@ const checkNewCategory = (object: any): CategoryCreateInput => {
   return categoryInput
 }
 
-const checkCategoryUpdate = (object: any): CategoryUpdateInput => {
-  const name = object.name && isString(
-    { name: 'name', param: object.name }
+const checkCategoryUpdate = ({ body }: Request): CategoryUpdateInput => {
+  const name = body.name && isString(
+    { name: 'name', param: body.name }
   )
 
-  const parentCategoryID = object.parentCategoryID && isNumber(
-    { name: 'parentCategoryID', param: object.parentCategoryID }
+  const parentCategoryID = body.parentCategoryID && isNumber(
+    { name: 'parentCategoryID', param: body.parentCategoryID }
   )
 
   const categoryInput: CategoryUpdateInput = {
@@ -300,11 +311,11 @@ const checkCategoryUpdate = (object: any): CategoryUpdateInput => {
   return hasDefinedProps(categoryInput)
 }
 
-const checkVendor = (object: any): VendorInput => {
+const checkVendor = ({ body }: Request): VendorInput => {
   const name = R.pipe(
     isProvided,
     isString
-  )({ name: 'name', param: object.name })
+  )({ name: 'name', param: body.name })
 
   const vendorInput: VendorInput = {
     name: name.param
@@ -312,11 +323,11 @@ const checkVendor = (object: any): VendorInput => {
   return vendorInput
 }
 
-const checkRole = (object: any): RoleInput => {
+const checkRole = ({ body }: Request): RoleInput => {
   const name = R.pipe(
     isProvided,
     isString
-  )({ name: 'name', param: object.name })
+  )({ name: 'name', param: body.name })
 
   const roleInput: RoleInput = {
     name: name.param
@@ -324,11 +335,11 @@ const checkRole = (object: any): RoleInput => {
   return roleInput
 }
 
-const checkShippingMethod = (object: any): ShippingMethodInput => {
+const checkShippingMethod = ({ body }: Request): ShippingMethodInput => {
   const name = R.pipe(
     isProvided,
     isString
-  )({ name: 'name', param: object.name })
+  )({ name: 'name', param: body.name })
 
   const shippingMethodID: ShippingMethodInput = {
     name: name.param
@@ -336,11 +347,11 @@ const checkShippingMethod = (object: any): ShippingMethodInput => {
   return shippingMethodID
 }
 
-const checkAddressType = (object: any): AddressTypeInput => {
+const checkAddressType = ({ body }: Request): AddressTypeInput => {
   const name = R.pipe(
     isProvided,
     isString
-  )({ name: 'name', param: object.name })
+  )({ name: 'name', param: body.name })
 
   const addressTypeInput: AddressTypeInput = {
     name: name.param
@@ -348,20 +359,20 @@ const checkAddressType = (object: any): AddressTypeInput => {
   return addressTypeInput
 }
 
-const checkNewAddress = (object: any): AddressCreateInput => {
-  const isDefault = object.isDefault && isBoolean(
-    { name: 'isDefault', param: object.isDefault }
+const checkNewAddress = ({ body }: Request): AddressCreateInput => {
+  const isDefault = body.isDefault && isBoolean(
+    { name: 'isDefault', param: body.isDefault }
   )
 
   const addr = R.pipe(
     isProvided,
     isString
-  )({ name: 'addr', param: object.addr })
+  )({ name: 'addr', param: body.addr })
 
   const addressTypeID = R.pipe(
     isProvided,
     isNumber
-  )({ name: 'addressTypeID', param: object.addressTypeID })
+  )({ name: 'addressTypeID', param: body.addressTypeID })
 
   const addressInput: AddressCreateInput = {
     isDefault: isDefault?.param,
@@ -371,70 +382,20 @@ const checkNewAddress = (object: any): AddressCreateInput => {
   return addressInput
 }
 
-const checkAddressesFetch = (object: any): AddressFetchInput => {
-  const userID = object.userID && canBeNumber(
-    { name: 'userID', param: object.userID }
-  )
-
-  const addressTypeID = object.addressTypeID && canBeNumber(
-    { name: 'addressTypeID', param: object.addressTypeID }
-  )
-
-  const addressInput: AddressFetchInput = {
-    userID: parseInt(userID?.param),
-    addressTypeID: parseInt(addressTypeID?.param)
-  }
-  return hasDefinedProps(addressInput)
-}
-
-const checkNewFollower = (object: any): Follower => {
-  const userID = R.pipe(
-    isProvided,
-    isNumber
-  )({ name: 'userID', param: object.userID })
-
-  const follows = R.pipe(
-    isProvided,
-    isNumber
-  )({ name: 'follows', param: object.follows })
-
-  const followerInput: Follower = {
-    userID: userID.param,
-    follows: follows.param
-  }
-  return followerInput
-}
-
-const checkFollowersFetch = (object: any): FollowerFetchInput => {
-  const userID = object.userID && canBeNumber(
-    { name: 'userID', param: object.userID }
-  )
-
-  const follows = object.follows && canBeNumber(
-    { name: 'follows', param: object.follows }
-  )
-
-  const followerInput: FollowerFetchInput = {
-    userID: parseInt(userID?.param),
-    follows: parseInt(follows?.param)
-  }
-  return hasDefinedProps(followerInput)
-}
-
-const checkNewUserAddress = (object: any): UserAddressCreateInput => {
-  const isDefault = object.isDefault && isBoolean(
-    { name: 'isDefault', param: object.isDefault }
+const checkNewUserAddress = ({ body }: Request): UserAddressCreateInput => {
+  const isDefault = body.isDefault && isBoolean(
+    { name: 'isDefault', param: body.isDefault }
   )
 
   const userID = R.pipe(
     isProvided,
     isNumber
-  )({ name: 'userID', param: object.userID })
+  )({ name: 'userID', param: body.userID })
 
   const addressID = R.pipe(
     isProvided,
     isNumber
-  )({ name: 'addressID', param: object.addressID })
+  )({ name: 'addressID', param: body.addressID })
 
   const userAddressInput: UserAddressCreateInput = {
     isDefault: isDefault?.param,
@@ -444,23 +405,11 @@ const checkNewUserAddress = (object: any): UserAddressCreateInput => {
   return userAddressInput
 }
 
-const checkUserAddressesFetch = (object: any): UserAddressFetchInput => {
-  const userID = R.pipe(
-    isProvided,
-    canBeNumber
-  )({ name: 'userID', param: object.userID })
-
-  const userAddressInput: UserAddressFetchInput = {
-    userID: parseInt(userID.param)
-  }
-  return userAddressInput
-}
-
-const checkUserAddressesUpdate = (object: any): UserAddressUpdateInput => {
+const checkUserAddressesUpdate = ({ body }: Request): UserAddressUpdateInput => {
   const isDefault = R.pipe(
     isProvided,
     isBoolean
-  )({ name: 'isDefault', param: object.isDefault })
+  )({ name: 'isDefault', param: body.isDefault })
 
   const userAddressInput: UserAddressUpdateInput = {
     isDefault: isDefault.param
@@ -468,11 +417,11 @@ const checkUserAddressesUpdate = (object: any): UserAddressUpdateInput => {
   return userAddressInput
 }
 
-const checkNewList = (object: any): ListCreateInput => {
+const checkNewList = ({ body }: Request): ListCreateInput => {
   const name = R.pipe(
     isProvided,
     isString
-  )({ name: 'name', param: object.name })
+  )({ name: 'name', param: body.name })
 
   const vendorInput: ListCreateInput = {
     name: name.param
@@ -480,23 +429,11 @@ const checkNewList = (object: any): ListCreateInput => {
   return vendorInput
 }
 
-const checkListsFetch = (object: any): ListFetchInput => {
-  const userID = R.pipe(
-    isProvided,
-    canBeNumber
-  )({ name: 'userID', param: object.userID })
-
-  const listInput: ListFetchInput = {
-    userID: parseInt(userID.param)
-  }
-  return listInput
-}
-
-const checkListUpdate = (object: any): ListCreateInput => {
+const checkListUpdate = ({ body }: Request): ListCreateInput => {
   const name = R.pipe(
     isProvided,
     isString
-  )({ name: 'name', param: object.name })
+  )({ name: 'name', param: body.name })
 
   const listInput: ListCreateInput = {
     name: name.param
@@ -504,28 +441,28 @@ const checkListUpdate = (object: any): ListCreateInput => {
   return listInput
 }
 
-const checkNewRating = (object: any): RatingCreateInput => {
-  const title = object.title && isString(
-    { name: 'title', param: object.title }
+const checkNewRating = ({ body }: Request): RatingCreateInput => {
+  const title = body.title && isString(
+    { name: 'title', param: body.title }
   )
 
-  const review = object.review && isString(
-    { name: 'review', param: object.review }
+  const review = body.review && isString(
+    { name: 'review', param: body.review }
   )
 
-  const media = object.media && isNumber(
-    { name: 'media', param: object.media }
+  const media = body.media && isNumber(
+    { name: 'media', param: body.media }
   )
 
   const stars = R.pipe(
     isProvided,
     isNumber
-  )({ name: 'stars', param: object.stars })
+  )({ name: 'stars', param: body.stars })
 
   const productID = R.pipe(
     isProvided,
     isNumber
-  )({ name: 'productID', param: object.productID })
+  )({ name: 'productID', param: body.productID })
 
   const ratingInput: RatingCreateInput = {
     title: title?.param,
@@ -535,6 +472,37 @@ const checkNewRating = (object: any): RatingCreateInput => {
     productID: parseInt(productID.param)
   }
   return ratingInput
+}
+
+const checkRatingUpdate = ({ body }: Request): RatingUpdateInput => {
+  const title = body.title && isString(
+    { name: 'title', param: body.title }
+  )
+
+  const review = body.review && isString(
+    { name: 'review', param: body.review }
+  )
+
+  const media = body.media && isNumber(
+    { name: 'media', param: body.media }
+  )
+
+  const stars = body.review && isNumber(
+    { name: 'stars', param: body.stars }
+  )
+
+  const isDeleted = body.isDeleted && isBoolean(
+    { name: 'isDeleted', param: body.isDeleted }
+  )
+
+  const ratingInput: RatingUpdateInput = {
+    title: title?.param,
+    review: review?.param,
+    media: media?.param,
+    stars: stars?.param,
+    isDeleted: isDeleted?.param
+  }
+  return hasDefinedProps(ratingInput)
 }
 
 export default {
@@ -553,14 +521,10 @@ export default {
   checkShippingMethod,
   checkAddressType,
   checkNewAddress,
-  checkAddressesFetch,
-  checkNewFollower,
-  checkFollowersFetch,
   checkNewUserAddress,
-  checkUserAddressesFetch,
   checkUserAddressesUpdate,
   checkNewList,
-  checkListsFetch,
   checkListUpdate,
-  checkNewRating
+  checkNewRating,
+  checkRatingUpdate
 }

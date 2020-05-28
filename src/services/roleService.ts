@@ -30,8 +30,10 @@ type SingleRoleData = {
 }
 
 const getRoleByID = async (roleID: number): Promise<SingleRoleData> => {
-  const roles = await db<Role>('roles')
-  const [ role ] = roles.filter((c) => c.roleID === roleID)
+  const role = await db<Role>('roles')
+    .first()
+    .where('roleID', roleID)
+
   if (!role) throw new StatusError(404, 'Not Found')
 
   const users = await db<User>('users')
@@ -48,12 +50,23 @@ const getRoleByID = async (roleID: number): Promise<SingleRoleData> => {
 }
 
 const updateRole = async (roleInput: RoleInput, roleID: number): Promise<SingleRoleData> => {
-  const [ updatedRole ] = await db<Role>('roles')
-    .update({ ...roleInput }, [ 'roleID' ])
+  const [ updatedRole ]: Role[] = await db<Role>('roles')
+    .update({ ...roleInput }, [ '*' ])
     .where('roleID', roleID)
 
   if (!updatedRole) throw new StatusError(404, 'Not Found')
-  return getRoleByID(updatedRole.roleID)
+
+  const users = await db<User>('users')
+    .where('roleID', roleID)
+
+  return {
+    ...updatedRole,
+    users: R.map(R.omit([
+      'password',
+      'resetToken',
+      'resetTokenCreatedAt'
+    ]), users)
+  }
 }
 
 export default {
