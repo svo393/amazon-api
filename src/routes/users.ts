@@ -2,6 +2,8 @@ import Router from 'express'
 import userService from '../services/userService'
 import inputValidator from '../utils/inputValidator'
 import { isAdmin, isLoggedIn, isSameUser } from '../utils/middleware'
+import followerService from '../services/followerService'
+import userAddressService from '../services/userAddressService'
 
 const router = Router()
 
@@ -53,6 +55,22 @@ router.post('/reset-password', async (req, res) => {
   const userPasswordResetInput = inputValidator.checkUserResetToken(req.body)
   const updatedUser = await userService.resetPassword(userPasswordResetInput, res)
   res.json(updatedUser)
+})
+
+router.delete('/:userID/followers/:follows', isSameUser('params'), async (req, res) => {
+  await followerService.deleteFollower(Number(req.params.userID), Number(req.params.follows))
+  res.status(204).end()
+})
+
+router.put('/:userID/addresses/:addressID/', isSameUser('params'), async (req, res) => {
+  const userAddressUpdateInput = inputValidator.checkUserAddressesUpdate(req.body)
+  const userAddresses = await userAddressService.updateUserAddress(userAddressUpdateInput, Number(req.params.addressID), Number(req.params.userID))
+  res.json(userAddresses)
+})
+
+router.delete('/:userID/addresses/:addressID/', isSameUser('params'), async (req, res) => {
+  await userAddressService.deleteUserAddress(Number(req.params.addressID), Number(req.params.userID))
+  res.status(204).end()
 })
 
 export default router

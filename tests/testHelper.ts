@@ -19,7 +19,6 @@ export const apiURLs = {
   followers: '/api/followers',
   userAddresses: '/api/user-addresses',
   lists: '/api/lists',
-  listProducts: '/api/list-products',
   ratings: '/api/ratings'
 }
 
@@ -336,7 +335,7 @@ export const createOneListProduct = async (): Promise<ListProduct & { token: str
   const { addedProduct } = await createOneProduct('admin')
 
   const { body }: { body: ListProduct } = await api
-    .post(apiURLs.listProducts)
+    .post(`${apiURLs.lists}/${listID}/products/${addedProduct.productID}`)
     .set('Cookie', `token=${token}`)
     .send({ listID, productID: addedProduct.productID })
 

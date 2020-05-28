@@ -1,10 +1,8 @@
-import { ListProduct, ListProductFetchInput } from '../types'
+import { ListProduct } from '../types'
 import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
-const addListProduct = async (listProductInput: ListProduct): Promise<ListProduct> => {
-  const { listID, productID } = listProductInput
-
+const addListProduct = async (listID: number, productID: number): Promise<ListProduct> => {
   const existingUA = await db<ListProduct>('listProducts')
     .first()
     .where('listID', listID)
@@ -13,7 +11,7 @@ const addListProduct = async (listProductInput: ListProduct): Promise<ListProduc
   if (existingUA) throw new StatusError(409, 'This product already added to the list')
 
   const [ addedUA ]: ListProduct[] = await db<ListProduct>('listProducts')
-    .insert(listProductInput, [ '*' ])
+    .insert({ listID, productID }, [ '*' ])
 
   return addedUA
 }

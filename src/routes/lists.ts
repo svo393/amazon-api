@@ -1,5 +1,6 @@
 import Router from 'express'
 import listService from '../services/listService'
+import listProductsService from '../services/listProductService'
 import inputValidator from '../utils/inputValidator'
 import { isCreator, isLoggedIn, isSameUserOrAdmin } from '../utils/middleware'
 
@@ -30,6 +31,16 @@ router.put('/:listID', isCreator('lists', 'listID', 'params'), async (req, res) 
 
 router.delete('/:listID', isCreator('lists', 'listID', 'params'), async (req, res) => {
   await listService.deleteList(Number(req.params.listID))
+  res.status(204).end()
+})
+
+router.post('/:listID/products/:productID', isCreator('lists', 'listID', 'params'), async (req, res) => {
+  const addedListProduct = await listProductsService.addListProduct(Number(req.params.listID), Number(req.params.productID))
+  res.status(201).json(addedListProduct)
+})
+
+router.delete('/:listID/products/:productID', isCreator('lists', 'listID', 'params'), async (req, res) => {
+  await listProductsService.deleteListProduct(Number(req.params.listID), Number(req.params.productID))
   res.status(204).end()
 })
 

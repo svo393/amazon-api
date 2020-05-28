@@ -17,15 +17,4 @@ router.get('/', isSameUserOrAdmin('query'), async (req, res) => {
   res.json(userAddresses)
 })
 
-router.put('/:addressID/:userID', isSameUser('params'), async (req, res) => {
-  const userAddressUpdateInput = inputValidator.checkUserAddressesUpdate(req.body)
-  const userAddresses = await userAddressService.updateUserAddress(userAddressUpdateInput, Number(req.params.addressID), Number(req.params.userID))
-  res.json(userAddresses)
-})
-
-router.delete('/:addressID/:userID', isSameUser('params'), async (req, res) => {
-  await userAddressService.deleteUserAddress(Number(req.params.addressID), Number(req.params.userID))
-  res.status(204).end()
-})
-
 export default router

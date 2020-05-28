@@ -63,7 +63,7 @@ describe('UserAddresss deleting', () => {
     const { userID, addressID, token } = await createOneUserAddress()
 
     await api
-      .delete(`${apiURL}/${addressID}/${userID}`)
+      .delete(`${apiURLs.users}/${userID}/addresses/${addressID}`)
       .set('Cookie', `token=${token}`)
       .expect(204)
   })
@@ -73,7 +73,7 @@ describe('UserAddresss deleting', () => {
     const { token } = await loginAs('admin', api)
 
     await api
-      .delete(`${apiURL}/${addressID}/${userID}`)
+      .delete(`${apiURLs.users}/${userID}/addresses/${addressID}`)
       .set('Cookie', `token=${token}`)
       .expect(403)
   })

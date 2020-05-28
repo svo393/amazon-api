@@ -4,7 +4,7 @@ import { db } from '../src/utils/db'
 import { apiURLs, createOneList, createOneListProduct, createOneProduct, listProductsInDB, loginAs, populateUsers, purge } from './testHelper'
 
 const api = supertest(app)
-const apiURL = apiURLs.listProducts
+const apiURL = apiURLs.lists
 
 beforeEach(async () => {
   await purge()
@@ -19,9 +19,8 @@ describe('ListProduct adding', () => {
     const listProductsAtStart = await listProductsInDB()
 
     await api
-      .post(apiURL)
+      .post(`${apiURL}/${listID}/products/${addedProduct.productID}`)
       .set('Cookie', `token=${token}`)
-      .send({ listID, productID: addedProduct.productID })
       .expect(201)
       .expect('Content-Type', /application\/json/)
 
@@ -35,7 +34,7 @@ describe('ListProducts deleting', () => {
     const { productID, listID, token } = await createOneListProduct()
 
     await api
-      .delete(`${apiURL}/${listID}/${productID}`)
+      .delete(`${apiURL}/${listID}/products/${productID}`)
       .set('Cookie', `token=${token}`)
       .expect(204)
   })
@@ -45,7 +44,7 @@ describe('ListProducts deleting', () => {
     const { token } = await loginAs('admin', api)
 
     await api
-      .delete(`${apiURL}/${listID}/${productID}`)
+      .delete(`${apiURL}/${listID}/products/${productID}`)
       .set('Cookie', `token=${token}`)
       .expect(403)
   })

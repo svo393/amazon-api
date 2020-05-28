@@ -47,7 +47,7 @@ describe('Followers deleting', () => {
     const { userID, follows, token } = await createOneFollower()
 
     await api
-      .delete(`${apiURL}/${userID}/${follows}`)
+      .delete(`${apiURLs.users}/${userID}/followers/${follows}`)
       .set('Cookie', `token=${token}`)
       .expect(204)
   })
@@ -57,7 +57,7 @@ describe('Followers deleting', () => {
     const { token } = await loginAs('admin', api)
 
     await api
-      .delete(`${apiURL}/${userID}/${follows}`)
+      .delete(`${apiURLs.users}/${userID}/followers/${follows}`)
       .set('Cookie', `token=${token}`)
       .expect(403)
   })

@@ -1,6 +1,6 @@
 import R from 'ramda'
-import { AddressCreateInput, AddressFetchInput, AddressTypeInput, CategoryCreateInput, CategoryUpdateInput, Follower, FollowerFetchInput, ListCreateInput, ListFetchInput, PasswordRequestInput, PasswordResetInput, RoleInput, ShippingMethodInput, UserAddressCreateInput, UserAddressFetchInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput, ProductCreateInput, ProductUpdateInput, ListProduct, ListProductFetchInput, RatingCreateInput } from '../types'
-import { canBeNumber, hasDefinedProps, isArray, isBoolean, isEmail, isGroup, isImage, isInputProvided, isNumber, isPasswordValid, isProductParameter, isProvided, isString, isStringOrArray } from './validatorLib'
+import { AddressCreateInput, AddressFetchInput, AddressTypeInput, CategoryCreateInput, CategoryUpdateInput, Follower, FollowerFetchInput, ListCreateInput, ListFetchInput, PasswordRequestInput, PasswordResetInput, ProductCreateInput, ProductUpdateInput, RatingCreateInput, RoleInput, ShippingMethodInput, UserAddressCreateInput, UserAddressFetchInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput } from '../types'
+import { canBeNumber, hasDefinedProps, isBoolean, isEmail, isInputProvided, isNumber, isPasswordValid, isProvided, isString, isStringOrArray } from './validatorLib'
 
 const checkNewUser = (object: any): UserSignupInput => {
   const email = R.pipe(
@@ -504,36 +504,6 @@ const checkListUpdate = (object: any): ListCreateInput => {
   return listInput
 }
 
-const checkListProduct = (object: any): ListProduct => {
-  const listID = R.pipe(
-    isProvided,
-    isNumber
-  )({ name: 'listID', param: object.listID })
-
-  const productID = R.pipe(
-    isProvided,
-    isNumber
-  )({ name: 'productID', param: object.productID })
-
-  const listProductInput: ListProduct = {
-    listID: listID.param,
-    productID: productID.param
-  }
-  return listProductInput
-}
-
-const checkListProductsFetch = (object: any): ListProductFetchInput => {
-  const listID = R.pipe(
-    isProvided,
-    canBeNumber
-  )({ name: 'listID', param: object.listID })
-
-  const listProductInput: ListProductFetchInput = {
-    listID: parseInt(listID.param)
-  }
-  return listProductInput
-}
-
 const checkNewRating = (object: any): RatingCreateInput => {
   const title = object.title && isString(
     { name: 'title', param: object.title }
@@ -592,7 +562,5 @@ export default {
   checkNewList,
   checkListsFetch,
   checkListUpdate,
-  checkListProduct,
-  checkListProductsFetch,
   checkNewRating
 }

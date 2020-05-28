@@ -17,9 +17,4 @@ router.get('/', async (req, res) => {
   res.json(followeres)
 })
 
-router.delete('/:userID/:follows', isSameUser('params'), async (req, res) => {
-  await followerService.deleteFollower(Number(req.params.userID), Number(req.params.follows))
-  res.status(204).end()
-})
-
 export default router
