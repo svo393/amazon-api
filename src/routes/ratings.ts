@@ -1,7 +1,7 @@
 import Router from 'express'
 import ratingService from '../services/ratingService'
 import inputValidator from '../utils/inputValidator'
-import { isLoggedIn, isCreator } from '../utils/middleware'
+import { isCreator, isLoggedIn } from '../utils/middleware'
 
 const router = Router()
 

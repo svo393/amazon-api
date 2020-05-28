@@ -17,13 +17,13 @@ router.get('/', async (_req, res) => {
 })
 
 router.get('/:vendorID', async (req, res) => {
-  const vendor = await vendorService.getVendorByID(Number(req.params.vendorID))
+  const vendor = await vendorService.getVendorByID(req)
   res.json(vendor)
 })
 
 router.put('/:vendorID', isAdmin, async (req, res) => {
   const vendorUpdateInput = inputValidator.checkVendor(req)
-  const updatedItem = await vendorService.updateVendor(vendorUpdateInput, Number(req.params.vendorID))
+  const updatedItem = await vendorService.updateVendor(vendorUpdateInput, req)
   res.json(updatedItem)
 })
 

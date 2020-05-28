@@ -1,4 +1,4 @@
-import { Response } from 'express'
+import { Request, Response } from 'express'
 import fs from 'fs'
 import multer from 'multer'
 import path from 'path'
@@ -77,14 +77,14 @@ export const getProducts = async (): Promise<ProductListData[]> => {
   return await getProductsQuery
 }
 
-const getProductByID = async (productID: number, res: Response): Promise<ProductListData| ProductAllData> => {
+const getProductByID = async (req: Request, res: Response): Promise<ProductListData| ProductAllData> => {
   const [ product ] = await db<Product>('products as p')
     .select('p.productID', 'p.title', 'listPrice', 'price',
       'primaryMedia', 'productCreatedAt', 'productUpdatedAt', 'p.userID')
     .avg('stars as stars')
     .count('r.ratingID as ratingCount')
     .leftJoin('ratings as r', 'p.productID', 'r.productID')
-    .where('p.productID', productID)
+    .where('p.productID', req.params.productID)
     .groupBy('p.productID')
 
   if (!product) throw new StatusError(404, 'Not Found')
@@ -101,10 +101,10 @@ const getProductByID = async (productID: number, res: Response): Promise<Product
     ], product)
 }
 
-const updateProduct = async (productInput: ProductUpdateInput, productID: number): Promise<Product> => {
+const updateProduct = async (productInput: ProductUpdateInput, req: Request): Promise<Product> => {
   const [ updatedProduct ]: Product[] = await db<Product>('products')
     .update({ ...productInput }, [ '*' ])
-    .where('productID', productID)
+    .where('productID', req.params.productID)
 
   if (!updatedProduct) throw new StatusError(404, 'Not Found')
   return updatedProduct
@@ -135,11 +135,11 @@ const multerUpload = multer({
   }
 })
 
-const uploadImages = (files: Express.Multer.File[], productID: number): void => {
+const uploadImages = (files: Express.Multer.File[], req: Request): void => {
   files.map(async (file, index) => {
     const image = sharp(file.path)
     const info = await image.metadata()
-    const fileName = `${productID}_${index}`
+    const fileName = `${req.params.productID}_${index}`
 
     if ((info.width as number) > maxWidth || (info.height as number) > maxHeight) {
       await image

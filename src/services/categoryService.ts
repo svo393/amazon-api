@@ -1,7 +1,8 @@
+import { Request } from 'express'
 import { db } from '../../src/utils/db'
-import { Category, CategoryCreateInput, CategoryUpdateInput, Product, ProductListData } from '../types'
-import StatusError from '../utils/StatusError'
+import { Category, CategoryCreateInput, CategoryUpdateInput, ProductListData } from '../types'
 import { getProductsQuery } from '../utils/queries'
+import StatusError from '../utils/StatusError'
 
 const addCategory = async (categoryInput: CategoryCreateInput): Promise<Category> => {
   const { name } = categoryInput
@@ -44,9 +45,11 @@ type SingleCategoryData = Category & {
   products: ProductListData[];
 }
 
-const getCategoryByID = async (categoryID: number): Promise<SingleCategoryData> => {
+const getCategoryByID = async (req: Request): Promise<SingleCategoryData> => {
+  const { categoryID } = req.params
+
   const categories = await db<Category>('categories')
-  const [ category ] = categories.filter((c) => c.categoryID === categoryID)
+  const [ category ] = categories.filter((c) => c.categoryID === Number(categoryID))
   if (!category) throw new StatusError(404, 'Not Found')
 
   let parentChain: Parent[] = []
@@ -62,7 +65,7 @@ const getCategoryByID = async (categoryID: number): Promise<SingleCategoryData> 
   }
 
   const children = categories
-    .filter((c) => c.parentCategoryID === categoryID)
+    .filter((c) => c.parentCategoryID === Number(categoryID))
     .map((c) => c.categoryID)
 
   const products: ProductListData[] = await getProductsQuery
@@ -76,13 +79,13 @@ const getCategoryByID = async (categoryID: number): Promise<SingleCategoryData> 
   }
 }
 
-const updateCategory = async (categoryInput: CategoryUpdateInput, categoryID: number): Promise<SingleCategoryData> => {
+const updateCategory = async (categoryInput: CategoryUpdateInput, req: Request): Promise<SingleCategoryData> => {
   const [ updatedCategory ] = await db<Category>('categories')
     .update({ ...categoryInput }, [ 'categoryID' ])
-    .where('categoryID', categoryID)
+    .where('categoryID', req.params.categoryID)
 
   if (!updatedCategory) throw new StatusError(404, 'Not Found')
-  return getCategoryByID(updatedCategory.categoryID)
+  return getCategoryByID(req)
 }
 
 export default {

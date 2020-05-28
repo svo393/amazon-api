@@ -1,7 +1,7 @@
 import Router from 'express'
 import userAddressService from '../services/userAddressService'
 import inputValidator from '../utils/inputValidator'
-import { isSameUser, isSameUserOrAdmin } from '../utils/middleware'
+import { isSameUser } from '../utils/middleware'
 
 const router = Router()
 

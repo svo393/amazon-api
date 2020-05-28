@@ -17,13 +17,13 @@ router.get('/', async (_req, res) => {
 })
 
 router.get('/:categoryID', async (req, res) => {
-  const category = await categoryService.getCategoryByID(Number(req.params.categoryID))
+  const category = await categoryService.getCategoryByID(req)
   res.json(category)
 })
 
 router.put('/:categoryID', isAdmin, async (req, res) => {
   const categoryUpdateInput = inputValidator.checkCategoryUpdate(req)
-  const updatedItem = await categoryService.updateCategory(categoryUpdateInput, Number(req.params.categoryID))
+  const updatedItem = await categoryService.updateCategory(categoryUpdateInput, req)
   res.json(updatedItem)
 })
 

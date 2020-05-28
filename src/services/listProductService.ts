@@ -1,8 +1,11 @@
+import { Request } from 'express'
 import { ListProduct } from '../types'
 import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
-const addListProduct = async (listID: number, productID: number): Promise<ListProduct> => {
+const addListProduct = async (req: Request): Promise<ListProduct> => {
+  const { listID, productID } = req.params
+
   const existingUA = await db<ListProduct>('listProducts')
     .first()
     .where('listID', listID)
@@ -11,12 +14,17 @@ const addListProduct = async (listID: number, productID: number): Promise<ListPr
   if (existingUA) throw new StatusError(409, 'This product already added to the list')
 
   const [ addedUA ]: ListProduct[] = await db<ListProduct>('listProducts')
-    .insert({ listID, productID }, [ '*' ])
+    .insert({
+      listID: Number(listID),
+      productID: Number(productID)
+    }, [ '*' ])
 
   return addedUA
 }
 
-const deleteListProduct = async (listID: number, productID: number): Promise<void> => {
+const deleteListProduct = async (req: Request): Promise<void> => {
+  const { listID, productID } = req.params
+
   const deleteCount = await db<ListProduct>('listProducts')
     .del()
     .where('productID', productID)

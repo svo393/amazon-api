@@ -1,16 +1,16 @@
 import { Router } from 'express'
 import 'express-async-errors'
+import addressesRouter from './addresses'
+import addressTypesRouter from './addressTypes'
 import categoriesRouter from './categories'
+import listsRouter from './lists'
 import productsRouter from './products'
-import usersRouter from './users'
-import vendorsRouter from './vendors'
+import ratingsRouter from './ratings'
 import rolesRouter from './roles'
 import shippingMethodsRouter from './shippingMethods'
-import addressTypesRouter from './addressTypes'
-import addressesRouter from './addresses'
 import userAddressesRouter from './userAddresses'
-import listsRouter from './lists'
-import ratingsRouter from './ratings'
+import usersRouter from './users'
+import vendorsRouter from './vendors'
 
 export default Router()
   .use('/categories', categoriesRouter)

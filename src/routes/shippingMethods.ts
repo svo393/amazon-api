@@ -17,13 +17,13 @@ router.get('/', async (_req, res) => {
 })
 
 router.get('/:shippingMethodID', async (req, res) => {
-  const shippingMethod = await shippingMethodService.getShippingMethodByID(Number(req.params.shippingMethodID))
+  const shippingMethod = await shippingMethodService.getShippingMethodByID(req)
   res.json(shippingMethod)
 })
 
 router.put('/:shippingMethodID', isAdmin, async (req, res) => {
   const shippingMethodUpdateInput = inputValidator.checkShippingMethod(req)
-  const updatedItem = await shippingMethodService.updateShippingMethod(shippingMethodUpdateInput, Number(req.params.shippingMethodID))
+  const updatedItem = await shippingMethodService.updateShippingMethod(shippingMethodUpdateInput, req)
   res.json(updatedItem)
 })
 

@@ -1,3 +1,4 @@
+import { Request } from 'express'
 import { ShippingMethod as SM, ShippingMethodInput as SMInput } from '../types'
 import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
@@ -23,19 +24,19 @@ const getShippingMethods = async (): Promise<SM[]> => {
   return await db<SM>('shippingMethods')
 }
 
-const getShippingMethodByID = async (smID: number): Promise<SM> => {
+const getShippingMethodByID = async (req: Request): Promise<SM> => {
   const sm = await db<SM>('shippingMethods')
     .first()
-    .where('shippingMethodID', smID)
+    .where('shippingMethodID', req.params.shippingMethodID)
 
   if (!sm) throw new StatusError(404, 'Not Found')
   return sm
 }
 
-const updateShippingMethod = async (smInput: SMInput, smID: number): Promise<SM> => {
+const updateShippingMethod = async (smInput: SMInput, req: Request): Promise<SM> => {
   const [ updatedSM ] = await db<SM>('shippingMethods')
     .update({ ...smInput }, [ 'shippingMethodID', 'name' ])
-    .where('shippingMethodID', smID)
+    .where('shippingMethodID', req.params.shippingMethodID)
 
   if (!updatedSM) throw new StatusError(404, 'Not Found')
   return updatedSM

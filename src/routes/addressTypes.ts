@@ -18,13 +18,13 @@ router.get('/', async (_req, res) => {
 })
 
 router.get('/:addressTypeID', async (req, res) => {
-  const addressType = await addressTypeService.getAddressTypeByID(res, Number(req.params.addressTypeID))
+  const addressType = await addressTypeService.getAddressTypeByID(res, req)
   res.json(addressType)
 })
 
 router.put('/:addressTypeID', isAdmin, async (req, res) => {
   const addressTypeUpdateInput = inputValidator.checkAddressType(req)
-  const updatedItem = await addressTypeService.updateAddressType(res, addressTypeUpdateInput, Number(req.params.addressTypeID))
+  const updatedItem = await addressTypeService.updateAddressType(res, addressTypeUpdateInput, req)
   res.json(updatedItem)
 })
 

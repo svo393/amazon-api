@@ -32,19 +32,19 @@ router.get('/', isAdmin, async (_req, res) => {
   res.json(users)
 })
 
-router.get('/me', isLoggedIn, async (_req, res) => {
-  const user = await userService.getUserByID(res.locals.userID, res)
+router.get('/me', isLoggedIn, async (req, res) => {
+  const user = await userService.getUserByID(req, res)
   res.json(user)
 })
 
 router.get('/:userID', async (req, res) => {
-  const user = await userService.getUserByID(Number(req.params.userID), res)
+  const user = await userService.getUserByID(req, res)
   res.json(user)
 })
 
 router.put('/:userID', isSameUser('params'), async (req, res) => {
   const userUpdateInput = inputValidator.checkUserUpdate(req)
-  const updatedUser = await userService.updateUser(userUpdateInput, res, Number(req.params.userID))
+  const updatedUser = await userService.updateUser(userUpdateInput, res, req)
   res.json(updatedUser)
 })
 
@@ -67,12 +67,12 @@ router.get('/:userID/addresses', isSameUserOrAdmin('params'), async (req, res) =
 
 router.put('/:userID/addresses/:addressID/', isSameUser('params'), async (req, res) => {
   const userAddressUpdateInput = inputValidator.checkUserAddressesUpdate(req)
-  const userAddresses = await userAddressService.updateUserAddress(userAddressUpdateInput, Number(req.params.addressID), Number(req.params.userID))
+  const userAddresses = await userAddressService.updateUserAddress(userAddressUpdateInput, req)
   res.json(userAddresses)
 })
 
 router.delete('/:userID/addresses/:addressID/', isSameUser('params'), async (req, res) => {
-  await userAddressService.deleteUserAddress(Number(req.params.addressID), Number(req.params.userID))
+  await userAddressService.deleteUserAddress(req)
   res.status(204).end()
 })
 

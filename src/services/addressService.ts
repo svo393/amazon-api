@@ -1,7 +1,7 @@
-import { Response, Request } from 'express'
+import { Request, Response } from 'express'
 import Knex from 'knex'
 import R from 'ramda'
-import { Address, AddressCreateInput, AddressFetchInput, UserAddress } from '../types'
+import { Address, AddressCreateInput, UserAddress } from '../types'
 import { db, dbTrans } from '../utils/db'
 import StatusError from '../utils/StatusError'
 

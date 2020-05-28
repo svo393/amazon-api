@@ -1,7 +1,8 @@
+import { Request } from 'express'
 import { db } from '../../src/utils/db'
-import { Product, ProductListData, Vendor, VendorInput } from '../types'
-import StatusError from '../utils/StatusError'
+import { ProductListData, Vendor, VendorInput } from '../types'
 import { getProductsQuery } from '../utils/queries'
+import StatusError from '../utils/StatusError'
 
 const addVendor = async (vendorInput: VendorInput): Promise<Vendor> => {
   const { name } = vendorInput
@@ -29,24 +30,24 @@ type SingleVendorData = {
   products: ProductListData[];
 }
 
-const getVendorByID = async (vendorID: number): Promise<SingleVendorData> => {
+const getVendorByID = async (req: Request): Promise<SingleVendorData> => {
   const vendors = await db<Vendor>('vendors')
-  const [ vendor ] = vendors.filter((c) => c.vendorID === vendorID)
+  const [ vendor ] = vendors.filter((c) => c.vendorID === Number(req.params.vendorID))
   if (!vendor) throw new StatusError(404, 'Not Found')
 
   const products: ProductListData[] = await getProductsQuery
-    .where('vendorID', vendorID)
+    .where('vendorID', req.params.vendorID)
 
   return { ...vendor, products }
 }
 
-const updateVendor = async (vendorInput: VendorInput, vendorID: number): Promise<SingleVendorData> => {
+const updateVendor = async (vendorInput: VendorInput, req: Request): Promise<SingleVendorData> => {
   const [ updatedVendor ] = await db<Vendor>('vendors')
     .update({ ...vendorInput }, [ 'vendorID' ])
-    .where('vendorID', vendorID)
+    .where('vendorID', req.params.vendorID)
 
   if (!updatedVendor) throw new StatusError(404, 'Not Found')
-  return getVendorByID(updatedVendor.vendorID)
+  return getVendorByID(req)
 }
 
 export default {

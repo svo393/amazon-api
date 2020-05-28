@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt'
 import { randomBytes } from 'crypto'
-import { CookieOptions, Response } from 'express'
+import { CookieOptions, Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
 import R from 'ramda'
 import { promisify } from 'util'
@@ -146,7 +146,9 @@ type UserPublicData = Omit<UserPersonalData,
   | 'orders'
 >
 
-const getUserByID = async (userID: number, res: Response): Promise<UserPersonalData | UserPublicData> => {
+const getUserByID = async (req: Request, res: Response): Promise<UserPersonalData | UserPublicData> => {
+  const userID = req.params.userID ?? res.locals.userID
+
   const user = await db<User>('users')
     .first()
     .where('userID', userID)
@@ -202,13 +204,13 @@ type UserUpdatedData = Pick<User,
   roleID?: number;
 }
 
-const updateUser = async (userInput: UserUpdateInput, res: Response, userID: number): Promise<UserUpdatedData> => {
+const updateUser = async (userInput: UserUpdateInput, res: Response, req: Request): Promise<UserUpdatedData> => {
   const role: string | undefined = res.locals.userRole
 
   const [ updatedUser ] = await db<User>('users')
     .update({ ...userInput },
       [ 'name', 'email', 'avatar', 'roleID' ])
-    .where('userID', userID)
+    .where('userID', req.params.userID)
 
   if (!updatedUser) { throw new StatusError(404, 'Not Found') }
 

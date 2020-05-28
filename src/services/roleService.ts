@@ -1,6 +1,7 @@
-import { Role, User, RoleInput, UserSafeData } from '../types'
-import { db } from '../utils/db'
+import { Request } from 'express'
 import R from 'ramda'
+import { Role, RoleInput, User, UserSafeData } from '../types'
+import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
 const addRole = async (roleInput: RoleInput): Promise<Role> => {
@@ -29,15 +30,15 @@ type SingleRoleData = {
   users: UserSafeData[];
 }
 
-const getRoleByID = async (roleID: number): Promise<SingleRoleData> => {
+const getRoleByID = async (req: Request): Promise<SingleRoleData> => {
   const role = await db<Role>('roles')
     .first()
-    .where('roleID', roleID)
+    .where('roleID', req.params.roleID)
 
   if (!role) throw new StatusError(404, 'Not Found')
 
   const users = await db<User>('users')
-    .where('roleID', roleID)
+    .where('roleID', req.params.roleID)
 
   return {
     ...role,
@@ -49,15 +50,15 @@ const getRoleByID = async (roleID: number): Promise<SingleRoleData> => {
   }
 }
 
-const updateRole = async (roleInput: RoleInput, roleID: number): Promise<SingleRoleData> => {
+const updateRole = async (roleInput: RoleInput, req: Request): Promise<SingleRoleData> => {
   const [ updatedRole ]: Role[] = await db<Role>('roles')
     .update({ ...roleInput }, [ '*' ])
-    .where('roleID', roleID)
+    .where('roleID', req.params.roleID)
 
   if (!updatedRole) throw new StatusError(404, 'Not Found')
 
   const users = await db<User>('users')
-    .where('roleID', roleID)
+    .where('roleID', req.params.roleID)
 
   return {
     ...updatedRole,

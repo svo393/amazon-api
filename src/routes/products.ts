@@ -1,8 +1,8 @@
 import Router from 'express'
 import productService from '../services/productService'
+import ratingService from '../services/ratingService'
 import inputValidator from '../utils/inputValidator'
 import { isAdmin, isCreator } from '../utils/middleware'
-import ratingService from '../services/ratingService'
 
 const router = Router()
 
@@ -18,19 +18,19 @@ router.get('/', async (_req, res) => {
 })
 
 router.get('/:productID', async (req, res) => {
-  const product = await productService.getProductByID(Number(req.params.productID), res)
+  const product = await productService.getProductByID(req, res)
   res.json(product)
 })
 
 router.put('/:productID', isCreator('products', 'productID', 'params'), async (req, res) => {
   const productInput = inputValidator.checkProductUpdate(req)
-  const updatedProduct = await productService.updateProduct(productInput, Number(req.params.productID))
+  const updatedProduct = await productService.updateProduct(productInput, req)
   res.json(updatedProduct)
 })
 
 router.post('/:productID/upload', isAdmin, productService.multerUpload.array('productMedia', 10), (req, res) => {
   const productMedia = inputValidator.checkProductMediaUpload(req)
-  productService.uploadImages(productMedia, Number(req.params.productID))
+  productService.uploadImages(productMedia, req)
   res.sendStatus(204)
 })
 

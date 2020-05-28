@@ -1,4 +1,4 @@
-import { Response } from 'express'
+import { Request, Response } from 'express'
 import { Address, AddressType as AT, AddressTypeInput as ATInput } from '../types'
 import { sensitiveAddressTypes as sensitiveATs } from '../utils/constants'
 import { db } from '../utils/db'
@@ -30,7 +30,9 @@ type SingleAddressTypeData = {
   addresses: Address[];
 }
 
-const getAddressTypeByID = async (res: Response, atID: number): Promise<SingleAddressTypeData> => {
+const getAddressTypeByID = async (res: Response, req: Request): Promise<SingleAddressTypeData> => {
+  const { addressTypeID: atID } = req.params
+
   const hasPermission = [ 'ROOT', 'ADMIN' ].includes(res.locals.userRole)
   const ats = await db<AT>('addressTypes')
 
@@ -38,7 +40,7 @@ const getAddressTypeByID = async (res: Response, atID: number): Promise<SingleAd
     ? ats
     : ats.filter((at) => !sensitiveATs.includes(at.name))
 
-  const [ at ] = filteredATs.filter((shm) => shm.addressTypeID === atID)
+  const [ at ] = filteredATs.filter((shm) => shm.addressTypeID === Number(atID))
   if (!at) throw new StatusError(404, 'Not Found')
 
   const addresses = await db<Address>('addresses')
@@ -47,13 +49,15 @@ const getAddressTypeByID = async (res: Response, atID: number): Promise<SingleAd
   return { ...at, addresses }
 }
 
-const updateAddressType = async (res: Response, atInput: ATInput, atID: number): Promise<SingleAddressTypeData> => {
+const updateAddressType = async (res: Response, atInput: ATInput, req: Request): Promise<SingleAddressTypeData> => {
+  const { addressTypeID: atID } = req.params
+
   const [ updatedAT ] = await db<AT>('addressTypes')
     .update({ ...atInput }, [ 'addressTypeID' ])
     .where('addressTypeID', atID)
 
   if (!updatedAT) throw new StatusError(404, 'Not Found')
-  return getAddressTypeByID(res, updatedAT.addressTypeID)
+  return getAddressTypeByID(res, req)
 }
 
 export default {

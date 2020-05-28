@@ -1,4 +1,4 @@
-import { Response, Request } from 'express'
+import { Request, Response } from 'express'
 import { Rating, RatingCreateInput, RatingUpdateInput } from '../types'
 import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'

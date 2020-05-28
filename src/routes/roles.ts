@@ -17,13 +17,13 @@ router.get('/', isRoot, async (_req, res) => {
 })
 
 router.get('/:roleID', isRoot, async (req, res) => {
-  const role = await roleService.getRoleByID(Number(req.params.roleID))
+  const role = await roleService.getRoleByID(req)
   res.json(role)
 })
 
 router.put('/:roleID', isRoot, async (req, res) => {
   const roleUpdateInput = inputValidator.checkRole(req)
-  const updatedItem = await roleService.updateRole(roleUpdateInput, Number(req.params.roleID))
+  const updatedItem = await roleService.updateRole(roleUpdateInput, req)
   res.json(updatedItem)
 })
 
