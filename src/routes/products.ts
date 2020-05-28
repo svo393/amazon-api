@@ -31,7 +31,7 @@ router.put('/:productID', isCreator('products', 'productID', 'params'), async (r
 router.post('/:productID/upload', isAdmin, productService.multerUpload.array('productMedia', 10), (req, res) => {
   const productMedia = inputValidator.checkProductMediaUpload(req)
   productService.uploadImages(productMedia, req)
-  res.sendStatus(204)
+  res.status(204).end()
 })
 
 router.get('/:productID/ratings', async (req, res) => {

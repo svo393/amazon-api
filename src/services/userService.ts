@@ -11,7 +11,6 @@ import StatusError from '../utils/StatusError'
 // import { makeANiceEmail, transport } from '../utils/mail'
 
 type UserBaseData = Omit<UserSafeData,
-  | 'isDeleted'
   | 'roleID'
 >
 
@@ -95,7 +94,6 @@ const loginUser = async (userInput: UserLoginInput, res: Response): Promise<User
     'password',
     'resetToken',
     'resetTokenCreatedAt',
-    'isDeleted',
     'roleID'
   ], existingUser)
 }
@@ -115,8 +113,8 @@ type UserListData = Omit<User,
 
 const getUsers = async (): Promise<UserListData[]> => {
   const users: UserListData[] = await db('users as u')
-    .select('email', 'u.name', 'info', 'avatar', 'userCreatedAt',
-      'u.isDeleted', 'u.userID', 'rl.name as role')
+    .select('email', 'u.name', 'info', 'avatar',
+      'userCreatedAt', 'u.userID', 'rl.name as role')
     .count('o.orderID as orderCount')
     .count('r.ratingID as ratingCount')
     .count('q.questionID as questionCount')
@@ -177,7 +175,6 @@ const getUserByID = async (req: Request, res: Response): Promise<UserPersonalDat
       'password',
       'resetToken',
       'resetTokenCreatedAt',
-      'isDeleted',
       'roleID'
     ], user)
     : R.pick([
@@ -216,6 +213,18 @@ const updateUser = async (userInput: UserUpdateInput, res: Response, req: Reques
 
   role !== 'ROOT' && delete updatedUser.roleID
   return updatedUser
+}
+
+const deleteUser = async (req: Request, res: Response): Promise<void> => {
+  if (res.locals.userRole === 'ROOT') {
+    throw new StatusError(451, 'Not gonna happen')
+  }
+
+  const deleteCount = await db<User>('users')
+    .del()
+    .where('userID', req.params.userID)
+
+  if (deleteCount === 0) throw new StatusError(404, 'Not Found')
 }
 
 const sendPasswordReset = async (userInput: PasswordRequestInput): Promise<void> => {
@@ -286,6 +295,7 @@ export default {
   getUsers,
   getUserByID,
   updateUser,
+  deleteUser,
   sendPasswordReset,
   resetPassword
 }

@@ -1,8 +1,9 @@
 import supertest from 'supertest'
 import app from '../src/app'
 import { Address } from '../src/types'
+import { apiURLs } from '../src/utils/constants'
 import { db } from '../src/utils/db'
-import { addressesInDB, apiURLs, createOneAddress, loginAs, newAddress, populateUsers, purge } from './testHelper'
+import { addressesInDB, createOneAddress, loginAs, newAddress, populateUsers, purge } from './testHelper'
 
 const api = supertest(app)
 const apiURL = apiURLs.addresses

@@ -1,7 +1,7 @@
-import R from 'ramda'
-import { AddressCreateInput, AddressFetchInput, AddressTypeInput, CategoryCreateInput, CategoryUpdateInput, Follower, FollowerFetchInput, ListCreateInput, ListFetchInput, PasswordRequestInput, PasswordResetInput, ProductCreateInput, ProductUpdateInput, RatingCreateInput, RatingUpdateInput, RoleInput, ShippingMethodInput, UserAddressCreateInput, UserAddressFetchInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput } from '../types'
-import { canBeNumber, hasDefinedProps, isBoolean, isEmail, isInputProvided, isNumber, isPasswordValid, isProvided, isString, isStringOrArray } from './validatorLib'
 import { Request } from 'express'
+import R from 'ramda'
+import { AddressCreateInput, AddressTypeInput, CategoryCreateInput, CategoryUpdateInput, ListCreateInput, PasswordRequestInput, PasswordResetInput, ProductCreateInput, ProductUpdateInput, RatingCreateInput, RatingUpdateInput, RoleInput, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput, RatingCommentCreateInput, RatingCommentUpdateInput } from '../types'
+import { hasDefinedProps, isBoolean, isEmail, isInputProvided, isNumber, isPasswordValid, isProvided, isString, isStringOrArray } from './validatorLib'
 
 const checkNewUser = ({ body }: Request): UserSignupInput => {
   const email = R.pipe(
@@ -71,16 +71,11 @@ const checkUserUpdate = ({ body }: Request): UserUpdateInput => {
     { name: 'roleID', param: body.roleID }
   )
 
-  const isDeleted = body.isDeleted && isBoolean(
-    { name: 'isDeleted', param: body.isDeleted }
-  )
-
   const userInput: UserUpdateInput = {
     name: name?.param,
     email: email?.param.toLowerCase(),
     password: password?.param,
     avatar: avatar?.param,
-    isDeleted: isDeleted?.param,
     roleID: roleID?.param
   }
   return hasDefinedProps(userInput)
@@ -251,10 +246,6 @@ const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
     { name: 'vendorID', param: body.vendorID }
   )
 
-  const isDeleted = body.isDeleted && isBoolean(
-    { name: 'isDeleted', param: body.isDeleted }
-  )
-
   const productInput: ProductUpdateInput = {
     title: title?.param,
     listPrice: listPrice?.param,
@@ -265,7 +256,6 @@ const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
     media: media?.param,
     primaryMedia: primaryMedia?.param,
     isAvailable: isAvailable?.param,
-    isDeleted: isDeleted?.param,
     categoryID: categoryID?.param,
     vendorID: vendorID?.param
   }
@@ -469,7 +459,7 @@ const checkNewRating = ({ body }: Request): RatingCreateInput => {
     review: review?.param,
     media: media?.param,
     stars: stars.param,
-    productID: parseInt(productID.param)
+    productID: productID.param
   }
   return ratingInput
 }
@@ -491,18 +481,57 @@ const checkRatingUpdate = ({ body }: Request): RatingUpdateInput => {
     { name: 'stars', param: body.stars }
   )
 
-  const isDeleted = body.isDeleted && isBoolean(
-    { name: 'isDeleted', param: body.isDeleted }
-  )
-
   const ratingInput: RatingUpdateInput = {
     title: title?.param,
     review: review?.param,
     media: media?.param,
-    stars: stars?.param,
-    isDeleted: isDeleted?.param
+    stars: stars?.param
   }
   return hasDefinedProps(ratingInput)
+}
+
+const checkNewRatingComment = ({ body }: Request): RatingCommentCreateInput => {
+  const content = R.pipe(
+    isProvided,
+    isString
+  )({ name: 'content', param: body.content })
+
+  const media = body.media && isNumber(
+    { name: 'media', param: body.media }
+  )
+
+  const ratingID = R.pipe(
+    isProvided,
+    isNumber
+  )({ name: 'ratingID', param: body.ratingID })
+
+  const parentRatingCommentID = body.media && isNumber(
+    { name: 'parentRatingCommentID', param: body.parentRatingCommentID }
+  )
+
+  const ratingCommentInput: RatingCommentCreateInput = {
+    content: content.param,
+    media: media?.param,
+    ratingID: ratingID.param,
+    parentRatingCommentID: parentRatingCommentID?.param
+  }
+  return ratingCommentInput
+}
+
+const checkRatingCommentUpdate = ({ body }: Request): RatingCommentUpdateInput => {
+  const content = body.content && isString(
+    { name: 'content', param: body.content }
+  )
+
+  const media = body.media && isNumber(
+    { name: 'media', param: body.media }
+  )
+
+  const ratingCommentInput: RatingCommentUpdateInput = {
+    content: content?.param,
+    media: media?.param
+  }
+  return ratingCommentInput
 }
 
 export default {
@@ -526,5 +555,7 @@ export default {
   checkNewList,
   checkListUpdate,
   checkNewRating,
-  checkRatingUpdate
+  checkRatingUpdate,
+  checkNewRatingComment,
+  checkRatingCommentUpdate
 }

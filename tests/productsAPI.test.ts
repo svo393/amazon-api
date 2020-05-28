@@ -1,9 +1,10 @@
 import path from 'path'
 import supertest from 'supertest'
 import app from '../src/app'
+import { apiURLs } from '../src/utils/constants'
 import { db } from '../src/utils/db'
 import { products } from './seedData'
-import { apiURLs, createOneCategory, createOneProduct, createOneVendor, loginAs, newProduct, populateUsers, productsInDB, purge } from './testHelper'
+import { createOneCategory, createOneProduct, createOneVendor, loginAs, newProduct, populateUsers, productsInDB, purge } from './testHelper'
 
 const api = supertest(app)
 const apiURL = apiURLs.products

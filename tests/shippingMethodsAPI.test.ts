@@ -1,8 +1,9 @@
 import supertest from 'supertest'
 import app from '../src/app'
 import { ShippingMethod } from '../src/types'
+import { apiURLs } from '../src/utils/constants'
 import { db } from '../src/utils/db'
-import { apiURLs, createOneShippingMethod, loginAs, newShippingMethod, populateUsers, purge, shippingMethodsInDB } from './testHelper'
+import { createOneShippingMethod, loginAs, newShippingMethod, populateUsers, purge, shippingMethodsInDB } from './testHelper'
 
 const api = supertest(app)
 

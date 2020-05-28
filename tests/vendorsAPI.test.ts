@@ -1,7 +1,8 @@
 import supertest from 'supertest'
 import app from '../src/app'
+import { apiURLs } from '../src/utils/constants'
 import { db } from '../src/utils/db'
-import { apiURLs, createOneVendor, loginAs, newVendor, populateUsers, purge, vendorsInDB } from './testHelper'
+import { createOneVendor, loginAs, newVendor, populateUsers, purge, vendorsInDB } from './testHelper'
 
 const api = supertest(app)
 const apiURL = apiURLs.vendors

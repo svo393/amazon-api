@@ -24,7 +24,7 @@ router.post('/login', async (req, res) => {
 
 router.post('/logout', (_req, res) => {
   res.clearCookie('token')
-  res.sendStatus(204)
+  res.status(204).end()
 })
 
 router.get('/', isAdmin, async (_req, res) => {
@@ -48,10 +48,16 @@ router.put('/:userID', isSameUser('params'), async (req, res) => {
   res.json(updatedUser)
 })
 
+router.delete('/:userID', isSameUser('params'), async (req, res) => {
+  await userService.deleteUser(req, res)
+  res.clearCookie('token')
+  res.status(204).end()
+})
+
 router.post('/request-password-reset', async (req, res) => {
   const userResetRequestInput = inputValidator.checkUserResetRequest(req)
   await userService.sendPasswordReset(userResetRequestInput)
-  res.sendStatus(204)
+  res.status(204).end()
 })
 
 router.post('/reset-password', async (req, res) => {
@@ -105,5 +111,9 @@ router.delete('/:userID/follows/:anotherUserID', isSameUser('params'), async (re
   await followerService.deleteFollower(req)
   res.status(204).end()
 })
+
+// router.get('/:userID/feed', async (req, res) => { // TODO all ratings, answers...
+
+// })
 
 export default router

@@ -1,25 +1,12 @@
 import supertest from 'supertest'
 import app from '../src/app'
-import { Address, AddressCreateInput, AddressType, AddressTypeInput, Category, CategoryCreateInput, Follower, List, ListCreateInput, ListProduct, Product, ProductPublicData, Role, RoleInput, ShippingMethod, ShippingMethodInput, User, UserAddress, Vendor, VendorInput, Rating, RatingCreateInput } from '../src/types'
+import { Address, AddressCreateInput, AddressType, AddressTypeInput, Category, CategoryCreateInput, Follower, List, ListCreateInput, ListProduct, Product, ProductPublicData, Rating, RatingComment, RatingCommentCreateInput, RatingCreateInput, Role, RoleInput, ShippingMethod, ShippingMethodInput, User, UserAddress, Vendor, VendorInput } from '../src/types'
+import { apiURLs } from '../src/utils/constants'
 import { db } from '../src/utils/db'
 import StatusError from '../src/utils/StatusError'
 import { products } from './seedData'
 
 const api = supertest(app)
-
-export const apiURLs = {
-  categories: '/api/categories',
-  products: '/api/products',
-  users: '/api/users',
-  vendors: '/api/vendors',
-  roles: '/api/roles',
-  shippingMethods: '/api/shipping-methods',
-  addressTypes: '/api/address-types',
-  addresses: '/api/addresses',
-  userAddresses: '/api/user-addresses',
-  lists: '/api/lists',
-  ratings: '/api/ratings'
-}
 
 export const customer = {
   email: 'customer@example.com',
@@ -165,6 +152,10 @@ export const productsInDB = async (): Promise<Product[]> => {
 
 export const ratingsInDB = async (): Promise<Rating[]> => {
   return await db<Rating>('ratings')
+}
+
+export const ratingCommentsInDB = async (): Promise<RatingComment[]> => {
+  return await db<RatingComment>('ratingComments')
 }
 
 export const listProductsInDB = async (): Promise<ListProduct[]> => {
@@ -355,6 +346,23 @@ export const createOneRating = async (): Promise<Rating & { token: string }> => 
     .post(apiURLs.ratings)
     .set('Cookie', `token=${token}`)
     .send(newRating(addedProduct.productID))
+
+  return { ...body, token }
+}
+
+export const newRatingComment = (ratingID: number): RatingCommentCreateInput => ({
+  content: `New RatingComment ${(new Date().getTime()).toString()}`,
+  ratingID
+})
+
+export const createOneRatingComment = async (): Promise<RatingComment & { token: string }> => {
+  const { token } = await loginAs('customer', api)
+  const { ratingID } = await createOneRating()
+
+  const { body }: { body: RatingComment } = await api
+    .post(`${apiURLs.ratings}/comments`)
+    .set('Cookie', `token=${token}`)
+    .send(newRatingComment(ratingID))
 
   return { ...body, token }
 }

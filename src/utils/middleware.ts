@@ -1,9 +1,10 @@
 import { NextFunction, Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
+import { User } from '../types'
 import env from './config'
+import { db } from './db'
 import logger from './logger'
 import StatusError from './StatusError'
-import { db } from './db'
 
 type Middleware = (
   req: Request,
@@ -23,6 +24,7 @@ type Entities =
   | 'lists'
   | 'products'
   | 'ratings'
+  | 'ratingComments'
 
 export const isLoggedIn: Middleware = (_req, res, next) => {
   if (!res.locals.userID) throw new StatusError(403, 'Forbidden')
@@ -112,7 +114,7 @@ export const getUserID: Middleware = async (req, res, next) => {
       const decodedToken = jwt.verify(req.cookies.token, env.JWT_SECRET)
       res.locals.userID = (decodedToken as DecodedToken).userID
 
-      const role: { name: string } | null = await db('users')
+      const role: { name: string } | null = await db<User>('users')
         .first('r.name')
         .where('userID', res.locals.userID)
         .joinRaw('JOIN roles as r USING ("roleID")')

@@ -1,7 +1,9 @@
 import supertest from 'supertest'
 import app from '../src/app'
+import { apiURLs } from '../src/utils/constants'
 import { db } from '../src/utils/db'
-import { apiURLs, createOneProduct, createOneRating, loginAs, newRating, populateUsers, purge, ratingsInDB } from './testHelper'
+import { createOneProduct, createOneRating, loginAs, newRating, populateUsers, purge, ratingsInDB } from './testHelper'
+import { Rating } from '../src/types'
 
 const api = supertest(app)
 const apiURL = apiURLs.ratings
@@ -67,10 +69,10 @@ describe('Rating updating', () => {
     const { body } = await api
       .put(`${apiURL}/${ratingID}`)
       .set('Cookie', `token=${token}`)
-      .send({ isDeleted: true })
+      .send({ title: 'Updated Rating' })
       .expect(200)
 
-    expect(body.isDeleted).toBe(true)
+    expect(body.title).toBe('Updated Rating')
   })
 
   test('403 if not creator', async () => {
@@ -81,6 +83,31 @@ describe('Rating updating', () => {
       .put(`${apiURL}/${ratingID}`)
       .set('Cookie', `token=${token}`)
       .send({ title: 'Updated Rating' })
+      .expect(403)
+  })
+})
+
+describe('Ratings deleting', () => {
+  test('204 if same user and 404 fetching', async () => {
+    const { ratingID, token } = await createOneRating()
+
+    await api
+      .delete(`${apiURL}/${ratingID}`)
+      .set('Cookie', `token=${token}`)
+      .expect(204)
+
+    await api
+      .get(`${apiURL}/${ratingID}`)
+      .expect(404)
+  })
+
+  test('403 if another user', async () => {
+    const { ratingID } = await createOneRating()
+    const { token } = await loginAs('admin', api)
+
+    await api
+      .delete(`${apiURL}/${ratingID}`)
+      .set('Cookie', `token=${token}`)
       .expect(403)
   })
 })

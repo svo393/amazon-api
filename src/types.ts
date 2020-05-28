@@ -33,7 +33,6 @@ export type User = {
   userCreatedAt: Date;
   resetToken?: string | null;
   resetTokenCreatedAt?: Date | null;
-  isDeleted: boolean;
   roleID: number;
 }
 
@@ -81,7 +80,6 @@ export type Product = {
   userID: number;
   categoryID: number;
   vendorID: number;
-  isDeleted: boolean;
 }
 
 export type ListProduct = {
@@ -102,7 +100,6 @@ export type Rating = {
   isVerified: boolean;
   userID: number;
   productID: number;
-  isDeleted: boolean;
 }
 
 export type RatingComment = {
@@ -115,7 +112,6 @@ export type RatingComment = {
   userID: number;
   ratingID: number;
   parentRatingCommentID?: number;
-  isDeleted: boolean;
 }
 
 export type Question = {
@@ -129,7 +125,6 @@ export type Question = {
   isVerified: boolean;
   userID: number;
   productID: number;
-  isDeleted: boolean;
 }
 
 export type Answer = {
@@ -143,7 +138,6 @@ export type Answer = {
   isVerified: boolean;
   userID: number;
   questionID: number;
-  isDeleted: boolean;
 }
 
 export type AnswerComment = {
@@ -156,7 +150,6 @@ export type AnswerComment = {
   userID: number;
   answerID: number;
   parentAnswerCommentID?: number;
-  isDeleted: boolean;
 }
 
 export type Group = {
@@ -238,7 +231,6 @@ export type UserUpdateInput = {
   password?: string;
   avatar?: boolean;
   roleID?: number;
-  isDeleted?: boolean;
 }
 
 export type PasswordRequestInput = Pick<User, 'email'>
@@ -306,7 +298,6 @@ export type ProductCreateInput = Omit<Product,
   | 'productUpdatedAt'
   | 'userID'
   | 'isAvailable'
-  | 'isDeleted'
 > & {
   isAvailable?: boolean;
 }
@@ -321,7 +312,6 @@ export type ProductUpdateInput = {
   media?: number;
   primaryMedia?: number;
   isAvailable?: boolean;
-  isDeleted?: boolean;
   categoryID?: number;
   vendorID?: number;
 }
@@ -382,5 +372,17 @@ export type RatingUpdateInput = Pick<Rating,
   | 'media'
 > & {
   stars?: number;
-  isDeleted?: boolean;
+}
+
+export type RatingCommentCreateInput = Pick<RatingComment,
+  | 'content'
+  | 'media'
+  | 'ratingID'
+  | 'parentRatingCommentID'
+>
+
+export type RatingCommentUpdateInput = Pick<RatingComment,
+  | 'media'
+> & {
+  content?: string;
 }

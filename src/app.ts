@@ -21,7 +21,7 @@ app.use(getUserID)
 app.use(express.json())
 env.NODE_ENV === 'development' && app.use(logger('dev'))
 
-app.use('/api', router)
+app.use('/', router)
 app.use(unknownEndpoint)
 app.use(errorHandler)
 

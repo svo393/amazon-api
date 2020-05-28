@@ -1,7 +1,8 @@
 import supertest from 'supertest'
 import app from '../src/app'
+import { apiURLs } from '../src/utils/constants'
 import { db } from '../src/utils/db'
-import { apiURLs, getUserByEmail, loginAs, populateUsers, purge, usersInDB } from './testHelper'
+import { getUserByEmail, loginAs, populateUsers, purge, usersInDB } from './testHelper'
 
 const api = supertest(app)
 const apiURL = apiURLs.users
@@ -162,6 +163,32 @@ describe('User updating', () => {
       .post(`${apiURL}/request-password-reset`)
       .send({ email: 'customer@example.com' })
       .expect(204)
+  })
+})
+
+describe('User deleting', () => {
+  test('204 if same user', async () => {
+    const { token, userID } = await loginAs('customer', api)
+
+    const usersAtStart = await usersInDB()
+
+    await api
+      .delete(`${apiURL}/${userID}`)
+      .set('Cookie', `token=${token}`)
+      .expect(204)
+
+    const usersAtEnd = await usersInDB()
+    expect(usersAtEnd).toHaveLength(usersAtStart.length - 1)
+  })
+
+  test('403 if not same user', async () => {
+    const { userID } = await loginAs('admin', api)
+    const { token } = await loginAs('customer', api)
+
+    await api
+      .delete(`${apiURL}/${userID}`)
+      .set('Cookie', `token=${token}`)
+      .expect(403)
   })
 })
 

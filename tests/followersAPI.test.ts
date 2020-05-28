@@ -1,8 +1,9 @@
 import supertest from 'supertest'
 import app from '../src/app'
 import { Follower } from '../src/types'
+import { apiURLs } from '../src/utils/constants'
 import { db } from '../src/utils/db'
-import { apiURLs, createOneFollower, followersInDB, getUserByEmail, loginAs, populateUsers, purge } from './testHelper'
+import { createOneFollower, followersInDB, loginAs, populateUsers, purge } from './testHelper'
 
 const api = supertest(app)
 const apiURL = apiURLs.users

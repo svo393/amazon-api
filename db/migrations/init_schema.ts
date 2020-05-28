@@ -40,7 +40,6 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.dateTime('userCreatedAt').notNullable()
       t.string('resetToken', 50)
       t.dateTime('resetTokenCreatedAt')
-      t.boolean('isDeleted').defaultTo(false).notNullable()
 
       t
         .integer('roleID')
@@ -53,11 +52,13 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .integer('userID')
         .references('users.userID')
         .notNullable()
+        .onDelete('CASCADE')
 
       t
         .integer('follows')
         .references('users.userID')
         .notNullable()
+        .onDelete('CASCADE')
     })
     .alterTable('followers', (t) => {
       t.primary([ 'userID', 'follows' ])
@@ -70,6 +71,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .integer('userID')
         .references('users.userID')
         .notNullable()
+        .onDelete('CASCADE')
 
       t
         .integer('addressID')
@@ -88,6 +90,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .integer('userID')
         .references('users.userID')
         .notNullable()
+        .onDelete('CASCADE')
     })
     .alterTable('lists', (t) => {
       t.unique([ 'userID', 'name' ])
@@ -120,7 +123,6 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.dateTime('productCreatedAt').notNullable()
       t.dateTime('productUpdatedAt').notNullable()
       t.boolean('isAvailable').defaultTo(true).notNullable()
-      t.boolean('isDeleted').defaultTo(false).notNullable()
 
       t
         .integer('userID')
@@ -164,12 +166,12 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.integer('likes').notNullable().unsigned().defaultTo(0)
       t.integer('dislikes').notNullable().unsigned().defaultTo(0)
       t.boolean('isVerified').defaultTo(false).notNullable()
-      t.boolean('isDeleted').defaultTo(false).notNullable()
 
       t
         .integer('userID')
         .references('users.userID')
         .notNullable()
+        .onDelete('CASCADE')
 
       t
         .integer('productID')
@@ -187,12 +189,12 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.string('content', 65535).notNullable()
       t.integer('media').unsigned()
       t.boolean('isVerified').defaultTo(false).notNullable()
-      t.boolean('isDeleted').defaultTo(false).notNullable()
 
       t
         .integer('userID')
         .references('users.userID')
         .notNullable()
+        .onDelete('CASCADE')
 
       t
         .integer('ratingID')
@@ -213,12 +215,12 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.integer('likes').notNullable().unsigned().defaultTo(0)
       t.integer('dislikes').notNullable().unsigned().defaultTo(0)
       t.boolean('isVerified').defaultTo(false).notNullable()
-      t.boolean('isDeleted').defaultTo(false).notNullable()
 
       t
         .integer('userID')
         .references('users.userID')
         .notNullable()
+        .onDelete('CASCADE')
 
       t
         .integer('productID')
@@ -235,12 +237,12 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.integer('likes').notNullable().unsigned().defaultTo(0)
       t.integer('dislikes').notNullable().unsigned().defaultTo(0)
       t.boolean('isVerified').defaultTo(false).notNullable()
-      t.boolean('isDeleted').defaultTo(false).notNullable()
 
       t
         .integer('userID')
         .references('users.userID')
         .notNullable()
+        .onDelete('CASCADE')
 
       t
         .integer('questionID')
@@ -255,12 +257,12 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.string('content', 65535).notNullable()
       t.integer('media').unsigned()
       t.boolean('isVerified').defaultTo(false).notNullable()
-      t.boolean('isDeleted').defaultTo(false).notNullable()
 
       t
         .integer('userID')
         .references('users.userID')
         .notNullable()
+        .onDelete('CASCADE')
 
       t
         .integer('answerID')
@@ -323,6 +325,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .integer('userID')
         .references('users.userID')
         .notNullable()
+        .onDelete('CASCADE')
 
       t
         .integer('productID')
@@ -347,7 +350,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t
         .integer('userID')
         .references('users.userID')
-        .notNullable()
+        .onDelete('SET NULL')
 
       t
         .integer('orderStatusID')

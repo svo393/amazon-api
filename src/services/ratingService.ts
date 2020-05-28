@@ -20,7 +20,7 @@ const addRating = async (ratingInput: RatingCreateInput, res: Response): Promise
   const [ addedRating ]: Rating[] = await db('ratings')
     .insert({
       ...ratingInput,
-      userID: res.locals.userID,
+      userID,
       ratingCreatedAt: now,
       ratingUpdatedAt: now
     }, [ '*' ])
@@ -28,12 +28,12 @@ const addRating = async (ratingInput: RatingCreateInput, res: Response): Promise
   return addedRating
 }
 
-const getRatingsByUser = async (req: Request): Promise<Rating[] | void> => {
+const getRatingsByUser = async (req: Request): Promise<Rating[]> => {
   return await db('ratings')
     .where('userID', req.params.userID)
 }
 
-const getRatingsByProduct = async (req: Request): Promise<Rating[] | void> => {
+const getRatingsByProduct = async (req: Request): Promise<Rating[]> => {
   return await db('ratings')
     .where('productID', req.params.productID)
 }
@@ -56,10 +56,19 @@ const updateRating = async (ratingInput: RatingUpdateInput, req: Request): Promi
   return updatedRating
 }
 
+const deleteRating = async (req: Request): Promise<void> => {
+  const deleteCount = await db<Rating>('ratings')
+    .del()
+    .where('ratingID', req.params.ratingID)
+
+  if (deleteCount === 0) throw new StatusError(404, 'Not Found')
+}
+
 export default {
   addRating,
   getRatingsByUser,
   getRatingsByProduct,
   getRatingByID,
-  updateRating
+  updateRating,
+  deleteRating
 }
