@@ -1,13 +1,13 @@
 import Router from 'express'
 import answerService from '../services/answerService'
 import questionService from '../services/questionService'
-import inputValidator from '../utils/inputValidator'
+import { checkNewAnswer, checkNewQuestion, checkQuestionUpdate } from '../utils/inputValidator'
 import { isCreator, isLoggedIn } from '../utils/middleware'
 
 const router = Router()
 
 router.post('/', isLoggedIn, async (req, res) => {
-  const questionCreateInput = inputValidator.checkNewQuestion(req)
+  const questionCreateInput = checkNewQuestion(req)
   const addedQuestion = await questionService.addQuestion(questionCreateInput, res)
   res.status(201).json(addedQuestion)
 })
@@ -18,7 +18,7 @@ router.get('/:questionID', async (req, res) => {
 })
 
 router.put('/:questionID', isCreator('questions', 'questionID', 'params'), async (req, res) => {
-  const questionUpdateInput = inputValidator.checkQuestionUpdate(req)
+  const questionUpdateInput = checkQuestionUpdate(req)
   const updatedQuestion = await questionService.updateQuestion(questionUpdateInput, req)
   res.json(updatedQuestion)
 })
@@ -29,7 +29,7 @@ router.delete('/:questionID', isCreator('questions', 'questionID', 'params'), as
 })
 
 router.post('/answers', isLoggedIn, async (req, res) => {
-  const answerCreateInput = inputValidator.checkNewAnswer(req)
+  const answerCreateInput = checkNewAnswer(req)
   const addedAnswer = await answerService.addAnswer(answerCreateInput, res)
   res.status(201).json(addedAnswer)
 })
@@ -40,7 +40,7 @@ router.get('/:questionID/answers', async (req, res) => {
 })
 
 // router.post('/:questionID/upload', isAdmin, questionCommentService.multerUpload.array('questionMedia', 10), (req, res) => { // TODO
-//   const questionMedia = inputValidator.checkquestionMediaUpload(req)
+//   const questionMedia = checkquestionMediaUpload(req)
 //   questionCommentService.uploadImages(questionMedia, req)
 //   res.status(204).end()
 // })

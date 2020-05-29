@@ -1,13 +1,13 @@
 import Router from 'express'
 import addressService from '../services/addressService'
 import addressTypeService from '../services/addressTypeService'
-import inputValidator from '../utils/inputValidator'
+import { checkAddressType } from '../utils/inputValidator'
 import { isAdmin } from '../utils/middleware'
 
 const router = Router()
 
 router.post('/', isAdmin, async (req, res) => {
-  const addressTypeCreateInput = inputValidator.checkAddressType(req)
+  const addressTypeCreateInput = checkAddressType(req)
   const addedAddressType = await addressTypeService.addAddressType(addressTypeCreateInput)
   res.status(201).json(addedAddressType)
 })
@@ -23,7 +23,7 @@ router.get('/:addressTypeID', async (req, res) => {
 })
 
 router.put('/:addressTypeID', isAdmin, async (req, res) => {
-  const addressTypeUpdateInput = inputValidator.checkAddressType(req)
+  const addressTypeUpdateInput = checkAddressType(req)
   const updatedItem = await addressTypeService.updateAddressType(res, addressTypeUpdateInput, req)
   res.json(updatedItem)
 })

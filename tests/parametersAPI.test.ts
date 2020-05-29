@@ -2,7 +2,7 @@ import supertest from 'supertest'
 import app from '../src/app'
 import { apiURLs } from '../src/utils/constants'
 import { db } from '../src/utils/db'
-import { createOneParameter, loginAs, newParameter, populateUsers, purge, parametersInDB } from './testHelper'
+import { createOneParameter, loginAs, newParameter, populateUsers, purge, parametersInDB, createOneProduct, productParametersInDB, newProductParameter, createOneProductParameter } from './testHelper'
 
 const api = supertest(app)
 const apiURL = apiURLs.parameters
@@ -36,26 +36,32 @@ describe('Parameter adding', () => {
       .send(newParameter())
       .expect(403)
   })
+
+  test('201 productParameter', async () => {
+    const { addedParameter, token } = await createOneParameter('admin')
+    const { addedProduct } = await createOneProduct('admin')
+
+    const parametersAtStart = await productParametersInDB()
+
+    await api
+      .post(`${apiURL}/${addedParameter.parameterID}/product/${addedProduct.productID}`)
+      .set('Cookie', `token=${token}`)
+      .send(newProductParameter(addedParameter.parameterID, addedProduct.productID))
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+
+    const parametersAtEnd = await productParametersInDB()
+    expect(parametersAtEnd).toHaveLength(parametersAtStart.length + 1)
+  })
 })
 
 describe('Parameter fetching', () => {
-  test('200 parameters', async () => {
-    await createOneParameter('admin')
+  test('200 parameters by product', async () => {
+    const { addedProductParameter } = await createOneProductParameter('admin')
 
     const { body } = await api
-      .get(apiURL)
+      .get(`${apiURLs.products}/${addedProductParameter.productID}/parameters`)
       .expect(200)
-
-    expect(body).toBeDefined()
-  })
-
-  test('200 parameter', async () => {
-    const { addedParameter } = await createOneParameter('admin')
-
-    const { body } = await api
-      .get(`${apiURL}/${addedParameter.parameterID}`)
-      .expect(200)
-
     expect(body).toBeDefined()
   })
 })

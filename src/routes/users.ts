@@ -6,19 +6,19 @@ import questionService from '../services/questionService'
 import ratingService from '../services/ratingService'
 import userAddressService from '../services/userAddressService'
 import userService from '../services/userService'
-import inputValidator from '../utils/inputValidator'
+import { checkNewUser, checkUserAddressesUpdate, checkUserLogin, checkUserResetRequest, checkUserResetToken, checkUserUpdate } from '../utils/inputValidator'
 import { isAdmin, isLoggedIn, isSameUser, isSameUserOrAdmin } from '../utils/middleware'
 
 const router = Router()
 
 router.post('/', async (req, res) => {
-  const userSignupInput = inputValidator.checkNewUser(req)
+  const userSignupInput = checkNewUser(req)
   const addedUser = await userService.addUser(userSignupInput, res)
   res.status(201).json(addedUser)
 })
 
 router.post('/login', async (req, res) => {
-  const userLoginInput = inputValidator.checkUserLogin(req)
+  const userLoginInput = checkUserLogin(req)
   const loggedInUser = await userService.loginUser(userLoginInput, res)
   res.json(loggedInUser)
 })
@@ -44,7 +44,7 @@ router.get('/:userID', async (req, res) => {
 })
 
 router.put('/:userID', isSameUser('params'), async (req, res) => {
-  const userUpdateInput = inputValidator.checkUserUpdate(req)
+  const userUpdateInput = checkUserUpdate(req)
   const updatedUser = await userService.updateUser(userUpdateInput, res, req)
   res.json(updatedUser)
 })
@@ -56,13 +56,13 @@ router.delete('/:userID', isSameUser('params'), async (req, res) => {
 })
 
 router.post('/request-password-reset', async (req, res) => {
-  const userResetRequestInput = inputValidator.checkUserResetRequest(req)
+  const userResetRequestInput = checkUserResetRequest(req)
   await userService.sendPasswordReset(userResetRequestInput)
   res.status(204).end()
 })
 
 router.post('/reset-password', async (req, res) => {
-  const userPasswordResetInput = inputValidator.checkUserResetToken(req)
+  const userPasswordResetInput = checkUserResetToken(req)
   const updatedUser = await userService.resetPassword(userPasswordResetInput, res)
   res.json(updatedUser)
 })
@@ -73,7 +73,7 @@ router.get('/:userID/addresses', isSameUserOrAdmin('params'), async (req, res) =
 })
 
 router.put('/:userID/addresses/:addressID/', isSameUser('params'), async (req, res) => {
-  const userAddressUpdateInput = inputValidator.checkUserAddressesUpdate(req)
+  const userAddressUpdateInput = checkUserAddressesUpdate(req)
   const userAddresses = await userAddressService.updateUserAddress(userAddressUpdateInput, req)
   res.json(userAddresses)
 })

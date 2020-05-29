@@ -1,9 +1,9 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CategoryCreateInput, CategoryUpdateInput, ListCreateInput, PasswordRequestInput, PasswordResetInput, ProductCreateInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, RoleInput, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput, GroupInput, ParameterInput, GroupProductInput, ProductParameterInput } from '../types'
+import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CategoryCreateInput, CategoryUpdateInput, GroupInput, GroupProductInput, ListCreateInput, ParameterInput, PasswordRequestInput, PasswordResetInput, ProductCreateInput, ProductParameterInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, RoleInput, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput } from '../types'
 import { hasDefinedProps, isBoolean, isEmail, isInputProvided, isNumber, isPasswordValid, isProvided, isString, isStringOrArray } from './validatorLib'
 
-const checkNewUser = ({ body }: Request): UserSignupInput => {
+export const checkNewUser = ({ body }: Request): UserSignupInput => {
   const email = R.pipe(
     isProvided,
     isString,
@@ -23,7 +23,7 @@ const checkNewUser = ({ body }: Request): UserSignupInput => {
   return userInput
 }
 
-const checkUserLogin = ({ body }: Request): UserLoginInput => {
+export const checkUserLogin = ({ body }: Request): UserLoginInput => {
   const email = R.pipe(
     isProvided,
     isString,
@@ -48,7 +48,7 @@ const checkUserLogin = ({ body }: Request): UserLoginInput => {
   return userInput
 }
 
-const checkUserUpdate = ({ body }: Request): UserUpdateInput => {
+export const checkUserUpdate = ({ body }: Request): UserUpdateInput => {
   const password = body.password && R.pipe(
     isString,
     isPasswordValid
@@ -81,7 +81,7 @@ const checkUserUpdate = ({ body }: Request): UserUpdateInput => {
   return hasDefinedProps(userInput)
 }
 
-const checkUserResetRequest = ({ body }: Request): PasswordRequestInput => {
+export const checkUserResetRequest = ({ body }: Request): PasswordRequestInput => {
   const email = R.pipe(
     isProvided,
     isString,
@@ -94,7 +94,7 @@ const checkUserResetRequest = ({ body }: Request): PasswordRequestInput => {
   return userInput
 }
 
-const checkUserResetToken = ({ body }: Request): PasswordResetInput => {
+export const checkUserResetToken = ({ body }: Request): PasswordResetInput => {
   const resetToken = R.pipe(
     isProvided,
     isString
@@ -113,7 +113,7 @@ const checkUserResetToken = ({ body }: Request): PasswordResetInput => {
   return userInput
 }
 
-const checkNewProduct = ({ body }: Request): ProductCreateInput => {
+export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
   const title = R.pipe(
     isProvided,
     isString
@@ -201,7 +201,7 @@ const checkNewProduct = ({ body }: Request): ProductCreateInput => {
   return productInput
 }
 
-const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
+export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
   const title = body.title && isString(
     { name: 'title', param: body.title }
   )
@@ -262,13 +262,13 @@ const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
   return hasDefinedProps(productInput)
 }
 
-const checkProductMediaUpload = ({ files }: Request): Express.Multer.File[] => {
+export const checkProductMediaUpload = ({ files }: Request): Express.Multer.File[] => {
   isInputProvided(files, 'Missing images')
   isStringOrArray({ name: 'images', param: files })
   return files as Express.Multer.File[]
 }
 
-const checkNewCategory = ({ body }: Request): CategoryCreateInput => {
+export const checkNewCategory = ({ body }: Request): CategoryCreateInput => {
   const name = R.pipe(
     isProvided,
     isString
@@ -285,7 +285,7 @@ const checkNewCategory = ({ body }: Request): CategoryCreateInput => {
   return categoryInput
 }
 
-const checkCategoryUpdate = ({ body }: Request): CategoryUpdateInput => {
+export const checkCategoryUpdate = ({ body }: Request): CategoryUpdateInput => {
   const name = body.name && isString(
     { name: 'name', param: body.name }
   )
@@ -301,7 +301,7 @@ const checkCategoryUpdate = ({ body }: Request): CategoryUpdateInput => {
   return hasDefinedProps(categoryInput)
 }
 
-const checkVendor = ({ body }: Request): VendorInput => {
+export const checkVendor = ({ body }: Request): VendorInput => {
   const name = R.pipe(
     isProvided,
     isString
@@ -313,7 +313,7 @@ const checkVendor = ({ body }: Request): VendorInput => {
   return vendorInput
 }
 
-const checkRole = ({ body }: Request): RoleInput => {
+export const checkRole = ({ body }: Request): RoleInput => {
   const name = R.pipe(
     isProvided,
     isString
@@ -325,7 +325,7 @@ const checkRole = ({ body }: Request): RoleInput => {
   return roleInput
 }
 
-const checkShippingMethod = ({ body }: Request): ShippingMethodInput => {
+export const checkShippingMethod = ({ body }: Request): ShippingMethodInput => {
   const name = R.pipe(
     isProvided,
     isString
@@ -337,7 +337,7 @@ const checkShippingMethod = ({ body }: Request): ShippingMethodInput => {
   return shippingMethodID
 }
 
-const checkAddressType = ({ body }: Request): AddressTypeInput => {
+export const checkAddressType = ({ body }: Request): AddressTypeInput => {
   const name = R.pipe(
     isProvided,
     isString
@@ -349,7 +349,7 @@ const checkAddressType = ({ body }: Request): AddressTypeInput => {
   return addressTypeInput
 }
 
-const checkNewAddress = ({ body }: Request): AddressCreateInput => {
+export const checkNewAddress = ({ body }: Request): AddressCreateInput => {
   const isDefault = body.isDefault && isBoolean(
     { name: 'isDefault', param: body.isDefault }
   )
@@ -372,7 +372,7 @@ const checkNewAddress = ({ body }: Request): AddressCreateInput => {
   return addressInput
 }
 
-const checkNewUserAddress = ({ body }: Request): UserAddressCreateInput => {
+export const checkNewUserAddress = ({ body }: Request): UserAddressCreateInput => {
   const isDefault = body.isDefault && isBoolean(
     { name: 'isDefault', param: body.isDefault }
   )
@@ -395,7 +395,7 @@ const checkNewUserAddress = ({ body }: Request): UserAddressCreateInput => {
   return userAddressInput
 }
 
-const checkUserAddressesUpdate = ({ body }: Request): UserAddressUpdateInput => {
+export const checkUserAddressesUpdate = ({ body }: Request): UserAddressUpdateInput => {
   const isDefault = R.pipe(
     isProvided,
     isBoolean
@@ -407,7 +407,7 @@ const checkUserAddressesUpdate = ({ body }: Request): UserAddressUpdateInput => 
   return userAddressInput
 }
 
-const checkNewList = ({ body }: Request): ListCreateInput => {
+export const checkNewList = ({ body }: Request): ListCreateInput => {
   const name = R.pipe(
     isProvided,
     isString
@@ -419,7 +419,7 @@ const checkNewList = ({ body }: Request): ListCreateInput => {
   return vendorInput
 }
 
-const checkListUpdate = ({ body }: Request): ListCreateInput => {
+export const checkListUpdate = ({ body }: Request): ListCreateInput => {
   const name = R.pipe(
     isProvided,
     isString
@@ -431,7 +431,7 @@ const checkListUpdate = ({ body }: Request): ListCreateInput => {
   return listInput
 }
 
-const checkNewRating = ({ body }: Request): RatingCreateInput => {
+export const checkNewRating = ({ body }: Request): RatingCreateInput => {
   const title = body.title && isString(
     { name: 'title', param: body.title }
   )
@@ -464,7 +464,7 @@ const checkNewRating = ({ body }: Request): RatingCreateInput => {
   return ratingInput
 }
 
-const checkRatingUpdate = ({ body }: Request): RatingUpdateInput => {
+export const checkRatingUpdate = ({ body }: Request): RatingUpdateInput => {
   const title = body.title && isString(
     { name: 'title', param: body.title }
   )
@@ -490,7 +490,7 @@ const checkRatingUpdate = ({ body }: Request): RatingUpdateInput => {
   return hasDefinedProps(ratingInput)
 }
 
-const checkNewRatingComment = ({ body }: Request): RatingCommentCreateInput => {
+export const checkNewRatingComment = ({ body }: Request): RatingCommentCreateInput => {
   const content = R.pipe(
     isProvided,
     isString
@@ -518,7 +518,7 @@ const checkNewRatingComment = ({ body }: Request): RatingCommentCreateInput => {
   return ratingCommentInput
 }
 
-const checkRatingCommentUpdate = ({ body }: Request): RatingCommentUpdateInput => {
+export const checkRatingCommentUpdate = ({ body }: Request): RatingCommentUpdateInput => {
   const content = body.content && isString(
     { name: 'content', param: body.content }
   )
@@ -534,7 +534,7 @@ const checkRatingCommentUpdate = ({ body }: Request): RatingCommentUpdateInput =
   return ratingCommentInput
 }
 
-const checkNewQuestion = ({ body }: Request): QuestionCreateInput => {
+export const checkNewQuestion = ({ body }: Request): QuestionCreateInput => {
   const content = R.pipe(
     isProvided,
     isString
@@ -557,7 +557,7 @@ const checkNewQuestion = ({ body }: Request): QuestionCreateInput => {
   return questionInput
 }
 
-const checkQuestionUpdate = ({ body }: Request): QuestionUpdateInput => {
+export const checkQuestionUpdate = ({ body }: Request): QuestionUpdateInput => {
   const content = body.content && isString(
     { name: 'content', param: body.content }
   )
@@ -573,7 +573,7 @@ const checkQuestionUpdate = ({ body }: Request): QuestionUpdateInput => {
   return hasDefinedProps(questionInput)
 }
 
-const checkNewAnswer = ({ body }: Request): AnswerCreateInput => {
+export const checkNewAnswer = ({ body }: Request): AnswerCreateInput => {
   const content = R.pipe(
     isProvided,
     isString
@@ -596,7 +596,7 @@ const checkNewAnswer = ({ body }: Request): AnswerCreateInput => {
   return answerInput
 }
 
-const checkAnswerUpdate = ({ body }: Request): AnswerUpdateInput => {
+export const checkAnswerUpdate = ({ body }: Request): AnswerUpdateInput => {
   const content = body.content && isString(
     { name: 'content', param: body.content }
   )
@@ -612,7 +612,7 @@ const checkAnswerUpdate = ({ body }: Request): AnswerUpdateInput => {
   return hasDefinedProps(answerInput)
 }
 
-const checkNewAnswerComment = ({ body }: Request): AnswerCommentCreateInput => {
+export const checkNewAnswerComment = ({ body }: Request): AnswerCommentCreateInput => {
   const content = R.pipe(
     isProvided,
     isString
@@ -640,7 +640,7 @@ const checkNewAnswerComment = ({ body }: Request): AnswerCommentCreateInput => {
   return answerCommentInput
 }
 
-const checkAnswerCommentUpdate = ({ body }: Request): AnswerCommentUpdateInput => {
+export const checkAnswerCommentUpdate = ({ body }: Request): AnswerCommentUpdateInput => {
   const content = body.content && isString(
     { name: 'content', param: body.content }
   )
@@ -656,7 +656,7 @@ const checkAnswerCommentUpdate = ({ body }: Request): AnswerCommentUpdateInput =
   return answerCommentInput
 }
 
-const checkParameter = ({ body }: Request): ParameterInput => {
+export const checkParameter = ({ body }: Request): ParameterInput => {
   const name = R.pipe(
     isProvided,
     isString
@@ -668,7 +668,7 @@ const checkParameter = ({ body }: Request): ParameterInput => {
   return parameterInput
 }
 
-const checkGroup = ({ body }: Request): GroupInput => {
+export const checkGroup = ({ body }: Request): GroupInput => {
   const name = R.pipe(
     isProvided,
     isString
@@ -680,7 +680,7 @@ const checkGroup = ({ body }: Request): GroupInput => {
   return groupInput
 }
 
-const checkGroupProduct = ({ body }: Request): GroupProductInput => {
+export const checkGroupProduct = ({ body }: Request): GroupProductInput => {
   const value = R.pipe(
     isProvided,
     isString
@@ -692,50 +692,14 @@ const checkGroupProduct = ({ body }: Request): GroupProductInput => {
   return groupProductInput
 }
 
-const checkProductParameter = ({ body }: Request): ProductParameterInput => {
+export const checkProductParameter = ({ body }: Request): ProductParameterInput => {
   const value = R.pipe(
     isProvided,
     isString
   )({ name: 'value', param: body.value })
 
-  const ProductParameterInput: ProductParameterInput = {
+  const productParameterInput: ProductParameterInput = {
     value: value.param
   }
-  return ProductParameterInput
-}
-
-export default {
-  checkNewUser,
-  checkUserLogin,
-  checkUserUpdate,
-  checkUserResetRequest,
-  checkUserResetToken,
-  checkNewProduct,
-  checkProductUpdate,
-  checkProductMediaUpload,
-  checkNewCategory,
-  checkCategoryUpdate,
-  checkVendor,
-  checkRole,
-  checkShippingMethod,
-  checkAddressType,
-  checkNewAddress,
-  checkNewUserAddress,
-  checkUserAddressesUpdate,
-  checkNewList,
-  checkListUpdate,
-  checkNewRating,
-  checkRatingUpdate,
-  checkNewRatingComment,
-  checkRatingCommentUpdate,
-  checkNewQuestion,
-  checkQuestionUpdate,
-  checkNewAnswer,
-  checkAnswerUpdate,
-  checkNewAnswerComment,
-  checkAnswerCommentUpdate,
-  checkParameter,
-  checkGroup,
-  checkGroupProduct,
-  checkProductParameter
+  return productParameterInput
 }

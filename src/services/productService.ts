@@ -100,20 +100,9 @@ const getProductByID = async (req: Request, res: Response): Promise<ProductListD
       : { ...acc, [cur.name]: [ cur ] }
   }, {})
 
-  const parameters = await db('productParameters as pp')
-    .leftJoin('parameters as p', 'p.parameterID', 'pp.parameterID')
-    .where('pp.productID', product.productID)
-
-  const formattedParameters: FormattedParameter[] = parameters.reduce((acc, cur) => {
-    return acc[cur.name]
-      ? { ...acc, [cur.name]: [ ...acc[cur.name], cur ] }
-      : { ...acc, [cur.name]: [ cur ] }
-  }, {})
-
   const fullProduct = {
     ...product,
-    groups: formattedGroups,
-    parameters: formattedParameters
+    groups: formattedGroups
   }
 
   const role: string | undefined = res.locals.userRole

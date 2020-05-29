@@ -1,7 +1,7 @@
 import Router from 'express'
 import answerCommentService from '../services/answerCommentService'
 import answerService from '../services/answerService'
-import inputValidator from '../utils/inputValidator'
+import { checkAnswerUpdate, checkNewAnswerComment } from '../utils/inputValidator'
 import { isCreator, isLoggedIn } from '../utils/middleware'
 
 const router = Router()
@@ -12,7 +12,7 @@ router.get('/:answerID', async (req, res) => {
 })
 
 router.put('/:answerID', isCreator('answers', 'answerID', 'params'), async (req, res) => {
-  const answerUpdateInput = inputValidator.checkAnswerUpdate(req)
+  const answerUpdateInput = checkAnswerUpdate(req)
   const updatedAnswer = await answerService.updateAnswer(answerUpdateInput, req)
   res.json(updatedAnswer)
 })
@@ -23,7 +23,7 @@ router.delete('/:answerID', isCreator('answers', 'answerID', 'params'), async (r
 })
 
 router.post('/comments', isLoggedIn, async (req, res) => {
-  const answerCommentCreateInput = inputValidator.checkNewAnswerComment(req)
+  const answerCommentCreateInput = checkNewAnswerComment(req)
   const addedAnswerComment = await answerCommentService.addAnswerComment(answerCommentCreateInput, res)
   res.status(201).json(addedAnswerComment)
 })

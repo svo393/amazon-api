@@ -1,15 +1,16 @@
 import Router from 'express'
+import groupService from '../services/groupService'
+import parameterService from '../services/parameterService'
 import productService from '../services/productService'
 import questionService from '../services/questionService'
 import ratingService from '../services/ratingService'
-import inputValidator from '../utils/inputValidator'
+import { checkNewProduct, checkProductMediaUpload, checkProductUpdate } from '../utils/inputValidator'
 import { isAdmin, isCreator } from '../utils/middleware'
-import groupService from '../services/groupService'
 
 const router = Router()
 
 router.post('/', isAdmin, async (req, res) => {
-  const productInput = inputValidator.checkNewProduct(req)
+  const productInput = checkNewProduct(req)
   const addedProduct = await productService.addProduct(productInput, res)
   res.status(201).json(addedProduct)
 })
@@ -25,13 +26,13 @@ router.get('/:productID', async (req, res) => {
 })
 
 router.put('/:productID', isCreator('products', 'productID', 'params'), async (req, res) => {
-  const productInput = inputValidator.checkProductUpdate(req)
+  const productInput = checkProductUpdate(req)
   const updatedProduct = await productService.updateProduct(productInput, req)
   res.json(updatedProduct)
 })
 
 router.post('/:productID/upload', isAdmin, productService.multerUpload.array('productMedia', 10), (req, res) => {
-  const productMedia = inputValidator.checkProductMediaUpload(req)
+  const productMedia = checkProductMediaUpload(req)
   productService.uploadImages(productMedia, req)
   res.status(204).end()
 })
@@ -49,6 +50,11 @@ router.get('/:productID/questions', async (req, res) => {
 router.get('/:productID/groups', async (req, res) => {
   const groups = await groupService.getGroupsByProduct(req)
   res.json(groups)
+})
+
+router.get('/:productID/parameters', async (req, res) => {
+  const parameters = await parameterService.getParametersByProduct(req)
+  res.json(parameters)
 })
 
 export default router

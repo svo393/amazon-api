@@ -1,6 +1,6 @@
 import supertest from 'supertest'
 import app from '../src/app'
-import { Address, AddressCreateInput, AddressType, AddressTypeInput, Answer, AnswerComment, AnswerCommentCreateInput, AnswerCreateInput, Category, CategoryCreateInput, Follower, List, ListCreateInput, ListProduct, Product, ProductPublicData, Question, QuestionCreateInput, Rating, RatingComment, RatingCommentCreateInput, RatingCreateInput, Role, RoleInput, ShippingMethod, ShippingMethodInput, User, UserAddress, Vendor, VendorInput, Parameter, Group, GroupInput, ParameterInput, GroupProduct } from '../src/types'
+import { Address, AddressCreateInput, AddressType, AddressTypeInput, Answer, AnswerComment, AnswerCommentCreateInput, AnswerCreateInput, Category, CategoryCreateInput, Follower, Group, GroupInput, GroupProduct, List, ListCreateInput, ListProduct, Parameter, ParameterInput, Product, ProductParameter, ProductPublicData, Question, QuestionCreateInput, Rating, RatingComment, RatingCommentCreateInput, RatingCreateInput, Role, RoleInput, ShippingMethod, ShippingMethodInput, User, UserAddress, Vendor, VendorInput } from '../src/types'
 import { apiURLs } from '../src/utils/constants'
 import { db } from '../src/utils/db'
 import StatusError from '../src/utils/StatusError'
@@ -70,35 +70,31 @@ export const purge = async (): Promise<void> => {
 }
 
 export const populateUsers = async (): Promise<void> => {
-  try {
-    await api
-      .post('/api/users')
-      .send(customer)
+  await api
+    .post('/api/users')
+    .send(customer)
 
-    await api
-      .post('/api/users')
-      .send(admin)
+  await api
+    .post('/api/users')
+    .send(admin)
 
-    await api
-      .post('/api/users')
-      .send(root)
+  await api
+    .post('/api/users')
+    .send(root)
 
-    const roles = await db<Role>('roles')
-    const adminRole = roles.find((r) => r.name === 'ADMIN')
-    const rootRole = roles.find((r) => r.name === 'ROOT')
+  const roles = await db<Role>('roles')
+  const adminRole = roles.find((r) => r.name === 'ADMIN')
+  const rootRole = roles.find((r) => r.name === 'ROOT')
 
-    if (!adminRole || !rootRole) { throw new StatusError() }
+  if (!adminRole || !rootRole) { throw new StatusError() }
 
-    await db('users')
-      .update('roleID', adminRole.roleID)
-      .where('email', admin.email)
+  await db('users')
+    .update('roleID', adminRole.roleID)
+    .where('email', admin.email)
 
-    await db('users')
-      .update('roleID', rootRole.roleID)
-      .where('email', root.email)
-  } catch (err) {
-    console.error(err)
-  }
+  await db('users')
+    .update('roleID', rootRole.roleID)
+    .where('email', root.email)
 }
 
 export const getUserByEmail = async (email: string): Promise<User> => {
@@ -132,6 +128,10 @@ export const groupsInDB = async (): Promise<Group[]> => {
 
 export const groupProductsInDB = async (): Promise<GroupProduct[]> => {
   return await db<GroupProduct>('groupProducts')
+}
+
+export const productParametersInDB = async (): Promise<ProductParameter[]> => {
+  return await db<ProductParameter>('productParameters')
 }
 
 export const rolesInDB = async (): Promise<Role[]> => {
@@ -488,4 +488,22 @@ export const createOneParameter = async (role: string, name?: string): Promise<{
     .send(newParameter(name))
 
   return { addedParameter: body, token }
+}
+
+export const newProductParameter = (parameterID: number, productID: number, value?: string): ProductParameter => ({
+  value: value ?? `New ProductParameter ${(new Date().getTime()).toString()}`,
+  parameterID,
+  productID
+})
+
+export const createOneProductParameter = async (role: string, name?: string): Promise<{ addedProductParameter: ProductParameter; token: string}> => {
+  const { addedParameter, token } = await createOneParameter(role)
+  const { addedProduct } = await createOneProduct(role)
+
+  const { body } = await api
+    .post(`${apiURLs.parameters}/${addedParameter.parameterID}/product/${addedProduct.productID}`)
+    .set('Cookie', `token=${token}`)
+    .send(newProductParameter(addedParameter.parameterID, addedProduct.productID, name))
+
+  return { addedProductParameter: body, token }
 }

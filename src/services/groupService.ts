@@ -1,7 +1,6 @@
 import { Request } from 'express'
+import { FormattedGroup, Group, GroupInput, GroupProduct, GroupProductInput } from '../types'
 import { db } from '../utils/db'
-import { ProductListData, Group, GroupInput, GroupProductInput, GroupProduct, FormattedGroup } from '../types'
-import { getProductsQuery } from '../utils/queries'
 import StatusError from '../utils/StatusError'
 
 const addGroup = async (groupInput: GroupInput): Promise<Group> => {
