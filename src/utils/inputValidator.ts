@@ -160,19 +160,17 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
     isNumber
   )({ name: 'vendorID', param: body.vendorID })
 
-  const groups = R.pipe(
-    isProvided,
-    isArray
-  )({ name: 'groups', param: body.groups })
+  const groups = body.groups && isArray(
+    { name: 'groups', param: body.groups }
+  )
 
-  groups.param.map((g: any) => isProductParameterOrGroupProduct({ name: 'group', param: g }))
+  groups && groups.param.map((g: any) => isProductParameterOrGroupProduct({ name: 'group', param: g }))
 
-  const parameters = R.pipe(
-    isProvided,
-    isArray
-  )({ name: 'parameters', param: body.parameters })
+  const parameters = body.parameters && isArray(
+    { name: 'parameters', param: body.parameters }
+  )
 
-  parameters.param.map((p: any) => isProductParameterOrGroupProduct({ name: 'parameter', param: p }))
+  parameters && parameters.param.map((p: any) => isProductParameterOrGroupProduct({ name: 'parameter', param: p }))
 
   return {
     title: title.param,
@@ -186,8 +184,8 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
     primaryMedia: primaryMedia.param,
     categoryID: categoryID.param,
     vendorID: vendorID.param,
-    parameters: parameters.param,
-    groups: groups.param
+    parameters: parameters?.param,
+    groups: groups?.param
   }
 }
 

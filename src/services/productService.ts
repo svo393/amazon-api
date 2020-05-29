@@ -16,7 +16,7 @@ const addProduct = async (productInput: ProductCreateInput, res: Response): Prom
   return await dbTrans(async (trx: Knex.Transaction) => {
     const [ addedProduct ]: Product[] = await trx
       .insert({
-        ...R.omit([ 'parameters' ], productInput),
+        ...R.omit([ 'parameters', 'groups' ], productInput),
         userID: res.locals.userID,
         productCreatedAt: now,
         productUpdatedAt: now
