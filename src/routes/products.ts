@@ -4,6 +4,7 @@ import questionService from '../services/questionService'
 import ratingService from '../services/ratingService'
 import inputValidator from '../utils/inputValidator'
 import { isAdmin, isCreator } from '../utils/middleware'
+import groupService from '../services/groupService'
 
 const router = Router()
 
@@ -43,6 +44,11 @@ router.get('/:productID/ratings', async (req, res) => {
 router.get('/:productID/questions', async (req, res) => {
   const questions = await questionService.getQuestionsByProduct(req)
   res.json(questions)
+})
+
+router.get('/:productID/groups', async (req, res) => {
+  const groups = await groupService.getGroupsByProduct(req)
+  res.json(groups)
 })
 
 export default router

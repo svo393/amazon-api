@@ -4,7 +4,7 @@ import multer from 'multer'
 import path from 'path'
 import R from 'ramda'
 import sharp from 'sharp'
-import { Product, ProductAllData, ProductCreateInput, ProductListData, ProductPublicData, ProductUpdateInput, Group, GroupProduct } from '../types'
+import { FormattedGroup, Product, ProductAllData, ProductCreateInput, ProductListData, ProductPublicData, ProductUpdateInput, Parameter, ProductParameter, FormattedParameter, Group, GroupProduct } from '../types'
 import { db } from '../utils/db'
 import { getProductsQuery } from '../utils/queries'
 import StatusError from '../utils/StatusError'
@@ -94,9 +94,17 @@ const getProductByID = async (req: Request, res: Response): Promise<ProductListD
     .whereIn('g.groupID', groupIDs.map((id) => id.groupID))
     .orderBy('g.name')
 
-  console.info('groups', groups)
+  const formattedGroups: FormattedGroup[] = groups.reduce((acc, cur) => {
+    return acc[cur.name]
+      ? { ...acc, [cur.name]: [ ...acc[cur.name], cur ] }
+      : { ...acc, [cur.name]: [ cur ] }
+  }, {})
 
-  const groupsFormatted = groups.reduce((acc, cur) => {
+  const parameters = await db('productParameters as pp')
+    .leftJoin('parameters as p', 'p.parameterID', 'pp.parameterID')
+    .where('pp.productID', product.productID)
+
+  const formattedParameters: FormattedParameter[] = parameters.reduce((acc, cur) => {
     return acc[cur.name]
       ? { ...acc, [cur.name]: [ ...acc[cur.name], cur ] }
       : { ...acc, [cur.name]: [ cur ] }
@@ -104,7 +112,8 @@ const getProductByID = async (req: Request, res: Response): Promise<ProductListD
 
   const fullProduct = {
     ...product,
-    groups: groupsFormatted
+    groups: formattedGroups,
+    parameters: formattedParameters
   }
 
   const role: string | undefined = res.locals.userRole

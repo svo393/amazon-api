@@ -2,7 +2,7 @@ import supertest from 'supertest'
 import app from '../src/app'
 import { apiURLs } from '../src/utils/constants'
 import { db } from '../src/utils/db'
-import { createOneGroup, loginAs, newGroup, populateUsers, purge, groupsInDB } from './testHelper'
+import { createOneGroup, loginAs, newGroup, populateUsers, purge, groupsInDB, createOneProduct, groupProductsInDB, newGroupProduct, createOneGroupProduct } from './testHelper'
 
 const api = supertest(app)
 const apiURL = apiURLs.groups
@@ -36,26 +36,32 @@ describe('Group adding', () => {
       .send(newGroup())
       .expect(403)
   })
+
+  test('201 groupProduct', async () => {
+    const { addedGroup, token } = await createOneGroup('admin')
+    const { addedProduct } = await createOneProduct('admin')
+
+    const groupsAtStart = await groupProductsInDB()
+
+    await api
+      .post(`${apiURL}/${addedGroup.groupID}/product/${addedProduct.productID}`)
+      .set('Cookie', `token=${token}`)
+      .send(newGroupProduct(addedGroup.groupID, addedProduct.productID))
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+
+    const groupsAtEnd = await groupProductsInDB()
+    expect(groupsAtEnd).toHaveLength(groupsAtStart.length + 1)
+  })
 })
 
 describe('Group fetching', () => {
-  test('200 groups', async () => {
-    await createOneGroup('admin')
+  test('200 groups by product', async () => {
+    const { addedGroupProduct } = await createOneGroupProduct('admin')
 
     const { body } = await api
-      .get(apiURL)
+      .get(`${apiURLs.products}/${addedGroupProduct.productID}/groups`)
       .expect(200)
-
-    expect(body).toBeDefined()
-  })
-
-  test('200 group', async () => {
-    const { addedGroup } = await createOneGroup('admin')
-
-    const { body } = await api
-      .get(`${apiURL}/${addedGroup.groupID}`)
-      .expect(200)
-
     expect(body).toBeDefined()
   })
 })

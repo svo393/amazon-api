@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CategoryCreateInput, CategoryUpdateInput, ListCreateInput, PasswordRequestInput, PasswordResetInput, ProductCreateInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, RoleInput, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput, GroupInput, ParameterInput } from '../types'
+import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CategoryCreateInput, CategoryUpdateInput, ListCreateInput, PasswordRequestInput, PasswordResetInput, ProductCreateInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, RoleInput, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput, GroupInput, ParameterInput, GroupProductInput, ProductParameterInput } from '../types'
 import { hasDefinedProps, isBoolean, isEmail, isInputProvided, isNumber, isPasswordValid, isProvided, isString, isStringOrArray } from './validatorLib'
 
 const checkNewUser = ({ body }: Request): UserSignupInput => {
@@ -680,6 +680,30 @@ const checkGroup = ({ body }: Request): GroupInput => {
   return groupInput
 }
 
+const checkGroupProduct = ({ body }: Request): GroupProductInput => {
+  const value = R.pipe(
+    isProvided,
+    isString
+  )({ name: 'value', param: body.value })
+
+  const groupProductInput: GroupProductInput = {
+    value: value.param
+  }
+  return groupProductInput
+}
+
+const checkProductParameter = ({ body }: Request): ProductParameterInput => {
+  const value = R.pipe(
+    isProvided,
+    isString
+  )({ name: 'value', param: body.value })
+
+  const ProductParameterInput: ProductParameterInput = {
+    value: value.param
+  }
+  return ProductParameterInput
+}
+
 export default {
   checkNewUser,
   checkUserLogin,
@@ -711,5 +735,7 @@ export default {
   checkNewAnswerComment,
   checkAnswerCommentUpdate,
   checkParameter,
-  checkGroup
+  checkGroup,
+  checkGroupProduct,
+  checkProductParameter
 }

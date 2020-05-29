@@ -11,14 +11,10 @@ router.post('/', isAdmin, async (req, res) => {
   res.status(201).json(addedGroup)
 })
 
-router.get('/', async (_req, res) => {
-  const groups = await groupService.getGroups()
-  res.json(groups)
-})
-
-router.get('/:groupID', async (req, res) => {
-  const group = await groupService.getGroupByID(req)
-  res.json(group)
+router.post('/:groupID/product/:productID', isAdmin, async (req, res) => {
+  const groupProductCreateInput = inputValidator.checkGroupProduct(req)
+  const addedGroupProduct = await groupService.addGroupProduct(groupProductCreateInput, req)
+  res.status(201).json(addedGroupProduct)
 })
 
 router.put('/:groupID', isAdmin, async (req, res) => {

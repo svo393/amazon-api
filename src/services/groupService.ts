@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import { db } from '../utils/db'
-import { ProductListData, Group, GroupInput } from '../types'
+import { ProductListData, Group, GroupInput, GroupProductInput, GroupProduct, FormattedGroup } from '../types'
 import { getProductsQuery } from '../utils/queries'
 import StatusError from '../utils/StatusError'
 
@@ -21,38 +21,57 @@ const addGroup = async (groupInput: GroupInput): Promise<Group> => {
   return addedGroup
 }
 
-const getGroups = async (): Promise<Group[]> => {
-  return await db<Group>('groups')
+const addGroupProduct = async (groupProductInput: GroupProductInput, req: Request): Promise<GroupProduct> => {
+  const { value } = groupProductInput
+
+  const existingGroupProduct = await db<GroupProduct>('groupProducts')
+    .first('value')
+    .where('value', value)
+
+  if (existingGroupProduct) {
+    throw new StatusError(409, 'This product is already added to the group')
+  }
+
+  const [ addedGroupProduct ]: GroupProduct[] = await db<GroupProduct>('groupProducts')
+    .insert({
+      ...groupProductInput,
+      productID: Number(req.params.productID),
+      groupID: Number(req.params.groupID)
+    }, [ '*' ])
+
+  return addedGroupProduct
 }
 
-type SingleGroupData = {
-  name: string;
-  products: ProductListData[];
+const getGroupsByProduct = async (req: Request): Promise<FormattedGroup[]> => {
+  const groupIDs = await db('groupProducts as gp')
+    .select('g.groupID')
+    .leftJoin('groups as g', 'gp.groupID', 'g.groupID')
+    .where('productID', req.params.productID)
+
+  const groups = await db('groups as g')
+    .leftJoin('groupProducts as gp', 'gp.groupID', 'g.groupID')
+    .whereIn('g.groupID', groupIDs.map((id) => id.groupID))
+    .orderBy('g.name')
+
+  return groups.reduce((acc, cur) => {
+    return acc[cur.name]
+      ? { ...acc, [cur.name]: [ ...acc[cur.name], cur ] }
+      : { ...acc, [cur.name]: [ cur ] }
+  }, {})
 }
 
-const getGroupByID = async (req: Request): Promise<SingleGroupData> => {
-  const groups = await db<Group>('groups')
-  const [ group ] = groups.filter((c) => c.groupID === Number(req.params.groupID))
-  if (!group) throw new StatusError(404, 'Not Found')
-
-  const products: ProductListData[] = await getProductsQuery.clone()
-    .where('groupID', req.params.groupID)
-
-  return { ...group, products }
-}
-
-const updateGroup = async (groupInput: GroupInput, req: Request): Promise<SingleGroupData> => {
-  const [ updatedGroup ] = await db<Group>('groups')
-    .update({ ...groupInput }, [ 'groupID' ])
+const updateGroup = async (groupInput: GroupInput, req: Request): Promise<Group> => {
+  const [ updatedGroup ]: Group[] = await db('groups')
+    .update({ ...groupInput }, [ '*' ])
     .where('groupID', req.params.groupID)
 
   if (!updatedGroup) throw new StatusError(404, 'Not Found')
-  return getGroupByID(req)
+  return updatedGroup
 }
 
 export default {
   addGroup,
-  getGroups,
-  getGroupByID,
+  addGroupProduct,
+  getGroupsByProduct,
   updateGroup
 }

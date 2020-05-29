@@ -322,6 +322,10 @@ export type ProductPublicData = Omit<Product,
   | 'userID'
 >
 
+export type FormattedGroup = { [name: string]: Group & GroupProduct }
+
+export type FormattedParameter = { [name: string]: Parameter & ProductParameter }
+
 export type ProductListData = Pick<Product,
 | 'productID'
 | 'title'
@@ -331,13 +335,13 @@ export type ProductListData = Pick<Product,
 > & {
   stars: number;
   ratingCount: number;
-  groups: (Group & GroupProduct)[];
+  groups: FormattedGroup[];
 }
 
 export type ProductAllData = Product & {
   stars: number;
   ratingCount: number;
-  groups: (Group & GroupProduct)[];
+  groups: FormattedGroup[];
 }
 
 // export type ItemCreateInputRaw = Omit<Item,
@@ -428,4 +432,8 @@ export type AnswerCommentUpdateInput = Pick<AnswerComment,
 
 export type GroupInput = Pick<Group, 'name'>
 
+export type GroupProductInput = Pick<GroupProduct, 'value'>
+
 export type ParameterInput = Pick<Parameter, 'name'>
+
+export type ProductParameterInput = Pick<GroupProduct, 'value'>
