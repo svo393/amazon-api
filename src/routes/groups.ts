@@ -1,12 +1,12 @@
 import Router from 'express'
 import groupService from '../services/groupService'
-import { checkGroup, checkGroupProduct } from '../utils/inputValidator'
+import { checkNewGroups, checkGroupProduct, checkGroupUpdate } from '../utils/inputValidator'
 import { isAdmin } from '../utils/middleware'
 
 const router = Router()
 
 router.post('/', isAdmin, async (req, res) => {
-  const groupCreateInput = checkGroup(req)
+  const groupCreateInput = checkNewGroups(req)
   const addedGroup = await groupService.addGroup(groupCreateInput)
   res.status(201).json(addedGroup)
 })
@@ -18,7 +18,7 @@ router.post('/:groupID/product/:productID', isAdmin, async (req, res) => {
 })
 
 router.put('/:groupID', isAdmin, async (req, res) => {
-  const groupUpdateInput = checkGroup(req)
+  const groupUpdateInput = checkGroupUpdate(req)
   const updatedItem = await groupService.updateGroup(groupUpdateInput, req)
   res.json(updatedItem)
 })

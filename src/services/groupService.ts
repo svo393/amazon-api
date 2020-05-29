@@ -1,23 +1,11 @@
 import { Request } from 'express'
-import { FormattedGroup, Group, GroupInput, GroupProduct, GroupProductInput } from '../types'
+import { FormattedGroup, Group, GroupCreateInput, GroupProduct, GroupProductInput, GroupUpdateInput } from '../types'
 import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
-const addGroup = async (groupInput: GroupInput): Promise<Group> => {
-  const { name } = groupInput
-
-  const existingGroup = await db<Group>('groups')
-    .first('groupID')
-    .where('name', name)
-
-  if (existingGroup) {
-    throw new StatusError(409, `Group with name "${name}" already exists`)
-  }
-
-  const [ addedGroup ]: Group[] = await db<Group>('groups')
+const addGroup = async (groupInput: GroupCreateInput): Promise<Group> => {
+  return await db<Group>('groups')
     .insert(groupInput, [ '*' ])
-
-  return addedGroup
 }
 
 const addGroupProduct = async (groupProductInput: GroupProductInput, req: Request): Promise<GroupProduct> => {
@@ -59,7 +47,7 @@ const getGroupsByProduct = async (req: Request): Promise<FormattedGroup[]> => {
   }, {})
 }
 
-const updateGroup = async (groupInput: GroupInput, req: Request): Promise<Group> => {
+const updateGroup = async (groupInput: GroupUpdateInput, req: Request): Promise<Group> => {
   const [ updatedGroup ]: Group[] = await db('groups')
     .update({ ...groupInput }, [ '*' ])
     .where('groupID', req.params.groupID)

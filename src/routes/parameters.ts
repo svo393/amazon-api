@@ -1,13 +1,13 @@
 import Router from 'express'
 import parameterService from '../services/parameterService'
-import { checkParameter, checkProductParameter } from '../utils/inputValidator'
+import { checkNewParameters, checkProductParameter, checkParameterUpdate } from '../utils/inputValidator'
 import { isAdmin } from '../utils/middleware'
 
 const router = Router()
 
 router.post('/', isAdmin, async (req, res) => {
-  const parameterCreateInput = checkParameter(req)
-  const addedParameter = await parameterService.addParameter(parameterCreateInput)
+  const parameterCreateInput = checkNewParameters(req)
+  const addedParameter = await parameterService.addParameters(parameterCreateInput)
   res.status(201).json(addedParameter)
 })
 
@@ -18,7 +18,7 @@ router.post('/:parameterID/product/:productID', isAdmin, async (req, res) => {
 })
 
 router.put('/:parameterID', isAdmin, async (req, res) => {
-  const parameterUpdateInput = checkParameter(req)
+  const parameterUpdateInput = checkParameterUpdate(req)
   const updatedItem = await parameterService.updateParameter(parameterUpdateInput, req)
   res.json(updatedItem)
 })

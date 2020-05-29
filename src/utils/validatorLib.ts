@@ -39,10 +39,22 @@ export const isString: CP = ({ name, param }) => {
   return { name, param: param.trim() }
 }
 
+export const isStringOrNumber: CP = ({ name, param }) => {
+  if (
+    typeof (param) !== 'string' &&
+    !(param instanceof String) &&
+    typeof (param) !== 'number'
+  ) {
+    throw new StatusError(400, `Incorrect ${name}: ${param}`)
+  }
+  return { name, param: typeof (param) === 'number' ? param : param.trim() }
+}
+
 export const isArray: CP = ({ name, param }) => {
   if (!Array.isArray(param)) {
     throw new StatusError(400, `Incorrect ${name}: ${param}`)
   }
+
   return { name, param }
 }
 
@@ -98,7 +110,7 @@ export const isImage: CP = ({ name, param }) => {
   return { name, param }
 }
 
-export const isProductParameter: CP = ({ name, param }) => {
+export const isProductParameterOrGroupProduct: CP = ({ name, param }) => {
   if (
     !(
       typeof (param.name) === 'string' ||
@@ -106,24 +118,10 @@ export const isProductParameter: CP = ({ name, param }) => {
     ) ||
     !(
       typeof (param.value) === 'string' ||
-       param.value instanceof String
+      param.value instanceof String ||
+      typeof (param.value) === 'number'
     )
-  ) throw new StatusError(400, `Incorrect ${name}: ${param}`)
-
-  return { name, param }
-}
-
-export const isGroup: CP = ({ name, param }) => {
-  if (
-    !(
-      typeof (param.name) === 'string' ||
-      param.name instanceof String
-    ) ||
-    !(
-      typeof (param.value) === 'string' ||
-       param.value instanceof String
-    )
-  ) throw new StatusError(400, `Incorrect ${name}: ${param}`)
+  ) throw new StatusError(400, `Incorrect ${name}: ${param.name}`)
 
   return { name, param }
 }

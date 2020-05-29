@@ -4,7 +4,7 @@ import app from '../src/app'
 import { apiURLs } from '../src/utils/constants'
 import { db } from '../src/utils/db'
 import { products } from './seedData'
-import { createOneCategory, createOneProduct, createOneVendor, loginAs, newProduct, populateUsers, productsInDB, purge } from './testHelper'
+import { createOneCategory, createOneProduct, createOneVendor, loginAs, newProduct, populateUsers, productsInDB, purge, parametersInDB } from './testHelper'
 
 const api = supertest(app)
 const apiURL = apiURLs.products
@@ -27,12 +27,17 @@ describe('Product adding', () => {
         ...newProduct,
         userID,
         categoryID: addedCategory.categoryID,
-        vendorID: addedVendor.vendorID
+        vendorID: addedVendor.vendorID,
+        parameters: [
+          { name: 'weight', value: 120 },
+          { name: 'memory', value: 'DDR4' }
+        ]
       })
       .expect(201)
       .expect('Content-Type', /application\/json/)
 
     const productsAtEnd = await productsInDB()
+    const parametersAtEnd = await parametersInDB()
     const descriptions = productsAtEnd.map((i) => i.description)
     expect(descriptions).toContain(products[0].description)
   })

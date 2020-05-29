@@ -5,72 +5,58 @@ import path from 'path'
 import R from 'ramda'
 import sharp from 'sharp'
 import { FormattedGroup, Product, ProductAllData, ProductCreateInput, ProductListData, ProductPublicData, ProductUpdateInput, Parameter, ProductParameter, FormattedParameter, Group, GroupProduct } from '../types'
-import { db } from '../utils/db'
+import { db, dbTrans } from '../utils/db'
 import { getProductsQuery } from '../utils/queries'
 import StatusError from '../utils/StatusError'
+import Knex from 'knex'
 
-const addProduct = async (productInput: ProductCreateInput, res: Response): Promise<ProductPublicData> => {
+const addProduct = async (productInput: ProductCreateInput, res: Response): Promise<ProductPublicData & { parameters?: Parameter[] }> => {
   const now = new Date()
 
-  const [ addedProduct ]: Product[] = await db<Product>('products')
-    .insert({
-      ...productInput,
-      userID: res.locals.userID,
-      productCreatedAt: now,
-      productUpdatedAt: now
-    }, [ '*' ])
+  return await dbTrans(async (trx: Knex.Transaction) => {
+    const [ addedProduct ]: Product[] = await trx
+      .insert({
+        ...R.omit([ 'parameters' ], productInput),
+        userID: res.locals.userID,
+        productCreatedAt: now,
+        productUpdatedAt: now
+      }, [ '*' ])
+      .into('products')
 
-  // productInput.productParameters.map(async (p) => { // TODO
-  //   const parameter = await prisma.parameter.upsert({
-  //     where: { name: p.name },
-  //     update: { name: p.name },
-  //     create: { name: p.name },
-  //     select: { name: true }
-  //   })
+    const publicProduct = R.omit([
+      'productCreatedAt',
+      'productUpdatedAt',
+      'userID'
+    ], addedProduct)
 
-  //   await prisma.productParameter.create({
-  //     data: {
-  //       value: p.value,
-  //       product: { connect: { id } },
-  //       parameter: { connect: { name: parameter.name } }
-  //     }
-  //   })
-  // })
+    if (productInput.parameters && !R.isEmpty(productInput.parameters)) {
+      const addedParameters: Parameter[] = await trx
+        .insert(productInput.parameters.map((p) => ({ name: p.name })), [ '*' ])
+        .into('parameters')
 
-  // productInput.groups.map(async (i) => {
-  //   let group: { id: string }
+      const addedProductParameters: ProductParameter[] = await trx
+        .insert(productInput.parameters.map((pp) => ({
+          value: pp.value,
+          parameterID: (addedParameters.find((p) => p.name === pp.name))?.parameterID,
+          productID: addedProduct.productID
+        })), [ '*' ])
+        .into('productParameters')
 
-  //   if (i.productID) {
-  //     const groupProducts = await prisma.groupProduct.findMany({
-  //       where: { productID: i.productID },
-  //       select: { group: true }
-  //     })
+      return {
+        ...publicProduct,
+        parameters: addedParameters.map((p) => ({
+          [p.name]: {
+            ...p,
+            ...addedProductParameters.find((pp) => pp.parameterID === p.parameterID)
+          }
+        }))
+      }
+    }
 
-  //     const targetGroup = groupProducts.find((gi) => gi.group.name === i.name)
-  //     if (!targetGroup) throw new StatusError(400, 'Invalid Group')
+    // TODO Groups
 
-  //     group = targetGroup.group
-  //   } else {
-  //     group = await prisma.group.create({
-  //       data: { name: i.name },
-  //       select: { id: true }
-  //     })
-  //   }
-
-  //   await prisma.groupProduct.create({
-  //     data: {
-  //       value: i.value,
-  //       product: { connect: { id } },
-  //       group: { connect: { id: group.id } }
-  //     }
-  //   })
-  // })
-
-  return R.omit([
-    'productCreatedAt',
-    'productUpdatedAt',
-    'userID'
-  ], addedProduct)
+    return publicProduct
+  })
 }
 
 export const getProducts = async (): Promise<ProductListData[]> => {

@@ -158,7 +158,7 @@ export type Group = {
 }
 
 export type GroupProduct = {
-  value: string;
+  value: string | number;
   groupID: number;
   productID: number;
 }
@@ -169,7 +169,7 @@ export type Parameter = {
 }
 
 export type ProductParameter = {
-  value: string;
+  value: string | number;
   parameterID: number;
   productID: number;
 }
@@ -300,6 +300,16 @@ export type ProductCreateInput = Omit<Product,
   | 'isAvailable'
 > & {
   isAvailable?: boolean;
+  parameters?: {
+    name: string;
+    value: string;
+  }[];
+  groups?: {
+    name: string;
+    productID?: string; // TODO
+    value: string;
+  }[];
+
 }
 
 export type ProductUpdateInput = {
@@ -343,26 +353,6 @@ export type ProductAllData = Product & {
   ratingCount: number;
   groups: FormattedGroup[];
 }
-
-// export type ItemCreateInputRaw = Omit<Item,
-//   | 'productCreatedAt'
-//   | 'productUpdatedAt'
-//   | 'stars'
-//   | 'id'
-//   | 'brandSectionID'
-//   | 'ratingCount'
-// > & {
-//   brandSection: string;
-//   itemParameters: {
-//     name: string;
-//     value: string;
-//   }[];
-//   groups: {
-//     name: string;
-//     itemID?: string;
-//     value: string;
-//   }[];
-// }
 
 export type RatingCreateInput = Pick<Rating,
   | 'title'
@@ -430,10 +420,14 @@ export type AnswerCommentUpdateInput = Pick<AnswerComment,
   content?: string;
 }
 
-export type GroupInput = Pick<Group, 'name'>
+export type GroupCreateInput = Pick<Group, 'name'>[]
+
+export type GroupUpdateInput = Pick<Group, 'name'>
 
 export type GroupProductInput = Pick<GroupProduct, 'value'>
 
-export type ParameterInput = Pick<Parameter, 'name'>
+export type ParameterCreateInput = Pick<Parameter, 'name'>[]
 
-export type ProductParameterInput = Pick<GroupProduct, 'value'>
+export type ParameterUpdateInput = Pick<Parameter, 'name'>
+
+export type ProductParameterInput = Pick<ProductParameter, 'value'>

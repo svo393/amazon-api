@@ -1,7 +1,7 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CategoryCreateInput, CategoryUpdateInput, GroupInput, GroupProductInput, ListCreateInput, ParameterInput, PasswordRequestInput, PasswordResetInput, ProductCreateInput, ProductParameterInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, RoleInput, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput } from '../types'
-import { hasDefinedProps, isBoolean, isEmail, isInputProvided, isNumber, isPasswordValid, isProvided, isString, isStringOrArray } from './validatorLib'
+import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CategoryCreateInput, CategoryUpdateInput, GroupCreateInput, GroupProductInput, GroupUpdateInput, ListCreateInput, ParameterCreateInput, ParameterUpdateInput, PasswordRequestInput, PasswordResetInput, ProductCreateInput, ProductParameterInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, RoleInput, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput } from '../types'
+import { hasDefinedProps, isArray, isBoolean, isEmail, isInputProvided, isNumber, isPasswordValid, isProvided, isString, isStringOrArray, isStringOrNumber, isProductParameterOrGroupProduct } from './validatorLib'
 
 export const checkNewUser = ({ body }: Request): UserSignupInput => {
   const email = R.pipe(
@@ -16,11 +16,10 @@ export const checkNewUser = ({ body }: Request): UserSignupInput => {
     isPasswordValid
   )({ name: 'password', param: body.password })
 
-  const userInput: UserSignupInput = {
+  return {
     email: email.param.toLowerCase(),
     password: password.param
   }
-  return userInput
 }
 
 export const checkUserLogin = ({ body }: Request): UserLoginInput => {
@@ -40,12 +39,11 @@ export const checkUserLogin = ({ body }: Request): UserLoginInput => {
     isBoolean
   )({ name: 'remember', param: body.remember })
 
-  const userInput: UserLoginInput = {
+  return {
     email: email.param.toLowerCase(),
     password: password.param,
     remember: remember.param
   }
-  return userInput
 }
 
 export const checkUserUpdate = ({ body }: Request): UserUpdateInput => {
@@ -71,14 +69,13 @@ export const checkUserUpdate = ({ body }: Request): UserUpdateInput => {
     { name: 'roleID', param: body.roleID }
   )
 
-  const userInput: UserUpdateInput = {
+  return hasDefinedProps({
     name: name?.param,
     email: email?.param.toLowerCase(),
     password: password?.param,
     avatar: avatar?.param,
     roleID: roleID?.param
-  }
-  return hasDefinedProps(userInput)
+  })
 }
 
 export const checkUserResetRequest = ({ body }: Request): PasswordRequestInput => {
@@ -88,10 +85,7 @@ export const checkUserResetRequest = ({ body }: Request): PasswordRequestInput =
     isEmail
   )({ name: 'email', param: body.email })
 
-  const userInput: PasswordRequestInput = {
-    email: email.param.toLowerCase()
-  }
-  return userInput
+  return { email: email.param.toLowerCase() }
 }
 
 export const checkUserResetToken = ({ body }: Request): PasswordResetInput => {
@@ -106,11 +100,10 @@ export const checkUserResetToken = ({ body }: Request): PasswordResetInput => {
     isPasswordValid
   )({ name: 'password', param: body.password })
 
-  const userInput: PasswordResetInput = {
+  return {
     resetToken: resetToken.param,
     password: password.param
   }
-  return userInput
 }
 
 export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
@@ -167,23 +160,21 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
     isNumber
   )({ name: 'vendorID', param: body.vendorID })
 
-  // const groups = R.pipe(
-  //   isProvided,
-  //   isArray
-  // )({ name: 'groups', param: body.groups })
+  const groups = R.pipe(
+    isProvided,
+    isArray
+  )({ name: 'groups', param: body.groups })
 
-  // groups.param.map((p: body) =>
-  //   isGroup({ name: 'productParameter', param: p }))
+  groups.param.map((g: any) => isProductParameterOrGroupProduct({ name: 'group', param: g }))
 
-  // const productParameters = R.pipe(
-  //   isProvided,
-  //   isArray
-  // )({ name: 'productParameters', param: body.productParameters })
+  const parameters = R.pipe(
+    isProvided,
+    isArray
+  )({ name: 'parameters', param: body.parameters })
 
-  // productParameters.param.map((p: body) =>
-  //   isProductParameter({ name: 'productParameter', param: p }))
+  parameters.param.map((p: any) => isProductParameterOrGroupProduct({ name: 'parameter', param: p }))
 
-  const productInput: ProductCreateInput = {
+  return {
     title: title.param,
     listPrice: listPrice.param,
     price: price.param,
@@ -194,11 +185,10 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
     media: media.param,
     primaryMedia: primaryMedia.param,
     categoryID: categoryID.param,
-    vendorID: vendorID.param
-    // groups: groups.param,
-    // productParameters: productParameters.param
+    vendorID: vendorID.param,
+    parameters: parameters.param,
+    groups: groups.param
   }
-  return productInput
 }
 
 export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
@@ -246,7 +236,7 @@ export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
     { name: 'vendorID', param: body.vendorID }
   )
 
-  const productInput: ProductUpdateInput = {
+  return hasDefinedProps({
     title: title?.param,
     listPrice: listPrice?.param,
     price: price?.param,
@@ -258,8 +248,7 @@ export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
     isAvailable: isAvailable?.param,
     categoryID: categoryID?.param,
     vendorID: vendorID?.param
-  }
-  return hasDefinedProps(productInput)
+  })
 }
 
 export const checkProductMediaUpload = ({ files }: Request): Express.Multer.File[] => {
@@ -278,11 +267,10 @@ export const checkNewCategory = ({ body }: Request): CategoryCreateInput => {
     { name: 'parentCategoryID', param: body.parentCategoryID }
   )
 
-  const categoryInput: CategoryCreateInput = {
+  return {
     name: name.param,
     parentCategoryID: parentCategoryID?.param
   }
-  return categoryInput
 }
 
 export const checkCategoryUpdate = ({ body }: Request): CategoryUpdateInput => {
@@ -294,11 +282,10 @@ export const checkCategoryUpdate = ({ body }: Request): CategoryUpdateInput => {
     { name: 'parentCategoryID', param: body.parentCategoryID }
   )
 
-  const categoryInput: CategoryUpdateInput = {
+  return hasDefinedProps({
     name: name?.param,
     parentCategoryID: parentCategoryID?.param
-  }
-  return hasDefinedProps(categoryInput)
+  })
 }
 
 export const checkVendor = ({ body }: Request): VendorInput => {
@@ -307,10 +294,7 @@ export const checkVendor = ({ body }: Request): VendorInput => {
     isString
   )({ name: 'name', param: body.name })
 
-  const vendorInput: VendorInput = {
-    name: name.param
-  }
-  return vendorInput
+  return { name: name.param }
 }
 
 export const checkRole = ({ body }: Request): RoleInput => {
@@ -319,10 +303,7 @@ export const checkRole = ({ body }: Request): RoleInput => {
     isString
   )({ name: 'name', param: body.name })
 
-  const roleInput: RoleInput = {
-    name: name.param
-  }
-  return roleInput
+  return { name: name.param }
 }
 
 export const checkShippingMethod = ({ body }: Request): ShippingMethodInput => {
@@ -331,10 +312,7 @@ export const checkShippingMethod = ({ body }: Request): ShippingMethodInput => {
     isString
   )({ name: 'name', param: body.name })
 
-  const shippingMethodID: ShippingMethodInput = {
-    name: name.param
-  }
-  return shippingMethodID
+  return { name: name.param }
 }
 
 export const checkAddressType = ({ body }: Request): AddressTypeInput => {
@@ -343,10 +321,7 @@ export const checkAddressType = ({ body }: Request): AddressTypeInput => {
     isString
   )({ name: 'name', param: body.name })
 
-  const addressTypeInput: AddressTypeInput = {
-    name: name.param
-  }
-  return addressTypeInput
+  return { name: name.param }
 }
 
 export const checkNewAddress = ({ body }: Request): AddressCreateInput => {
@@ -364,12 +339,11 @@ export const checkNewAddress = ({ body }: Request): AddressCreateInput => {
     isNumber
   )({ name: 'addressTypeID', param: body.addressTypeID })
 
-  const addressInput: AddressCreateInput = {
+  return {
     isDefault: isDefault?.param,
     addr: addr.param,
     addressTypeID: addressTypeID.param
   }
-  return addressInput
 }
 
 export const checkNewUserAddress = ({ body }: Request): UserAddressCreateInput => {
@@ -387,12 +361,11 @@ export const checkNewUserAddress = ({ body }: Request): UserAddressCreateInput =
     isNumber
   )({ name: 'addressID', param: body.addressID })
 
-  const userAddressInput: UserAddressCreateInput = {
+  return {
     isDefault: isDefault?.param,
     userID: userID.param,
     addressID: addressID.param
   }
-  return userAddressInput
 }
 
 export const checkUserAddressesUpdate = ({ body }: Request): UserAddressUpdateInput => {
@@ -401,10 +374,7 @@ export const checkUserAddressesUpdate = ({ body }: Request): UserAddressUpdateIn
     isBoolean
   )({ name: 'isDefault', param: body.isDefault })
 
-  const userAddressInput: UserAddressUpdateInput = {
-    isDefault: isDefault.param
-  }
-  return userAddressInput
+  return { isDefault: isDefault.param }
 }
 
 export const checkNewList = ({ body }: Request): ListCreateInput => {
@@ -413,10 +383,7 @@ export const checkNewList = ({ body }: Request): ListCreateInput => {
     isString
   )({ name: 'name', param: body.name })
 
-  const vendorInput: ListCreateInput = {
-    name: name.param
-  }
-  return vendorInput
+  return { name: name.param }
 }
 
 export const checkListUpdate = ({ body }: Request): ListCreateInput => {
@@ -425,10 +392,7 @@ export const checkListUpdate = ({ body }: Request): ListCreateInput => {
     isString
   )({ name: 'name', param: body.name })
 
-  const listInput: ListCreateInput = {
-    name: name.param
-  }
-  return listInput
+  return { name: name.param }
 }
 
 export const checkNewRating = ({ body }: Request): RatingCreateInput => {
@@ -454,14 +418,13 @@ export const checkNewRating = ({ body }: Request): RatingCreateInput => {
     isNumber
   )({ name: 'productID', param: body.productID })
 
-  const ratingInput: RatingCreateInput = {
+  return {
     title: title?.param,
     review: review?.param,
     media: media?.param,
     stars: stars.param,
     productID: productID.param
   }
-  return ratingInput
 }
 
 export const checkRatingUpdate = ({ body }: Request): RatingUpdateInput => {
@@ -481,13 +444,12 @@ export const checkRatingUpdate = ({ body }: Request): RatingUpdateInput => {
     { name: 'stars', param: body.stars }
   )
 
-  const ratingInput: RatingUpdateInput = {
+  return hasDefinedProps({
     title: title?.param,
     review: review?.param,
     media: media?.param,
     stars: stars?.param
-  }
-  return hasDefinedProps(ratingInput)
+  })
 }
 
 export const checkNewRatingComment = ({ body }: Request): RatingCommentCreateInput => {
@@ -509,13 +471,12 @@ export const checkNewRatingComment = ({ body }: Request): RatingCommentCreateInp
     { name: 'parentRatingCommentID', param: body.parentRatingCommentID }
   )
 
-  const ratingCommentInput: RatingCommentCreateInput = {
+  return {
     content: content.param,
     media: media?.param,
     ratingID: ratingID.param,
     parentRatingCommentID: parentRatingCommentID?.param
   }
-  return ratingCommentInput
 }
 
 export const checkRatingCommentUpdate = ({ body }: Request): RatingCommentUpdateInput => {
@@ -527,11 +488,10 @@ export const checkRatingCommentUpdate = ({ body }: Request): RatingCommentUpdate
     { name: 'media', param: body.media }
   )
 
-  const ratingCommentInput: RatingCommentUpdateInput = {
+  return {
     content: content?.param,
     media: media?.param
   }
-  return ratingCommentInput
 }
 
 export const checkNewQuestion = ({ body }: Request): QuestionCreateInput => {
@@ -549,12 +509,11 @@ export const checkNewQuestion = ({ body }: Request): QuestionCreateInput => {
     isNumber
   )({ name: 'productID', param: body.productID })
 
-  const questionInput: QuestionCreateInput = {
+  return {
     content: content.param,
     media: media?.param,
     productID: productID.param
   }
-  return questionInput
 }
 
 export const checkQuestionUpdate = ({ body }: Request): QuestionUpdateInput => {
@@ -566,11 +525,10 @@ export const checkQuestionUpdate = ({ body }: Request): QuestionUpdateInput => {
     { name: 'media', param: body.media }
   )
 
-  const questionInput: QuestionUpdateInput = {
+  return hasDefinedProps({
     content: content?.param,
     media: media?.param
-  }
-  return hasDefinedProps(questionInput)
+  })
 }
 
 export const checkNewAnswer = ({ body }: Request): AnswerCreateInput => {
@@ -588,12 +546,11 @@ export const checkNewAnswer = ({ body }: Request): AnswerCreateInput => {
     isNumber
   )({ name: 'questionID', param: body.questionID })
 
-  const answerInput: AnswerCreateInput = {
+  return {
     content: content.param,
     media: media?.param,
     questionID: questionID.param
   }
-  return answerInput
 }
 
 export const checkAnswerUpdate = ({ body }: Request): AnswerUpdateInput => {
@@ -605,11 +562,10 @@ export const checkAnswerUpdate = ({ body }: Request): AnswerUpdateInput => {
     { name: 'media', param: body.media }
   )
 
-  const answerInput: AnswerUpdateInput = {
+  return {
     content: content?.param,
     media: media?.param
   }
-  return hasDefinedProps(answerInput)
 }
 
 export const checkNewAnswerComment = ({ body }: Request): AnswerCommentCreateInput => {
@@ -631,13 +587,12 @@ export const checkNewAnswerComment = ({ body }: Request): AnswerCommentCreateInp
     { name: 'parentAnswerCommentID', param: body.parentAnswerCommentID }
   )
 
-  const answerCommentInput: AnswerCommentCreateInput = {
+  return {
     content: content.param,
     media: media?.param,
     answerID: answerID.param,
     parentAnswerCommentID: parentAnswerCommentID?.param
   }
-  return answerCommentInput
 }
 
 export const checkAnswerCommentUpdate = ({ body }: Request): AnswerCommentUpdateInput => {
@@ -649,35 +604,50 @@ export const checkAnswerCommentUpdate = ({ body }: Request): AnswerCommentUpdate
     { name: 'media', param: body.media }
   )
 
-  const answerCommentInput: AnswerCommentUpdateInput = {
+  return {
     content: content?.param,
     media: media?.param
   }
-  return answerCommentInput
 }
 
-export const checkParameter = ({ body }: Request): ParameterInput => {
+export const checkNewParameters = ({ body }: Request): ParameterCreateInput => {
+  const names = R.pipe(
+    isProvided,
+    isArray
+  )({ name: 'parameter names', param: body })
+
+  names.param.map((p: any) => isStringOrNumber({ name: 'parameter name', param: p.name }))
+
+  return names.param
+}
+
+export const checkParameterUpdate = ({ body }: Request): ParameterUpdateInput => {
   const name = R.pipe(
     isProvided,
     isString
   )({ name: 'name', param: body.name })
 
-  const parameterInput: ParameterInput = {
-    name: name.param
-  }
-  return parameterInput
+  return { name: name.param }
 }
 
-export const checkGroup = ({ body }: Request): GroupInput => {
+export const checkNewGroups = ({ body }: Request): GroupCreateInput => {
+  const names = R.pipe(
+    isProvided,
+    isArray
+  )({ name: 'group names', param: body })
+
+  names.param.map((p: any) => isStringOrNumber({ name: 'group name', param: p.name }))
+
+  return names.param
+}
+
+export const checkGroupUpdate = ({ body }: Request): GroupUpdateInput => {
   const name = R.pipe(
     isProvided,
     isString
   )({ name: 'name', param: body.name })
 
-  const groupInput: GroupInput = {
-    name: name.param
-  }
-  return groupInput
+  return { name: name.param }
 }
 
 export const checkGroupProduct = ({ body }: Request): GroupProductInput => {
@@ -686,10 +656,7 @@ export const checkGroupProduct = ({ body }: Request): GroupProductInput => {
     isString
   )({ name: 'value', param: body.value })
 
-  const groupProductInput: GroupProductInput = {
-    value: value.param
-  }
-  return groupProductInput
+  return { value: value.param }
 }
 
 export const checkProductParameter = ({ body }: Request): ProductParameterInput => {
@@ -698,8 +665,5 @@ export const checkProductParameter = ({ body }: Request): ProductParameterInput 
     isString
   )({ name: 'value', param: body.value })
 
-  const productParameterInput: ProductParameterInput = {
-    value: value.param
-  }
-  return productParameterInput
+  return { value: value.param }
 }
