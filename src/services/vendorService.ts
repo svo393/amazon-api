@@ -1,5 +1,5 @@
 import { Request } from 'express'
-import { db } from '../../src/utils/db'
+import { db } from '../utils/db'
 import { ProductListData, Vendor, VendorInput } from '../types'
 import { getProductsQuery } from '../utils/queries'
 import StatusError from '../utils/StatusError'
@@ -35,7 +35,7 @@ const getVendorByID = async (req: Request): Promise<SingleVendorData> => {
   const [ vendor ] = vendors.filter((c) => c.vendorID === Number(req.params.vendorID))
   if (!vendor) throw new StatusError(404, 'Not Found')
 
-  const products: ProductListData[] = await getProductsQuery
+  const products: ProductListData[] = await getProductsQuery.clone()
     .where('vendorID', req.params.vendorID)
 
   return { ...vendor, products }

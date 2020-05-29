@@ -91,6 +91,8 @@
     "test:useraddr": "cross-env NODE_ENV=development jest ./tests/userAddressesAPI.test.ts --verbose  --runInBand",
     "test:users": "cross-env NODE_ENV=development jest ./tests/usersAPI.test.ts --verbose  --runInBand",
     "test:vendors": "cross-env NODE_ENV=development jest ./tests/vendorsAPI.test.ts --verbose  --runInBand",
+    "test:groups": "cross-env NODE_ENV=development jest ./tests/groupsAPI.test.ts --verbose  --runInBand",
+    "test:params": "cross-env NODE_ENV=development jest ./tests/parametersAPI.test.ts --verbose  --runInBand",
     "tsc": "rm -rf build && tsc",
     "tut": "ts-node-dev src/tut.ts"
   },

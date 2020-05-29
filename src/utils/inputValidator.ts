@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CategoryCreateInput, CategoryUpdateInput, ListCreateInput, PasswordRequestInput, PasswordResetInput, ProductCreateInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, RoleInput, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput } from '../types'
+import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CategoryCreateInput, CategoryUpdateInput, ListCreateInput, PasswordRequestInput, PasswordResetInput, ProductCreateInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, RoleInput, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput, GroupInput, ParameterInput } from '../types'
 import { hasDefinedProps, isBoolean, isEmail, isInputProvided, isNumber, isPasswordValid, isProvided, isString, isStringOrArray } from './validatorLib'
 
 const checkNewUser = ({ body }: Request): UserSignupInput => {
@@ -656,6 +656,30 @@ const checkAnswerCommentUpdate = ({ body }: Request): AnswerCommentUpdateInput =
   return answerCommentInput
 }
 
+const checkParameter = ({ body }: Request): ParameterInput => {
+  const name = R.pipe(
+    isProvided,
+    isString
+  )({ name: 'name', param: body.name })
+
+  const parameterInput: ParameterInput = {
+    name: name.param
+  }
+  return parameterInput
+}
+
+const checkGroup = ({ body }: Request): GroupInput => {
+  const name = R.pipe(
+    isProvided,
+    isString
+  )({ name: 'name', param: body.name })
+
+  const groupInput: GroupInput = {
+    name: name.param
+  }
+  return groupInput
+}
+
 export default {
   checkNewUser,
   checkUserLogin,
@@ -685,5 +709,7 @@ export default {
   checkNewAnswer,
   checkAnswerUpdate,
   checkNewAnswerComment,
-  checkAnswerCommentUpdate
+  checkAnswerCommentUpdate,
+  checkParameter,
+  checkGroup
 }

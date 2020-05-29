@@ -4,7 +4,7 @@ import multer from 'multer'
 import path from 'path'
 import R from 'ramda'
 import sharp from 'sharp'
-import { Product, ProductAllData, ProductCreateInput, ProductListData, ProductPublicData, ProductUpdateInput } from '../types'
+import { Product, ProductAllData, ProductCreateInput, ProductListData, ProductPublicData, ProductUpdateInput, Group, GroupProduct } from '../types'
 import { db } from '../utils/db'
 import { getProductsQuery } from '../utils/queries'
 import StatusError from '../utils/StatusError'
@@ -74,31 +74,49 @@ const addProduct = async (productInput: ProductCreateInput, res: Response): Prom
 }
 
 export const getProducts = async (): Promise<ProductListData[]> => {
-  return await getProductsQuery
+  return await getProductsQuery.clone()
 }
 
 const getProductByID = async (req: Request, res: Response): Promise<ProductListData| ProductAllData> => {
-  const [ product ] = await db<Product>('products as p')
-    .select('p.productID', 'p.title', 'listPrice', 'price',
-      'primaryMedia', 'productCreatedAt', 'productUpdatedAt', 'p.userID')
-    .avg('stars as stars')
-    .count('r.ratingID as ratingCount')
-    .leftJoin('ratings as r', 'p.productID', 'r.productID')
+  const [ product ]: ProductAllData[] = await getProductsQuery.clone()
+    .select('productCreatedAt', 'productUpdatedAt', 'p.userID')
     .where('p.productID', req.params.productID)
-    .groupBy('p.productID')
 
   if (!product) throw new StatusError(404, 'Not Found')
+
+  const groupIDs = await db('groupProducts as gp')
+    .select('g.groupID')
+    .leftJoin('groups as g', 'gp.groupID', 'g.groupID')
+    .where('productID', product.productID)
+
+  const groups = await db('groups as g')
+    .leftJoin('groupProducts as gp', 'gp.groupID', 'g.groupID')
+    .whereIn('g.groupID', groupIDs.map((id) => id.groupID))
+    .orderBy('g.name')
+
+  console.info('groups', groups)
+
+  const groupsFormatted = groups.reduce((acc, cur) => {
+    return acc[cur.name]
+      ? { ...acc, [cur.name]: [ ...acc[cur.name], cur ] }
+      : { ...acc, [cur.name]: [ cur ] }
+  }, {})
+
+  const fullProduct = {
+    ...product,
+    groups: groupsFormatted
+  }
 
   const role: string | undefined = res.locals.userRole
   const hasPermission = role && [ 'ROOT', 'ADMIN' ].includes(role)
 
   return hasPermission
-    ? product
+    ? fullProduct
     : R.omit([
       'productCreatedAt',
       'productUpdatedAt',
       'userID'
-    ], product)
+    ], fullProduct)
 }
 
 const updateProduct = async (productInput: ProductUpdateInput, req: Request): Promise<Product> => {

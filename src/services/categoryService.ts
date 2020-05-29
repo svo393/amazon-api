@@ -1,5 +1,5 @@
 import { Request } from 'express'
-import { db } from '../../src/utils/db'
+import { db } from '../utils/db'
 import { Category, CategoryCreateInput, CategoryUpdateInput, ProductListData } from '../types'
 import { getProductsQuery } from '../utils/queries'
 import StatusError from '../utils/StatusError'
@@ -68,7 +68,7 @@ const getCategoryByID = async (req: Request): Promise<SingleCategoryData> => {
     .filter((c) => c.parentCategoryID === Number(categoryID))
     .map((c) => c.categoryID)
 
-  const products: ProductListData[] = await getProductsQuery
+  const products: ProductListData[] = await getProductsQuery.clone()
     .where('categoryID', categoryID)
 
   return {

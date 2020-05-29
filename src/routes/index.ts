@@ -16,12 +16,16 @@ import shippingMethodsRouter from './shippingMethods'
 import userAddressesRouter from './userAddresses'
 import usersRouter from './users'
 import vendorsRouter from './vendors'
+import groupsRouter from './groups'
+import parametersRouter from './parameters'
 
 export default Router()
   .use(apiURLs.categories, categoriesRouter)
   .use(apiURLs.products, productsRouter)
   .use(apiURLs.users, usersRouter)
   .use(apiURLs.vendors, vendorsRouter)
+  .use(apiURLs.groups, groupsRouter)
+  .use(apiURLs.parameters, parametersRouter)
   .use(apiURLs.roles, rolesRouter)
   .use(apiURLs.shippingMethods, shippingMethodsRouter)
   .use(apiURLs.addressTypes, addressTypesRouter)

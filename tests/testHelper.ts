@@ -1,6 +1,6 @@
 import supertest from 'supertest'
 import app from '../src/app'
-import { Address, AddressCreateInput, AddressType, AddressTypeInput, Answer, AnswerComment, AnswerCommentCreateInput, AnswerCreateInput, Category, CategoryCreateInput, Follower, List, ListCreateInput, ListProduct, Product, ProductPublicData, Question, QuestionCreateInput, Rating, RatingComment, RatingCommentCreateInput, RatingCreateInput, Role, RoleInput, ShippingMethod, ShippingMethodInput, User, UserAddress, Vendor, VendorInput } from '../src/types'
+import { Address, AddressCreateInput, AddressType, AddressTypeInput, Answer, AnswerComment, AnswerCommentCreateInput, AnswerCreateInput, Category, CategoryCreateInput, Follower, List, ListCreateInput, ListProduct, Product, ProductPublicData, Question, QuestionCreateInput, Rating, RatingComment, RatingCommentCreateInput, RatingCreateInput, Role, RoleInput, ShippingMethod, ShippingMethodInput, User, UserAddress, Vendor, VendorInput, Parameter, Group, GroupInput, ParameterInput } from '../src/types'
 import { apiURLs } from '../src/utils/constants'
 import { db } from '../src/utils/db'
 import StatusError from '../src/utils/StatusError'
@@ -120,6 +120,14 @@ export const categoriesInDB = async (): Promise<Category[]> => {
 
 export const vendorsInDB = async (): Promise<Vendor[]> => {
   return await db<Vendor>('vendors')
+}
+
+export const parametersInDB = async (): Promise<Parameter[]> => {
+  return await db<Parameter>('parameters')
+}
+
+export const groupsInDB = async (): Promise<Group[]> => {
+  return await db<Group>('groups')
 }
 
 export const rolesInDB = async (): Promise<Role[]> => {
@@ -428,4 +436,34 @@ export const createOneAnswerComment = async (): Promise<AnswerComment & { token:
     .send(newAnswerComment(answerID))
 
   return { ...body, token }
+}
+
+export const newGroup = (name?: string): GroupInput => ({
+  name: name ?? `New Group ${(new Date().getTime()).toString()}`
+})
+
+export const createOneGroup = async (role: string, name?: string): Promise<{ addedGroup: Group; token: string}> => {
+  const { token } = await loginAs(role, api)
+
+  const { body } = await api
+    .post(apiURLs.groups)
+    .set('Cookie', `token=${token}`)
+    .send(newGroup(name))
+
+  return { addedGroup: body, token }
+}
+
+export const newParameter = (name?: string): ParameterInput => ({
+  name: name ?? `New Parameter ${(new Date().getTime()).toString()}`
+})
+
+export const createOneParameter = async (role: string, name?: string): Promise<{ addedParameter: Parameter; token: string}> => {
+  const { token } = await loginAs(role, api)
+
+  const { body } = await api
+    .post(apiURLs.parameters)
+    .set('Cookie', `token=${token}`)
+    .send(newParameter(name))
+
+  return { addedParameter: body, token }
 }

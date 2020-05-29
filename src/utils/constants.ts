@@ -25,5 +25,7 @@ export const apiURLs = {
   ratingComments: `${baseAPI}/rating-comment`,
   questions: `${baseAPI}/questions`,
   answers: `${baseAPI}/answers`,
-  answerComments: `${baseAPI}/answer-comment`
+  answerComments: `${baseAPI}/answer-comment`,
+  groups: `${baseAPI}/groups`,
+  parameters: `${baseAPI}/parameters`
 }
