@@ -249,7 +249,7 @@ export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
   })
 }
 
-export const checkProductMediaUpload = ({ files }: Request): Express.Multer.File[] => {
+export const checkMediaUpload = ({ files }: Request): Express.Multer.File[] => {
   isInputProvided(files, 'Missing images')
   isStringOrArray({ name: 'images', param: files })
   return files as Express.Multer.File[]

@@ -1,3 +1,4 @@
+import path from 'path'
 import supertest from 'supertest'
 import app from '../src/app'
 import { apiURLs } from '../src/utils/constants'
@@ -26,6 +27,18 @@ describe('RatingComment adding', () => {
 
     const ratingCommentsAtEnd = await ratingCommentsInDB()
     expect(ratingCommentsAtEnd).toHaveLength(1)
+  })
+
+  test('204 upload file', async () => {
+    const { ratingCommentID, ratingID } = await createOneRatingComment()
+    const { token } = await loginAs('customer', api)
+
+    await api
+      .post(`${apiURLs.ratings}/${ratingID}/comments/${ratingCommentID}/upload`)
+      .set('Cookie', `token=${token}`)
+      .attach('ratingCommentMedia', path.join(__dirname, 'test-image.png'))
+      .attach('ratingCommentMedia', path.join(__dirname, 'test-image2.png'))
+      .expect(204)
   })
 })
 

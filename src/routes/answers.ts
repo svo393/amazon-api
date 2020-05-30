@@ -1,8 +1,8 @@
 import Router from 'express'
 import answerCommentService from '../services/answerCommentService'
 import answerService from '../services/answerService'
-import { checkAnswerUpdate, checkNewAnswerComment } from '../utils/inputValidator'
-import { isCreator, isLoggedIn } from '../utils/middleware'
+import { checkAnswerUpdate, checkMediaUpload, checkNewAnswerComment } from '../utils/inputValidator'
+import { isCreator, isLoggedIn, multerUpload } from '../utils/middleware'
 
 const router = Router()
 
@@ -31,6 +31,18 @@ router.post('/comments', isLoggedIn, async (req, res) => {
 router.get('/:answerID/comments', async (req, res) => {
   const answerComments = await answerCommentService.getCommentsByAnswer(req)
   res.json(answerComments)
+})
+
+router.post('/:answerID/upload', isCreator('answers', 'answerID', 'params'), multerUpload.array('answerMedia', 4), (req, res) => {
+  const answerMedia = checkMediaUpload(req)
+  answerService.uploadAnswerImages(answerMedia, req)
+  res.status(204).end()
+})
+
+router.post('/:answerID/comments/:answerCommentID/upload', isCreator('answerComments', 'answerCommentID', 'params'), multerUpload.array('answerCommentMedia', 4), (req, res) => {
+  const answerMedia = checkMediaUpload(req)
+  answerCommentService.uploadAnswerCommentImages(answerMedia, req)
+  res.status(204).end()
 })
 
 export default router

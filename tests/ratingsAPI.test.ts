@@ -1,3 +1,4 @@
+import path from 'path'
 import supertest from 'supertest'
 import app from '../src/app'
 import { apiURLs } from '../src/utils/constants'
@@ -26,6 +27,18 @@ describe('Rating adding', () => {
 
     const ratingsAtEnd = await ratingsInDB()
     expect(ratingsAtEnd).toHaveLength(1)
+  })
+
+  test('204 upload file', async () => {
+    const { ratingID } = await createOneRating()
+    const { token } = await loginAs('customer', api)
+
+    await api
+      .post(`${apiURL}/${ratingID}/upload`)
+      .set('Cookie', `token=${token}`)
+      .attach('ratingMedia', path.join(__dirname, 'test-image.png'))
+      .attach('ratingMedia', path.join(__dirname, 'test-image2.png'))
+      .expect(204)
   })
 })
 

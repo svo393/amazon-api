@@ -2,6 +2,7 @@ import supertest from 'supertest'
 import app from '../src/app'
 import { apiURLs } from '../src/utils/constants'
 import { db } from '../src/utils/db'
+import path from 'path'
 import { answersInDB, createOneAnswer, createOneQuestion, loginAs, newAnswer, populateUsers, purge } from './testHelper'
 
 const api = supertest(app)
@@ -26,6 +27,18 @@ describe('Answer adding', () => {
 
     const answersAtEnd = await answersInDB()
     expect(answersAtEnd).toHaveLength(1)
+  })
+
+  test('204 upload file', async () => {
+    const { answerID } = await createOneAnswer()
+    const { token } = await loginAs('customer', api)
+
+    await api
+      .post(`${apiURL}/${answerID}/upload`)
+      .set('Cookie', `token=${token}`)
+      .attach('answerMedia', path.join(__dirname, 'test-image.png'))
+      .attach('answerMedia', path.join(__dirname, 'test-image2.png'))
+      .expect(204)
   })
 })
 

@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import { Rating, RatingCreateInput, RatingUpdateInput } from '../types'
 import { db } from '../utils/db'
+import { uploadImages } from '../utils/img'
 import StatusError from '../utils/StatusError'
 
 const addRating = async (ratingInput: RatingCreateInput, res: Response): Promise<Rating> => {
@@ -61,11 +62,25 @@ const deleteRating = async (req: Request): Promise<void> => {
   if (deleteCount === 0) throw new StatusError(404, 'Not Found')
 }
 
+const uploadRatingImages = (files: Express.Multer.File[], req: Request): void => {
+  const uploadConfig = {
+    imagePath: './public/media/ratings',
+    maxWidth: 1632,
+    maxHeight: 1632,
+    previewWidth: 175,
+    previewHeight: 175,
+    thumbWidth: 117,
+    thumbHeight: 117
+  }
+  uploadImages(files, req, uploadConfig, 'ratingID')
+}
+
 export default {
   addRating,
   getRatingsByUser,
   getRatingsByProduct,
   getRatingByID,
   updateRating,
-  deleteRating
+  deleteRating,
+  uploadRatingImages
 }

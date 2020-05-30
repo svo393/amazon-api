@@ -1,8 +1,8 @@
 import Router from 'express'
 import ratingCommentService from '../services/ratingCommentService'
 import ratingService from '../services/ratingService'
-import { checkNewRating, checkNewRatingComment, checkRatingUpdate } from '../utils/inputValidator'
-import { isCreator, isLoggedIn } from '../utils/middleware'
+import { checkNewRating, checkNewRatingComment, checkMediaUpload, checkRatingUpdate } from '../utils/inputValidator'
+import { isCreator, isLoggedIn, multerUpload } from '../utils/middleware'
 
 const router = Router()
 
@@ -39,10 +39,16 @@ router.get('/:ratingID/comments', async (req, res) => {
   res.json(ratingComments)
 })
 
-// router.post('/:ratingID/upload', isAdmin, ratingCommentService.multerUpload.array('ratingMedia', 10), (req, res) => { // TODO
-//   const ratingMedia = checkratingMediaUpload(req)
-//   ratingCommentService.uploadImages(ratingMedia, req)
-//   res.status(204).end()
-// })
+router.post('/:ratingID/upload', isCreator('ratings', 'ratingID', 'params'), multerUpload.array('ratingMedia', 4), (req, res) => {
+  const ratingMedia = checkMediaUpload(req)
+  ratingService.uploadRatingImages(ratingMedia, req)
+  res.status(204).end()
+})
+
+router.post('/:ratingID/comments/:ratingCommentID/upload', isCreator('ratingComments', 'ratingCommentID', 'params'), multerUpload.array('ratingCommentMedia', 4), (req, res) => {
+  const ratingMedia = checkMediaUpload(req)
+  ratingCommentService.uploadRatingCommentImages(ratingMedia, req)
+  res.status(204).end()
+})
 
 export default router

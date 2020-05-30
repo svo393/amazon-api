@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
+import multer from 'multer'
 import { User } from '../types'
 import env from './config'
 import { db } from './db'
@@ -152,3 +153,20 @@ export const errorHandler = (
 
   next(error)
 }
+
+const storage = multer.diskStorage({
+  destination: './tmp',
+  filename (_req, file, cb) { cb(null, file.originalname) }
+})
+
+export const multerUpload = multer({
+  storage,
+  fileFilter: (_req, file, cb) => {
+    if ([ 'image/png', 'image/jpg', 'image/jpeg', 'image/webp' ].includes(file.mimetype)) {
+      cb(null, true)
+    } else {
+      cb(null, false)
+      return cb(new StatusError(400, 'Only .png, .jpg, .jpeg and .webp formats allowed'))
+    }
+  }
+})

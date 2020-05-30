@@ -1,3 +1,4 @@
+import path from 'path'
 import supertest from 'supertest'
 import app from '../src/app'
 import { apiURLs } from '../src/utils/constants'
@@ -26,6 +27,18 @@ describe('AnswerComment adding', () => {
 
     const answerCommentsAtEnd = await answerCommentsInDB()
     expect(answerCommentsAtEnd).toHaveLength(1)
+  })
+
+  test('204 upload file', async () => {
+    const { answerCommentID, answerID } = await createOneAnswerComment()
+    const { token } = await loginAs('customer', api)
+
+    await api
+      .post(`${apiURLs.answers}/${answerID}/comments/${answerCommentID}/upload`)
+      .set('Cookie', `token=${token}`)
+      .attach('answerCommentMedia', path.join(__dirname, 'test-image.png'))
+      .attach('answerCommentMedia', path.join(__dirname, 'test-image2.png'))
+      .expect(204)
   })
 })
 

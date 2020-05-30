@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import { AnswerComment, AnswerCommentCreateInput, AnswerCommentUpdateInput } from '../types'
 import { db } from '../utils/db'
+import { uploadImages } from '../utils/img'
 import StatusError from '../utils/StatusError'
 
 const addAnswerComment = async (answerCommentInput: AnswerCommentCreateInput, res: Response): Promise<AnswerComment> => {
@@ -48,10 +49,24 @@ const deleteAnswerComment = async (req: Request): Promise<void> => {
   if (deleteCount === 0) throw new StatusError(404, 'Not Found')
 }
 
+const uploadAnswerCommentImages = (files: Express.Multer.File[], req: Request): void => {
+  const uploadConfig = {
+    imagePath: './public/media/answerComments',
+    maxWidth: 1632,
+    maxHeight: 1632,
+    previewWidth: 175,
+    previewHeight: 175,
+    thumbWidth: 117,
+    thumbHeight: 117
+  }
+  uploadImages(files, req, uploadConfig, 'answerCommentID')
+}
+
 export default {
   addAnswerComment,
   getCommentsByAnswer,
   getAnswerCommentByID,
   updateAnswerComment,
-  deleteAnswerComment
+  deleteAnswerComment,
+  uploadAnswerCommentImages
 }

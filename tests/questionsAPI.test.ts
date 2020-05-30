@@ -1,3 +1,4 @@
+import path from 'path'
 import supertest from 'supertest'
 import app from '../src/app'
 import { apiURLs } from '../src/utils/constants'
@@ -26,6 +27,18 @@ describe('Question adding', () => {
 
     const questionsAtEnd = await questionsInDB()
     expect(questionsAtEnd).toHaveLength(1)
+  })
+
+  test('204 upload file', async () => {
+    const { questionID } = await createOneQuestion()
+    const { token } = await loginAs('customer', api)
+
+    await api
+      .post(`${apiURL}/${questionID}/upload`)
+      .set('Cookie', `token=${token}`)
+      .attach('questionMedia', path.join(__dirname, 'test-image.png'))
+      .attach('questionMedia', path.join(__dirname, 'test-image2.png'))
+      .expect(204)
   })
 })
 

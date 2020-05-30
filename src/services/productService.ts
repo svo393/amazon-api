@@ -9,6 +9,7 @@ import { FormattedGroup, Group, GroupProduct, Parameter, Product, ProductAllData
 import { db, dbTrans } from '../utils/db'
 import { getProductsQuery } from '../utils/queries'
 import StatusError from '../utils/StatusError'
+import { uploadImages } from '../utils/img'
 
 const addProduct = async (productInput: ProductCreateInput, res: Response): Promise<ProductPublicData & { parameters?: Parameter[] }> => {
   const now = new Date()
@@ -155,95 +156,17 @@ const deleteProduct = async (req: Request): Promise<void> => {
   if (deleteCount === 0) throw new StatusError(404, 'Not Found')
 }
 
-const storage = multer.diskStorage({
-  destination: './tmp',
-  filename (_req, file, cb) { cb(null, file.originalname) }
-})
-
-const imagePath = './public/uploads'
-const maxWidth = 1500
-const maxHeight = 1500
-const previewWidth = 450
-const previewHeight = 450
-const thumbWidth = 40
-const thumbHeight = 40
-
-const multerUpload = multer({
-  storage,
-  fileFilter: (_req, file, cb) => {
-    if ([ 'image/png', 'image/jpg', 'image/jpeg', 'image/webp' ].includes(file.mimetype)) {
-      cb(null, true)
-    } else {
-      cb(null, false)
-      return cb(new StatusError(400, 'Only .png, .jpg, .jpeg and .webp formats allowed'))
-    }
+const uploadProductImages = (files: Express.Multer.File[], req: Request): void => {
+  const uploadConfig = {
+    imagePath: './public/media/products',
+    maxWidth: 1500,
+    maxHeight: 1500,
+    previewWidth: 450,
+    previewHeight: 450,
+    thumbWidth: 40,
+    thumbHeight: 40
   }
-})
-
-const uploadImages = (files: Express.Multer.File[], req: Request): void => {
-  files.map(async (file, index) => {
-    const image = sharp(file.path)
-    const info = await image.metadata()
-    const fileName = `${req.params.productID}_${index}`
-
-    if ((info.width as number) > maxWidth || (info.height as number) > maxHeight) {
-      await image
-        .resize(maxWidth, maxHeight, { fit: 'inside' })
-        .jpeg({ progressive: true })
-        .toFile(
-          path.resolve(imagePath, `${fileName}_${maxWidth}.jpg`)
-        )
-
-      await image
-        .resize(maxWidth, maxHeight, { fit: 'inside' })
-        .webp()
-        .toFile(
-          path.resolve(imagePath, `${fileName}_${maxWidth}.webp`)
-        )
-    } else {
-      await image
-        .jpeg({ progressive: true })
-        .toFile(
-          path.resolve(imagePath, `${fileName}_${maxWidth}.jpg`)
-        )
-
-      await image
-        .webp()
-        .toFile(
-          path.resolve(imagePath, `${fileName}_${maxWidth}.webp`)
-        )
-    }
-
-    await image
-      .resize(previewWidth, previewHeight, { fit: 'inside' })
-      .jpeg({ progressive: true })
-      .toFile(
-        path.resolve(imagePath, `${fileName}_${previewWidth}.jpg`)
-      )
-
-    await image
-      .resize(previewWidth, previewHeight, { fit: 'inside' })
-      .webp()
-      .toFile(
-        path.resolve(imagePath, `${fileName}_${previewWidth}.webp`)
-      )
-
-    await image
-      .resize(thumbWidth, thumbHeight, { fit: 'inside' })
-      .jpeg({ progressive: true })
-      .toFile(
-        path.resolve(imagePath, `${fileName}_${thumbWidth}.jpg`)
-      )
-
-    await image
-      .resize(thumbWidth, thumbHeight, { fit: 'inside' })
-      .webp()
-      .toFile(
-        path.resolve(imagePath, `${fileName}_${thumbWidth}.webp`)
-      )
-
-    fs.unlinkSync(file.path)
-  })
+  uploadImages(files, req, uploadConfig, 'productID')
 }
 
 export default {
@@ -252,6 +175,5 @@ export default {
   getProductByID,
   updateProduct,
   deleteProduct,
-  multerUpload,
-  uploadImages
+  uploadProductImages
 }

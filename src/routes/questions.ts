@@ -1,8 +1,8 @@
 import Router from 'express'
 import answerService from '../services/answerService'
 import questionService from '../services/questionService'
-import { checkNewAnswer, checkNewQuestion, checkQuestionUpdate } from '../utils/inputValidator'
-import { isCreator, isLoggedIn } from '../utils/middleware'
+import { checkMediaUpload, checkNewAnswer, checkNewQuestion, checkQuestionUpdate } from '../utils/inputValidator'
+import { isCreator, isLoggedIn, multerUpload } from '../utils/middleware'
 
 const router = Router()
 
@@ -39,10 +39,10 @@ router.get('/:questionID/answers', async (req, res) => {
   res.json(answers)
 })
 
-// router.post('/:questionID/upload', isAdmin, questionCommentService.multerUpload.array('questionMedia', 10), (req, res) => { // TODO
-//   const questionMedia = checkquestionMediaUpload(req)
-//   questionCommentService.uploadImages(questionMedia, req)
-//   res.status(204).end()
-// })
+router.post('/:questionID/upload', isCreator('questions', 'questionID', 'params'), multerUpload.array('questionMedia', 4), (req, res) => {
+  const questionMedia = checkMediaUpload(req)
+  questionService.uploadQuestionImages(questionMedia, req)
+  res.status(204).end()
+})
 
 export default router

@@ -4,8 +4,8 @@ import parameterService from '../services/parameterService'
 import productService from '../services/productService'
 import questionService from '../services/questionService'
 import ratingService from '../services/ratingService'
-import { checkNewProduct, checkProductMediaUpload, checkProductUpdate } from '../utils/inputValidator'
-import { isAdmin, isCreator } from '../utils/middleware'
+import { checkNewProduct, checkMediaUpload, checkProductUpdate } from '../utils/inputValidator'
+import { isAdmin, isCreator, multerUpload } from '../utils/middleware'
 
 const router = Router()
 
@@ -31,9 +31,9 @@ router.put('/:productID', isCreator('products', 'productID', 'params'), async (r
   res.json(updatedProduct)
 })
 
-router.post('/:productID/upload', isAdmin, productService.multerUpload.array('productMedia', 10), (req, res) => {
-  const productMedia = checkProductMediaUpload(req)
-  productService.uploadImages(productMedia, req)
+router.post('/:productID/upload', isAdmin, multerUpload.array('productMedia', 10), (req, res) => {
+  const productMedia = checkMediaUpload(req)
+  productService.uploadProductImages(productMedia, req)
   res.status(204).end()
 })
 
