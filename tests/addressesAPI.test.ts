@@ -51,6 +51,17 @@ describe('Addresses fetching', () => {
 
     expect(body).toBeDefined()
   })
+
+  test('200 addresses by ID', async () => {
+    const { addedAddress, token } = await createOneAddress('customer')
+
+    const { body }: { body: Address[] } = await api
+      .get(`${apiURL}/${addedAddress.addressID}`)
+      .set('Cookie', `token=${token}`)
+      .expect(200)
+
+    expect(body).toBeDefined()
+  })
 })
 
 afterAll(async () => await db.destroy())

@@ -4,6 +4,7 @@ import R from 'ramda'
 import { Address, AddressCreateInput, UserAddress } from '../types'
 import { db, dbTrans } from '../utils/db'
 import StatusError from '../utils/StatusError'
+import { sensitiveAddressTypes } from '../utils/constants'
 
 const addAddress = async (addressInput: AddressCreateInput, res: Response): Promise<Address & UserAddress> => {
   const { isDefault, addr, addressTypeID } = addressInput
@@ -76,13 +77,34 @@ const getAddressesByType = async (req: Request): Promise<Address[]> => {
     .where('addressTypeID', req.params.addressTypeID)
 }
 
-const getAddressByID = async (req: Request): Promise<Address> => {
-  const address = await db<Address>('addresses')
-    .first()
+type AddressFullData = Address & { userID: string; name: string }
+
+const getAddressByID = async (req: Request, res: Response): Promise<AddressFullData> => {
+  const { userID } = res.locals.userID
+
+  const address: AddressFullData = await db('addresses as a')
+    .first(
+      'a.addressID',
+      'a.addr',
+      'a.addressTypeID',
+      'ua.userID',
+      'at.name'
+    )
     .where('addressID', req.params.addressID)
+    .joinRaw('JOIN "userAddresses" as ua USING ("addressID")')
+    .joinRaw('LEFT JOIN "addressTypes" as at USING ("addressTypeID")')
 
   if (!address) throw new StatusError(404, 'Not Found')
 
+  const role: string | undefined = res.locals.userRole
+
+  if (
+    sensitiveAddressTypes.includes(address.name) &&
+    (!role || ![ 'ROOT', 'ADMIN' ].includes(role)) &&
+    address.userID !== userID
+  ) {
+    throw new StatusError(404, 'Not Found')
+  }
   return address
 }
 

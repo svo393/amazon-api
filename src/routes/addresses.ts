@@ -12,7 +12,7 @@ router.post('/', isLoggedIn, async (req, res) => {
 })
 
 router.get('/:addressID', async (req, res) => { // TODO add permissions
-  const address = await addressService.getAddressByID(req)
+  const address = await addressService.getAddressByID(req, res)
   res.json(address)
 })
 

@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken'
 import R from 'ramda'
 import { promisify } from 'util'
 import { db } from '../utils/db'
-import { Answer, Order, PasswordRequestInput, PasswordResetInput, Question, Rating, Role, User, UserLoginInput, UserSafeData, UserSignupInput, UserUpdateInput } from '../types'
+import { Answer, Order, PasswordRequestInput, PasswordResetInput, Question, Rating, Role, User, UserLoginInput, UserSafeData, UserSignupInput, UserUpdateInput, RatingComment, AnswerComment } from '../types'
 import env from '../utils/config'
 import StatusError from '../utils/StatusError'
 // import { makeANiceEmail, transport } from '../utils/mail'
@@ -134,8 +134,10 @@ const getUsers = async (): Promise<UserListData[]> => {
 type UserPersonalData = UserBaseData & {
   orders: Order[];
   ratings: Rating[];
+  ratingComments: RatingComment[];
   questions: Question[];
   answers: Answer[];
+  answerComments: AnswerComment[];
 }
 
 type UserPublicData = Omit<UserPersonalData,
@@ -164,10 +166,16 @@ const getUserByID = async (req: Request, res: Response): Promise<UserPersonalDat
   const ratings = await db<Rating>('ratings')
     .where('userID', userID)
 
+  const ratingComments = await db<RatingComment>('ratingComments')
+    .where('userID', userID)
+
   const questions = await db<Question>('questions')
     .where('userID', userID)
 
   const answers = await db<Answer>('answers')
+    .where('userID', userID)
+
+  const answerComments = await db<AnswerComment>('answerComments')
     .where('userID', userID)
 
   const userDataSplitted = hasPermission
@@ -187,9 +195,11 @@ const getUserByID = async (req: Request, res: Response): Promise<UserPersonalDat
   return {
     ...userDataSplitted,
     orders,
+    ratingComments,
     ratings,
     questions,
-    answers
+    answers,
+    answerComments
   }
 }
 

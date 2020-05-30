@@ -118,8 +118,4 @@ router.delete('/:userID/follows/:anotherUserID', isSameUser('params'), async (re
   res.status(204).end()
 })
 
-// router.get('/:userID/feed', async (req, res) => { // TODO all ratings, answers...
-
-// })
-
 export default router
