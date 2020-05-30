@@ -306,7 +306,7 @@ export type ProductCreateInput = Omit<Product,
   }[];
   groups?: {
     name: string;
-    productID?: number;
+    groupID?: number;
     value: string;
   }[];
 

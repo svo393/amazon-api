@@ -61,15 +61,7 @@ const addProduct = async (productInput: ProductCreateInput, res: Response): Prom
 
     if (productInput.groups && !R.isEmpty(productInput.groups)) {
       const addedGroups: Group[] = await Promise.all(productInput.groups.map(async (g) => {
-        if (g.productID) {
-          const [ group ]: Group[] = await trx
-            .from('groupProducts as gp')
-            .leftJoin('groups as g', 'gp.groupID', 'g.groupID')
-            .where('gp.productID', g.productID)
-            .andWhere('g.name', g.name)
-
-          return group
-        }
+        if (g.groupID) return { name: g.name, groupID: g.groupID }
 
         const [ group ]: Group[] = await trx
           .insert({ name: g.name }, [ '*' ])
