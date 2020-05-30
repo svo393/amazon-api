@@ -7,17 +7,16 @@ import StatusError from '../utils/StatusError'
 const addVendor = async (vendorInput: VendorInput): Promise<Vendor> => {
   const { name } = vendorInput
 
-  const existingVendor = await db<Vendor>('vendors')
-    .first('vendorID')
-    .where('name', name)
+  const { rows: [ addedVendor ] }: { rows: Vendor[] } = await db.raw(
+    `? ON CONFLICT
+       DO NOTHING
+       RETURNING *;`,
+    [ db('vendors').insert(vendorInput) ]
+  )
 
-  if (existingVendor) {
+  if (!addedVendor) {
     throw new StatusError(409, `Vendor with name "${name}" already exists`)
   }
-
-  const [ addedVendor ]: Vendor[] = await db<Vendor>('vendors')
-    .insert(vendorInput, [ '*' ])
-
   return addedVendor
 }
 

@@ -9,23 +9,20 @@ const addParameters = async (parameterInput: ParameterCreateInput): Promise<Para
 }
 
 const addProductParameter = async (productParameterInput: ProductParameterInput, req: Request): Promise<ProductParameter> => {
-  const { value } = productParameterInput
-
-  const existingProductParameter = await db<ProductParameter>('productParameters')
-    .first('value')
-    .where('value', value)
-
-  if (existingProductParameter) {
-    throw new StatusError(409, 'This product is already added to the parameter')
-  }
-
-  const [ addedProductParameter ]: ProductParameter[] = await db<ProductParameter>('productParameters')
-    .insert({
+  const { rows: [ addedProductParameter ] }: { rows: ProductParameter[] } = await db.raw(
+    `? ON CONFLICT
+       DO NOTHING
+       RETURNING *;`,
+    [ db('productParameters').insert(({
       ...productParameterInput,
       productID: Number(req.params.productID),
       parameterID: Number(req.params.parameterID)
-    }, [ '*' ])
+    })) ]
+  )
 
+  if (!addedProductParameter) {
+    throw new StatusError(409, 'This parameter is already added to the product')
+  }
   return addedProductParameter
 }
 

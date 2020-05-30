@@ -9,23 +9,20 @@ const addGroup = async (groupInput: GroupCreateInput): Promise<Group> => {
 }
 
 const addGroupProduct = async (groupProductInput: GroupProductInput, req: Request): Promise<GroupProduct> => {
-  const { value } = groupProductInput
-
-  const existingGroupProduct = await db<GroupProduct>('groupProducts')
-    .first('value')
-    .where('value', value)
-
-  if (existingGroupProduct) {
-    throw new StatusError(409, 'This product is already added to the group')
-  }
-
-  const [ addedGroupProduct ]: GroupProduct[] = await db<GroupProduct>('groupProducts')
-    .insert({
+  const { rows: [ addedGroupProduct ] }: { rows: GroupProduct[] } = await db.raw(
+    `? ON CONFLICT
+       DO NOTHING
+       RETURNING *;`,
+    [ db('groupProducts').insert({
       ...groupProductInput,
       productID: Number(req.params.productID),
       groupID: Number(req.params.groupID)
-    }, [ '*' ])
+    }) ]
+  )
 
+  if (!addedGroupProduct) {
+    throw new StatusError(409, 'This product is already added to the group')
+  }
   return addedGroupProduct
 }
 

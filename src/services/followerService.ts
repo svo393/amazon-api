@@ -6,18 +6,16 @@ import StatusError from '../utils/StatusError'
 const addFollower = async (req: Request): Promise<Follower> => {
   const { userID, anotherUserID } = req.params
 
-  const existingFollower = await db<Follower>('followers')
-    .first()
-    .where('userID', userID)
-    .andWhere('follows', anotherUserID)
+  const { rows: [ addedFollower ] }: { rows: Follower[] } = await db.raw(
+    `? ON CONFLICT
+       DO NOTHING
+       RETURNING *;`,
+    [ db('followers').insert({ userID, follows: anotherUserID }) ]
+  )
 
-  if (existingFollower) {
+  if (!addedFollower) {
     throw new StatusError(409, 'You\'are already following this user')
   }
-
-  const [ addedFollower ]: Follower[] = await db('followers')
-    .insert({ userID, follows: anotherUserID }, [ '*' ])
-
   return addedFollower
 }
 

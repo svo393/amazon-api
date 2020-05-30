@@ -1,14 +1,14 @@
 import { Request, Response } from 'express'
 import fs from 'fs'
+import Knex from 'knex'
 import multer from 'multer'
 import path from 'path'
 import R from 'ramda'
 import sharp from 'sharp'
-import { FormattedGroup, Product, ProductAllData, ProductCreateInput, ProductListData, ProductPublicData, ProductUpdateInput, Parameter, ProductParameter, FormattedParameter, Group, GroupProduct } from '../types'
+import { FormattedGroup, Group, GroupProduct, Parameter, Product, ProductAllData, ProductCreateInput, ProductListData, ProductParameter, ProductPublicData, ProductUpdateInput } from '../types'
 import { db, dbTrans } from '../utils/db'
 import { getProductsQuery } from '../utils/queries'
 import StatusError from '../utils/StatusError'
-import Knex from 'knex'
 
 const addProduct = async (productInput: ProductCreateInput, res: Response): Promise<ProductPublicData & { parameters?: Parameter[] }> => {
   const now = new Date()
@@ -35,9 +35,9 @@ const addProduct = async (productInput: ProductCreateInput, res: Response): Prom
     if (productInput.parameters && !R.isEmpty(productInput.parameters)) {
       const { rows: addedParameters }: { rows: Parameter[] } = await trx.raw(
         `? ON CONFLICT ("name")
-              DO UPDATE SET
-              "name" = EXCLUDED."name"
-              RETURNING *;`,
+           DO UPDATE SET
+           "name" = EXCLUDED."name"
+           RETURNING *;`,
         [ trx
           .insert(productInput.parameters.map((p) => ({ name: p.name })))
           .into('parameters') ]

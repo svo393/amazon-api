@@ -286,7 +286,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
 
     .createTable('groups', (t) => {
       t.increments('groupID')
-      t.string('name', 50).unique().notNullable()
+      t.string('name', 50).notNullable()
     })
 
     .createTable('groupProducts', (t) => {

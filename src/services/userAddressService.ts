@@ -4,18 +4,14 @@ import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
 const addUserAddress = async (UAInput: UACreateInput): Promise<UserAddress> => {
-  const { userID, addressID } = UAInput
+  const { rows: [ addedUA ] }: { rows: UserAddress[] } = await db.raw(
+    `? ON CONFLICT
+       DO NOTHING
+       RETURNING *;`,
+    [ db('userAddresses').insert(UAInput) ]
+  )
 
-  const existingUA = await db<UserAddress>('userAddresses')
-    .first()
-    .where('userID', userID)
-    .andWhere('addressID', addressID)
-
-  if (existingUA) throw new StatusError(409, 'Address already added')
-
-  const [ addedUA ]: UserAddress[] = await db<UserAddress>('userAddresses')
-    .insert(UAInput, [ '*' ])
-
+  if (!addedUA) throw new StatusError(409, 'Address already added')
   return addedUA
 }
 

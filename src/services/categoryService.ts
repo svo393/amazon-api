@@ -7,17 +7,16 @@ import StatusError from '../utils/StatusError'
 const addCategory = async (categoryInput: CategoryCreateInput): Promise<Category> => {
   const { name } = categoryInput
 
-  const existingCategory = await db<Category>('categories')
-    .first('categoryID')
-    .where('name', name)
+  const { rows: [ addedCategory ] }: { rows: Category[] } = await db.raw(
+    `? ON CONFLICT
+       DO NOTHING
+       RETURNING *;`,
+    [ db('categories').insert(categoryInput) ]
+  )
 
-  if (existingCategory) {
+  if (!addedCategory) {
     throw new StatusError(409, `Category with name "${name}" already exists`)
   }
-
-  const [ addedCategory ]: Category[] = await db<Category>('categories')
-    .insert(categoryInput, [ '*' ])
-
   return addedCategory
 }
 

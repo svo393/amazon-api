@@ -7,17 +7,16 @@ import StatusError from '../utils/StatusError'
 const addAddressType = async (atInput: ATInput): Promise<AT> => {
   const { name } = atInput
 
-  const existingAT = await db<AT>('addressTypes')
-    .first('addressTypeID')
-    .where('name', name)
+  const { rows: [ addedAT ] }: { rows: AT[] } = await db.raw(
+    `? ON CONFLICT
+       DO NOTHING
+       RETURNING *;`,
+    [ db('addressTypes').insert(atInput) ]
+  )
 
-  if (existingAT) {
+  if (!addedAT) {
     throw new StatusError(409, `AddressType with name "${name}" already exists`)
   }
-
-  const [ addedAT ]: AT[] = await db<AT>('addressTypes')
-    .insert(atInput, [ '*' ])
-
   return addedAT
 }
 

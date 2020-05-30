@@ -6,19 +6,19 @@ import StatusError from '../utils/StatusError'
 const addListProduct = async (req: Request): Promise<ListProduct> => {
   const { listID, productID } = req.params
 
-  const existingUA = await db<ListProduct>('listProducts')
-    .first()
-    .where('listID', listID)
-    .andWhere('productID', productID)
-
-  if (existingUA) throw new StatusError(409, 'This product already added to the list')
-
-  const [ addedUA ]: ListProduct[] = await db<ListProduct>('listProducts')
-    .insert({
+  const { rows: [ addedUA ] }: { rows: ListProduct[] } = await db.raw(
+    `? ON CONFLICT
+       DO NOTHING
+       RETURNING *;`,
+    [ db('listProducts').insert({
       listID: Number(listID),
       productID: Number(productID)
-    }, [ '*' ])
+    }) ]
+  )
 
+  if (!addedUA) {
+    throw new StatusError(409, 'This product already added to the list')
+  }
   return addedUA
 }
 

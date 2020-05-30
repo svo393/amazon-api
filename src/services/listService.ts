@@ -7,18 +7,16 @@ const addList = async (listInput: ListCreateInput, res: Response): Promise<List>
   const { name } = listInput
   const { userID } = res.locals
 
-  const existingList = await db<List>('lists')
-    .first()
-    .where('name', name)
-    .andWhere('userID', userID)
+  const { rows: [ addedList ] }: { rows: List[] } = await db.raw(
+    `? ON CONFLICT
+       DO NOTHING
+       RETURNING *;`,
+    [ db('lists').insert({ ...listInput, userID }) ]
+  )
 
-  if (existingList) {
+  if (!addedList) {
     throw new StatusError(409, `List with name "${name}" already exists`)
   }
-
-  const [ addedList ]: List[] = await db('lists')
-    .insert({ ...listInput, userID }, [ '*' ])
-
   return addedList
 }
 

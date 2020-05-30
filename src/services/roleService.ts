@@ -7,17 +7,16 @@ import StatusError from '../utils/StatusError'
 const addRole = async (roleInput: RoleInput): Promise<Role> => {
   const { name } = roleInput
 
-  const existingRole = await db<Role>('roles')
-    .first('roleID')
-    .where('name', name)
+  const { rows: [ addedRole ] }: { rows: Role[] } = await db.raw(
+    `? ON CONFLICT
+       DO NOTHING
+       RETURNING *;`,
+    [ db('roles').insert(roleInput) ]
+  )
 
-  if (existingRole) {
+  if (!addedRole) {
     throw new StatusError(409, `Role with name "${name}" already exists`)
   }
-
-  const [ addedRole ]: Role[] = await db<Role>('roles')
-    .insert(roleInput, [ '*' ])
-
   return addedRole
 }
 

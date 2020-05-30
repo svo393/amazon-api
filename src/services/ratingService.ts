@@ -5,26 +5,23 @@ import StatusError from '../utils/StatusError'
 
 const addRating = async (ratingInput: RatingCreateInput, res: Response): Promise<Rating> => {
   const userID = res.locals.userID
-  const { productID } = ratingInput
-
-  const [ existingRating ] = await db<Rating>('ratings')
-    .where('userID', userID)
-    .andWhere('productID', productID)
-
-  if (existingRating) {
-    throw new StatusError(409, 'You\'ve already left a review for this product')
-  }
-
   const now = new Date()
 
-  const [ addedRating ]: Rating[] = await db('ratings')
-    .insert({
+  const { rows: [ addedRating ] }: { rows: Rating[] } = await db.raw(
+    `? ON CONFLICT
+       DO NOTHING
+       RETURNING *;`,
+    [ db('ratings').insert({
       ...ratingInput,
       userID,
       ratingCreatedAt: now,
       ratingUpdatedAt: now
-    }, [ '*' ])
+    }) ]
+  )
 
+  if (!addedRating) {
+    throw new StatusError(409, 'You\'ve already left a review for this product')
+  }
   return addedRating
 }
 

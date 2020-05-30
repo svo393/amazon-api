@@ -6,17 +6,16 @@ import StatusError from '../utils/StatusError'
 const addShippingMethod = async (smInput: SMInput): Promise<SM> => {
   const { name } = smInput
 
-  const existingSM = await db<SM>('shippingMethods')
-    .first('shippingMethodID')
-    .where('name', name)
+  const { rows: [ addedSM ] }: { rows: SM[] } = await db.raw(
+    `? ON CONFLICT
+       DO NOTHING
+       RETURNING *;`,
+    [ db('shippingMethods').insert(smInput) ]
+  )
 
-  if (existingSM) {
+  if (!addedSM) {
     throw new StatusError(409, `ShippingMethod with name "${name}" already exists`)
   }
-
-  const [ addedSM ]: SM[] = await db<SM>('shippingMethods')
-    .insert(smInput, [ '*' ])
-
   return addedSM
 }
 
