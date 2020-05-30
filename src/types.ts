@@ -306,7 +306,7 @@ export type ProductCreateInput = Omit<Product,
   }[];
   groups?: {
     name: string;
-    productID?: string; // TODO
+    productID?: number;
     value: string;
   }[];
 
@@ -332,9 +332,9 @@ export type ProductPublicData = Omit<Product,
   | 'userID'
 >
 
-export type FormattedGroup = { [name: string]: Group & GroupProduct }
+export type FormattedGroup = { [groupID: number]: Group & GroupProduct }
 
-export type FormattedParameter = { [name: string]: Parameter & ProductParameter }
+export type FormattedParameter = { [parameterID: number]: Parameter & ProductParameter }
 
 export type ProductListData = Pick<Product,
 | 'productID'

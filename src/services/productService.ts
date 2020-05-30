@@ -14,6 +14,9 @@ const addProduct = async (productInput: ProductCreateInput, res: Response): Prom
   const now = new Date()
 
   return await dbTrans(async (trx: Knex.Transaction) => {
+    let parameters
+    let groups
+
     const [ addedProduct ]: Product[] = await trx
       .insert({
         ...R.omit([ 'parameters', 'groups' ], productInput),
@@ -30,9 +33,15 @@ const addProduct = async (productInput: ProductCreateInput, res: Response): Prom
     ], addedProduct)
 
     if (productInput.parameters && !R.isEmpty(productInput.parameters)) {
-      const addedParameters: Parameter[] = await trx
-        .insert(productInput.parameters.map((p) => ({ name: p.name })), [ '*' ])
-        .into('parameters')
+      const { rows: addedParameters }: { rows: Parameter[] } = await trx.raw(
+        `? ON CONFLICT ("name")
+              DO UPDATE SET
+              "name" = EXCLUDED."name"
+              RETURNING *;`,
+        [ trx
+          .insert(productInput.parameters.map((p) => ({ name: p.name })))
+          .into('parameters') ]
+      )
 
       const addedProductParameters: ProductParameter[] = await trx
         .insert(productInput.parameters.map((pp) => ({
@@ -42,20 +51,54 @@ const addProduct = async (productInput: ProductCreateInput, res: Response): Prom
         })), [ '*' ])
         .into('productParameters')
 
-      return {
-        ...publicProduct,
-        parameters: addedParameters.map((p) => ({
-          [p.name]: {
-            ...p,
-            ...addedProductParameters.find((pp) => pp.parameterID === p.parameterID)
-          }
-        }))
-      }
+      parameters = addedParameters.map((p) => ({
+        [p.name]: {
+          ...p,
+          ...addedProductParameters.find((pp) => pp.parameterID === p.parameterID)
+        }
+      }))
     }
 
-    // TODO Groups
+    if (productInput.groups && !R.isEmpty(productInput.groups)) {
+      const addedGroups: Group[] = await Promise.all(productInput.groups.map(async (g) => {
+        if (g.productID) {
+          const [ group ]: Group[] = await trx
+            .from('groupProducts as gp')
+            .leftJoin('groups as g', 'gp.groupID', 'g.groupID')
+            .where('gp.productID', g.productID)
+            .andWhere('g.name', g.name)
 
-    return publicProduct
+          return group
+        }
+
+        const [ group ]: Group[] = await trx
+          .insert({ name: g.name }, [ '*' ])
+          .into('groups')
+
+        return group
+      }))
+
+      const addedGroupProducts: GroupProduct[] = await trx
+        .insert(productInput.groups.map((gg) => ({
+          value: gg.value,
+          groupID: (addedGroups.find((g) => g.name === gg.name))?.groupID,
+          productID: addedProduct.productID
+        })), [ '*' ])
+        .into('groupProducts')
+
+      groups = addedGroups.map((g) => ({
+        [g.name]: {
+          ...g,
+          ...addedGroupProducts.find((gg) => gg.groupID === g.groupID)
+        }
+      }))
+    }
+
+    return {
+      ...publicProduct,
+      groups,
+      parameters
+    }
   })
 }
 
@@ -110,6 +153,14 @@ const updateProduct = async (productInput: ProductUpdateInput, req: Request): Pr
 
   if (!updatedProduct) throw new StatusError(404, 'Not Found')
   return updatedProduct
+}
+
+const deleteProduct = async (req: Request): Promise<void> => {
+  const deleteCount = await db<Product>('products')
+    .del()
+    .where('productID', req.params.productID)
+
+  if (deleteCount === 0) throw new StatusError(404, 'Not Found')
 }
 
 const storage = multer.diskStorage({
@@ -208,6 +259,7 @@ export default {
   getProducts,
   getProductByID,
   updateProduct,
+  deleteProduct,
   multerUpload,
   uploadImages
 }

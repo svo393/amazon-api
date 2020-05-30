@@ -4,7 +4,7 @@ import app from '../src/app'
 import { apiURLs } from '../src/utils/constants'
 import { db } from '../src/utils/db'
 import { products } from './seedData'
-import { createOneCategory, createOneProduct, createOneVendor, loginAs, newProduct, populateUsers, productsInDB, purge, parametersInDB } from './testHelper'
+import { createOneCategory, createOneProduct, createOneVendor, loginAs, newProduct, populateUsers, productsInDB, purge } from './testHelper'
 
 const api = supertest(app)
 const apiURL = apiURLs.products
@@ -31,13 +31,15 @@ describe('Product adding', () => {
         parameters: [
           { name: 'weight', value: 120 },
           { name: 'memory', value: 'DDR4' }
+        ],
+        groups: [
+          { name: 'color', value: 'black' }
         ]
       })
       .expect(201)
       .expect('Content-Type', /application\/json/)
 
     const productsAtEnd = await productsInDB()
-    const parametersAtEnd = await parametersInDB()
     const descriptions = productsAtEnd.map((i) => i.description)
     expect(descriptions).toContain(products[0].description)
   })
@@ -159,6 +161,17 @@ describe('Product updating', () => {
       .set('Cookie', `token=${token}`)
       .send({ name: 'Updated Product' })
       .expect(403)
+  })
+})
+
+describe('Products deleting', () => {
+  test('204 if same user', async () => {
+    const { addedProduct, token } = await createOneProduct('admin')
+
+    await api
+      .delete(`${apiURL}/${addedProduct.productID}`)
+      .set('Cookie', `token=${token}`)
+      .expect(204)
   })
 })
 

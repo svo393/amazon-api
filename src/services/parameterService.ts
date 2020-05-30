@@ -35,9 +35,9 @@ const getParametersByProduct = async (req: Request): Promise<FormattedParameter[
     .where('pp.productID', req.params.productID)
 
   return parameters.reduce((acc, cur) => {
-    return acc[cur.name]
-      ? { ...acc, [cur.name]: [ ...acc[cur.name], cur ] }
-      : { ...acc, [cur.name]: [ cur ] }
+    return acc[cur.parameterID]
+      ? { ...acc, [cur.parameterID]: [ ...acc[cur.parameterID], cur ] }
+      : { ...acc, [cur.parameterID]: [ cur ] }
   }, {})
 }
 

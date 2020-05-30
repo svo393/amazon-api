@@ -41,9 +41,9 @@ const getGroupsByProduct = async (req: Request): Promise<FormattedGroup[]> => {
     .orderBy('g.name')
 
   return groups.reduce((acc, cur) => {
-    return acc[cur.name]
-      ? { ...acc, [cur.name]: [ ...acc[cur.name], cur ] }
-      : { ...acc, [cur.name]: [ cur ] }
+    return acc[cur.groupID]
+      ? { ...acc, [cur.groupID]: [ ...acc[cur.groupID], cur ] }
+      : { ...acc, [cur.groupID]: [ cur ] }
   }, {})
 }
 
