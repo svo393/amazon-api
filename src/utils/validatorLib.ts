@@ -105,12 +105,28 @@ export const isPasswordValid: CP = ({ name, param }) => {
 
 export const isImage: CP = ({ name, param }) => {
   if (!param.mimetype || ![ 'image/png', 'image/jpeg', 'image/webp' ].includes(param.mimetype)) {
-    throw new StatusError(400, 'Image files only!')
+    throw new StatusError(415, 'Image files only!')
   }
   return { name, param }
 }
 
 export const isProductParameterOrGroupProduct: CP = ({ name, param }) => {
+  if (
+    !(
+      typeof (param.name) === 'string' ||
+      param.name instanceof String
+    ) ||
+    !(
+      typeof (param.value) === 'string' ||
+      param.value instanceof String ||
+      typeof (param.value) === 'number'
+    )
+  ) throw new StatusError(400, `Incorrect ${name}: ${param.name}`)
+
+  return { name, param }
+}
+
+export const isCart: CP = ({ name, param }) => {
   if (
     !(
       typeof (param.name) === 'string' ||

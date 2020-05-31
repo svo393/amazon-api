@@ -1,7 +1,7 @@
 import { Request } from 'express'
 import R from 'ramda'
 import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CategoryCreateInput, CategoryUpdateInput, GroupCreateInput, GroupProductInput, GroupUpdateInput, ListCreateInput, ParameterCreateInput, ParameterUpdateInput, PasswordRequestInput, PasswordResetInput, ProductCreateInput, ProductParameterInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, RoleInput, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput, PaymentTypeInput, CartProduct, CartProductInput, OrderStatusInput, InvoiceStatusInput, OrderStatus, InvoiceStatus, OrderCreateInput } from '../types'
-import { hasDefinedProps, isArray, isBoolean, isEmail, isInputProvided, isNumber, isPasswordValid, isProvided, isString, isStringOrArray, isStringOrNumber, isProductParameterOrGroupProduct } from './validatorLib'
+import { hasDefinedProps, isArray, isBoolean, isEmail, isInputProvided, isNumber, isPasswordValid, isProvided, isString, isStringOrArray, isStringOrNumber, isProductParameterOrGroupProduct, isCart } from './validatorLib'
 
 export const checkNewUser = ({ body }: Request): UserSignupInput => {
   const email = R.pipe(
@@ -757,10 +757,22 @@ export const checkNewOrder = ({ body }: Request): OrderCreateInput => {
     isNumber
   )({ name: 'userID', param: body.userID })
 
+  const cart = R.pipe(
+    isProvided,
+    isArray
+  )({ name: 'cart', param: body.cart })
+
+  cart.param.map((cp: any) => {
+    isNumber({ name: 'productID', param: cp.productID })
+    isNumber({ name: 'userID', param: cp.userID })
+    isNumber({ name: 'qty', param: cp.qty })
+  })
+
   return {
     address: address.param,
     userID: userID.param,
-    shippingMethodID: shippingMethodID.param
+    shippingMethodID: shippingMethodID.param,
+    cart: cart.param
   }
 }
 

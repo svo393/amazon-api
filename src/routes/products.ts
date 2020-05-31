@@ -57,9 +57,4 @@ router.get('/:productID/parameters', async (req, res) => {
   res.json(parameters)
 })
 
-router.delete('/:productID', isAdmin, async (req, res) => {
-  await productService.deleteProduct(req)
-  res.status(204).end()
-})
-
 export default router

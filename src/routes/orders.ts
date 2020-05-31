@@ -8,7 +8,7 @@ const router = Router()
 
 router.post('/', isLoggedIn, async (req, res) => {
   const orderCreateInput = checkNewOrder(req)
-  const addedOrder = await orderService.addOrder(orderCreateInput, req)
+  const addedOrder = await orderService.addOrder(orderCreateInput)
   res.status(201).json(addedOrder)
 })
 

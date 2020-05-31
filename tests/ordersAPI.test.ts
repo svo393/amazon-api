@@ -3,7 +3,7 @@ import app from '../src/app'
 import { Order } from '../src/types'
 import { apiURLs } from '../src/utils/constants'
 import { db } from '../src/utils/db'
-import { createOneOrder, ordersInDB, loginAs, newOrder, populateUsers, purge, createOneShippingMethod, createOneAddress } from './testHelper'
+import { createOneAddress, createOneOrder, createOneShippingMethod, newOrder, ordersInDB, populateUsers, purge, createOneCartProduct } from './testHelper'
 
 const api = supertest(app)
 const apiURL = apiURLs.orders
@@ -17,13 +17,20 @@ describe('Order adding', () => {
   test('201', async () => {
     const { addedShippingMethod } = await createOneShippingMethod('admin')
     const { addedAddress, token, userID } = await createOneAddress('customer')
+    const { addedCartProduct: addedCartProduct1 } = await createOneCartProduct('customer')
+    const { addedCartProduct: addedCartProduct2 } = await createOneCartProduct('customer')
 
     const ordersAtStart = await ordersInDB()
 
     await api
       .post(apiURL)
       .set('Cookie', `token=${token}`)
-      .send(newOrder(addedAddress.addr, addedShippingMethod.shippingMethodID, userID))
+      .send(newOrder(
+        addedAddress.addr,
+        addedShippingMethod.shippingMethodID,
+        userID,
+        [ addedCartProduct1, addedCartProduct2 ]
+      ))
       .expect(201)
       .expect('Content-Type', /application\/json/)
 
@@ -72,10 +79,10 @@ describe('Order updating', () => {
     const { body } = await api
       .put(`${apiURL}/${orderID}`)
       .set('Cookie', `token=${token}`)
-      .send({ address: 'Updated Address' })
+      .send({ orderStatusID: 1 })
       .expect(200)
 
-    expect(body.address).toBe('Updated Address')
+    expect(body.orderStatusID).toBe(1)
   })
 })
 

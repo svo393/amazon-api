@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import Knex from 'knex'
 import R from 'ramda'
-import { FormattedGroup, Group, GroupProduct, Parameter, Product, ProductAllData, ProductCreateInput, ProductListData, ProductParameter, ProductPublicData, ProductUpdateInput } from '../types'
+import { FormattedGroups, Group, GroupProduct, Parameter, Product, ProductAllData, ProductCreateInput, ProductListData, ProductParameter, ProductPublicData, ProductUpdateInput } from '../types'
 import { db, dbTrans } from '../utils/db'
 import { uploadImages } from '../utils/img'
 import { getProductsQuery } from '../utils/queries'
@@ -14,14 +14,13 @@ const addProduct = async (productInput: ProductCreateInput, res: Response): Prom
     let parameters
     let groups
 
-    const [ addedProduct ]: Product[] = await trx
+    const [ addedProduct ]: Product[] = await trx('products')
       .insert({
         ...R.omit([ 'parameters', 'groups' ], productInput),
         userID: res.locals.userID,
         productCreatedAt: now,
         productUpdatedAt: now
       }, [ '*' ])
-      .into('products')
 
     const publicProduct = R.omit([
       'productCreatedAt',
@@ -35,18 +34,18 @@ const addProduct = async (productInput: ProductCreateInput, res: Response): Prom
            DO UPDATE SET
            "name" = EXCLUDED."name"
            RETURNING *;`,
-        [ trx
-          .insert(productInput.parameters.map((p) => ({ name: p.name })))
-          .into('parameters') ]
+        [
+          trx('parameters')
+            .insert(productInput.parameters.map((p) => ({ name: p.name })))
+        ]
       )
 
-      const addedProductParameters: ProductParameter[] = await trx
+      const addedProductParameters: ProductParameter[] = await trx('productParameters')
         .insert(productInput.parameters.map((pp) => ({
           value: pp.value,
           parameterID: (addedParameters.find((p) => p.name === pp.name))?.parameterID,
           productID: addedProduct.productID
         })), [ '*' ])
-        .into('productParameters')
 
       parameters = addedParameters.map((p) => ({
         [p.name]: {
@@ -60,20 +59,18 @@ const addProduct = async (productInput: ProductCreateInput, res: Response): Prom
       const addedGroups: Group[] = await Promise.all(productInput.groups.map(async (g) => {
         if (g.groupID) return { name: g.name, groupID: g.groupID }
 
-        const [ group ]: Group[] = await trx
+        const [ group ]: Group[] = await trx('groups')
           .insert({ name: g.name }, [ '*' ])
-          .into('groups')
 
         return group
       }))
 
-      const addedGroupProducts: GroupProduct[] = await trx
+      const addedGroupProducts: GroupProduct[] = await trx('groupProducts')
         .insert(productInput.groups.map((gg) => ({
           value: gg.value,
           groupID: (addedGroups.find((g) => g.name === gg.name))?.groupID,
           productID: addedProduct.productID
         })), [ '*' ])
-        .into('groupProducts')
 
       groups = addedGroups.map((g) => ({
         [g.name]: {
@@ -112,16 +109,13 @@ const getProductByID = async (req: Request, res: Response): Promise<ProductListD
     .whereIn('g.groupID', groupIDs.map((id) => id.groupID))
     .orderBy('g.name')
 
-  const formattedGroups: FormattedGroup[] = groups.reduce((acc, cur) => {
+  const formattedGroups: FormattedGroups = groups.reduce((acc, cur) => {
     return acc[cur.name]
       ? { ...acc, [cur.name]: [ ...acc[cur.name], cur ] }
       : { ...acc, [cur.name]: [ cur ] }
   }, {})
 
-  const fullProduct = {
-    ...product,
-    groups: formattedGroups
-  }
+  const fullProduct = { ...product, groups: formattedGroups }
 
   const role: string | undefined = res.locals.userRole
 
@@ -146,14 +140,6 @@ const updateProduct = async (productInput: ProductUpdateInput, req: Request): Pr
   return updatedProduct
 }
 
-const deleteProduct = async (req: Request): Promise<void> => {
-  const deleteCount = await db<Product>('products')
-    .del()
-    .where('productID', req.params.productID)
-
-  if (deleteCount === 0) throw new StatusError(404, 'Not Found')
-}
-
 const uploadProductImages = (files: Express.Multer.File[], req: Request): void => {
   const uploadConfig = {
     imagePath: './public/media/products',
@@ -172,6 +158,5 @@ export default {
   getProducts,
   getProductByID,
   updateProduct,
-  deleteProduct,
   uploadProductImages
 }

@@ -157,7 +157,6 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .integer('productID')
         .references('products.productID')
         .notNullable()
-        .onDelete('CASCADE')
     })
     .alterTable('listProducts', (t) => {
       t.primary([ 'listID', 'productID' ])
@@ -185,7 +184,6 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .integer('productID')
         .references('products.productID')
         .notNullable()
-        .onDelete('CASCADE')
     })
     .alterTable('ratings', (t) => {
       t.unique([ 'userID', 'productID' ])
@@ -237,7 +235,6 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .integer('productID')
         .references('products.productID')
         .notNullable()
-        .onDelete('CASCADE')
     })
 
     .createTable('answers', (t) => {
@@ -307,7 +304,6 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .integer('productID')
         .references('products.productID')
         .notNullable()
-        .onDelete('CASCADE')
     })
     .alterTable('groupProducts', (t) => {
       t.primary([ 'groupID', 'productID' ])
@@ -331,7 +327,6 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .integer('productID')
         .references('products.productID')
         .notNullable()
-        .onDelete('CASCADE')
     })
     .alterTable('productParameters', (t) => {
       t.primary([ 'parameterID', 'productID' ])
@@ -350,7 +345,6 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .integer('productID')
         .references('products.productID')
         .notNullable()
-        .onDelete('CASCADE')
     })
     .alterTable('cartProducts', (t) => {
       t.primary([ 'userID', 'productID' ])
@@ -383,6 +377,24 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .notNullable()
     })
 
+    .createTable('orderProducts', (t) => {
+      t.integer('price').notNullable().unsigned()
+      t.integer('qty').notNullable().unsigned()
+
+      t
+        .integer('orderID')
+        .references('orders.orderID')
+        .notNullable()
+
+      t
+        .integer('productID')
+        .references('products.productID')
+        .notNullable()
+    })
+    .alterTable('orderProducts', (t) => {
+      t.primary([ 'orderID', 'productID' ])
+    })
+
     .createTable('invoiceStatuses', (t) => {
       t.increments('invoiceStatusID')
       t.string('name', 50).unique().notNullable()
@@ -404,30 +416,11 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .notNullable()
     })
 
-    .createTable('orderProducts', (t) => {
-      t.integer('price').notNullable().unsigned()
-      t.integer('qty').notNullable().unsigned()
-
-      t
-        .integer('orderID')
-        .references('orders.orderID')
-        .notNullable()
-        .onDelete('CASCADE')
-
-      t
-        .integer('productID')
-        .references('products.productID')
-        .notNullable()
-    })
-    .alterTable('orderProducts', (t) => {
-      t.primary([ 'orderID', 'productID' ])
-    })
-
 export const down = (knex: Knex): Knex.SchemaBuilder =>
   knex.schema
-    .dropTableIfExists('orderProducts')
     .dropTableIfExists('invoices')
     .dropTableIfExists('invoiceStatuses')
+    .dropTableIfExists('orderProducts')
     .dropTableIfExists('orders')
     .dropTableIfExists('orderStatuses')
     .dropTableIfExists('cartProducts')

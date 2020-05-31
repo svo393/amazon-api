@@ -146,10 +146,10 @@ describe('Product updating', () => {
     const { body } = await api
       .put(`${apiURL}/${addedProduct.productID}`)
       .set('Cookie', `token=${token}`)
-      .send({ title: 'Updated Product' })
+      .send({ isAvailable: false })
       .expect(200)
 
-    expect(body.title).toBe('Updated Product')
+    expect(body.isAvailable).toBe(false)
   })
 
   test('403 if another user\'s product', async () => {
@@ -161,17 +161,6 @@ describe('Product updating', () => {
       .set('Cookie', `token=${token}`)
       .send({ name: 'Updated Product' })
       .expect(403)
-  })
-})
-
-describe('Products deleting', () => {
-  test('204 if same user', async () => {
-    const { addedProduct, token } = await createOneProduct('admin')
-
-    await api
-      .delete(`${apiURL}/${addedProduct.productID}`)
-      .set('Cookie', `token=${token}`)
-      .expect(204)
   })
 })
 

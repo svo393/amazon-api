@@ -200,6 +200,13 @@ export type Order = {
   shippingMethodID: number;
 }
 
+export type OrderProduct = {
+  price: number;
+  qty: number;
+  orderID: number;
+  productID: number;
+}
+
 export type InvoiceStatus = {
   invoiceStatusID: number;
   name: string;
@@ -211,13 +218,6 @@ export type Invoice = {
   invoiceCreatedAt: Date;
   orderID: number;
   invoiceStatusID: number;
-}
-
-export type OrderProduct = {
-  price: number;
-  qty: number;
-  orderID: number;
-  productID: number;
 }
 
 //
@@ -339,9 +339,9 @@ export type ProductPublicData = Omit<Product,
   | 'userID'
 >
 
-export type FormattedGroup = { [groupID: number]: Group & GroupProduct }
+export type FormattedGroups = { [groupID: number]: Group & GroupProduct }
 
-export type FormattedParameter = { [parameterID: number]: Parameter & ProductParameter }
+export type FormattedParameters = { [parameterID: number]: Parameter & ProductParameter }
 
 export type ProductListData = Pick<Product,
 | 'productID'
@@ -352,13 +352,13 @@ export type ProductListData = Pick<Product,
 > & {
   stars: number;
   ratingCount: number;
-  groups: FormattedGroup[];
+  groups: FormattedGroups;
 }
 
 export type ProductAllData = Product & {
   stars: number;
   ratingCount: number;
-  groups: FormattedGroup[];
+  groups: FormattedGroups;
 }
 
 export type RatingCreateInput = Pick<Rating,
@@ -449,7 +449,7 @@ export type OrderCreateInput = Pick<Order,
   | 'address'
   | 'userID'
   | 'shippingMethodID'
->
+> & { cart: CartProduct[] }
 
 export type OrderUpdateInput = {
   address?: string;

@@ -1,5 +1,5 @@
 import { Request } from 'express'
-import { FormattedParameter, Parameter, ParameterCreateInput, ParameterUpdateInput, ProductParameter, ProductParameterInput } from '../types'
+import { FormattedParameters, Parameter, ParameterCreateInput, ParameterUpdateInput, ProductParameter, ProductParameterInput } from '../types'
 import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
@@ -26,7 +26,7 @@ const addProductParameter = async (productParameterInput: ProductParameterInput,
   return addedProductParameter
 }
 
-const getParametersByProduct = async (req: Request): Promise<FormattedParameter[]> => {
+const getParametersByProduct = async (req: Request): Promise<FormattedParameters> => {
   const parameters = await db('productParameters as pp')
     .leftJoin('parameters as p', 'p.parameterID', 'pp.parameterID')
     .where('pp.productID', req.params.productID)

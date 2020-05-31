@@ -192,7 +192,7 @@ export const multerUpload = multer({
       cb(null, true)
     } else {
       cb(null, false)
-      return cb(new StatusError(400, 'Only .png, .jpg, .jpeg and .webp formats allowed'))
+      return cb(new StatusError(415, 'Only .png, .jpg, .jpeg and .webp formats allowed'))
     }
   }
 })
