@@ -456,3 +456,7 @@ export type OrderUpdateInput = {
   orderStatusID?: number;
   shippingMethodID?: number;
 }
+
+export type OrderProductCreateInput = Omit<OrderProduct, | 'orderID'>
+
+export type OrderProductUpdateInput = Omit<OrderProductCreateInput, | 'productID'>

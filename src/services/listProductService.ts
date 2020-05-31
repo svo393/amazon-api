@@ -15,7 +15,7 @@ const addListProduct = async (req: Request): Promise<ListProduct> => {
   )
 
   if (!addedUA) {
-    throw new StatusError(409, 'This product already added to the list')
+    throw new StatusError(409, 'This product is already added to the list')
   }
   return addedUA
 }

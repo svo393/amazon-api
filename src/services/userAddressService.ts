@@ -11,7 +11,7 @@ const addUserAddress = async (UAInput: UACreateInput): Promise<UserAddress> => {
     [ db('userAddresses').insert(UAInput) ]
   )
 
-  if (!addedUA) throw new StatusError(409, 'Address already added')
+  if (!addedUA) throw new StatusError(409, 'Address is already added')
   return addedUA
 }
 

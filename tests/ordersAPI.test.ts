@@ -51,20 +51,20 @@ describe('Orders fetching', () => {
   })
 
   test('200 orders by user', async () => {
-    const { userID, token } = await createOneOrder('admin')
+    const { addedOrder, token } = await createOneOrder('admin')
 
     const { body }: { body: Order[] } = await api
-      .get(`${apiURLs.users}/${userID}/orders`)
+      .get(`${apiURLs.users}/${addedOrder.userID}/orders`)
       .set('Cookie', `token=${token}`)
       .expect(200)
     expect(body).toBeDefined()
   })
 
   test('200 order if creator', async () => {
-    const { orderID, token } = await createOneOrder('customer')
+    const { addedOrder, token } = await createOneOrder('customer')
 
     const { body } = await api
-      .get(`${apiURL}/${orderID}`)
+      .get(`${apiURL}/${addedOrder.orderID}`)
       .set('Cookie', `token=${token}`)
       .expect(200)
 
@@ -73,11 +73,11 @@ describe('Orders fetching', () => {
 })
 
 describe('Order updating', () => {
-  test('200 if creator', async () => {
-    const { orderID, token } = await createOneOrder('customer')
+  test('200 if admin', async () => {
+    const { addedOrder, token } = await createOneOrder('admin')
 
     const { body } = await api
-      .put(`${apiURL}/${orderID}`)
+      .put(`${apiURL}/${addedOrder.orderID}`)
       .set('Cookie', `token=${token}`)
       .send({ orderStatusID: 1 })
       .expect(200)

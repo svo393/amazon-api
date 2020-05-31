@@ -86,6 +86,7 @@
     "test:lists": "cross-env NODE_ENV=development jest ./tests/listsAPI.test.ts --verbose  --runInBand",
     "test:lp": "cross-env NODE_ENV=development jest ./tests/listProductsAPI.test.ts --verbose  --runInBand",
     "test:orders": "cross-env NODE_ENV=development jest ./tests/ordersAPI.test.ts --verbose  --runInBand",
+    "test:op": "cross-env NODE_ENV=development jest ./tests/orderProductsAPI.test.ts --verbose  --runInBand",
     "test:os": "cross-env NODE_ENV=development jest ./tests/orderStatusesAPI.test.ts --verbose  --runInBand",
     "test:params": "cross-env NODE_ENV=development jest ./tests/parametersAPI.test.ts --verbose  --runInBand",
     "test:pm": "cross-env NODE_ENV=development jest ./tests/paymentMethodsAPI.test.ts --verbose  --runInBand",
