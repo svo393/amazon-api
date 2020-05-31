@@ -28,7 +28,7 @@ const getCartProductsByUser = async (req: Request): Promise<CartProduct[]> => {
 
 const updateCartProduct = async (cartProductInput: CartProductInput, req: Request): Promise<CartProduct> => {
   const [ updatedCP ]: CartProduct[] = await db('cartProducts')
-    .update({ ...cartProductInput }, [ '*' ])
+    .update(cartProductInput, [ '*' ])
     .where('userID', req.params.userID)
     .andWhere('productID', req.params.productID)
 

@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CategoryCreateInput, CategoryUpdateInput, GroupCreateInput, GroupProductInput, GroupUpdateInput, ListCreateInput, ParameterCreateInput, ParameterUpdateInput, PasswordRequestInput, PasswordResetInput, ProductCreateInput, ProductParameterInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, RoleInput, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput, PaymentTypeInput, CartProduct, CartProductInput } from '../types'
+import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CategoryCreateInput, CategoryUpdateInput, GroupCreateInput, GroupProductInput, GroupUpdateInput, ListCreateInput, ParameterCreateInput, ParameterUpdateInput, PasswordRequestInput, PasswordResetInput, ProductCreateInput, ProductParameterInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, RoleInput, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput, PaymentTypeInput, CartProduct, CartProductInput, OrderStatusInput, InvoiceStatusInput, OrderStatus, InvoiceStatus } from '../types'
 import { hasDefinedProps, isArray, isBoolean, isEmail, isInputProvided, isNumber, isPasswordValid, isProvided, isString, isStringOrArray, isStringOrNumber, isProductParameterOrGroupProduct } from './validatorLib'
 
 export const checkNewUser = ({ body }: Request): UserSignupInput => {
@@ -296,6 +296,42 @@ export const checkVendor = ({ body }: Request): VendorInput => {
 }
 
 export const checkRole = ({ body }: Request): RoleInput => {
+  const name = R.pipe(
+    isProvided,
+    isString
+  )({ name: 'name', param: body.name })
+
+  return { name: name.param }
+}
+
+export const checkNewOrderStatus = ({ body }: Request): OrderStatusInput => {
+  const name = R.pipe(
+    isProvided,
+    isString
+  )({ name: 'name', param: body.name })
+
+  return { name: name.param }
+}
+
+export const checkNewInvoiceStatus = ({ body }: Request): InvoiceStatusInput => {
+  const name = R.pipe(
+    isProvided,
+    isString
+  )({ name: 'name', param: body.name })
+
+  return { name: name.param }
+}
+
+export const checkOrderStatusUpdate = ({ body }: Request): OrderStatusInput => {
+  const name = R.pipe(
+    isProvided,
+    isString
+  )({ name: 'name', param: body.name })
+
+  return { name: name.param }
+}
+
+export const checkInvoiceStatusUpdate = ({ body }: Request): InvoiceStatusInput => {
   const name = R.pipe(
     isProvided,
     isString

@@ -46,7 +46,7 @@ const getGroupsByProduct = async (req: Request): Promise<FormattedGroup[]> => {
 
 const updateGroup = async (groupInput: GroupUpdateInput, req: Request): Promise<Group> => {
   const [ updatedGroup ]: Group[] = await db('groups')
-    .update({ ...groupInput }, [ '*' ])
+    .update(groupInput, [ '*' ])
     .where('groupID', req.params.groupID)
 
   if (!updatedGroup) throw new StatusError(404, 'Not Found')

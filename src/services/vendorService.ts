@@ -40,7 +40,7 @@ const getVendorByID = async (req: Request): Promise<SingleVendorData> => {
 
 const updateVendor = async (vendorInput: VendorInput, req: Request): Promise<SingleVendorData> => {
   const [ updatedVendor ] = await db<Vendor>('vendors')
-    .update({ ...vendorInput }, [ 'vendorID' ])
+    .update(vendorInput, [ 'vendorID' ])
     .where('vendorID', req.params.vendorID)
 
   if (!updatedVendor) throw new StatusError(404, 'Not Found')

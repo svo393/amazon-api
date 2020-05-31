@@ -17,6 +17,8 @@ export const apiURLs = {
   users: `${baseAPI}/users`,
   vendors: `${baseAPI}/vendors`,
   roles: `${baseAPI}/roles`,
+  orderStatuses: `${baseAPI}/order-statuses`,
+  invoiceStatuses: `${baseAPI}/invoice-statuses`,
   shippingMethods: `${baseAPI}/shipping-methods`,
   addressTypes: `${baseAPI}/address-types`,
   paymentTypes: `${baseAPI}/payment-types`,
@@ -29,5 +31,6 @@ export const apiURLs = {
   answers: `${baseAPI}/answers`,
   answerComments: `${baseAPI}/answer-comments`,
   groups: `${baseAPI}/groups`,
-  parameters: `${baseAPI}/parameters`
+  parameters: `${baseAPI}/parameters`,
+  orders: `${baseAPI}/orders`
 }

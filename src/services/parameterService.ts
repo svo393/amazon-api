@@ -40,7 +40,7 @@ const getParametersByProduct = async (req: Request): Promise<FormattedParameter[
 
 const updateParameter = async (parameterInput: ParameterUpdateInput, req: Request): Promise<Parameter> => {
   const [ updatedParameter ]: Parameter[] = await db('parameters')
-    .update({ ...parameterInput }, [ '*' ])
+    .update(parameterInput, [ '*' ])
     .where('parameterID', req.params.parameterID)
 
   if (!updatedParameter) throw new StatusError(404, 'Not Found')

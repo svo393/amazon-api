@@ -32,7 +32,7 @@ const getShippingMethodByID = async (req: Request): Promise<SM> => {
 
 const updateShippingMethod = async (smInput: SMInput, req: Request): Promise<SM> => {
   const [ updatedSM ] = await db<SM>('shippingMethods')
-    .update({ ...smInput }, [ 'shippingMethodID', 'name' ])
+    .update(smInput, [ 'shippingMethodID', 'name' ])
     .where('shippingMethodID', req.params.shippingMethodID)
 
   if (!updatedSM) throw new StatusError(404, 'Not Found')

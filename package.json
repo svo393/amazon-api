@@ -91,6 +91,8 @@
     "test:ratings": "cross-env NODE_ENV=development jest ./tests/ratingsAPI.test.ts --verbose  --runInBand",
     "test:rcomm": "cross-env NODE_ENV=development jest ./tests/ratingCommentsAPI.test.ts --verbose  --runInBand",
     "test:roles": "cross-env NODE_ENV=development jest ./tests/rolesAPI.test.ts --verbose  --runInBand",
+    "test:os": "cross-env NODE_ENV=development jest ./tests/orderStatusesAPI.test.ts --verbose  --runInBand",
+    "test:is": "cross-env NODE_ENV=development jest ./tests/invoiceStatusesAPI.test.ts --verbose  --runInBand",
     "test:sm": "cross-env NODE_ENV=development jest ./tests/shippingMethodsAPI.test.ts --verbose  --runInBand",
     "test:useraddr": "cross-env NODE_ENV=development jest ./tests/userAddressesAPI.test.ts --verbose  --runInBand",
     "test:users": "cross-env NODE_ENV=development jest ./tests/usersAPI.test.ts --verbose  --runInBand",

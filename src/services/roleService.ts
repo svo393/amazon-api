@@ -49,7 +49,7 @@ const getRoleByID = async (req: Request): Promise<SingleRoleData> => {
 
 const updateRole = async (roleInput: RoleInput, req: Request): Promise<SingleRoleData> => {
   const [ updatedRole ]: Role[] = await db<Role>('roles')
-    .update({ ...roleInput }, [ '*' ])
+    .update(roleInput, [ '*' ])
     .where('roleID', req.params.roleID)
 
   if (!updatedRole) throw new StatusError(404, 'Not Found')

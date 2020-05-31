@@ -1,6 +1,6 @@
 import supertest from 'supertest'
 import app from '../src/app'
-import { Address, AddressCreateInput, AddressType, AddressTypeInput, Answer, AnswerComment, AnswerCommentCreateInput, AnswerCreateInput, CartProduct, Category, CategoryCreateInput, Follower, Group, GroupCreateInput, GroupProduct, List, ListCreateInput, ListProduct, Parameter, ParameterCreateInput, PaymentType, PaymentTypeInput, Product, ProductParameter, ProductPublicData, Question, QuestionCreateInput, Rating, RatingComment, RatingCommentCreateInput, RatingCreateInput, Role, RoleInput, ShippingMethod, ShippingMethodInput, User, UserAddress, Vendor, VendorInput } from '../src/types'
+import { Address, AddressCreateInput, AddressType, AddressTypeInput, Answer, AnswerComment, AnswerCommentCreateInput, AnswerCreateInput, CartProduct, Category, CategoryCreateInput, Follower, Group, GroupCreateInput, GroupProduct, List, ListCreateInput, ListProduct, Parameter, ParameterCreateInput, PaymentType, PaymentTypeInput, Product, ProductParameter, ProductPublicData, Question, QuestionCreateInput, Rating, RatingComment, RatingCommentCreateInput, RatingCreateInput, Role, RoleInput, ShippingMethod, ShippingMethodInput, User, UserAddress, Vendor, VendorInput, OrderStatus, InvoiceStatus, OrderStatusInput, InvoiceStatusInput } from '../src/types'
 import { apiURLs } from '../src/utils/constants'
 import { db } from '../src/utils/db'
 import StatusError from '../src/utils/StatusError'
@@ -140,6 +140,14 @@ export const rolesInDB = async (): Promise<Role[]> => {
 
 export const addressesInDB = async (): Promise<Address[]> => {
   return await db('addresses')
+}
+
+export const orderStatusesInDB = async (): Promise<OrderStatus[]> => {
+  return await db('orderStatuses')
+}
+
+export const invoiceStatusesInDB = async (): Promise<InvoiceStatus[]> => {
+  return await db('invoiceStatuses')
 }
 
 export const shippingMethodsInDB = async (): Promise<ShippingMethod[]> => {
@@ -547,4 +555,34 @@ export const createOneCartProduct = async (role: string): Promise<{ addedCartPro
     .send(newCartProduct(userID, addedProduct.productID))
 
   return { addedCartProduct: body, token }
+}
+
+export const newOrderStatus = (): OrderStatusInput => ({
+  name: `New OrderStatus ${(new Date().getTime()).toString()}`
+})
+
+export const createOneOrderStatus = async (orderStatus: string): Promise<{ addedOrderStatus: OrderStatus; token: string}> => {
+  const { token } = await loginAs(orderStatus, api)
+
+  const { body } = await api
+    .post(apiURLs.orderStatuses)
+    .set('Cookie', `token=${token}`)
+    .send(newOrderStatus())
+
+  return { addedOrderStatus: body, token }
+}
+
+export const newInvoiceStatus = (): InvoiceStatusInput => ({
+  name: `New InvoiceStatus ${(new Date().getTime()).toString()}`
+})
+
+export const createOneInvoiceStatus = async (invoiceStatus: string): Promise<{ addedInvoiceStatus: InvoiceStatus; token: string}> => {
+  const { token } = await loginAs(invoiceStatus, api)
+
+  const { body } = await api
+    .post(apiURLs.invoiceStatuses)
+    .set('Cookie', `token=${token}`)
+    .send(newInvoiceStatus())
+
+  return { addedInvoiceStatus: body, token }
 }

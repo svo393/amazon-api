@@ -34,7 +34,7 @@ const getAnswerByID = async (req: Request): Promise<Answer> => {
 
 const updateAnswer = async (answerInput: AnswerUpdateInput, req: Request): Promise<Answer> => {
   const [ updatedRC ]: Answer[] = await db<Answer>('answers')
-    .update({ ...answerInput }, [ '*' ])
+    .update(answerInput, [ '*' ])
     .where('answerID', req.params.answerID)
 
   if (!updatedRC) throw new StatusError(404, 'Not Found')

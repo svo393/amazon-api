@@ -34,7 +34,7 @@ const getAnswerCommentByID = async (req: Request): Promise<AnswerComment> => {
 
 const updateAnswerComment = async (answerCommentInput: AnswerCommentUpdateInput, req: Request): Promise<AnswerComment> => {
   const [ updatedRC ]: AnswerComment[] = await db<AnswerComment>('answerComments')
-    .update({ ...answerCommentInput }, [ '*' ])
+    .update(answerCommentInput, [ '*' ])
     .where('answerCommentID', req.params.answerCommentID)
 
   if (!updatedRC) throw new StatusError(404, 'Not Found')

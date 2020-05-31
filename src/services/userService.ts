@@ -215,7 +215,7 @@ const updateUser = async (userInput: UserUpdateInput, res: Response, req: Reques
   const role: string | undefined = res.locals.userRole
 
   const [ updatedUser ] = await db<User>('users')
-    .update({ ...userInput },
+    .update(userInput,
       [ 'name', 'email', 'avatar', 'roleID' ])
     .where('userID', req.params.userID)
 

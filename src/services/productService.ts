@@ -136,7 +136,7 @@ const getProductByID = async (req: Request, res: Response): Promise<ProductListD
 
 const updateProduct = async (productInput: ProductUpdateInput, req: Request): Promise<Product> => {
   const [ updatedProduct ]: Product[] = await db<Product>('products')
-    .update({ ...productInput }, [ '*' ])
+    .update(productInput, [ '*' ])
     .where('productID', req.params.productID)
 
   if (!updatedProduct) throw new StatusError(404, 'Not Found')

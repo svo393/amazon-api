@@ -440,3 +440,7 @@ export type ParameterUpdateInput = Pick<Parameter, 'name'>
 export type ProductParameterInput = Pick<ProductParameter, 'value'>
 
 export type CartProductInput = Pick<CartProduct, 'qty'>
+
+export type OrderStatusInput = Pick<OrderStatus, 'name'>
+
+export type InvoiceStatusInput = Pick<InvoiceStatus, 'name'>

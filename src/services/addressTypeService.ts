@@ -47,7 +47,7 @@ const getAddressTypeByID = async (res: Response, req: Request): Promise<SingleAd
 
 const updateAddressType = async (res: Response, atInput: ATInput, req: Request): Promise<SingleAddressTypeData> => {
   const [ updatedAT ] = await db<AT>('addressTypes')
-    .update({ ...atInput }, [ 'addressTypeID' ])
+    .update(atInput, [ 'addressTypeID' ])
     .where('addressTypeID', req.params.addressTypeID)
 
   if (!updatedAT) throw new StatusError(404, 'Not Found')

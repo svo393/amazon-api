@@ -78,7 +78,7 @@ const getCategoryByID = async (req: Request): Promise<SingleCategoryData> => {
 
 const updateCategory = async (categoryInput: CategoryUpdateInput, req: Request): Promise<SingleCategoryData> => {
   const [ updatedCategory ] = await db<Category>('categories')
-    .update({ ...categoryInput }, [ 'categoryID' ])
+    .update(categoryInput, [ 'categoryID' ])
     .where('categoryID', req.params.categoryID)
 
   if (!updatedCategory) throw new StatusError(404, 'Not Found')

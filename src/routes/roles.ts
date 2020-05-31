@@ -23,8 +23,8 @@ router.get('/:roleID', isRoot, async (req, res) => {
 
 router.put('/:roleID', isRoot, async (req, res) => {
   const roleUpdateInput = checkRole(req)
-  const updatedItem = await roleService.updateRole(roleUpdateInput, req)
-  res.json(updatedItem)
+  const updatedRole = await roleService.updateRole(roleUpdateInput, req)
+  res.json(updatedRole)
 })
 
 export default router

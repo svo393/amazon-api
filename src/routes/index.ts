@@ -3,11 +3,15 @@ import 'express-async-errors'
 import { apiURLs } from '../utils/constants'
 import addressesRouter from './addresses'
 import addressTypesRouter from './addressTypes'
-import paymentTypesRouter from './paymentTypes'
 import answerCommentsRouter from './answerComments'
 import answersRouter from './answers'
 import categoriesRouter from './categories'
+import groupsRouter from './groups'
+import invoiceStatusesRouter from './invoiceStatuses'
 import listsRouter from './lists'
+import orderStatusesRouter from './orderStatuses'
+import parametersRouter from './parameters'
+import paymentTypesRouter from './paymentTypes'
 import productsRouter from './products'
 import questionsRouter from './questions'
 import ratingCommentsRouter from './ratingComments'
@@ -17,8 +21,6 @@ import shippingMethodsRouter from './shippingMethods'
 import userAddressesRouter from './userAddresses'
 import usersRouter from './users'
 import vendorsRouter from './vendors'
-import groupsRouter from './groups'
-import parametersRouter from './parameters'
 
 export default Router()
   .use(apiURLs.categories, categoriesRouter)
@@ -28,6 +30,8 @@ export default Router()
   .use(apiURLs.groups, groupsRouter)
   .use(apiURLs.parameters, parametersRouter)
   .use(apiURLs.roles, rolesRouter)
+  .use(apiURLs.orderStatuses, orderStatusesRouter)
+  .use(apiURLs.invoiceStatuses, invoiceStatusesRouter)
   .use(apiURLs.shippingMethods, shippingMethodsRouter)
   .use(apiURLs.addressTypes, addressTypesRouter)
   .use(apiURLs.paymentTypes, paymentTypesRouter)

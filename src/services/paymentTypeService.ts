@@ -30,7 +30,7 @@ const getPaymentTypeByID = async (req: Request): Promise<PaymentType> => {
 
 const updatePaymentType = async (paymentTypeInput: PaymentTypeInput, req: Request): Promise<PaymentType> => {
   const [ updatedPaymentType ]: PaymentType[] = await db('paymentTypes')
-    .update({ ...paymentTypeInput }, [ '*' ])
+    .update(paymentTypeInput, [ '*' ])
     .where('paymentTypeID', req.params.paymentTypeID)
 
   if (!updatedPaymentType) throw new StatusError(404, 'Not Found')
