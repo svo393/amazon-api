@@ -1,7 +1,7 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CategoryCreateInput, CategoryUpdateInput, GroupCreateInput, GroupProductInput, GroupUpdateInput, ListCreateInput, ParameterCreateInput, ParameterUpdateInput, PasswordRequestInput, PasswordResetInput, ProductCreateInput, ProductParameterInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, RoleInput, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput, PaymentTypeInput, CartProduct, CartProductInput, OrderStatusInput, InvoiceStatusInput, OrderStatus, InvoiceStatus, OrderCreateInput } from '../types'
-import { hasDefinedProps, isArray, isBoolean, isEmail, isInputProvided, isNumber, isPasswordValid, isProvided, isString, isStringOrArray, isStringOrNumber, isProductParameterOrGroupProduct, isCart } from './validatorLib'
+import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoryCreateInput, CategoryUpdateInput, GroupCreateInput, GroupProductInput, GroupUpdateInput, InvoiceStatusInput, ListCreateInput, OrderCreateInput, OrderStatusInput, ParameterCreateInput, ParameterUpdateInput, PasswordRequestInput, PasswordResetInput, PaymentTypeInput, ProductCreateInput, ProductParameterInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, RoleInput, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput } from '../types'
+import { hasDefinedProps, isArray, isBoolean, isEmail, isInputProvided, isNumber, isPasswordValid, isProductParameterOrGroupProduct, isProvided, isString, isStringOrArray, isStringOrNumber } from './validatorLib'
 
 export const checkNewUser = ({ body }: Request): UserSignupInput => {
   const email = R.pipe(
@@ -61,9 +61,9 @@ export const checkUserUpdate = ({ body }: Request): UserUpdateInput => {
     { name: 'name', param: body.name }
   )
 
-  const avatar = body.avatar && isBoolean(
-    { name: 'avatar', param: body.avatar }
-  )
+  const avatar = 'avatar' in body
+    ? isBoolean({ name: 'avatar', param: body.avatar })
+    : undefined
 
   const roleID = body.roleID && isNumber(
     { name: 'roleID', param: body.roleID }
@@ -146,9 +146,9 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
     isNumber
   )({ name: 'primaryMedia', param: body.primaryMedia })
 
-  const isAvailable = body.isAvailable && isBoolean(
-    { name: 'isAvailable', param: body.isAvailable }
-  )
+  const isAvailable = 'isAvailable' in body
+    ? isBoolean({ name: 'isAvailable', param: body.isAvailable })
+    : undefined
 
   const categoryID = R.pipe(
     isProvided,
@@ -222,9 +222,9 @@ export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
     { name: 'primaryMedia', param: body.primaryMedia }
   )
 
-  const isAvailable = body.isAvailable && isBoolean(
-    { name: 'isAvailable', param: body.isAvailable }
-  )
+  const isAvailable = 'isAvailable' in body
+    ? isBoolean({ name: 'isAvailable', param: body.isAvailable })
+    : undefined
 
   const categoryID = body.categoryID && isNumber(
     { name: 'categoryID', param: body.categoryID }
@@ -398,9 +398,9 @@ export const checkPaymentType = ({ body }: Request): PaymentTypeInput => {
 }
 
 export const checkNewAddress = ({ body }: Request): AddressCreateInput => {
-  const isDefault = body.isDefault && isBoolean(
-    { name: 'isDefault', param: body.isDefault }
-  )
+  const isDefault = 'isDefault' in body
+    ? isBoolean({ name: 'isDefault', param: body.isDefault })
+    : undefined
 
   const addr = R.pipe(
     isProvided,
@@ -420,9 +420,9 @@ export const checkNewAddress = ({ body }: Request): AddressCreateInput => {
 }
 
 export const checkNewUserAddress = ({ body }: Request): UserAddressCreateInput => {
-  const isDefault = body.isDefault && isBoolean(
-    { name: 'isDefault', param: body.isDefault }
-  )
+  const isDefault = 'isDefault' in body
+    ? isBoolean({ name: 'isDefault', param: body.isDefault })
+    : undefined
 
   const userID = R.pipe(
     isProvided,

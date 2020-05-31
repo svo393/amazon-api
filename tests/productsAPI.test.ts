@@ -103,7 +103,7 @@ describe('Product adding', () => {
       .post(`${apiURL}/${addedProduct.productID}/upload`)
       .attach('productMedia', path.join(__dirname, 'test-non-image.json'))
       .set('Cookie', `token=${token}`)
-      .expect(400)
+      .expect(415)
   })
 })
 
