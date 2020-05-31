@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CategoryCreateInput, CategoryUpdateInput, GroupCreateInput, GroupProductInput, GroupUpdateInput, ListCreateInput, ParameterCreateInput, ParameterUpdateInput, PasswordRequestInput, PasswordResetInput, ProductCreateInput, ProductParameterInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, RoleInput, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput } from '../types'
+import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CategoryCreateInput, CategoryUpdateInput, GroupCreateInput, GroupProductInput, GroupUpdateInput, ListCreateInput, ParameterCreateInput, ParameterUpdateInput, PasswordRequestInput, PasswordResetInput, ProductCreateInput, ProductParameterInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, RoleInput, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput, PaymentTypeInput, CartProduct, CartProductInput } from '../types'
 import { hasDefinedProps, isArray, isBoolean, isEmail, isInputProvided, isNumber, isPasswordValid, isProvided, isString, isStringOrArray, isStringOrNumber, isProductParameterOrGroupProduct } from './validatorLib'
 
 export const checkNewUser = ({ body }: Request): UserSignupInput => {
@@ -314,6 +314,45 @@ export const checkShippingMethod = ({ body }: Request): ShippingMethodInput => {
 }
 
 export const checkAddressType = ({ body }: Request): AddressTypeInput => {
+  const name = R.pipe(
+    isProvided,
+    isString
+  )({ name: 'name', param: body.name })
+
+  return { name: name.param }
+}
+
+export const checkNewCartProduct = ({ body }: Request): CartProduct => {
+  const qty = R.pipe(
+    isProvided,
+    isNumber
+  )({ name: 'qty', param: body.qty })
+
+  const userID = R.pipe(
+    isProvided,
+    isNumber
+  )({ name: 'userID', param: body.userID })
+
+  const productID = R.pipe(
+    isProvided,
+    isNumber
+  )({ name: 'productID', param: body.productID })
+
+  return {
+    qty: qty.param,
+    userID: userID.param,
+    productID: productID.param
+  }
+}
+
+export const checkCartProductUpdate = ({ body }: Request): CartProductInput => {
+  const qty = body.qty && isNumber(
+    { name: 'qty', param: body.qty }
+  )
+  return { qty: qty.param }
+}
+
+export const checkPaymentType = ({ body }: Request): PaymentTypeInput => {
   const name = R.pipe(
     isProvided,
     isString

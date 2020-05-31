@@ -1,12 +1,13 @@
 import Router from 'express'
 import addressService from '../services/addressService'
+import cartProductService from '../services/cartProductService'
 import followerService from '../services/followerService'
 import listService from '../services/listService'
 import questionService from '../services/questionService'
 import ratingService from '../services/ratingService'
 import userAddressService from '../services/userAddressService'
 import userService from '../services/userService'
-import { checkNewUser, checkUserAddressesUpdate, checkUserLogin, checkUserResetRequest, checkUserResetToken, checkUserUpdate } from '../utils/inputValidator'
+import { checkCartProductUpdate, checkNewCartProduct, checkNewUser, checkUserAddressesUpdate, checkUserLogin, checkUserResetRequest, checkUserResetToken, checkUserUpdate } from '../utils/inputValidator'
 import { isAdmin, isLoggedIn, isSameUser, isSameUserOrAdmin } from '../utils/middleware'
 
 const router = Router()
@@ -115,6 +116,33 @@ router.get('/:userID/follows', async (req, res) => {
 
 router.delete('/:userID/follows/:anotherUserID', isSameUser('params'), async (req, res) => {
   await followerService.deleteFollower(req)
+  res.status(204).end()
+})
+
+router.post('/:userID/cartProducts', isSameUserOrAdmin('params'), async (req, res) => {
+  const cartProductCreateInput = checkNewCartProduct(req)
+  const addedCartProduct = await cartProductService.addCartProduct(cartProductCreateInput)
+  res.status(201).json(addedCartProduct)
+})
+
+router.get('/:userID/cartProducts', isSameUserOrAdmin('params'), async (req, res) => {
+  const cartProducts = await cartProductService.getCartProductsByUser(req)
+  res.json(cartProducts)
+})
+
+router.get('/:userID/cartProducts/:productID', isSameUserOrAdmin('params'), async (req, res) => {
+  const cartProduct = await cartProductService.getCartProductByID(req)
+  res.json(cartProduct)
+})
+
+router.put('/:userID/cartProducts/:productID', isSameUserOrAdmin('params'), async (req, res) => {
+  const cartProductUpdateInput = checkCartProductUpdate(req)
+  const updatedCartProduct = await cartProductService.updateCartProduct(cartProductUpdateInput, req)
+  res.json(updatedCartProduct)
+})
+
+router.delete('/:userID/cartProducts/:productID', isSameUserOrAdmin('params'), async (req, res) => {
+  await cartProductService.deleteCartProduct(req)
   res.status(204).end()
 })
 

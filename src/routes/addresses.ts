@@ -11,7 +11,7 @@ router.post('/', isLoggedIn, async (req, res) => {
   res.status(201).json(addedAddress)
 })
 
-router.get('/:addressID', async (req, res) => { // TODO add permissions
+router.get('/:addressID', async (req, res) => {
   const address = await addressService.getAddressByID(req, res)
   res.json(address)
 })

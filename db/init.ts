@@ -1,5 +1,5 @@
-import { invoiceStatuses, lockerAddresses, orderStatuses, addressTypes, roles, shippingMethods } from '../src/utils/constants'
-import { AddressType } from '../src/types'
+import { invoiceStatuses, lockerAddresses, orderStatuses, addressTypes, roles, shippingMethods, paymentTypes } from '../src/utils/constants'
+import { AddressType, PaymentType } from '../src/types'
 import { db } from '../src/utils/db'
 
 export const init = async (): Promise<void> => {
@@ -13,6 +13,9 @@ export const init = async (): Promise<void> => {
 
   const ats: AddressType[] = await db('addressTypes')
     .insert(addressTypes.map((at) => ({ name: at })), [ '*' ])
+
+  await db('paymentTypes').del()
+  await db('paymentTypes').insert(paymentTypes.map((pt) => ({ name: pt })))
 
   await db('addresses').del()
 

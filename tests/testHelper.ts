@@ -1,6 +1,6 @@
 import supertest from 'supertest'
 import app from '../src/app'
-import { Address, AddressCreateInput, AddressType, AddressTypeInput, Answer, AnswerComment, AnswerCommentCreateInput, AnswerCreateInput, Category, CategoryCreateInput, Follower, Group, GroupCreateInput, GroupProduct, List, ListCreateInput, ListProduct, Parameter, ParameterCreateInput, Product, ProductParameter, ProductPublicData, Question, QuestionCreateInput, Rating, RatingComment, RatingCommentCreateInput, RatingCreateInput, Role, RoleInput, ShippingMethod, ShippingMethodInput, User, UserAddress, Vendor, VendorInput } from '../src/types'
+import { Address, AddressCreateInput, AddressType, AddressTypeInput, Answer, AnswerComment, AnswerCommentCreateInput, AnswerCreateInput, CartProduct, Category, CategoryCreateInput, Follower, Group, GroupCreateInput, GroupProduct, List, ListCreateInput, ListProduct, Parameter, ParameterCreateInput, PaymentType, PaymentTypeInput, Product, ProductParameter, ProductPublicData, Question, QuestionCreateInput, Rating, RatingComment, RatingCommentCreateInput, RatingCreateInput, Role, RoleInput, ShippingMethod, ShippingMethodInput, User, UserAddress, Vendor, VendorInput } from '../src/types'
 import { apiURLs } from '../src/utils/constants'
 import { db } from '../src/utils/db'
 import StatusError from '../src/utils/StatusError'
@@ -107,92 +107,96 @@ export const getUserByEmail = async (email: string): Promise<User> => {
 }
 
 export const usersInDB = async (): Promise<User[]> => {
-  return await db<User>('users')
+  return await db('users')
 }
 
 export const categoriesInDB = async (): Promise<Category[]> => {
-  return await db<Category>('categories')
+  return await db('categories')
 }
 
 export const vendorsInDB = async (): Promise<Vendor[]> => {
-  return await db<Vendor>('vendors')
+  return await db('vendors')
 }
 
 export const parametersInDB = async (): Promise<Parameter[]> => {
-  return await db<Parameter>('parameters')
+  return await db('parameters')
 }
 
 export const groupsInDB = async (): Promise<Group[]> => {
-  return await db<Group>('groups')
+  return await db('groups')
 }
 
 export const groupProductsInDB = async (): Promise<GroupProduct[]> => {
-  return await db<GroupProduct>('groupProducts')
+  return await db('groupProducts')
 }
 
 export const productParametersInDB = async (): Promise<ProductParameter[]> => {
-  return await db<ProductParameter>('productParameters')
+  return await db('productParameters')
 }
 
 export const rolesInDB = async (): Promise<Role[]> => {
-  return await db<Role>('roles')
+  return await db('roles')
 }
 
 export const addressesInDB = async (): Promise<Address[]> => {
-  return await db<Address>('addresses')
+  return await db('addresses')
 }
 
 export const shippingMethodsInDB = async (): Promise<ShippingMethod[]> => {
-  return await db<ShippingMethod>('shippingMethods')
+  return await db('shippingMethods')
 }
 
 export const addressTypesInDB = async (): Promise<AddressType[]> => {
-  return await db<AddressType>('addressTypes')
+  return await db('addressTypes')
+}
+
+export const paymentTypesInDB = async (): Promise<PaymentType[]> => {
+  return await db('paymentTypes')
 }
 
 export const followersInDB = async (): Promise<Follower[]> => {
-  return await db<Follower>('followers')
+  return await db('followers')
 }
 
 export const listsInDB = async (): Promise<List[]> => {
-  return await db<List>('lists')
+  return await db('lists')
 }
 
 export const productsInDB = async (): Promise<Product[]> => {
-  return await db<Product>('products')
+  return await db('products')
+}
+
+export const cartProductsInDB = async (): Promise<CartProduct[]> => {
+  return await db('cartProducts')
 }
 
 export const ratingsInDB = async (): Promise<Rating[]> => {
-  return await db<Rating>('ratings')
+  return await db('ratings')
 }
 
 export const ratingCommentsInDB = async (): Promise<RatingComment[]> => {
-  return await db<RatingComment>('ratingComments')
+  return await db('ratingComments')
 }
 
 export const answerCommentsInDB = async (): Promise<AnswerComment[]> => {
-  return await db<AnswerComment>('answerComments')
+  return await db('answerComments')
 }
 
 export const questionsInDB = async (): Promise<Question[]> => {
-  return await db<Question>('questions')
+  return await db('questions')
 }
 
 export const answersInDB = async (): Promise<Answer[]> => {
-  return await db<Answer>('answers')
+  return await db('answers')
 }
 
 export const listProductsInDB = async (): Promise<ListProduct[]> => {
-  return await db<ListProduct>('listProducts')
+  return await db('listProducts')
 }
 
 export const userAddressesInDB = async (): Promise<UserAddress[]> => {
-  return await db<UserAddress>('userAddresses')
+  return await db('userAddresses')
 }
-
-export const newAddressType = (): AddressTypeInput => ({
-  name: `New AddressType ${(new Date().getTime()).toString()}`
-})
 
 export const newRole = (): RoleInput => ({
   name: `New Role ${(new Date().getTime()).toString()}`
@@ -224,8 +228,12 @@ export const createOneShippingMethod = async (role: string): Promise<{ addedShip
   return { addedShippingMethod: body, token }
 }
 
-export const createOneAddressType = async (addressType: string): Promise<{ addedAddressType: AddressType; token: string}> => {
-  const { token } = await loginAs(addressType, api)
+export const newAddressType = (): AddressTypeInput => ({
+  name: `New AddressType ${(new Date().getTime()).toString()}`
+})
+
+export const createOneAddressType = async (role: string): Promise<{ addedAddressType: AddressType; token: string}> => {
+  const { token } = await loginAs(role, api)
 
   const { body } = await api
     .post(apiURLs.addressTypes)
@@ -233,6 +241,21 @@ export const createOneAddressType = async (addressType: string): Promise<{ added
     .send(newAddressType())
 
   return { addedAddressType: body, token }
+}
+
+export const newPaymentType = (): PaymentTypeInput => ({
+  name: `New PaymentType ${(new Date().getTime()).toString()}`
+})
+
+export const createOnePaymentType = async (role: string): Promise<{ addedPaymentType: PaymentType; token: string}> => {
+  const { token } = await loginAs(role, api)
+
+  const { body } = await api
+    .post(apiURLs.paymentTypes)
+    .set('Cookie', `token=${token}`)
+    .send(newPaymentType())
+
+  return { addedPaymentType: body, token }
 }
 
 export const newAddress = async (): Promise<AddressCreateInput> => {
@@ -506,4 +529,22 @@ export const createOneProductParameter = async (role: string, name?: string): Pr
     .send(newProductParameter(addedParameter.parameterID, addedProduct.productID, name))
 
   return { addedProductParameter: body, token }
+}
+
+export const newCartProduct = (userID: number, productID: number): CartProduct => ({
+  qty: 2,
+  userID,
+  productID
+})
+
+export const createOneCartProduct = async (role: string): Promise<{ addedCartProduct: CartProduct; token: string}> => {
+  const { token, userID } = await loginAs(role, api)
+  const { addedProduct } = await createOneProduct('admin')
+
+  const { body } = await api
+    .post(`${apiURLs.users}/${userID}/cartProducts`)
+    .set('Cookie', `token=${token}`)
+    .send(newCartProduct(userID, addedProduct.productID))
+
+  return { addedCartProduct: body, token }
 }

@@ -17,6 +17,11 @@ export type AddressType = {
   name: string;
 }
 
+export type PaymentType = {
+  paymentTypeID: number;
+  name: string;
+}
+
 export type Address = {
   addressID: number;
   addr: string;
@@ -269,6 +274,8 @@ export type AddressCreateInput = Pick<Address, 'addr' | 'addressTypeID'> & {
   isDefault?: boolean;
 }
 
+export type PaymentTypeInput = Pick<PaymentType, 'name'>
+
 export type AddressFetchInput = {
   userID?: number;
   addressTypeID?: number;
@@ -431,3 +438,5 @@ export type ParameterCreateInput = Pick<Parameter, 'name'>[]
 export type ParameterUpdateInput = Pick<Parameter, 'name'>
 
 export type ProductParameterInput = Pick<ProductParameter, 'value'>
+
+export type CartProductInput = Pick<CartProduct, 'qty'>

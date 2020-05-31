@@ -24,8 +24,8 @@ router.get('/:addressTypeID', async (req, res) => {
 
 router.put('/:addressTypeID', isAdmin, async (req, res) => {
   const addressTypeUpdateInput = checkAddressType(req)
-  const updatedItem = await addressTypeService.updateAddressType(res, addressTypeUpdateInput, req)
-  res.json(updatedItem)
+  const updatedAddressType = await addressTypeService.updateAddressType(res, addressTypeUpdateInput, req)
+  res.json(updatedAddressType)
 })
 
 router.get('/:addressTypeID/addresses', isAdmin, async (req, res) => {
