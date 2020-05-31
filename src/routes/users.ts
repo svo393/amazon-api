@@ -9,6 +9,7 @@ import userAddressService from '../services/userAddressService'
 import userService from '../services/userService'
 import { checkCartProductUpdate, checkNewCartProduct, checkNewUser, checkUserAddressesUpdate, checkUserLogin, checkUserResetRequest, checkUserResetToken, checkUserUpdate } from '../utils/inputValidator'
 import { isAdmin, isLoggedIn, isSameUser, isSameUserOrAdmin } from '../utils/middleware'
+import orderService from '../services/orderService'
 
 const router = Router()
 
@@ -144,6 +145,11 @@ router.put('/:userID/cartProducts/:productID', isSameUserOrAdmin('params'), asyn
 router.delete('/:userID/cartProducts/:productID', isSameUserOrAdmin('params'), async (req, res) => {
   await cartProductService.deleteCartProduct(req)
   res.status(204).end()
+})
+
+router.get('/:userID/orders', isSameUserOrAdmin('params'), async (req, res) => {
+  const orders = await orderService.getOrdersByUser(req)
+  res.json(orders)
 })
 
 export default router

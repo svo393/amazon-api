@@ -46,7 +46,10 @@ const getQuestionByID = async (req: Request): Promise<Question> => {
 
 const updateQuestion = async (questionInput: QuestionUpdateInput, req: Request): Promise<Question> => {
   const [ updatedQuestion ]: Question[] = await db<Question>('questions')
-    .update(questionInput, [ '*' ])
+    .update({
+      ...questionInput,
+      questionUpdatedAt: new Date()
+    }, [ '*' ])
     .where('questionID', req.params.questionID)
 
   if (!updatedQuestion) throw new StatusError(404, 'Not Found')

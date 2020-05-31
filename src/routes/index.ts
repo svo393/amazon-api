@@ -21,9 +21,11 @@ import shippingMethodsRouter from './shippingMethods'
 import userAddressesRouter from './userAddresses'
 import usersRouter from './users'
 import vendorsRouter from './vendors'
+import ordersRouter from './orders'
 
 export default Router()
   .use(apiURLs.categories, categoriesRouter)
+  .use(apiURLs.orders, ordersRouter)
   .use(apiURLs.products, productsRouter)
   .use(apiURLs.users, usersRouter)
   .use(apiURLs.vendors, vendorsRouter)

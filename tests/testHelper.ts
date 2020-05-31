@@ -1,6 +1,6 @@
 import supertest from 'supertest'
 import app from '../src/app'
-import { Address, AddressCreateInput, AddressType, AddressTypeInput, Answer, AnswerComment, AnswerCommentCreateInput, AnswerCreateInput, CartProduct, Category, CategoryCreateInput, Follower, Group, GroupCreateInput, GroupProduct, List, ListCreateInput, ListProduct, Parameter, ParameterCreateInput, PaymentType, PaymentTypeInput, Product, ProductParameter, ProductPublicData, Question, QuestionCreateInput, Rating, RatingComment, RatingCommentCreateInput, RatingCreateInput, Role, RoleInput, ShippingMethod, ShippingMethodInput, User, UserAddress, Vendor, VendorInput, OrderStatus, InvoiceStatus, OrderStatusInput, InvoiceStatusInput } from '../src/types'
+import { Address, AddressCreateInput, AddressType, AddressTypeInput, Answer, AnswerComment, AnswerCommentCreateInput, AnswerCreateInput, CartProduct, Category, CategoryCreateInput, Follower, Group, GroupCreateInput, GroupProduct, List, ListCreateInput, ListProduct, Parameter, ParameterCreateInput, PaymentType, PaymentTypeInput, Product, ProductParameter, ProductPublicData, Question, QuestionCreateInput, Rating, RatingComment, RatingCommentCreateInput, RatingCreateInput, Role, RoleInput, ShippingMethod, ShippingMethodInput, User, UserAddress, Vendor, VendorInput, OrderStatus, InvoiceStatus, OrderStatusInput, InvoiceStatusInput, Order, Invoice, OrderCreateInput } from '../src/types'
 import { apiURLs } from '../src/utils/constants'
 import { db } from '../src/utils/db'
 import StatusError from '../src/utils/StatusError'
@@ -136,6 +136,14 @@ export const productParametersInDB = async (): Promise<ProductParameter[]> => {
 
 export const rolesInDB = async (): Promise<Role[]> => {
   return await db('roles')
+}
+
+export const ordersInDB = async (): Promise<Order[]> => {
+  return await db('orders')
+}
+
+export const invoicesInDB = async (): Promise<Invoice[]> => {
+  return await db('invoices')
 }
 
 export const addressesInDB = async (): Promise<Address[]> => {
@@ -585,4 +593,21 @@ export const createOneInvoiceStatus = async (invoiceStatus: string): Promise<{ a
     .send(newInvoiceStatus())
 
   return { addedInvoiceStatus: body, token }
+}
+
+export const newOrder = (address: string, shippingMethodID: number, userID: number): OrderCreateInput => ({
+  address,
+  shippingMethodID,
+  userID
+})
+
+export const createOneOrder = async (role: string): Promise<Order & { token: string}> => {
+  const { addedShippingMethod } = await createOneShippingMethod('admin')
+  const { addedAddress, token, userID } = await createOneAddress(role)
+
+  const { body }: { body: Order } = await api
+    .post(apiURLs.orders)
+    .set('Cookie', `token=${token}`)
+    .send(newOrder(addedAddress.addr, addedShippingMethod.shippingMethodID, userID))
+  return { ...body, token }
 }

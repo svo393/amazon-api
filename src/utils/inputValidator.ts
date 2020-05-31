@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CategoryCreateInput, CategoryUpdateInput, GroupCreateInput, GroupProductInput, GroupUpdateInput, ListCreateInput, ParameterCreateInput, ParameterUpdateInput, PasswordRequestInput, PasswordResetInput, ProductCreateInput, ProductParameterInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, RoleInput, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput, PaymentTypeInput, CartProduct, CartProductInput, OrderStatusInput, InvoiceStatusInput, OrderStatus, InvoiceStatus } from '../types'
+import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CategoryCreateInput, CategoryUpdateInput, GroupCreateInput, GroupProductInput, GroupUpdateInput, ListCreateInput, ParameterCreateInput, ParameterUpdateInput, PasswordRequestInput, PasswordResetInput, ProductCreateInput, ProductParameterInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, RoleInput, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput, PaymentTypeInput, CartProduct, CartProductInput, OrderStatusInput, InvoiceStatusInput, OrderStatus, InvoiceStatus, OrderCreateInput } from '../types'
 import { hasDefinedProps, isArray, isBoolean, isEmail, isInputProvided, isNumber, isPasswordValid, isProvided, isString, isStringOrArray, isStringOrNumber, isProductParameterOrGroupProduct } from './validatorLib'
 
 export const checkNewUser = ({ body }: Request): UserSignupInput => {
@@ -739,4 +739,47 @@ export const checkProductParameter = ({ body }: Request): ProductParameterInput 
   )({ name: 'value', param: body.value })
 
   return { value: value.param }
+}
+
+export const checkNewOrder = ({ body }: Request): OrderCreateInput => {
+  const address = R.pipe(
+    isProvided,
+    isString
+  )({ name: 'address', param: body.address })
+
+  const shippingMethodID = R.pipe(
+    isProvided,
+    isNumber
+  )({ name: 'shippingMethodID', param: body.shippingMethodID })
+
+  const userID = R.pipe(
+    isProvided,
+    isNumber
+  )({ name: 'userID', param: body.userID })
+
+  return {
+    address: address.param,
+    userID: userID.param,
+    shippingMethodID: shippingMethodID.param
+  }
+}
+
+export const checkOrderUpdate = ({ body }: Request): OrderCreateInput => {
+  const address = body.address && isString(
+    { name: 'address', param: body.address }
+  )
+
+  const orderStatusID = body.orderStatusID && isNumber(
+    { name: 'orderStatusID', param: body.orderStatusID }
+  )
+
+  const shippingMethodID = body.shippingMethodID && isNumber(
+    { name: 'shippingMethodID', param: body.shippingMethodID }
+  )
+
+  return hasDefinedProps({
+    address: address?.param,
+    orderStatusID: orderStatusID?.param,
+    shippingMethodID: shippingMethodID?.param
+  })
 }

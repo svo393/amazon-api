@@ -34,7 +34,10 @@ const getRatingCommentByID = async (req: Request): Promise<RatingComment> => {
 
 const updateRatingComment = async (ratingCommentInput: RatingCommentUpdateInput, req: Request): Promise<RatingComment> => {
   const [ updatedRC ]: RatingComment[] = await db<RatingComment>('ratingComments')
-    .update(ratingCommentInput, [ '*' ])
+    .update({
+      ...ratingCommentInput,
+      ratingCommentUpdatedAt: new Date()
+    }, [ '*' ])
     .where('ratingCommentID', req.params.ratingCommentID)
 
   if (!updatedRC) throw new StatusError(404, 'Not Found')

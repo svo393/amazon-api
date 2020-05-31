@@ -444,3 +444,15 @@ export type CartProductInput = Pick<CartProduct, 'qty'>
 export type OrderStatusInput = Pick<OrderStatus, 'name'>
 
 export type InvoiceStatusInput = Pick<InvoiceStatus, 'name'>
+
+export type OrderCreateInput = Pick<Order,
+  | 'address'
+  | 'userID'
+  | 'shippingMethodID'
+>
+
+export type OrderUpdateInput = {
+  address?: string;
+  orderStatusID?: number;
+  shippingMethodID?: number;
+}
