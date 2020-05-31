@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoryCreateInput, CategoryUpdateInput, GroupCreateInput, GroupProductInput, GroupUpdateInput, InvoiceStatusInput, ListCreateInput, OrderCreateInput, OrderStatusInput, ParameterCreateInput, ParameterUpdateInput, PasswordRequestInput, PasswordResetInput, PaymentTypeInput, ProductCreateInput, ProductParameterInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, RoleInput, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput } from '../types'
+import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoryCreateInput, CategoryUpdateInput, GroupCreateInput, GroupProductInput, GroupUpdateInput, InvoiceStatusInput, ListCreateInput, OrderCreateInput, OrderStatusInput, ParameterCreateInput, ParameterUpdateInput, PasswordRequestInput, PasswordResetInput, PaymentMethodInput, ProductCreateInput, ProductParameterInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, RoleInput, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput } from '../types'
 import { hasDefinedProps, isArray, isBoolean, isEmail, isInputProvided, isNumber, isPasswordValid, isProductParameterOrGroupProduct, isProvided, isString, isStringOrArray, isStringOrNumber } from './validatorLib'
 
 export const checkNewUser = ({ body }: Request): UserSignupInput => {
@@ -388,7 +388,7 @@ export const checkCartProductUpdate = ({ body }: Request): CartProductInput => {
   return { qty: qty.param }
 }
 
-export const checkPaymentType = ({ body }: Request): PaymentTypeInput => {
+export const checkPaymentMethod = ({ body }: Request): PaymentMethodInput => {
   const name = R.pipe(
     isProvided,
     isString

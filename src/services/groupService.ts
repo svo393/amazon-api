@@ -1,5 +1,5 @@
 import { Request } from 'express'
-import { FormattedGroup, Group, GroupCreateInput, GroupProduct, GroupProductInput, GroupUpdateInput } from '../types'
+import { FormattedGroups, Group, GroupCreateInput, GroupProduct, GroupProductInput, GroupUpdateInput } from '../types'
 import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
@@ -26,7 +26,7 @@ const addGroupProduct = async (groupProductInput: GroupProductInput, req: Reques
   return addedGroupProduct
 }
 
-const getGroupsByProduct = async (req: Request): Promise<FormattedGroup[]> => {
+const getGroupsByProduct = async (req: Request): Promise<FormattedGroups[]> => {
   const groupIDs = await db('groupProducts as gp')
     .select('g.groupID')
     .leftJoin('groups as g', 'gp.groupID', 'g.groupID')

@@ -1,6 +1,6 @@
 import supertest from 'supertest'
 import app from '../src/app'
-import { Address, AddressCreateInput, AddressType, AddressTypeInput, Answer, AnswerComment, AnswerCommentCreateInput, AnswerCreateInput, CartProduct, Category, CategoryCreateInput, Follower, Group, GroupCreateInput, GroupProduct, List, ListCreateInput, ListProduct, Parameter, ParameterCreateInput, PaymentType, PaymentTypeInput, Product, ProductParameter, ProductPublicData, Question, QuestionCreateInput, Rating, RatingComment, RatingCommentCreateInput, RatingCreateInput, Role, RoleInput, ShippingMethod, ShippingMethodInput, User, UserAddress, Vendor, VendorInput, OrderStatus, InvoiceStatus, OrderStatusInput, InvoiceStatusInput, Order, Invoice, OrderCreateInput } from '../src/types'
+import { Address, AddressCreateInput, AddressType, AddressTypeInput, Answer, AnswerComment, AnswerCommentCreateInput, AnswerCreateInput, CartProduct, Category, CategoryCreateInput, Follower, Group, GroupCreateInput, GroupProduct, Invoice, InvoiceStatus, InvoiceStatusInput, List, ListCreateInput, ListProduct, Order, OrderCreateInput, OrderStatus, OrderStatusInput, Parameter, ParameterCreateInput, PaymentMethod, PaymentMethodInput, Product, ProductParameter, ProductPublicData, Question, QuestionCreateInput, Rating, RatingComment, RatingCommentCreateInput, RatingCreateInput, Role, RoleInput, ShippingMethod, ShippingMethodInput, User, UserAddress, Vendor, VendorInput } from '../src/types'
 import { apiURLs } from '../src/utils/constants'
 import { db } from '../src/utils/db'
 import StatusError from '../src/utils/StatusError'
@@ -166,8 +166,8 @@ export const addressTypesInDB = async (): Promise<AddressType[]> => {
   return await db('addressTypes')
 }
 
-export const paymentTypesInDB = async (): Promise<PaymentType[]> => {
-  return await db('paymentTypes')
+export const paymentMethodsInDB = async (): Promise<PaymentMethod[]> => {
+  return await db('paymentMethods')
 }
 
 export const followersInDB = async (): Promise<Follower[]> => {
@@ -259,19 +259,19 @@ export const createOneAddressType = async (role: string): Promise<{ addedAddress
   return { addedAddressType: body, token }
 }
 
-export const newPaymentType = (): PaymentTypeInput => ({
-  name: `New PaymentType ${(new Date().getTime()).toString()}`
+export const newPaymentMethod = (): PaymentMethodInput => ({
+  name: `New PaymentMethod ${(new Date().getTime()).toString()}`
 })
 
-export const createOnePaymentType = async (role: string): Promise<{ addedPaymentType: PaymentType; token: string}> => {
+export const createOnePaymentMethod = async (role: string): Promise<{ addedPaymentMethod: PaymentMethod; token: string}> => {
   const { token } = await loginAs(role, api)
 
   const { body } = await api
-    .post(apiURLs.paymentTypes)
+    .post(apiURLs.paymentMethods)
     .set('Cookie', `token=${token}`)
-    .send(newPaymentType())
+    .send(newPaymentMethod())
 
-  return { addedPaymentType: body, token }
+  return { addedPaymentMethod: body, token }
 }
 
 export const newAddress = async (): Promise<AddressCreateInput> => {

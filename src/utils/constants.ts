@@ -1,7 +1,7 @@
 export const roles = [ 'ROOT', 'ADMIN', 'CUSTOMER' ]
 export const shippingMethods = [ 'INTL', 'DOOR', 'LOCKER' ]
 export const sensitiveShippingMethods = [ 'INTL', 'DOOR' ]
-export const paymentTypes = [ 'CARD', 'CASH' ]
+export const paymentMethods = [ 'CARD', 'CASH' ]
 export const addressTypes = [ 'SHIPPING', 'LOCKER' ]
 export const sensitiveAddressTypes = [ 'SHIPPING' ]
 export const lockerAddresses = [
@@ -21,7 +21,7 @@ export const apiURLs = {
   invoiceStatuses: `${baseAPI}/invoice-statuses`,
   shippingMethods: `${baseAPI}/shipping-methods`,
   addressTypes: `${baseAPI}/address-types`,
-  paymentTypes: `${baseAPI}/payment-types`,
+  paymentMethods: `${baseAPI}/payment-methods`,
   addresses: `${baseAPI}/addresses`,
   userAddresses: `${baseAPI}/user-addresses`,
   lists: `${baseAPI}/lists`,

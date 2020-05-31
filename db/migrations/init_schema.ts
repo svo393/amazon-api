@@ -12,8 +12,8 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.string('name', 50).unique().notNullable()
     })
 
-    .createTable('paymentTypes', (t) => {
-      t.increments('paymentTypeID')
+    .createTable('paymentMethods', (t) => {
+      t.increments('paymentMethodID')
       t.string('name', 50).unique().notNullable()
     })
 
@@ -442,7 +442,7 @@ export const down = (knex: Knex): Knex.SchemaBuilder =>
     .dropTableIfExists('followers')
     .dropTableIfExists('users')
     .dropTableIfExists('addresses')
-    .dropTableIfExists('paymentTypes')
+    .dropTableIfExists('paymentMethods')
     .dropTableIfExists('addressTypes')
     .dropTableIfExists('shippingMethods')
     .dropTableIfExists('roles')

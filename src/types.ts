@@ -17,8 +17,8 @@ export type AddressType = {
   name: string;
 }
 
-export type PaymentType = {
-  paymentTypeID: number;
+export type PaymentMethod = {
+  paymentMethodID: number;
   name: string;
 }
 
@@ -274,7 +274,7 @@ export type AddressCreateInput = Pick<Address, 'addr' | 'addressTypeID'> & {
   isDefault?: boolean;
 }
 
-export type PaymentTypeInput = Pick<PaymentType, 'name'>
+export type PaymentMethodInput = Pick<PaymentMethod, 'name'>
 
 export type AddressFetchInput = {
   userID?: number;

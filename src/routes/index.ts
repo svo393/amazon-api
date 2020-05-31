@@ -11,7 +11,7 @@ import invoiceStatusesRouter from './invoiceStatuses'
 import listsRouter from './lists'
 import orderStatusesRouter from './orderStatuses'
 import parametersRouter from './parameters'
-import paymentTypesRouter from './paymentTypes'
+import paymentMethodsRouter from './paymentMethods'
 import productsRouter from './products'
 import questionsRouter from './questions'
 import ratingCommentsRouter from './ratingComments'
@@ -36,7 +36,7 @@ export default Router()
   .use(apiURLs.invoiceStatuses, invoiceStatusesRouter)
   .use(apiURLs.shippingMethods, shippingMethodsRouter)
   .use(apiURLs.addressTypes, addressTypesRouter)
-  .use(apiURLs.paymentTypes, paymentTypesRouter)
+  .use(apiURLs.paymentMethods, paymentMethodsRouter)
   .use(apiURLs.addresses, addressesRouter)
   .use(apiURLs.userAddresses, userAddressesRouter)
   .use(apiURLs.lists, listsRouter)
