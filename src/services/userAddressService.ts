@@ -16,10 +16,8 @@ const addUserAddress = async (UAInput: UACreateInput): Promise<UserAddress> => {
 }
 
 const updateUserAddress = async (UAInput: UAUpdateInput, req: Request): Promise<UserAddress> => {
-  const { isDefault } = UAInput
-
   const [ updatedUA ]: UserAddress[] = await db<UserAddress>('userAddresses')
-    .update({ isDefault }, [ '*' ])
+    .update(UAInput, [ '*' ])
     .where('userID', req.params.userID)
     .andWhere('addressID', req.params.addressID)
 

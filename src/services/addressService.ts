@@ -80,8 +80,6 @@ const getAddressesByType = async (req: Request): Promise<Address[]> => {
 type AddressFullData = Address & { userID: string; name: string }
 
 const getAddressByID = async (req: Request, res: Response): Promise<AddressFullData> => {
-  const { userID } = res.locals.userID
-
   const address: AddressFullData = await db('addresses as a')
     .first(
       'a.addressID',
@@ -101,7 +99,7 @@ const getAddressByID = async (req: Request, res: Response): Promise<AddressFullD
   if (
     sensitiveAddressTypes.includes(address.name) &&
     (!role || ![ 'ROOT', 'ADMIN' ].includes(role)) &&
-    address.userID !== userID
+    address.userID !== res.locals.userID
   ) {
     throw new StatusError(404, 'Not Found')
   }

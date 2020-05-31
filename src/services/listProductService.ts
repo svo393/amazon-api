@@ -4,15 +4,13 @@ import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
 const addListProduct = async (req: Request): Promise<ListProduct> => {
-  const { listID, productID } = req.params
-
   const { rows: [ addedUA ] }: { rows: ListProduct[] } = await db.raw(
     `? ON CONFLICT
        DO NOTHING
        RETURNING *;`,
     [ db('listProducts').insert({
-      listID: Number(listID),
-      productID: Number(productID)
+      listID: Number(req.params.listID),
+      productID: Number(req.params.productID)
     }) ]
   )
 
@@ -23,12 +21,10 @@ const addListProduct = async (req: Request): Promise<ListProduct> => {
 }
 
 const deleteListProduct = async (req: Request): Promise<void> => {
-  const { listID, productID } = req.params
-
   const deleteCount = await db<ListProduct>('listProducts')
     .del()
-    .where('productID', productID)
-    .andWhere('listID', listID)
+    .where('productID', req.params.productID)
+    .andWhere('listID', req.params.listID)
 
   if (deleteCount === 0) throw new StatusError(404, 'Not Found')
 }

@@ -1,15 +1,11 @@
 import { Request, Response } from 'express'
-import fs from 'fs'
 import Knex from 'knex'
-import multer from 'multer'
-import path from 'path'
 import R from 'ramda'
-import sharp from 'sharp'
 import { FormattedGroup, Group, GroupProduct, Parameter, Product, ProductAllData, ProductCreateInput, ProductListData, ProductParameter, ProductPublicData, ProductUpdateInput } from '../types'
 import { db, dbTrans } from '../utils/db'
+import { uploadImages } from '../utils/img'
 import { getProductsQuery } from '../utils/queries'
 import StatusError from '../utils/StatusError'
-import { uploadImages } from '../utils/img'
 
 const addProduct = async (productInput: ProductCreateInput, res: Response): Promise<ProductPublicData & { parameters?: Parameter[] }> => {
   const now = new Date()
@@ -128,9 +124,8 @@ const getProductByID = async (req: Request, res: Response): Promise<ProductListD
   }
 
   const role: string | undefined = res.locals.userRole
-  const hasPermission = role && [ 'ROOT', 'ADMIN' ].includes(role)
 
-  return hasPermission
+  return role && [ 'ROOT', 'ADMIN' ].includes(role)
     ? fullProduct
     : R.omit([
       'productCreatedAt',

@@ -5,8 +5,6 @@ import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
 const addAddressType = async (atInput: ATInput): Promise<AT> => {
-  const { name } = atInput
-
   const { rows: [ addedAT ] }: { rows: AT[] } = await db.raw(
     `? ON CONFLICT
        DO NOTHING
@@ -15,7 +13,7 @@ const addAddressType = async (atInput: ATInput): Promise<AT> => {
   )
 
   if (!addedAT) {
-    throw new StatusError(409, `AddressType with name "${name}" already exists`)
+    throw new StatusError(409, `AddressType with name "${atInput.name}" already exists`)
   }
   return addedAT
 }
@@ -30,30 +28,27 @@ type SingleAddressTypeData = {
 }
 
 const getAddressTypeByID = async (res: Response, req: Request): Promise<SingleAddressTypeData> => {
-  const { addressTypeID: atID } = req.params
+  const addressTypeID = Number(req.params.addressTypeID)
 
-  const hasPermission = [ 'ROOT', 'ADMIN' ].includes(res.locals.userRole)
   const ats = await db<AT>('addressTypes')
 
-  const filteredATs = hasPermission
+  const filteredATs = [ 'ROOT', 'ADMIN' ].includes(res.locals.userRole)
     ? ats
     : ats.filter((at) => !sensitiveATs.includes(at.name))
 
-  const [ at ] = filteredATs.filter((shm) => shm.addressTypeID === Number(atID))
+  const [ at ] = filteredATs.filter((shm) => shm.addressTypeID === Number(addressTypeID))
   if (!at) throw new StatusError(404, 'Not Found')
 
   const addresses = await db<Address>('addresses')
-    .where('addressTypeID', atID)
+    .where('addressTypeID', addressTypeID)
 
   return { ...at, addresses }
 }
 
 const updateAddressType = async (res: Response, atInput: ATInput, req: Request): Promise<SingleAddressTypeData> => {
-  const { addressTypeID: atID } = req.params
-
   const [ updatedAT ] = await db<AT>('addressTypes')
     .update({ ...atInput }, [ 'addressTypeID' ])
-    .where('addressTypeID', atID)
+    .where('addressTypeID', req.params.addressTypeID)
 
   if (!updatedAT) throw new StatusError(404, 'Not Found')
   return getAddressTypeByID(res, req)

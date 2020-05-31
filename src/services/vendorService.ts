@@ -5,8 +5,6 @@ import { getProductsQuery } from '../utils/queries'
 import StatusError from '../utils/StatusError'
 
 const addVendor = async (vendorInput: VendorInput): Promise<Vendor> => {
-  const { name } = vendorInput
-
   const { rows: [ addedVendor ] }: { rows: Vendor[] } = await db.raw(
     `? ON CONFLICT
        DO NOTHING
@@ -15,7 +13,7 @@ const addVendor = async (vendorInput: VendorInput): Promise<Vendor> => {
   )
 
   if (!addedVendor) {
-    throw new StatusError(409, `Vendor with name "${name}" already exists`)
+    throw new StatusError(409, `Vendor with name "${vendorInput.name}" already exists`)
   }
   return addedVendor
 }

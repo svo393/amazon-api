@@ -5,8 +5,6 @@ import { getProductsQuery } from '../utils/queries'
 import StatusError from '../utils/StatusError'
 
 const addCategory = async (categoryInput: CategoryCreateInput): Promise<Category> => {
-  const { name } = categoryInput
-
   const { rows: [ addedCategory ] }: { rows: Category[] } = await db.raw(
     `? ON CONFLICT
        DO NOTHING
@@ -15,7 +13,7 @@ const addCategory = async (categoryInput: CategoryCreateInput): Promise<Category
   )
 
   if (!addedCategory) {
-    throw new StatusError(409, `Category with name "${name}" already exists`)
+    throw new StatusError(409, `Category with name "${categoryInput.name}" already exists`)
   }
   return addedCategory
 }
@@ -45,10 +43,10 @@ type SingleCategoryData = Category & {
 }
 
 const getCategoryByID = async (req: Request): Promise<SingleCategoryData> => {
-  const { categoryID } = req.params
+  const categoryID = Number(req.params.categoryID)
 
   const categories = await db<Category>('categories')
-  const [ category ] = categories.filter((c) => c.categoryID === Number(categoryID))
+  const [ category ] = categories.filter((c) => c.categoryID === categoryID)
   if (!category) throw new StatusError(404, 'Not Found')
 
   let parentChain: Parent[] = []
@@ -64,7 +62,7 @@ const getCategoryByID = async (req: Request): Promise<SingleCategoryData> => {
   }
 
   const children = categories
-    .filter((c) => c.parentCategoryID === Number(categoryID))
+    .filter((c) => c.parentCategoryID === categoryID)
     .map((c) => c.categoryID)
 
   const products: ProductListData[] = await getProductsQuery.clone()

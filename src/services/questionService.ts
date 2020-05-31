@@ -5,7 +5,6 @@ import { uploadImages } from '../utils/img'
 import StatusError from '../utils/StatusError'
 
 const addQuestion = async (questionInput: QuestionCreateInput, res: Response): Promise<Question> => {
-  const userID = res.locals.userID
   const now = new Date()
 
   const { rows: [ addedQuestion ] }: { rows: Question[] } = await db.raw(
@@ -14,7 +13,7 @@ const addQuestion = async (questionInput: QuestionCreateInput, res: Response): P
        RETURNING *;`,
     [ db('questions').insert({
       ...questionInput,
-      userID,
+      userID: res.locals.userID,
       questionCreatedAt: now,
       questionUpdatedAt: now
     }) ]

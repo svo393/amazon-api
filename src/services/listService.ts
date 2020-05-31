@@ -4,18 +4,15 @@ import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
 const addList = async (listInput: ListCreateInput, res: Response): Promise<List> => {
-  const { name } = listInput
-  const { userID } = res.locals
-
   const { rows: [ addedList ] }: { rows: List[] } = await db.raw(
     `? ON CONFLICT
        DO NOTHING
        RETURNING *;`,
-    [ db('lists').insert({ ...listInput, userID }) ]
+    [ db('lists').insert({ ...listInput, userID: res.locals.userID }) ]
   )
 
   if (!addedList) {
-    throw new StatusError(409, `List with name "${name}" already exists`)
+    throw new StatusError(409, `List with name "${listInput.name}" already exists`)
   }
   return addedList
 }

@@ -4,13 +4,14 @@ import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
 const addFollower = async (req: Request): Promise<Follower> => {
-  const { userID, anotherUserID } = req.params
-
   const { rows: [ addedFollower ] }: { rows: Follower[] } = await db.raw(
     `? ON CONFLICT
        DO NOTHING
        RETURNING *;`,
-    [ db('followers').insert({ userID, follows: anotherUserID }) ]
+    [ db('followers').insert({
+      userID: req.params.userID,
+      follows: req.params.anotherUserID
+    }) ]
   )
 
   if (!addedFollower) {

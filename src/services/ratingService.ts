@@ -5,7 +5,6 @@ import { uploadImages } from '../utils/img'
 import StatusError from '../utils/StatusError'
 
 const addRating = async (ratingInput: RatingCreateInput, res: Response): Promise<Rating> => {
-  const userID = res.locals.userID
   const now = new Date()
 
   const { rows: [ addedRating ] }: { rows: Rating[] } = await db.raw(
@@ -14,7 +13,7 @@ const addRating = async (ratingInput: RatingCreateInput, res: Response): Promise
        RETURNING *;`,
     [ db('ratings').insert({
       ...ratingInput,
-      userID,
+      userID: res.locals.userID,
       ratingCreatedAt: now,
       ratingUpdatedAt: now
     }) ]

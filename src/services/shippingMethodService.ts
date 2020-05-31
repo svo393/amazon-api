@@ -4,8 +4,6 @@ import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
 const addShippingMethod = async (smInput: SMInput): Promise<SM> => {
-  const { name } = smInput
-
   const { rows: [ addedSM ] }: { rows: SM[] } = await db.raw(
     `? ON CONFLICT
        DO NOTHING
@@ -14,7 +12,7 @@ const addShippingMethod = async (smInput: SMInput): Promise<SM> => {
   )
 
   if (!addedSM) {
-    throw new StatusError(409, `ShippingMethod with name "${name}" already exists`)
+    throw new StatusError(409, `ShippingMethod with name "${smInput.name}" already exists`)
   }
   return addedSM
 }

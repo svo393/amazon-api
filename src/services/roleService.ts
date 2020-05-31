@@ -5,8 +5,6 @@ import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
 const addRole = async (roleInput: RoleInput): Promise<Role> => {
-  const { name } = roleInput
-
   const { rows: [ addedRole ] }: { rows: Role[] } = await db.raw(
     `? ON CONFLICT
        DO NOTHING
@@ -15,7 +13,7 @@ const addRole = async (roleInput: RoleInput): Promise<Role> => {
   )
 
   if (!addedRole) {
-    throw new StatusError(409, `Role with name "${name}" already exists`)
+    throw new StatusError(409, `Role with name "${roleInput.name}" already exists`)
   }
   return addedRole
 }
