@@ -24,7 +24,7 @@ const addAddress = async (addressInput: AddressCreateInput, res: Response): Prom
         isDefault !== undefined &&
         curUA.isDefault !== isDefault
       ) {
-        const [ updatedUserAddress ]: UserAddress[] = await db<UserAddress>('userAddresses')
+        const [ updatedUserAddress ]: UserAddress[] = await db('userAddresses')
           .where('userID', curUA.userID)
           .andWhere('addressID', curUA.addressID)
           .update({ isDefault }, [ '*' ])
@@ -32,7 +32,7 @@ const addAddress = async (addressInput: AddressCreateInput, res: Response): Prom
         curUA = { ...curUA, ...updatedUserAddress }
       }
     } else {
-      const [ addedUserAddress ]: UserAddress[] = await db<UserAddress>('userAddresses')
+      const [ addedUserAddress ]: UserAddress[] = await db('userAddresses')
         .insert({
           isDefault,
           addressID: existingAddresses[0].addressID,

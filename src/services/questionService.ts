@@ -45,7 +45,7 @@ const getQuestionByID = async (req: Request): Promise<Question> => {
 }
 
 const updateQuestion = async (questionInput: QuestionUpdateInput, req: Request): Promise<Question> => {
-  const [ updatedQuestion ]: Question[] = await db<Question>('questions')
+  const [ updatedQuestion ]: Question[] = await db('questions')
     .update({
       ...questionInput,
       questionUpdatedAt: new Date()
@@ -57,7 +57,7 @@ const updateQuestion = async (questionInput: QuestionUpdateInput, req: Request):
 }
 
 const deleteQuestion = async (req: Request): Promise<void> => {
-  const deleteCount = await db<Question>('questions')
+  const deleteCount = await db('questions')
     .del()
     .where('questionID', req.params.questionID)
 

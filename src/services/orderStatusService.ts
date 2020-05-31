@@ -18,7 +18,7 @@ const addOrderStatus = async (orderStatusInput: OrderStatusInput): Promise<Order
 }
 
 const getOrderStatuses = async (): Promise<OrderStatus[]> => {
-  return await db<OrderStatus>('orderStatuses')
+  return await db('orderStatuses')
 }
 
 const updateOrderStatus = async (orderStatusInput: OrderStatusInput, req: Request): Promise<OrderStatus> => {

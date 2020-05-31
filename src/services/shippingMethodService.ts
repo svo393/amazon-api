@@ -18,7 +18,7 @@ const addShippingMethod = async (smInput: SMInput): Promise<SM> => {
 }
 
 const getShippingMethods = async (): Promise<SM[]> => {
-  return await db<SM>('shippingMethods')
+  return await db('shippingMethods')
 }
 
 const getShippingMethodByID = async (req: Request): Promise<SM> => {

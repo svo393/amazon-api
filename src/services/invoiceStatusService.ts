@@ -18,7 +18,7 @@ const addInvoiceStatus = async (invoiceStatusInput: InvoiceStatusInput): Promise
 }
 
 const getInvoiceStatuses = async (): Promise<InvoiceStatus[]> => {
-  return await db<InvoiceStatus>('invoiceStatuses')
+  return await db('invoiceStatuses')
 }
 
 const updateInvoiceStatus = async (invoiceStatusInput: InvoiceStatusInput, req: Request): Promise<InvoiceStatus> => {

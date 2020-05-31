@@ -31,7 +31,7 @@ const getFollowedByUser = async (req: Request): Promise<Follower[]> => {
 }
 
 const deleteFollower = async (req: Request): Promise<void> => {
-  const deleteCount = await db<Follower>('followers')
+  const deleteCount = await db('followers')
     .del()
     .where('userID', req.params.userID)
     .andWhere('follows', req.params.anotherUserID)

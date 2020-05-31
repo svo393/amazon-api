@@ -403,7 +403,14 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
     .createTable('invoices', (t) => {
       t.increments('invoiceID')
       t.integer('amount').notNullable().unsigned()
+      t.string('details', 65535).notNullable()
       t.dateTime('invoiceCreatedAt').notNullable()
+      t.dateTime('invoiceUpdatedAt').notNullable()
+
+      t
+        .integer('userID')
+        .references('users.userID')
+        .onDelete('SET NULL')
 
       t
         .integer('orderID')
@@ -413,6 +420,11 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t
         .integer('invoiceStatusID')
         .references('invoiceStatuses.invoiceStatusID')
+        .notNullable()
+
+      t
+        .integer('paymentMethodID')
+        .references('paymentMethods.paymentMethodID')
         .notNullable()
     })
 

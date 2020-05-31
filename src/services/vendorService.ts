@@ -19,7 +19,7 @@ const addVendor = async (vendorInput: VendorInput): Promise<Vendor> => {
 }
 
 const getVendors = async (): Promise<Vendor[]> => {
-  return await db<Vendor>('vendors')
+  return await db('vendors')
 }
 
 type SingleVendorData = {

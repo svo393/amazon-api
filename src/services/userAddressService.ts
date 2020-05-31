@@ -16,7 +16,7 @@ const addUserAddress = async (UAInput: UACreateInput): Promise<UserAddress> => {
 }
 
 const updateUserAddress = async (UAInput: UAUpdateInput, req: Request): Promise<UserAddress> => {
-  const [ updatedUA ]: UserAddress[] = await db<UserAddress>('userAddresses')
+  const [ updatedUA ]: UserAddress[] = await db('userAddresses')
     .update(UAInput, [ '*' ])
     .where('userID', req.params.userID)
     .andWhere('addressID', req.params.addressID)
@@ -26,7 +26,7 @@ const updateUserAddress = async (UAInput: UAUpdateInput, req: Request): Promise<
 }
 
 const deleteUserAddress = async (req: Request): Promise<void> => {
-  const deleteCount = await db<UserAddress>('userAddresses')
+  const deleteCount = await db('userAddresses')
     .del()
     .where('userID', req.params.userID)
     .andWhere('addressID', req.params.addressID)

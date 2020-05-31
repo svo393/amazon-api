@@ -45,7 +45,7 @@ const getRatingByID = async (req: Request): Promise<Rating> => {
 }
 
 const updateRating = async (ratingInput: RatingUpdateInput, req: Request): Promise<Rating> => {
-  const [ updatedRating ]: Rating[] = await db<Rating>('ratings')
+  const [ updatedRating ]: Rating[] = await db('ratings')
     .update({
       ...ratingInput,
       ratingUpdatedAt: new Date()
@@ -57,7 +57,7 @@ const updateRating = async (ratingInput: RatingUpdateInput, req: Request): Promi
 }
 
 const deleteRating = async (req: Request): Promise<void> => {
-  const deleteCount = await db<Rating>('ratings')
+  const deleteCount = await db('ratings')
     .del()
     .where('ratingID', req.params.ratingID)
 

@@ -45,7 +45,7 @@ const addUser = async (userInput: UserSignupInput, res: Response): Promise<UserS
 
   if (!customerRoleID) { throw new StatusError() }
 
-  const [ addedUser ]: UserSignupData[] = await db<User>('users')
+  const [ addedUser ]: UserSignupData[] = await db('users')
     .insert({
       email,
       password: passwordHash,
@@ -230,7 +230,7 @@ const deleteUser = async (req: Request, res: Response): Promise<void> => {
     throw new StatusError(451, 'Not gonna happen')
   }
 
-  const deleteCount = await db<User>('users')
+  const deleteCount = await db('users')
     .del()
     .where('userID', req.params.userID)
 

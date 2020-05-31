@@ -129,7 +129,7 @@ const getProductByID = async (req: Request, res: Response): Promise<ProductListD
 }
 
 const updateProduct = async (productInput: ProductUpdateInput, req: Request): Promise<Product> => {
-  const [ updatedProduct ]: Product[] = await db<Product>('products')
+  const [ updatedProduct ]: Product[] = await db('products')
     .update({
       ...productInput,
       productUpdatedAt: new Date()

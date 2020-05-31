@@ -32,7 +32,7 @@ const getListByID = async (req: Request): Promise<List> => {
 }
 
 const updateList = async (listInput: ListCreateInput, req: Request): Promise<List> => {
-  const [ updatedList ]: List[] = await db<List>('lists')
+  const [ updatedList ]: List[] = await db('lists')
     .update(listInput, [ '*' ])
     .where('listID', req.params.listID)
 
@@ -41,7 +41,7 @@ const updateList = async (listInput: ListCreateInput, req: Request): Promise<Lis
 }
 
 const deleteList = async (req: Request): Promise<void> => {
-  const deleteCount = await db<List>('lists')
+  const deleteCount = await db('lists')
     .del()
     .where('listID', req.params.listID)
 

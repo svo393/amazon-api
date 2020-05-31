@@ -21,7 +21,7 @@ const addListProduct = async (req: Request): Promise<ListProduct> => {
 }
 
 const deleteListProduct = async (req: Request): Promise<void> => {
-  const deleteCount = await db<ListProduct>('listProducts')
+  const deleteCount = await db('listProducts')
     .del()
     .where('productID', req.params.productID)
     .andWhere('listID', req.params.listID)

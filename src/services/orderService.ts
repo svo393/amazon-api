@@ -1,7 +1,7 @@
 import { Request } from 'express'
 import Knex from 'knex'
 import R from 'ramda'
-import { Order, OrderCreateInput, OrderProduct, OrderStatus } from '../types'
+import { Order, OrderCreateInput, OrderProduct, OrderStatus, OrderUpdateInput } from '../types'
 import { db, dbTrans } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
@@ -64,25 +64,27 @@ const getOrderByID = async (req: Request): Promise<Order> => {
   return order
 }
 
-const updateOrder = async (orderInput: OrderCreateInput, req: Request): Promise<Order> => {
-  const order: { orderStatusName: string } = await db('orders as o')
-    .first('os.name as orderStatusName')
-    .where('orderID', req.params.orderID)
-    .joinRaw('JOIN "orderStatuses" as os USING ("orderStatusID")')
+const updateOrder = async (orderInput: OrderUpdateInput, req: Request): Promise<Order> => {
+  return await dbTrans(async (trx: Knex.Transaction) => {
+    const order: { orderStatusName: string } = await trx('orders as o')
+      .first('os.name as orderStatusName')
+      .where('orderID', req.params.orderID)
+      .joinRaw('JOIN "orderStatuses" as os USING ("orderStatusID")')
 
-  if ([ 'DONE', 'CANCELED' ].includes(order.orderStatusName)) {
-    throw new StatusError(410, 'This order can\'t be updated anymore')
-  }
+    if ([ 'DONE', 'CANCELED' ].includes(order.orderStatusName)) {
+      throw new StatusError(410, 'This order can\'t be updated anymore')
+    }
 
-  const [ updatedOrder ]: Order[] = await db<Order>('orders')
-    .update({
-      ...orderInput,
-      orderUpdatedAt: new Date()
-    }, [ '*' ])
-    .where('orderID', req.params.orderID)
+    const [ updatedOrder ]: Order[] = await trx('orders')
+      .update({
+        ...orderInput,
+        orderUpdatedAt: new Date()
+      }, [ '*' ])
+      .where('orderID', req.params.orderID)
 
-  if (!updatedOrder) throw new StatusError(404, 'Not Found')
-  return updatedOrder
+    if (!updatedOrder) throw new StatusError(404, 'Not Found')
+    return updatedOrder
+  })
 }
 
 export default {

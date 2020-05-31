@@ -19,7 +19,7 @@ const addAddressType = async (atInput: ATInput): Promise<AT> => {
 }
 
 const getAddressTypes = async (): Promise<AT[]> => {
-  return await db<AT>('addressTypes')
+  return await db('addressTypes')
 }
 
 type SingleAddressTypeData = {

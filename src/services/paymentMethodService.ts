@@ -18,7 +18,7 @@ const addPaymentMethod = async (paymentMethodInput: PaymentMethodInput): Promise
 }
 
 const getPaymentMethods = async (): Promise<PaymentMethod[]> => {
-  return await db<PaymentMethod>('paymentMethods')
+  return await db('paymentMethods')
 }
 
 const getPaymentMethodByID = async (req: Request): Promise<PaymentMethod> => {

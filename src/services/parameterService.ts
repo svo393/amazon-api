@@ -4,7 +4,7 @@ import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
 const addParameters = async (parameterInput: ParameterCreateInput): Promise<Parameter[]> => {
-  return await db<Parameter>('parameters')
+  return await db('parameters')
     .insert(parameterInput, [ '*' ])
 }
 

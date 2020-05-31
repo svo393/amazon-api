@@ -37,7 +37,7 @@ const updateCartProduct = async (cartProductInput: CartProductInput, req: Reques
 }
 
 const deleteCartProduct = async (req: Request): Promise<void> => {
-  const deleteCount = await db<CartProduct>('cartProducts')
+  const deleteCount = await db('cartProducts')
     .del()
     .where('userID', req.params.userID)
     .andWhere('productID', req.params.productID)

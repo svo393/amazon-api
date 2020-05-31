@@ -144,7 +144,7 @@ export const getUserID: Middleware = async (req, res, next) => {
       const decodedToken = jwt.verify(req.cookies.token, env.JWT_SECRET)
       res.locals.userID = (decodedToken as DecodedToken).userID
 
-      const role: { name: string } | null = await db<User>('users')
+      const role: { name: string } | null = await db('users')
         .first('r.name')
         .where('userID', res.locals.userID)
         .joinRaw('JOIN roles as r USING ("roleID")')

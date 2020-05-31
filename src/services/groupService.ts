@@ -4,7 +4,7 @@ import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
 const addGroup = async (groupInput: GroupCreateInput): Promise<Group> => {
-  return await db<Group>('groups')
+  return await db('groups')
     .insert(groupInput, [ '*' ])
 }
 
