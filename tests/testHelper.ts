@@ -4,7 +4,7 @@ import { Address, AddressCreateInput, AddressType, AddressTypeInput, Answer, Ans
 import { apiURLs } from '../src/utils/constants'
 import { db } from '../src/utils/db'
 import StatusError from '../src/utils/StatusError'
-import { products } from './seedData'
+import { products } from './testProductData'
 
 const api = supertest(app)
 
@@ -25,86 +25,6 @@ export const root = {
 
 export const sleep = (ms: number): Promise<any> =>
   new Promise((resolve) => setTimeout(resolve, ms))
-
-export const loginAs = async (role: string): Promise<{token: string; userID: number}> => {
-  const user = {
-    email: `${role}@example.com`,
-    password: '12345678',
-    remember: true
-  }
-
-  const res = await api
-    .post('/api/users/login')
-    .send(user)
-
-  const token = res.header['set-cookie'][0].split('; ')[0].slice(6)
-  return { token, userID: res.body.userID }
-}
-
-export const purge = async (): Promise<void> => {
-  try {
-    await db('orderProducts').del()
-    await db('invoices').del()
-    await db('orders').del()
-    await db('cartProducts').del()
-    await db('productParameters').del()
-    await db('parameters').del()
-    await db('groupProducts').del()
-    await db('groups').del()
-    await db('listProducts').del()
-    await db('answerComments').del()
-    await db('answers').del()
-    await db('questions').del()
-    await db('ratingComments').del()
-    await db('ratings').del()
-    await db('products').del()
-    await db('vendors').del()
-    await db('categories').del()
-    await db('lists').del()
-    await db('userAddresses').del()
-    await db('followers').del()
-    await db('users').del()
-  } catch (err) {
-    console.error(err)
-  }
-}
-
-export const populateUsers = async (): Promise<void> => {
-  await api
-    .post('/api/users')
-    .send(customer)
-
-  await api
-    .post('/api/users')
-    .send(admin)
-
-  await api
-    .post('/api/users')
-    .send(root)
-
-  const roles = await db<Role>('roles')
-  const adminRole = roles.find((r) => r.name === 'ADMIN')
-  const rootRole = roles.find((r) => r.name === 'ROOT')
-
-  if (!adminRole || !rootRole) { throw new StatusError() }
-
-  await db('users')
-    .update('roleID', adminRole.roleID)
-    .where('email', admin.email)
-
-  await db('users')
-    .update('roleID', rootRole.roleID)
-    .where('email', root.email)
-}
-
-export const getUserByEmail = async (email: string): Promise<User> => {
-  const user = await db<User>('users')
-    .first()
-    .where('email', email)
-
-  if (!user) throw new StatusError(404, 'Not Found')
-  return user
-}
 
 export const usersInDB = async (): Promise<User[]> => {
   return await db('users')
@@ -216,6 +136,73 @@ export const listProductsInDB = async (): Promise<ListProduct[]> => {
 
 export const userAddressesInDB = async (): Promise<UserAddress[]> => {
   return await db('userAddresses')
+}
+
+export const purge = async (): Promise<void> => {
+  await db('invoices').del()
+  await db('orderProducts').del()
+  await db('orders').del()
+  await db('cartProducts').del()
+  await db('productParameters').del()
+  await db('parameters').del()
+  await db('groupProducts').del()
+  await db('groups').del()
+  await db('answerComments').del()
+  await db('answers').del()
+  await db('questions').del()
+  await db('ratingComments').del()
+  await db('ratings').del()
+  await db('listProducts').del()
+  await db('products').del()
+  await db('vendors').del()
+  await db('categories').del()
+  await db('lists').del()
+  await db('userAddresses').del()
+  await db('followers').del()
+  await db('users').del()
+}
+
+export const populateUsers = async (): Promise<void> => {
+  await api
+    .post('/api/users')
+    .send(customer)
+
+  await api
+    .post('/api/users')
+    .send(admin)
+
+  await api
+    .post('/api/users')
+    .send(root)
+
+  const roles = await db<Role>('roles')
+  const adminRole = roles.find((r) => r.name === 'ADMIN')
+  const rootRole = roles.find((r) => r.name === 'ROOT')
+
+  if (!adminRole || !rootRole) { throw new StatusError() }
+
+  await db('users')
+    .update('roleID', adminRole.roleID)
+    .where('email', admin.email)
+
+  await db('users')
+    .update('roleID', rootRole.roleID)
+    .where('email', root.email)
+}
+
+export const loginAs = async (role: string): Promise<{token: string; userID: number}> => {
+  const user = {
+    email: `${role}@example.com`,
+    password: '12345678',
+    remember: true
+  }
+
+  const res = await api
+    .post('/api/users/login')
+    .send(user)
+
+  const token = res.header['set-cookie'][0].split('; ')[0].slice(6)
+  return { token, userID: res.body.userID }
 }
 
 export const newRole = (): RoleInput => ({

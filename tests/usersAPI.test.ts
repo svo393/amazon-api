@@ -2,7 +2,7 @@ import supertest from 'supertest'
 import app from '../src/app'
 import { apiURLs } from '../src/utils/constants'
 import { db } from '../src/utils/db'
-import { getUserByEmail, loginAs, populateUsers, purge, usersInDB } from './testHelper'
+import { loginAs, populateUsers, purge, usersInDB } from './testHelper'
 
 const api = supertest(app)
 const apiURL = apiURLs.users
@@ -86,10 +86,10 @@ describe('User fetching', () => {
   })
 
   test('public user if not root or admin', async () => {
-    const anotherUser = await getUserByEmail('admin@example.com')
+    const { userID } = await loginAs('admin')
 
     const { body } = await api
-      .get(`${apiURL}/${anotherUser.userID}`)
+      .get(`${apiURL}/${userID}`)
       .expect(200)
 
     expect(Object.keys(body)).toHaveLength(9)
@@ -97,11 +97,10 @@ describe('User fetching', () => {
 
   test('full user if admin', async () => {
     const { token } = await loginAs('admin')
-
-    const anotherUser = await getUserByEmail('admin@example.com')
+    const { userID } = await loginAs('customer')
 
     const { body } = await api
-      .get(`${apiURL}/${anotherUser.userID}`)
+      .get(`${apiURL}/${userID}`)
       .set('Cookie', `token=${token}`)
       .expect(200)
 
@@ -136,11 +135,10 @@ describe('User updating', () => {
 
   test('403 if another user\'s profile', async () => {
     const { token } = await loginAs('customer')
-
-    const anotherUser = await getUserByEmail('admin@example.com')
+    const { userID } = await loginAs('admin')
 
     await api
-      .put(`${apiURL}/${anotherUser.userID}`)
+      .put(`${apiURL}/${userID}`)
       .set('Cookie', `token=${token}`)
       .send({ name: 'Jack' })
       .expect(403)
@@ -148,11 +146,10 @@ describe('User updating', () => {
 
   test('200 if root', async () => {
     const { token } = await loginAs('root')
-
-    const anotherUser = await getUserByEmail('admin@example.com')
+    const { userID } = await loginAs('admin')
 
     await api
-      .put(`${apiURL}/${anotherUser.userID}`)
+      .put(`${apiURL}/${userID}`)
       .set('Cookie', `token=${token}`)
       .send({ name: 'Jack' })
       .expect(200)
