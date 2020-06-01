@@ -14,7 +14,7 @@ beforeEach(async () => {
 
 describe('Role adding', () => {
   test('201', async () => {
-    const { token } = await loginAs('root', api)
+    const { token } = await loginAs('root')
     const rolesAtStart = await rolesInDB()
 
     await api
@@ -29,7 +29,7 @@ describe('Role adding', () => {
   })
 
   test('403 if not root', async () => {
-    const { token } = await loginAs('admin', api)
+    const { token } = await loginAs('admin')
 
     await api
       .post(apiURL)
@@ -73,7 +73,7 @@ describe('Role updating', () => {
 
   test('403 if not root', async () => {
     const { addedRole } = await createOneRole('root')
-    const { token } = await loginAs('admin', api)
+    const { token } = await loginAs('admin')
 
     await api
       .put(`${apiURL}/${addedRole.roleID}`)

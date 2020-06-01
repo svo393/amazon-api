@@ -66,7 +66,7 @@ const getOrderByID = async (req: Request): Promise<Order> => {
 
 const updateOrder = async (orderInput: OrderUpdateInput, req: Request): Promise<Order> => {
   return await dbTrans(async (trx: Knex.Transaction) => {
-    const order: { orderStatusName: string } = await trx('orders as o')
+    const order: { orderStatusName: string } = await trx('orders')
       .first('os.name as orderStatusName')
       .where('orderID', req.params.orderID)
       .joinRaw('JOIN "orderStatuses" as os USING ("orderStatusID")')

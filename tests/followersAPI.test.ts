@@ -15,8 +15,8 @@ beforeEach(async () => {
 
 describe('Follower adding', () => {
   test('201', async () => {
-    const { token, userID } = await loginAs('root', api)
-    const { userID: follows } = await loginAs('customer', api)
+    const { token, userID } = await loginAs('root')
+    const { userID: follows } = await loginAs('customer')
 
     const followersAtStart = await followersInDB()
 
@@ -64,7 +64,7 @@ describe('Followers deleting', () => {
 
   test('403 if another user', async () => {
     const { userID, follows } = await createOneFollower()
-    const { token } = await loginAs('admin', api)
+    const { token } = await loginAs('admin')
 
     await api
       .delete(`${apiURL}/${userID}/follows/${follows}`)

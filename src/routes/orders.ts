@@ -1,6 +1,5 @@
 import Router from 'express'
 import orderProductService from '../services/orderProductService'
-// import orderProductsService from '../services/orderProductService'
 import orderService from '../services/orderService'
 import { checkNewOrder, checkNewOrderProduct, checkOrderProductUpdate, checkOrderUpdate } from '../utils/inputValidator'
 import { isAdmin, isCreatorOrAdmin, isLoggedIn } from '../utils/middleware'

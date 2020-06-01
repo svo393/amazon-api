@@ -15,7 +15,7 @@ beforeEach(async () => {
 
 describe('List adding', () => {
   test('201', async () => {
-    const { token } = await loginAs('customer', api)
+    const { token } = await loginAs('customer')
 
     const listsAtStart = await listsInDB()
 

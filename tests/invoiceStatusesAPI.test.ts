@@ -14,7 +14,7 @@ beforeEach(async () => {
 
 describe('InvoiceStatus adding', () => {
   test('201', async () => {
-    const { token } = await loginAs('admin', api)
+    const { token } = await loginAs('admin')
     const invoiceStatusesAtStart = await invoiceStatusesInDB()
 
     await api
@@ -29,7 +29,7 @@ describe('InvoiceStatus adding', () => {
   })
 
   test('403 if not admin', async () => {
-    const { token } = await loginAs('customer', api)
+    const { token } = await loginAs('customer')
 
     await api
       .post(apiURL)
@@ -41,7 +41,7 @@ describe('InvoiceStatus adding', () => {
 
 describe('InvoiceStatuses fetching', () => {
   test('200 invoiceStatuses', async () => {
-    const { token } = await loginAs('admin', api)
+    const { token } = await loginAs('admin')
 
     await api
       .get(apiURL)
@@ -65,7 +65,7 @@ describe('InvoiceStatus updating', () => {
 
   test('403 if not admin', async () => {
     const { addedInvoiceStatus } = await createOneInvoiceStatus('admin')
-    const { token } = await loginAs('customer', api)
+    const { token } = await loginAs('customer')
 
     await api
       .put(`${apiURL}/${addedInvoiceStatus.invoiceStatusID}`)

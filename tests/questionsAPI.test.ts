@@ -15,7 +15,7 @@ beforeEach(async () => {
 
 describe('Question adding', () => {
   test('201', async () => {
-    const { token } = await loginAs('customer', api)
+    const { token } = await loginAs('customer')
     const { addedProduct } = await createOneProduct('admin')
 
     await api
@@ -31,7 +31,7 @@ describe('Question adding', () => {
 
   test('204 upload file', async () => {
     const { questionID } = await createOneQuestion()
-    const { token } = await loginAs('customer', api)
+    const { token } = await loginAs('customer')
 
     await api
       .post(`${apiURL}/${questionID}/upload`)
@@ -89,7 +89,7 @@ describe('Question updating', () => {
 
   test('403 if not creator', async () => {
     const { questionID } = await createOneQuestion()
-    const { token } = await loginAs('admin', api)
+    const { token } = await loginAs('admin')
 
     await api
       .put(`${apiURL}/${questionID}`)
@@ -115,7 +115,7 @@ describe('Questions deleting', () => {
 
   test('403 if another user', async () => {
     const { questionID } = await createOneQuestion()
-    const { token } = await loginAs('admin', api)
+    const { token } = await loginAs('admin')
 
     await api
       .delete(`${apiURL}/${questionID}`)

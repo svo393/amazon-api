@@ -22,9 +22,11 @@ import userAddressesRouter from './userAddresses'
 import usersRouter from './users'
 import vendorsRouter from './vendors'
 import ordersRouter from './orders'
+import invoicesRouter from './invoices'
 
 export default Router()
   .use(apiURLs.categories, categoriesRouter)
+  .use(apiURLs.invoices, invoicesRouter)
   .use(apiURLs.orders, ordersRouter)
   .use(apiURLs.products, productsRouter)
   .use(apiURLs.users, usersRouter)

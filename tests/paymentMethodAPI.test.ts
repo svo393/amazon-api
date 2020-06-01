@@ -16,7 +16,7 @@ beforeEach(async () => {
 
 describe('PaymentMethod adding', () => {
   test('201', async () => {
-    const { token } = await loginAs('root', api)
+    const { token } = await loginAs('root')
     const paymentMethodsAtStart = await paymentMethodsInDB()
 
     await api
@@ -31,7 +31,7 @@ describe('PaymentMethod adding', () => {
   })
 
   test('403 if not root ar admin', async () => {
-    const { token } = await loginAs('customer', api)
+    const { token } = await loginAs('customer')
 
     await api
       .post(apiURL)
@@ -76,7 +76,7 @@ describe('PaymentMethod updating', () => {
 
   test('403 if not admin or root', async () => {
     const { addedPaymentMethod } = await createOnePaymentMethod('root')
-    const { token } = await loginAs('customer', api)
+    const { token } = await loginAs('customer')
 
     await api
       .put(`${apiURL}/${addedPaymentMethod.paymentMethodID}`)

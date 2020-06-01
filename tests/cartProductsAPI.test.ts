@@ -16,7 +16,7 @@ beforeEach(async () => {
 
 describe('CartProduct adding', () => {
   test('201', async () => {
-    const { token, userID } = await loginAs('customer', api)
+    const { token, userID } = await loginAs('customer')
     const { addedProduct } = await createOneProduct('admin')
     const cartProductsAtStart = await cartProductsInDB()
 
@@ -71,7 +71,7 @@ describe('CartProduct updating', () => {
 
   test('403 if not same user', async () => {
     const { addedCartProduct } = await createOneCartProduct('admin')
-    const { token } = await loginAs('customer', api)
+    const { token } = await loginAs('customer')
 
     await api
       .put(`${apiURL}/${addedCartProduct.userID}/cartProducts/${addedCartProduct.productID}`)

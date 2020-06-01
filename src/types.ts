@@ -215,9 +215,13 @@ export type InvoiceStatus = {
 export type Invoice = {
   invoiceID: number;
   amount: number;
+  details: string;
   invoiceCreatedAt: Date;
+  invoiceUpdatedAt: Date;
   orderID: number;
+  userID: number;
   invoiceStatusID: number;
+  paymentMethodID: number;
 }
 
 //
@@ -460,3 +464,18 @@ export type OrderUpdateInput = {
 export type OrderProductCreateInput = Omit<OrderProduct, | 'orderID'>
 
 export type OrderProductUpdateInput = Omit<OrderProductCreateInput, | 'productID'>
+
+export type InvoiceCreateInput = Pick<Invoice,
+  | 'amount'
+  | 'details'
+  | 'orderID'
+  | 'paymentMethodID'
+  | 'userID'
+>
+
+export type InvoiceUpdateInput = {
+  amount?: number;
+  details?: string;
+  paymentMethodID?: number;
+  invoiceStatusID?: number;
+}

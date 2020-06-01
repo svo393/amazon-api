@@ -1,6 +1,6 @@
 import supertest from 'supertest'
 import app from '../src/app'
-import { Address, AddressCreateInput, AddressType, AddressTypeInput, Answer, AnswerComment, AnswerCommentCreateInput, AnswerCreateInput, CartProduct, Category, CategoryCreateInput, Follower, Group, GroupCreateInput, GroupProduct, Invoice, InvoiceStatus, InvoiceStatusInput, List, ListCreateInput, ListProduct, Order, OrderCreateInput, OrderStatus, OrderStatusInput, Parameter, ParameterCreateInput, PaymentMethod, PaymentMethodInput, Product, ProductParameter, ProductPublicData, Question, QuestionCreateInput, Rating, RatingComment, RatingCommentCreateInput, RatingCreateInput, Role, RoleInput, ShippingMethod, ShippingMethodInput, User, UserAddress, Vendor, VendorInput, OrderProduct, OrderProductCreateInput } from '../src/types'
+import { Address, AddressCreateInput, AddressType, AddressTypeInput, Answer, AnswerComment, AnswerCommentCreateInput, AnswerCreateInput, CartProduct, Category, CategoryCreateInput, Follower, Group, GroupCreateInput, GroupProduct, Invoice, InvoiceCreateInput, InvoiceStatus, InvoiceStatusInput, List, ListCreateInput, ListProduct, Order, OrderCreateInput, OrderProduct, OrderProductCreateInput, OrderStatus, OrderStatusInput, Parameter, ParameterCreateInput, PaymentMethod, PaymentMethodInput, Product, ProductParameter, ProductPublicData, Question, QuestionCreateInput, Rating, RatingComment, RatingCommentCreateInput, RatingCreateInput, Role, RoleInput, ShippingMethod, ShippingMethodInput, User, UserAddress, Vendor, VendorInput } from '../src/types'
 import { apiURLs } from '../src/utils/constants'
 import { db } from '../src/utils/db'
 import StatusError from '../src/utils/StatusError'
@@ -23,10 +23,10 @@ export const root = {
   password: '12345678'
 }
 
-export const sleep = (ms: number): Promise<any> => new Promise((resolve) => setTimeout(resolve, ms))
+export const sleep = (ms: number): Promise<any> =>
+  new Promise((resolve) => setTimeout(resolve, ms))
 
-export const loginAs: (role: string, api: supertest.SuperTest<supertest.Test>) => Promise<{token: string; userID: number}> =
-async (role, api) => {
+export const loginAs = async (role: string): Promise<{token: string; userID: number}> => {
   const user = {
     email: `${role}@example.com`,
     password: '12345678',
@@ -223,7 +223,7 @@ export const newRole = (): RoleInput => ({
 })
 
 export const createOneRole = async (role: string): Promise<{ addedRole: Role; token: string}> => {
-  const { token } = await loginAs(role, api)
+  const { token } = await loginAs(role)
 
   const { body } = await api
     .post(apiURLs.roles)
@@ -238,7 +238,7 @@ export const newShippingMethod = (): ShippingMethodInput => ({
 })
 
 export const createOneShippingMethod = async (role: string): Promise<{ addedShippingMethod: ShippingMethod; token: string}> => {
-  const { token } = await loginAs(role, api)
+  const { token } = await loginAs(role)
 
   const { body } = await api
     .post(apiURLs.shippingMethods)
@@ -253,7 +253,7 @@ export const newAddressType = (): AddressTypeInput => ({
 })
 
 export const createOneAddressType = async (role: string): Promise<{ addedAddressType: AddressType; token: string}> => {
-  const { token } = await loginAs(role, api)
+  const { token } = await loginAs(role)
 
   const { body } = await api
     .post(apiURLs.addressTypes)
@@ -268,7 +268,7 @@ export const newPaymentMethod = (): PaymentMethodInput => ({
 })
 
 export const createOnePaymentMethod = async (role: string): Promise<{ addedPaymentMethod: PaymentMethod; token: string}> => {
-  const { token } = await loginAs(role, api)
+  const { token } = await loginAs(role)
 
   const { body } = await api
     .post(apiURLs.paymentMethods)
@@ -288,8 +288,8 @@ export const newAddress = async (): Promise<AddressCreateInput> => {
 }
 
 export const createOneFollower = async (): Promise<Follower & { token: string }> => {
-  const { token, userID } = await loginAs('root', api)
-  const { userID: follows } = await loginAs('customer', api)
+  const { token, userID } = await loginAs('root')
+  const { userID: follows } = await loginAs('customer')
 
   const { body }: { body: Follower } = await api
     .post(`${apiURLs.users}/${userID}/follows/${follows}`)
@@ -300,7 +300,7 @@ export const createOneFollower = async (): Promise<Follower & { token: string }>
 }
 
 export const createOneAddress = async (role: string): Promise<{ addedAddress: Address; token: string; userID: number}> => {
-  const { token, userID } = await loginAs(role, api)
+  const { token, userID } = await loginAs(role)
 
   const { body } = await api
     .post(apiURLs.addresses)
@@ -312,7 +312,7 @@ export const createOneAddress = async (role: string): Promise<{ addedAddress: Ad
 
 export const createOneUserAddress = async (): Promise<UserAddress & { token: string}> => {
   const { addedAddress } = await createOneAddress('admin')
-  const { userID, token } = await loginAs('customer', api)
+  const { userID, token } = await loginAs('customer')
 
   const { body }: { body: UserAddress } = await api
     .post(apiURLs.userAddresses)
@@ -327,7 +327,7 @@ export const newList = (): ListCreateInput => ({
 })
 
 export const createOneList = async (): Promise<List & { token: string}> => {
-  const { token } = await loginAs('customer', api)
+  const { token } = await loginAs('customer')
 
   const { body }: { body: List } = await api
     .post(apiURLs.lists)
@@ -343,7 +343,7 @@ export const newCategory = (name?: string, parentCategoryID?: number): CategoryC
 })
 
 export const createOneCategory = async (role: string, name?: string, parentCategoryID?: number): Promise<{ addedCategory: Category; token: string}> => {
-  const { token } = await loginAs(role, api)
+  const { token } = await loginAs(role)
 
   const { body } = await api
     .post(apiURLs.categories)
@@ -358,7 +358,7 @@ export const newVendor = (name?: string): VendorInput => ({
 })
 
 export const createOneVendor = async (role: string, name?: string): Promise<{ addedVendor: Vendor; token: string}> => {
-  const { token } = await loginAs(role, api)
+  const { token } = await loginAs(role)
 
   const { body } = await api
     .post(apiURLs.vendors)
@@ -373,7 +373,7 @@ export const newProduct = products[0]
 export const createOneProduct = async (role: string, vendorName?: string, categoryName?: string, parentCategoryID?: number): Promise<{addedProduct: ProductPublicData; token: string}> => {
   const { addedCategory } = await createOneCategory(role, categoryName, parentCategoryID)
   const { addedVendor } = await createOneVendor(role, vendorName)
-  const { token, userID } = await loginAs(role, api)
+  const { token, userID } = await loginAs(role)
 
   const { body } = await api
     .post(apiURLs.products)
@@ -406,7 +406,7 @@ export const newRating = (productID: number): RatingCreateInput => ({
 })
 
 export const createOneRating = async (): Promise<Rating & { token: string }> => {
-  const { token } = await loginAs('customer', api)
+  const { token } = await loginAs('customer')
   const { addedProduct } = await createOneProduct('admin')
 
   const { body }: { body: Rating } = await api
@@ -423,7 +423,7 @@ export const newRatingComment = (ratingID: number): RatingCommentCreateInput => 
 })
 
 export const createOneRatingComment = async (): Promise<RatingComment & { token: string }> => {
-  const { token } = await loginAs('customer', api)
+  const { token } = await loginAs('customer')
   const { ratingID } = await createOneRating()
 
   const { body }: { body: RatingComment } = await api
@@ -440,7 +440,7 @@ export const newQuestion = (productID: number): QuestionCreateInput => ({
 })
 
 export const createOneQuestion = async (): Promise<Question & { token: string }> => {
-  const { token } = await loginAs('customer', api)
+  const { token } = await loginAs('customer')
   const { addedProduct } = await createOneProduct('admin')
 
   const { body }: { body: Question } = await api
@@ -457,7 +457,7 @@ export const newAnswer = (questionID: number): AnswerCreateInput => ({
 })
 
 export const createOneAnswer = async (): Promise<Answer & { token: string }> => {
-  const { token } = await loginAs('customer', api)
+  const { token } = await loginAs('customer')
   const { questionID } = await createOneQuestion()
 
   const { body }: { body: Answer } = await api
@@ -474,7 +474,7 @@ export const newAnswerComment = (answerID: number): AnswerCommentCreateInput => 
 })
 
 export const createOneAnswerComment = async (): Promise<AnswerComment & { token: string }> => {
-  const { token } = await loginAs('customer', api)
+  const { token } = await loginAs('customer')
   const { answerID } = await createOneAnswer()
 
   const { body }: { body: AnswerComment } = await api
@@ -490,7 +490,7 @@ export const newGroup = (name?: string): GroupCreateInput => ([ {
 } ])
 
 export const createOneGroup = async (role: string, name?: string): Promise<{ addedGroup: Group; token: string}> => {
-  const { token } = await loginAs(role, api)
+  const { token } = await loginAs(role)
 
   const { body } = await api
     .post(apiURLs.groups)
@@ -523,7 +523,7 @@ export const newParameter = (name?: string): ParameterCreateInput => ([ {
 } ])
 
 export const createOneParameter = async (role: string, name?: string): Promise<{ addedParameter: Parameter; token: string}> => {
-  const { token } = await loginAs(role, api)
+  const { token } = await loginAs(role)
 
   const { body } = await api
     .post(apiURLs.parameters)
@@ -558,7 +558,7 @@ export const newCartProduct = (userID: number, productID: number): CartProduct =
 })
 
 export const createOneCartProduct = async (role: string): Promise<{ addedCartProduct: CartProduct; token: string}> => {
-  const { token, userID } = await loginAs(role, api)
+  const { token, userID } = await loginAs(role)
   const { addedProduct } = await createOneProduct('admin')
 
   const { body } = await api
@@ -574,7 +574,7 @@ export const newOrderStatus = (): OrderStatusInput => ({
 })
 
 export const createOneOrderStatus = async (orderStatus: string): Promise<{ addedOrderStatus: OrderStatus; token: string}> => {
-  const { token } = await loginAs(orderStatus, api)
+  const { token } = await loginAs(orderStatus)
 
   const { body } = await api
     .post(apiURLs.orderStatuses)
@@ -589,7 +589,7 @@ export const newInvoiceStatus = (): InvoiceStatusInput => ({
 })
 
 export const createOneInvoiceStatus = async (invoiceStatus: string): Promise<{ addedInvoiceStatus: InvoiceStatus; token: string }> => {
-  const { token } = await loginAs(invoiceStatus, api)
+  const { token } = await loginAs(invoiceStatus)
 
   const { body } = await api
     .post(apiURLs.invoiceStatuses)
@@ -639,4 +639,23 @@ export const createOneOrderProduct = async (role: string): Promise<{ addedOrderP
     .set('Cookie', `token=${token}`)
     .send(newOrderProduct(addedProduct))
   return { addedOrderProduct: body, token }
+}
+
+export const newInvoice = (orderID: number, paymentMethodID: number, userID: number): InvoiceCreateInput => ({
+  amount: 1899,
+  details: 'Card 4242 4242 4242 4242',
+  orderID,
+  paymentMethodID,
+  userID
+})
+
+export const createOneInvoice = async (role: string): Promise<{ addedInvoice: Invoice; token: string }> => {
+  const { addedPaymentMethod } = await createOnePaymentMethod('admin')
+  const { addedOrder, token } = await createOneOrder(role)
+
+  const { body }: { body: Invoice } = await api
+    .post(apiURLs.invoices)
+    .set('Cookie', `token=${token}`)
+    .send(newInvoice(addedOrder.orderID, addedPaymentMethod.paymentMethodID, addedOrder.userID as number))
+  return { addedInvoice: body, token }
 }

@@ -18,7 +18,7 @@ describe('Product adding', () => {
   test('201', async () => {
     const { addedCategory } = await createOneCategory('admin', 'Desktops')
     const { addedVendor } = await createOneVendor('admin', 'Acer')
-    const { token, userID } = await loginAs('root', api)
+    const { token, userID } = await loginAs('root')
 
     await api
       .post(apiURL)
@@ -47,7 +47,7 @@ describe('Product adding', () => {
   test('400 if no price', async () => {
     const { addedCategory } = await createOneCategory('admin', 'Desktops')
     const { addedVendor } = await createOneVendor('admin', 'Acer')
-    const { token, userID } = await loginAs('root', api)
+    const { token, userID } = await loginAs('root')
 
     await api
       .post(apiURL)
@@ -64,7 +64,7 @@ describe('Product adding', () => {
 
   test('204 upload file if admin or root', async () => {
     const { addedProduct } = await createOneProduct('admin')
-    const { token } = await loginAs('admin', api)
+    const { token } = await loginAs('admin')
 
     await api
       .post(`${apiURL}/${addedProduct.productID}/upload`)
@@ -76,7 +76,7 @@ describe('Product adding', () => {
 
   test('403 upload file if not admin or root', async () => {
     const { addedProduct } = await createOneProduct('root')
-    const { token } = await loginAs('customer', api)
+    const { token } = await loginAs('customer')
 
     await api
       .post(`${apiURL}/${addedProduct.productID}/upload`)
@@ -87,7 +87,7 @@ describe('Product adding', () => {
 
   test('400 upload file if no file', async () => {
     const { addedProduct } = await createOneProduct('admin')
-    const { token } = await loginAs('admin', api)
+    const { token } = await loginAs('admin')
 
     await api
       .post(`${apiURL}/${addedProduct.productID}/upload`)
@@ -97,7 +97,7 @@ describe('Product adding', () => {
 
   test('400 upload file if wrong type', async () => {
     const { addedProduct } = await createOneProduct('admin')
-    const { token } = await loginAs('admin', api)
+    const { token } = await loginAs('admin')
 
     await api
       .post(`${apiURL}/${addedProduct.productID}/upload`)

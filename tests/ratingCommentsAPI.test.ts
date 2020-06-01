@@ -15,7 +15,7 @@ beforeEach(async () => {
 
 describe('RatingComment adding', () => {
   test('201', async () => {
-    const { token } = await loginAs('customer', api)
+    const { token } = await loginAs('customer')
     const { ratingID } = await createOneRating()
 
     await api
@@ -31,7 +31,7 @@ describe('RatingComment adding', () => {
 
   test('204 upload file', async () => {
     const { ratingCommentID, ratingID } = await createOneRatingComment()
-    const { token } = await loginAs('customer', api)
+    const { token } = await loginAs('customer')
 
     await api
       .post(`${apiURLs.ratings}/${ratingID}/comments/${ratingCommentID}/upload`)
@@ -79,7 +79,7 @@ describe('RatingComment updating', () => {
 
   test('403 if not creator', async () => {
     const { ratingCommentID } = await createOneRatingComment()
-    const { token } = await loginAs('admin', api)
+    const { token } = await loginAs('admin')
 
     await api
       .put(`${apiURL}/${ratingCommentID}`)
@@ -101,7 +101,7 @@ describe('RatingComments deleting', () => {
 
   test('403 if another user', async () => {
     const { ratingCommentID } = await createOneRatingComment()
-    const { token } = await loginAs('admin', api)
+    const { token } = await loginAs('admin')
 
     await api
       .delete(`${apiURL}/${ratingCommentID}`)

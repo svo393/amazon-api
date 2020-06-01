@@ -16,7 +16,7 @@ beforeEach(async () => {
 describe('UserAddress adding', () => {
   test('201', async () => {
     const { addedAddress } = await createOneAddress('admin')
-    const { userID, token } = await loginAs('customer', api)
+    const { userID, token } = await loginAs('customer')
 
     const userAddressesAtStart = await userAddressesInDB()
 
@@ -58,7 +58,7 @@ describe('UserAddress deleting', () => {
 
   test('403 if another user', async () => {
     const { userID, addressID } = await createOneUserAddress()
-    const { token } = await loginAs('admin', api)
+    const { token } = await loginAs('admin')
 
     await api
       .delete(`${apiURLs.users}/${userID}/addresses/${addressID}`)

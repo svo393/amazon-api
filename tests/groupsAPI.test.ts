@@ -14,7 +14,7 @@ beforeEach(async () => {
 
 describe('Group adding', () => {
   test('201', async () => {
-    const { token } = await loginAs('admin', api)
+    const { token } = await loginAs('admin')
 
     await api
       .post(apiURL)
@@ -28,7 +28,7 @@ describe('Group adding', () => {
   })
 
   test('403 if not admin or root', async () => {
-    const { token } = await loginAs('customer', api)
+    const { token } = await loginAs('customer')
 
     await api
       .post(apiURL)
@@ -81,7 +81,7 @@ describe('Group updating', () => {
 
   test('403 if not admin or root', async () => {
     const { addedGroup } = await createOneGroup('admin')
-    const { token } = await loginAs('customer', api)
+    const { token } = await loginAs('customer')
 
     await api
       .put(`${apiURL}/${addedGroup.groupID}`)

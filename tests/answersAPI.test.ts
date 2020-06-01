@@ -15,7 +15,7 @@ beforeEach(async () => {
 
 describe('Answer adding', () => {
   test('201', async () => {
-    const { token } = await loginAs('customer', api)
+    const { token } = await loginAs('customer')
     const { questionID } = await createOneQuestion()
 
     await api
@@ -31,7 +31,7 @@ describe('Answer adding', () => {
 
   test('204 upload file', async () => {
     const { answerID } = await createOneAnswer()
-    const { token } = await loginAs('customer', api)
+    const { token } = await loginAs('customer')
 
     await api
       .post(`${apiURL}/${answerID}/upload`)
@@ -79,7 +79,7 @@ describe('Answer updating', () => {
 
   test('403 if not creator', async () => {
     const { answerID } = await createOneAnswer()
-    const { token } = await loginAs('admin', api)
+    const { token } = await loginAs('admin')
 
     await api
       .put(`${apiURL}/${answerID}`)
@@ -105,7 +105,7 @@ describe('Answers deleting', () => {
 
   test('403 if another user', async () => {
     const { answerID } = await createOneAnswer()
-    const { token } = await loginAs('admin', api)
+    const { token } = await loginAs('admin')
 
     await api
       .delete(`${apiURL}/${answerID}`)

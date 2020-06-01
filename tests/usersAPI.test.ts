@@ -42,7 +42,7 @@ describe('User authorization', () => {
   })
 
   test('204 logout with token deletion', async () => {
-    const { token } = await loginAs('customer', api)
+    const { token } = await loginAs('customer')
 
     const resLogout = await api
       .post(`${apiURL}/logout`)
@@ -68,7 +68,7 @@ describe('User authorization', () => {
 
 describe('User fetching', () => {
   test('403 users if not root or admin', async () => {
-    const { token } = await loginAs('customer', api)
+    const { token } = await loginAs('customer')
 
     await api
       .get(apiURL)
@@ -77,7 +77,7 @@ describe('User fetching', () => {
   })
 
   test('200 users if admin', async () => {
-    const { token } = await loginAs('admin', api)
+    const { token } = await loginAs('admin')
 
     await api
       .get(apiURL)
@@ -96,7 +96,7 @@ describe('User fetching', () => {
   })
 
   test('full user if admin', async () => {
-    const { token } = await loginAs('admin', api)
+    const { token } = await loginAs('admin')
 
     const anotherUser = await getUserByEmail('admin@example.com')
 
@@ -109,7 +109,7 @@ describe('User fetching', () => {
   })
 
   test('full user if own profile', async () => {
-    const { token } = await loginAs('customer', api)
+    const { token } = await loginAs('customer')
 
     const { body } = await api
       .get(`${apiURL}/me`)
@@ -122,7 +122,7 @@ describe('User fetching', () => {
 
 describe('User updating', () => {
   test('200 if own profile', async () => {
-    const { token, userID } = await loginAs('customer', api)
+    const { token, userID } = await loginAs('customer')
 
     const { body } = await api
       .put(`${apiURL}/${userID}`)
@@ -135,7 +135,7 @@ describe('User updating', () => {
   })
 
   test('403 if another user\'s profile', async () => {
-    const { token } = await loginAs('customer', api)
+    const { token } = await loginAs('customer')
 
     const anotherUser = await getUserByEmail('admin@example.com')
 
@@ -147,7 +147,7 @@ describe('User updating', () => {
   })
 
   test('200 if root', async () => {
-    const { token } = await loginAs('root', api)
+    const { token } = await loginAs('root')
 
     const anotherUser = await getUserByEmail('admin@example.com')
 
@@ -168,7 +168,7 @@ describe('User updating', () => {
 
 describe('User deleting', () => {
   test('204 if same user', async () => {
-    const { token, userID } = await loginAs('customer', api)
+    const { token, userID } = await loginAs('customer')
 
     const usersAtStart = await usersInDB()
 
@@ -182,8 +182,8 @@ describe('User deleting', () => {
   })
 
   test('403 if not same user', async () => {
-    const { userID } = await loginAs('admin', api)
-    const { token } = await loginAs('customer', api)
+    const { userID } = await loginAs('admin')
+    const { token } = await loginAs('customer')
 
     await api
       .delete(`${apiURL}/${userID}`)

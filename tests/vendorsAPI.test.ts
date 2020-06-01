@@ -14,7 +14,7 @@ beforeEach(async () => {
 
 describe('Vendor adding', () => {
   test('201', async () => {
-    const { token } = await loginAs('admin', api)
+    const { token } = await loginAs('admin')
 
     await api
       .post(apiURL)
@@ -28,7 +28,7 @@ describe('Vendor adding', () => {
   })
 
   test('403 if not admin or root', async () => {
-    const { token } = await loginAs('customer', api)
+    const { token } = await loginAs('customer')
 
     await api
       .post(apiURL)
@@ -75,7 +75,7 @@ describe('Vendor updating', () => {
 
   test('403 if not admin or root', async () => {
     const { addedVendor } = await createOneVendor('admin')
-    const { token } = await loginAs('customer', api)
+    const { token } = await loginAs('customer')
 
     await api
       .put(`${apiURL}/${addedVendor.vendorID}`)

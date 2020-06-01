@@ -42,7 +42,7 @@ describe('ListProducts deleting', () => {
 
   test('403 if another user', async () => {
     const { productID, listID } = await createOneListProduct()
-    const { token } = await loginAs('admin', api)
+    const { token } = await loginAs('admin')
 
     await api
       .delete(`${apiURL}/${listID}/products/${productID}`)

@@ -32,5 +32,6 @@ export const apiURLs = {
   answerComments: `${baseAPI}/answer-comments`,
   groups: `${baseAPI}/groups`,
   parameters: `${baseAPI}/parameters`,
-  orders: `${baseAPI}/orders`
+  orders: `${baseAPI}/orders`,
+  invoices: `${baseAPI}/invoices`
 }

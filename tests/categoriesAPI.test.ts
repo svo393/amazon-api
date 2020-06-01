@@ -14,7 +14,7 @@ beforeEach(async () => {
 
 describe('Category adding', () => {
   test('201', async () => {
-    const { token } = await loginAs('admin', api)
+    const { token } = await loginAs('admin')
 
     await api
       .post(apiURL)
@@ -28,7 +28,7 @@ describe('Category adding', () => {
   })
 
   test('403 if not admin or root', async () => {
-    const { token } = await loginAs('customer', api)
+    const { token } = await loginAs('customer')
 
     await api
       .post(apiURL)
@@ -75,7 +75,7 @@ describe('Category updating', () => {
 
   test('403 if not admin or root', async () => {
     const { addedCategory } = await createOneCategory('admin')
-    const { token } = await loginAs('customer', api)
+    const { token } = await loginAs('customer')
 
     await api
       .put(`${apiURL}/${addedCategory.categoryID}`)

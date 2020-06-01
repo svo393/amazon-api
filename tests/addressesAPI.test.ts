@@ -15,7 +15,7 @@ beforeEach(async () => {
 
 describe('Address adding', () => {
   test('201', async () => {
-    const { token } = await loginAs('root', api)
+    const { token } = await loginAs('root')
     const addressesAtStart = await addressesInDB()
 
     await api

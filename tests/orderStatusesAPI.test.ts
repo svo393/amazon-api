@@ -14,7 +14,7 @@ beforeEach(async () => {
 
 describe('OrderStatus adding', () => {
   test('201', async () => {
-    const { token } = await loginAs('admin', api)
+    const { token } = await loginAs('admin')
     const orderStatusesAtStart = await orderStatusesInDB()
 
     await api
@@ -29,7 +29,7 @@ describe('OrderStatus adding', () => {
   })
 
   test('403 if not admin', async () => {
-    const { token } = await loginAs('customer', api)
+    const { token } = await loginAs('customer')
 
     await api
       .post(apiURL)
@@ -41,7 +41,7 @@ describe('OrderStatus adding', () => {
 
 describe('OrderStatuses fetching', () => {
   test('200 orderStatuses', async () => {
-    const { token } = await loginAs('admin', api)
+    const { token } = await loginAs('admin')
 
     await api
       .get(apiURL)
@@ -65,7 +65,7 @@ describe('OrderStatus updating', () => {
 
   test('403 if not admin', async () => {
     const { addedOrderStatus } = await createOneOrderStatus('admin')
-    const { token } = await loginAs('customer', api)
+    const { token } = await loginAs('customer')
 
     await api
       .put(`${apiURL}/${addedOrderStatus.orderStatusID}`)

@@ -15,7 +15,7 @@ beforeEach(async () => {
 
 describe('AnswerComment adding', () => {
   test('201', async () => {
-    const { token } = await loginAs('customer', api)
+    const { token } = await loginAs('customer')
     const { answerID } = await createOneAnswer()
 
     await api
@@ -31,7 +31,7 @@ describe('AnswerComment adding', () => {
 
   test('204 upload file', async () => {
     const { answerCommentID, answerID } = await createOneAnswerComment()
-    const { token } = await loginAs('customer', api)
+    const { token } = await loginAs('customer')
 
     await api
       .post(`${apiURLs.answers}/${answerID}/comments/${answerCommentID}/upload`)
@@ -79,7 +79,7 @@ describe('AnswerComment updating', () => {
 
   test('403 if not creator', async () => {
     const { answerCommentID } = await createOneAnswerComment()
-    const { token } = await loginAs('admin', api)
+    const { token } = await loginAs('admin')
 
     await api
       .put(`${apiURL}/${answerCommentID}`)
@@ -101,7 +101,7 @@ describe('AnswerComments deleting', () => {
 
   test('403 if another user', async () => {
     const { answerCommentID } = await createOneAnswerComment()
-    const { token } = await loginAs('admin', api)
+    const { token } = await loginAs('admin')
 
     await api
       .delete(`${apiURL}/${answerCommentID}`)

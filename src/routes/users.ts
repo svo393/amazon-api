@@ -10,6 +10,7 @@ import userService from '../services/userService'
 import { checkCartProductUpdate, checkNewCartProduct, checkNewUser, checkUserAddressesUpdate, checkUserLogin, checkUserResetRequest, checkUserResetToken, checkUserUpdate } from '../utils/inputValidator'
 import { isAdmin, isLoggedIn, isSameUser, isSameUserOrAdmin } from '../utils/middleware'
 import orderService from '../services/orderService'
+import invoiceService from '../services/invoiceService'
 
 const router = Router()
 
@@ -150,6 +151,11 @@ router.delete('/:userID/cartProducts/:productID', isSameUserOrAdmin('params'), a
 router.get('/:userID/orders', isSameUserOrAdmin('params'), async (req, res) => {
   const orders = await orderService.getOrdersByUser(req)
   res.json(orders)
+})
+
+router.get('/:userID/invoices', isSameUserOrAdmin('params'), async (req, res) => {
+  const invoices = await invoiceService.getInvoicesByUser(req)
+  res.json(invoices)
 })
 
 export default router

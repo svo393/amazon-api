@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoryCreateInput, CategoryUpdateInput, GroupCreateInput, GroupProductInput, GroupUpdateInput, InvoiceStatusInput, ListCreateInput, OrderCreateInput, OrderProductCreateInput, OrderStatusInput, ParameterCreateInput, ParameterUpdateInput, PasswordRequestInput, PasswordResetInput, PaymentMethodInput, ProductCreateInput, ProductParameterInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, RoleInput, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput, OrderProductUpdateInput } from '../types'
+import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoryCreateInput, CategoryUpdateInput, GroupCreateInput, GroupProductInput, GroupUpdateInput, InvoiceStatusInput, ListCreateInput, OrderCreateInput, OrderProductCreateInput, OrderStatusInput, ParameterCreateInput, ParameterUpdateInput, PasswordRequestInput, PasswordResetInput, PaymentMethodInput, ProductCreateInput, ProductParameterInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, RoleInput, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput, OrderProductUpdateInput, InvoiceCreateInput, InvoiceUpdateInput } from '../types'
 import { hasDefinedProps, isArray, isBoolean, isEmail, isInputProvided, isNumber, isPasswordValid, isProductParameterOrGroupProduct, isProvided, isString, isStringOrArray, isStringOrNumber } from './validatorLib'
 
 export const checkNewUser = ({ body }: Request): UserSignupInput => {
@@ -827,4 +827,64 @@ export const checkOrderProductUpdate = ({ body }: Request): OrderProductUpdateIn
     qty: qty?.param,
     price: price?.param
   }
+}
+
+export const checkNewInvoice = ({ body }: Request): InvoiceCreateInput => {
+  const details = R.pipe(
+    isProvided,
+    isString
+  )({ name: 'details', param: body.details })
+
+  const amount = R.pipe(
+    isProvided,
+    isNumber
+  )({ name: 'amount', param: body.amount })
+
+  const paymentMethodID = R.pipe(
+    isProvided,
+    isNumber
+  )({ name: 'paymentMethodID', param: body.paymentMethodID })
+
+  const userID = R.pipe(
+    isProvided,
+    isNumber
+  )({ name: 'userID', param: body.userID })
+
+  const orderID = R.pipe(
+    isProvided,
+    isNumber
+  )({ name: 'orderID', param: body.orderID })
+
+  return {
+    amount: amount.param,
+    details: details.param,
+    orderID: orderID.param,
+    userID: userID.param,
+    paymentMethodID: paymentMethodID.param
+  }
+}
+
+export const checkInvoiceUpdate = ({ body }: Request): InvoiceUpdateInput => {
+  const amount = body.amount && isNumber(
+    { name: 'amount', param: body.amount }
+  )
+
+  const details = body.details && isString(
+    { name: 'details', param: body.details }
+  )
+
+  const invoiceStatusID = body.invoiceStatusID && isNumber(
+    { name: 'invoiceStatusID', param: body.invoiceStatusID }
+  )
+
+  const paymentMethodID = body.paymentMethodID && isNumber(
+    { name: 'paymentMethodID', param: body.paymentMethodID }
+  )
+
+  return hasDefinedProps({
+    amount: amount?.param,
+    details: details?.param,
+    invoiceStatusID: invoiceStatusID?.param,
+    paymentMethodID: paymentMethodID?.param
+  })
 }
