@@ -73,10 +73,10 @@ describe('Invoice updating', () => {
     const { body } = await api
       .put(`${apiURL}/${addedInvoice.invoiceID}`)
       .set('Cookie', `token=${token}`)
-      .send({ invoiceStatusID: 1 })
+      .send({ details: 'Updated details' })
       .expect(200)
 
-    expect(body.invoiceStatusID).toBe(1)
+    expect(body.details).toBe('Updated details')
   })
 })
 

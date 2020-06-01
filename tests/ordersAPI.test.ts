@@ -79,10 +79,10 @@ describe('Order updating', () => {
     const { body } = await api
       .put(`${apiURL}/${addedOrder.orderID}`)
       .set('Cookie', `token=${token}`)
-      .send({ orderStatusID: 1 })
+      .send({ address: 'Updated Address' })
       .expect(200)
 
-    expect(body.orderStatusID).toBe(1)
+    expect(body.address).toBe('Updated Address')
   })
 })
 
