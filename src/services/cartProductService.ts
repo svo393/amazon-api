@@ -5,10 +5,12 @@ import StatusError from '../utils/StatusError'
 
 const addCartProduct = async (cartProductInput: CartProduct): Promise<CartProduct> => {
   const { rows: [ addedCP ] }: { rows: CartProduct[] } = await db.raw(
-    `? ON CONFLICT ("userID", "productID")
-       DO UPDATE SET
-       "qty" = EXCLUDED."qty"
-       RETURNING *;`,
+    `
+    ? ON CONFLICT ("userID", "productID")
+      DO UPDATE SET
+      "qty" = EXCLUDED."qty"
+      RETURNING *;
+    `,
     [ db('cartProducts').insert(cartProductInput) ]
   )
   return addedCP

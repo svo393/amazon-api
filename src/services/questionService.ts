@@ -8,9 +8,11 @@ const addQuestion = async (questionInput: QuestionCreateInput, res: Response): P
   const now = new Date()
 
   const { rows: [ addedQuestion ] }: { rows: Question[] } = await db.raw(
-    `? ON CONFLICT
-       DO NOTHING
-       RETURNING *;`,
+    `
+    ? ON CONFLICT
+      DO NOTHING
+      RETURNING *;
+    `,
     [ db('questions').insert({
       ...questionInput,
       userID: res.locals.userID,

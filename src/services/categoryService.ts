@@ -6,9 +6,11 @@ import StatusError from '../utils/StatusError'
 
 const addCategory = async (categoryInput: CategoryCreateInput): Promise<Category> => {
   const { rows: [ addedCategory ] }: { rows: Category[] } = await db.raw(
-    `? ON CONFLICT
-       DO NOTHING
-       RETURNING *;`,
+    `
+    ? ON CONFLICT
+      DO NOTHING
+      RETURNING *;
+      `,
     [ db('categories').insert(categoryInput) ]
   )
 

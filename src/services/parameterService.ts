@@ -10,9 +10,11 @@ const addParameters = async (parameterInput: ParameterCreateInput): Promise<Para
 
 const addProductParameter = async (productParameterInput: ProductParameterInput, req: Request): Promise<ProductParameter> => {
   const { rows: [ addedProductParameter ] }: { rows: ProductParameter[] } = await db.raw(
-    `? ON CONFLICT
-       DO NOTHING
-       RETURNING *;`,
+    `
+    ? ON CONFLICT
+      DO NOTHING
+      RETURNING *;
+    `,
     [ db('productParameters').insert(({
       ...productParameterInput,
       productID: Number(req.params.productID),

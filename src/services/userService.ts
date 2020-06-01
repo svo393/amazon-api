@@ -8,6 +8,7 @@ import { db } from '../utils/db'
 import { Answer, Order, PasswordRequestInput, PasswordResetInput, Question, Rating, Role, User, UserLoginInput, UserSafeData, UserSignupInput, UserUpdateInput, RatingComment, AnswerComment } from '../types'
 import env from '../utils/config'
 import StatusError from '../utils/StatusError'
+import { uploadImages } from '../utils/img'
 // import { makeANiceEmail, transport } from '../utils/mail'
 
 type UserBaseData = Omit<UserSafeData,
@@ -299,6 +300,17 @@ const resetPassword = async ({ password, resetToken }: PasswordResetInput, res: 
   return updatedUser
 }
 
+const uploadUserAvatar = (file: Express.Multer.File, req: Request): void => {
+  const uploadConfig = {
+    imagePath: './public/media/avatars',
+    maxWidth: 460,
+    maxHeight: 460,
+    thumbWidth: 48,
+    thumbHeight: 48
+  }
+  uploadImages([ file ], req, uploadConfig, 'userID')
+}
+
 export default {
   addUser,
   loginUser,
@@ -307,5 +319,6 @@ export default {
   updateUser,
   deleteUser,
   sendPasswordReset,
-  resetPassword
+  resetPassword,
+  uploadUserAvatar
 }

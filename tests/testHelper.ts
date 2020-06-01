@@ -8,19 +8,19 @@ import { products } from './testProductData'
 
 const api = supertest(app)
 
-export const customer = {
+export const customerUser = {
   email: 'customer@example.com',
-  password: '12345678'
+  password: 'yW%491f8UGYJ'
 }
 
-export const admin = {
+export const adminUser = {
   email: 'admin@example.com',
-  password: '12345678'
+  password: 'yW%491f8UGYJ'
 }
 
-export const root = {
+export const rootUser = {
   email: 'root@example.com',
-  password: '12345678'
+  password: 'yW%491f8UGYJ'
 }
 
 export const sleep = (ms: number): Promise<any> =>
@@ -165,15 +165,15 @@ export const purge = async (): Promise<void> => {
 export const populateUsers = async (): Promise<void> => {
   await api
     .post('/api/users')
-    .send(customer)
+    .send(customerUser)
 
   await api
     .post('/api/users')
-    .send(admin)
+    .send(adminUser)
 
   await api
     .post('/api/users')
-    .send(root)
+    .send(rootUser)
 
   const roles = await db<Role>('roles')
   const adminRole = roles.find((r) => r.name === 'ADMIN')
@@ -183,17 +183,17 @@ export const populateUsers = async (): Promise<void> => {
 
   await db('users')
     .update('roleID', adminRole.roleID)
-    .where('email', admin.email)
+    .where('email', adminUser.email)
 
   await db('users')
     .update('roleID', rootRole.roleID)
-    .where('email', root.email)
+    .where('email', rootUser.email)
 }
 
 export const loginAs = async (role: string): Promise<{token: string; userID: number}> => {
   const user = {
     email: `${role}@example.com`,
-    password: '12345678',
+    password: 'yW%491f8UGYJ',
     remember: true
   }
 

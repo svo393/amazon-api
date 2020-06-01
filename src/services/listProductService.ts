@@ -5,9 +5,11 @@ import StatusError from '../utils/StatusError'
 
 const addListProduct = async (req: Request): Promise<ListProduct> => {
   const { rows: [ addedUA ] }: { rows: ListProduct[] } = await db.raw(
-    `? ON CONFLICT
-       DO NOTHING
-       RETURNING *;`,
+    `
+    ? ON CONFLICT
+      DO NOTHING
+      RETURNING *;
+    `,
     [ db('listProducts').insert({
       listID: Number(req.params.listID),
       productID: Number(req.params.productID)

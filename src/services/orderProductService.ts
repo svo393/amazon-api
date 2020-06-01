@@ -6,9 +6,11 @@ import Knex from 'knex'
 
 const addOrderProduct = async (orderProductInput: OrderProductCreateInput, req: Request): Promise<OrderProduct> => {
   const { rows: [ addedOrderProduct ] }: { rows: OrderProduct[] } = await db.raw(
-    `? ON CONFLICT
-       DO NOTHING
-       RETURNING *;`,
+    `
+    ? ON CONFLICT
+      DO NOTHING
+      RETURNING *;
+    `,
     [ db('orderProducts').insert({
       ...orderProductInput,
       orderID: Number(req.params.orderID)

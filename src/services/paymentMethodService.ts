@@ -5,9 +5,11 @@ import StatusError from '../utils/StatusError'
 
 const addPaymentMethod = async (paymentMethodInput: PaymentMethodInput): Promise<PaymentMethod> => {
   const { rows: [ addedPT ] }: { rows: PaymentMethod[] } = await db.raw(
-    `? ON CONFLICT
-       DO NOTHING
-       RETURNING *;`,
+    `
+    ? ON CONFLICT
+      DO NOTHING
+      RETURNING *;
+    `,
     [ db('paymentMethods').insert(paymentMethodInput) ]
   )
 

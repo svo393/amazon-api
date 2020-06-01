@@ -5,9 +5,11 @@ import StatusError from '../utils/StatusError'
 
 const addFollower = async (req: Request): Promise<Follower> => {
   const { rows: [ addedFollower ] }: { rows: Follower[] } = await db.raw(
-    `? ON CONFLICT
-       DO NOTHING
-       RETURNING *;`,
+    `
+    ? ON CONFLICT
+      DO NOTHING
+      RETURNING *;
+    `,
     [ db('followers').insert({
       userID: req.params.userID,
       follows: req.params.anotherUserID

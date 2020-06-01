@@ -6,9 +6,11 @@ import StatusError from '../utils/StatusError'
 
 const addAddressType = async (atInput: ATInput): Promise<AT> => {
   const { rows: [ addedAT ] }: { rows: AT[] } = await db.raw(
-    `? ON CONFLICT
-       DO NOTHING
-       RETURNING *;`,
+    `
+    ? ON CONFLICT
+      DO NOTHING
+      RETURNING *;
+    `,
     [ db('addressTypes').insert(atInput) ]
   )
 

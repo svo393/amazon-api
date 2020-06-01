@@ -2,15 +2,15 @@ import Router from 'express'
 import addressService from '../services/addressService'
 import cartProductService from '../services/cartProductService'
 import followerService from '../services/followerService'
+import invoiceService from '../services/invoiceService'
 import listService from '../services/listService'
+import orderService from '../services/orderService'
 import questionService from '../services/questionService'
 import ratingService from '../services/ratingService'
 import userAddressService from '../services/userAddressService'
 import userService from '../services/userService'
-import { checkCartProductUpdate, checkNewCartProduct, checkNewUser, checkUserAddressesUpdate, checkUserLogin, checkUserResetRequest, checkUserResetToken, checkUserUpdate } from '../utils/inputValidator'
-import { isAdmin, isLoggedIn, isSameUser, isSameUserOrAdmin } from '../utils/middleware'
-import orderService from '../services/orderService'
-import invoiceService from '../services/invoiceService'
+import { checkCartProductUpdate, checkNewCartProduct, checkNewUser, checkSingleMediaUpload, checkUserAddressesUpdate, checkUserLogin, checkUserResetRequest, checkUserResetToken, checkUserUpdate } from '../utils/inputValidator'
+import { isAdmin, isLoggedIn, isSameUser, isSameUserOrAdmin, multerUpload } from '../utils/middleware'
 
 const router = Router()
 
@@ -55,6 +55,12 @@ router.put('/:userID', isSameUser('params'), async (req, res) => {
 router.delete('/:userID', isSameUser('params'), async (req, res) => {
   await userService.deleteUser(req, res)
   res.clearCookie('token')
+  res.status(204).end()
+})
+
+router.post('/:userID/upload', isSameUser('params'), multerUpload.single('userAvatar'), (req, res) => {
+  const userMedia = checkSingleMediaUpload(req)
+  userService.uploadUserAvatar(userMedia, req)
   res.status(204).end()
 })
 

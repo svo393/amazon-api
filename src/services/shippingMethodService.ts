@@ -5,9 +5,11 @@ import StatusError from '../utils/StatusError'
 
 const addShippingMethod = async (smInput: SMInput): Promise<SM> => {
   const { rows: [ addedSM ] }: { rows: SM[] } = await db.raw(
-    `? ON CONFLICT
-       DO NOTHING
-       RETURNING *;`,
+    `
+    ? ON CONFLICT
+      DO NOTHING
+      RETURNING *;
+    `,
     [ db('shippingMethods').insert(smInput) ]
   )
 

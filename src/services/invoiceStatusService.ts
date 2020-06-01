@@ -5,9 +5,11 @@ import StatusError from '../utils/StatusError'
 
 const addInvoiceStatus = async (invoiceStatusInput: InvoiceStatusInput): Promise<InvoiceStatus> => {
   const { rows: [ addedInvoiceStatus ] }: { rows: InvoiceStatus[] } = await db.raw(
-    `? ON CONFLICT
-       DO NOTHING
-       RETURNING *;`,
+    `
+    ? ON CONFLICT
+      DO NOTHING
+      RETURNING *;
+    `,
     [ db('invoiceStatuses').insert(invoiceStatusInput) ]
   )
 

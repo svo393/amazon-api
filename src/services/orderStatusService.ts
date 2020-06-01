@@ -5,9 +5,11 @@ import StatusError from '../utils/StatusError'
 
 const addOrderStatus = async (orderStatusInput: OrderStatusInput): Promise<OrderStatus> => {
   const { rows: [ addedOrderStatus ] }: { rows: OrderStatus[] } = await db.raw(
-    `? ON CONFLICT
-       DO NOTHING
-       RETURNING *;`,
+    `
+    ? ON CONFLICT
+      DO NOTHING
+      RETURNING *;
+    `,
     [ db('orderStatuses').insert(orderStatusInput) ]
   )
 

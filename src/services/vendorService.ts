@@ -6,9 +6,11 @@ import StatusError from '../utils/StatusError'
 
 const addVendor = async (vendorInput: VendorInput): Promise<Vendor> => {
   const { rows: [ addedVendor ] }: { rows: Vendor[] } = await db.raw(
-    `? ON CONFLICT
-       DO NOTHING
-       RETURNING *;`,
+    `
+    ? ON CONFLICT
+      DO NOTHING
+      RETURNING *;
+    `,
     [ db('vendors').insert(vendorInput) ]
   )
 

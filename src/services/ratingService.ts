@@ -8,9 +8,11 @@ const addRating = async (ratingInput: RatingCreateInput, res: Response): Promise
   const now = new Date()
 
   const { rows: [ addedRating ] }: { rows: Rating[] } = await db.raw(
-    `? ON CONFLICT
-       DO NOTHING
-       RETURNING *;`,
+    `
+    ? ON CONFLICT
+      DO NOTHING
+      RETURNING *;
+    `,
     [ db('ratings').insert({
       ...ratingInput,
       userID: res.locals.userID,

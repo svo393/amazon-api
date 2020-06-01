@@ -5,9 +5,11 @@ import StatusError from '../utils/StatusError'
 
 const addUserAddress = async (UAInput: UACreateInput): Promise<UserAddress> => {
   const { rows: [ addedUA ] }: { rows: UserAddress[] } = await db.raw(
-    `? ON CONFLICT
-       DO NOTHING
-       RETURNING *;`,
+    `
+    ? ON CONFLICT
+      DO NOTHING
+      RETURNING *;
+    `,
     [ db('userAddresses').insert(UAInput) ]
   )
 

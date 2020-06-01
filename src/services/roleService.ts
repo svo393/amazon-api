@@ -6,9 +6,11 @@ import StatusError from '../utils/StatusError'
 
 const addRole = async (roleInput: RoleInput): Promise<Role> => {
   const { rows: [ addedRole ] }: { rows: Role[] } = await db.raw(
-    `? ON CONFLICT
-       DO NOTHING
-       RETURNING *;`,
+    `
+    ? ON CONFLICT
+      DO NOTHING
+      RETURNING *;
+    `,
     [ db('roles').insert(roleInput) ]
   )
 

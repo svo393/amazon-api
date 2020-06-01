@@ -10,9 +10,11 @@ const addGroup = async (groupInput: GroupCreateInput): Promise<Group> => {
 
 const addGroupProduct = async (groupProductInput: GroupProductInput, req: Request): Promise<GroupProduct> => {
   const { rows: [ addedGroupProduct ] }: { rows: GroupProduct[] } = await db.raw(
-    `? ON CONFLICT
-       DO NOTHING
-       RETURNING *;`,
+    `
+    ? ON CONFLICT
+      DO NOTHING
+      RETURNING *;
+    `,
     [ db('groupProducts').insert({
       ...groupProductInput,
       productID: Number(req.params.productID),

@@ -5,9 +5,11 @@ import StatusError from '../utils/StatusError'
 
 const addList = async (listInput: ListCreateInput, res: Response): Promise<List> => {
   const { rows: [ addedList ] }: { rows: List[] } = await db.raw(
-    `? ON CONFLICT
-       DO NOTHING
-       RETURNING *;`,
+    `
+    ? ON CONFLICT
+      DO NOTHING
+      RETURNING *;
+    `,
     [ db('lists').insert({ ...listInput, userID: res.locals.userID }) ]
   )
 

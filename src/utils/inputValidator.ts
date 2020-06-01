@@ -61,6 +61,10 @@ export const checkUserUpdate = ({ body }: Request): UserUpdateInput => {
     { name: 'name', param: body.name }
   )
 
+  const info = body.info && isString(
+    { name: 'info', param: body.info }
+  )
+
   const avatar = 'avatar' in body
     ? isBoolean({ name: 'avatar', param: body.avatar })
     : undefined
@@ -71,6 +75,7 @@ export const checkUserUpdate = ({ body }: Request): UserUpdateInput => {
 
   return hasDefinedProps({
     name: name?.param,
+    info: info?.param,
     email: email?.param.toLowerCase(),
     password: password?.param,
     avatar: avatar?.param,
@@ -251,8 +256,13 @@ export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
 
 export const checkMediaUpload = ({ files }: Request): Express.Multer.File[] => {
   isInputProvided(files, 'Missing images')
-  isStringOrArray({ name: 'images', param: files })
+  isArray({ name: 'images', param: files })
   return files as Express.Multer.File[]
+}
+
+export const checkSingleMediaUpload = ({ file }: Request): Express.Multer.File => {
+  isInputProvided(file, 'Missing image')
+  return file
 }
 
 export const checkNewCategory = ({ body }: Request): CategoryCreateInput => {
