@@ -9,6 +9,7 @@ import questionService from '../services/questionService'
 import ratingService from '../services/ratingService'
 import userAddressService from '../services/userAddressService'
 import userService from '../services/userService'
+import { UPLOAD_TIMEOUT } from '../utils/config'
 import { checkCartProductUpdate, checkNewCartProduct, checkNewUser, checkSingleMediaUpload, checkUserAddressesUpdate, checkUserLogin, checkUserResetRequest, checkUserResetToken, checkUserUpdate } from '../utils/inputValidator'
 import { isAdmin, isLoggedIn, isSameUser, isSameUserOrAdmin, multerUpload } from '../utils/middleware'
 
@@ -59,6 +60,7 @@ router.delete('/:userID', isSameUser('params'), async (req, res) => {
 })
 
 router.post('/:userID/upload', isSameUser('params'), multerUpload.single('userAvatar'), (req, res) => {
+  req.socket.setTimeout(UPLOAD_TIMEOUT)
   const userMedia = checkSingleMediaUpload(req)
   userService.uploadUserAvatar(userMedia, req)
   res.status(204).end()

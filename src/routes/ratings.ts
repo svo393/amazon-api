@@ -1,7 +1,8 @@
 import Router from 'express'
 import ratingCommentService from '../services/ratingCommentService'
 import ratingService from '../services/ratingService'
-import { checkNewRating, checkNewRatingComment, checkMediaUpload, checkRatingUpdate } from '../utils/inputValidator'
+import { UPLOAD_TIMEOUT } from '../utils/config'
+import { checkMediaUpload, checkNewRating, checkNewRatingComment, checkRatingUpdate } from '../utils/inputValidator'
 import { isCreator, isLoggedIn, multerUpload } from '../utils/middleware'
 
 const router = Router()
@@ -40,12 +41,14 @@ router.get('/:ratingID/comments', async (req, res) => {
 })
 
 router.post('/:ratingID/upload', isCreator('ratings', 'ratingID', 'params'), multerUpload.array('ratingMedia', 4), (req, res) => {
+  req.socket.setTimeout(UPLOAD_TIMEOUT)
   const ratingMedia = checkMediaUpload(req)
   ratingService.uploadRatingImages(ratingMedia, req)
   res.status(204).end()
 })
 
 router.post('/:ratingID/comments/:ratingCommentID/upload', isCreator('ratingComments', 'ratingCommentID', 'params'), multerUpload.array('ratingCommentMedia', 4), (req, res) => {
+  req.socket.setTimeout(UPLOAD_TIMEOUT)
   const ratingMedia = checkMediaUpload(req)
   ratingCommentService.uploadRatingCommentImages(ratingMedia, req)
   res.status(204).end()

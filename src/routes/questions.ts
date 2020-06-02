@@ -1,6 +1,7 @@
 import Router from 'express'
 import answerService from '../services/answerService'
 import questionService from '../services/questionService'
+import { UPLOAD_TIMEOUT } from '../utils/config'
 import { checkMediaUpload, checkNewAnswer, checkNewQuestion, checkQuestionUpdate } from '../utils/inputValidator'
 import { isCreator, isLoggedIn, multerUpload } from '../utils/middleware'
 
@@ -40,6 +41,7 @@ router.get('/:questionID/answers', async (req, res) => {
 })
 
 router.post('/:questionID/upload', isCreator('questions', 'questionID', 'params'), multerUpload.array('questionMedia', 4), (req, res) => {
+  req.socket.setTimeout(UPLOAD_TIMEOUT)
   const questionMedia = checkMediaUpload(req)
   questionService.uploadQuestionImages(questionMedia, req)
   res.status(204).end()

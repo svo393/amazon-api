@@ -7,6 +7,9 @@ import StatusError from '../utils/StatusError'
 import { sensitiveAddressTypes } from '../utils/constants'
 
 const addAddress = async (addressInput: AddressCreateInput, res: Response): Promise<Address & UserAddress> => {
+  // TODO if new address isDefault, set false to the previous
+  // TODO transfor all sequence db calls to transactions
+
   const { isDefault, addr, addressTypeID } = addressInput
 
   const existingAddresses = await db<Address & UserAddress>('addresses as a')

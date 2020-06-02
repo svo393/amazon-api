@@ -4,7 +4,8 @@ import parameterService from '../services/parameterService'
 import productService from '../services/productService'
 import questionService from '../services/questionService'
 import ratingService from '../services/ratingService'
-import { checkNewProduct, checkMediaUpload, checkProductUpdate } from '../utils/inputValidator'
+import { UPLOAD_TIMEOUT } from '../utils/config'
+import { checkMediaUpload, checkNewProduct, checkProductUpdate } from '../utils/inputValidator'
 import { isAdmin, isCreator, multerUpload } from '../utils/middleware'
 
 const router = Router()
@@ -32,6 +33,7 @@ router.put('/:productID', isCreator('products', 'productID', 'params'), async (r
 })
 
 router.post('/:productID/upload', isAdmin, multerUpload.array('productMedia', 10), (req, res) => {
+  req.socket.setTimeout(UPLOAD_TIMEOUT)
   const productMedia = checkMediaUpload(req)
   productService.uploadProductImages(productMedia, req)
   res.status(204).end()
