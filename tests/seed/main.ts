@@ -87,34 +87,39 @@ const seed = async (): Promise<void> => {
       return await Promise.all(Object.entries(c[1]).map(async (v) => {
         const { addedVendor } = await createOneVendor('admin', v[0])
 
-        return await Promise.all(v[1].map(async (p, i) => {
-          const { body } = await api
-            .post(apiURLs.products)
-            .set('Cookie', `token=${token}`)
-            .send({
-              ...p,
-              userID,
-              categoryID: addedCategory.categoryID,
-              vendorID: addedVendor.vendorID
-            })
-          console.info('p.media', p.media)
+        return await Promise.all(Object.entries(v[1]).map(async (g) => {
+          let groupID: string
 
-          if (p.media) {
-            const uploadAPI = api
-              .post(`${apiURLs.products}/${body.productID}/upload`)
+          return await Promise.all(g[1].map(async (p, i) => {
+            const { body } = await api
+              .post(apiURLs.products)
               .set('Cookie', `token=${token}`)
+              .send({
+                ...p,
+                userID,
+                categoryID: addedCategory.categoryID,
+                vendorID: addedVendor.vendorID,
+                groupID
+              })
+            groupID = body.groupID
 
-            const mediaRange = [ ...Array(p.media).keys() ]
+            if (p.media) {
+              const uploadAPI = api
+                .post(`${apiURLs.products}/${body.productID}/upload`)
+                .set('Cookie', `token=${token}`)
 
-            mediaRange.map((m) => {
-              uploadAPI
-                .attach('productMedia', path.join(
-                  __dirname, `images/products/${i}_${m}.jpg`
-                ))
-            })
-            await uploadAPI
-          }
-          return body
+              const mediaRange = [ ...Array(p.media).keys() ]
+
+              mediaRange.map((m) => {
+                uploadAPI
+                  .attach('productMedia', path.join(
+                    __dirname, `images/products/${i}_${m}.jpg`
+                  ))
+              })
+              await uploadAPI
+            }
+            return body
+          }))
         }))
       }))
     })))
