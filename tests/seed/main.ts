@@ -118,6 +118,34 @@ const seed = async (): Promise<void> => {
         }))
       }))
     })))
+
+    const newList1 = await api
+      .post(apiURLs.lists)
+      .set('Cookie', `token=${users[0].token}`)
+      .send({ name: 'Wishlist' })
+
+    await api
+      .post(
+        `${apiURLs.lists}/${newList1.body.listID}/products/${products[0].productID}`
+      )
+      .set('Cookie', `token=${users[0].token}`)
+
+    await api
+      .post(
+        `${apiURLs.lists}/${newList1.body.listID}/products/${products[1].productID}`
+      )
+      .set('Cookie', `token=${users[0].token}`)
+
+    const newList2 = await api
+      .post(apiURLs.lists)
+      .set('Cookie', `token=${users[2].token}`)
+      .send({ name: 'Stuff to buy' })
+
+    await api
+      .post(
+        `${apiURLs.lists}/${newList2.body.listID}/products/${products[2].productID}`
+      )
+      .set('Cookie', `token=${users[2].token}`)
   } catch (error) { console.error(error) }
 }
 

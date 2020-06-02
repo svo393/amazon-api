@@ -1,6 +1,6 @@
 import supertest from 'supertest'
 import app from '../src/app'
-import { Address, AddressCreateInput, AddressType, AddressTypeInput, Answer, AnswerComment, AnswerCommentCreateInput, AnswerCreateInput, CartProduct, Category, CategoryCreateInput, Follower, Group, GroupCreateInput, GroupProduct, Invoice, InvoiceCreateInput, InvoiceStatus, InvoiceStatusInput, List, ListCreateInput, ListProduct, Order, OrderCreateInput, OrderProduct, OrderProductCreateInput, OrderStatus, OrderStatusInput, Parameter, ParameterCreateInput, PaymentMethod, PaymentMethodInput, Product, ProductParameter, ProductPublicData, Question, QuestionCreateInput, Rating, RatingComment, RatingCommentCreateInput, RatingCreateInput, Role, RoleInput, ShippingMethod, ShippingMethodInput, User, UserAddress, Vendor, VendorInput } from '../src/types'
+import { Address, AddressCreateInput, AddressType, AddressTypeInput, Answer, AnswerComment, AnswerCommentCreateInput, AnswerCreateInput, CartProduct, Category, CategoryCreateInput, Follower, Group, GroupCreateInput, GroupVariant, Invoice, InvoiceCreateInput, InvoiceStatus, InvoiceStatusInput, List, ListCreateInput, ListProduct, Order, OrderCreateInput, OrderProduct, OrderProductCreateInput, OrderStatus, OrderStatusInput, Parameter, ParameterCreateInput, PaymentMethod, PaymentMethodInput, Product, ProductParameter, ProductPublicData, Question, QuestionCreateInput, Rating, RatingComment, RatingCommentCreateInput, RatingCreateInput, Role, RoleInput, ShippingMethod, ShippingMethodInput, User, UserAddress, Vendor, VendorInput } from '../src/types'
 import { apiURLs } from '../src/utils/constants'
 import { db } from '../src/utils/db'
 import StatusError from '../src/utils/StatusError'
@@ -50,8 +50,8 @@ export const groupsInDB = async (): Promise<Group[]> => {
   return await db('groups')
 }
 
-export const groupProductsInDB = async (): Promise<GroupProduct[]> => {
-  return await db('groupProducts')
+export const GroupVariantsInDB = async (): Promise<GroupVariant[]> => {
+  return await db('GroupVariants')
 }
 
 export const productParametersInDB = async (): Promise<ProductParameter[]> => {
@@ -145,7 +145,7 @@ export const purge = async (): Promise<void> => {
   await db('cartProducts').del()
   await db('productParameters').del()
   await db('parameters').del()
-  await db('groupProducts').del()
+  await db('GroupVariants').del()
   await db('groups').del()
   await db('answerComments').del()
   await db('answers').del()
@@ -487,22 +487,22 @@ export const createOneGroup = async (role: string, name?: string): Promise<{ add
   return { addedGroup: body[0], token }
 }
 
-export const newGroupProduct = (groupID: number, productID: number, value?: string): GroupProduct => ({
-  value: value ?? `New GroupProduct ${(new Date().getTime()).toString()}`,
+export const newGroupVariant = (groupID: number, productID: number, value?: string): GroupVariant => ({
+  value: value ?? `New GroupVariant ${(new Date().getTime()).toString()}`,
   groupID,
   productID
 })
 
-export const createOneGroupProduct = async (role: string, name?: string): Promise<{ addedGroupProduct: GroupProduct; token: string}> => {
+export const createOneGroupVariant = async (role: string, name?: string): Promise<{ addedGroupVariant: GroupVariant; token: string}> => {
   const { addedGroup, token } = await createOneGroup(role)
   const { addedProduct } = await createOneProduct(role)
 
   const { body } = await api
     .post(`${apiURLs.groups}/${addedGroup.groupID}/product/${addedProduct.productID}`)
     .set('Cookie', `token=${token}`)
-    .send(newGroupProduct(addedGroup.groupID, addedProduct.productID, name))
+    .send(newGroupVariant(addedGroup.groupID, addedProduct.productID, name))
 
-  return { addedGroupProduct: body, token }
+  return { addedGroupVariant: body, token }
 }
 
 export const newParameter = (name?: string): ParameterCreateInput => ([ {

@@ -1,7 +1,7 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoryCreateInput, CategoryUpdateInput, GroupCreateInput, GroupProductInput, GroupUpdateInput, InvoiceStatusInput, ListCreateInput, OrderCreateInput, OrderProductCreateInput, OrderStatusInput, ParameterCreateInput, ParameterUpdateInput, PasswordRequestInput, PasswordResetInput, PaymentMethodInput, ProductCreateInput, ProductParameterInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, RoleInput, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput, OrderProductUpdateInput, InvoiceCreateInput, InvoiceUpdateInput } from '../types'
-import { hasDefinedProps, isArray, isBoolean, isEmail, isInputProvided, isNumber, isPasswordValid, isProductParameterOrGroupProduct, isProvided, isString, isStringOrArray, isStringOrNumber } from './validatorLib'
+import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoryCreateInput, CategoryUpdateInput, GroupVariantInput, InvoiceCreateInput, InvoiceStatusInput, InvoiceUpdateInput, ListCreateInput, OrderCreateInput, OrderProductCreateInput, OrderProductUpdateInput, OrderStatusInput, ParameterCreateInput, ParameterUpdateInput, PasswordRequestInput, PasswordResetInput, PaymentMethodInput, ProductCreateInput, ProductParameterInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, RoleInput, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput } from '../types'
+import { hasDefinedProps, isArray, isBoolean, isEmail, isInputProvided, isNumber, isPasswordValid, isProductParameterOrGroupVariant, isProvided, isString, isStringOrNumber } from './validatorLib'
 
 export const checkNewUser = ({ body }: Request): UserSignupInput => {
   const email = R.pipe(
@@ -165,17 +165,21 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
     isNumber
   )({ name: 'vendorID', param: body.vendorID })
 
-  const groups = body.groups && isArray(
-    { name: 'groups', param: body.groups }
+  const groupID = body.groupID && isNumber(
+    { name: 'groupID', param: body.groupID }
   )
 
-  groups && groups.param.map((g: any) => isProductParameterOrGroupProduct({ name: 'group', param: g }))
+  const variants = body.variants && isArray(
+    { name: 'variants', param: body.variants }
+  )
+
+  variants && variants.param.map((v: any) => isProductParameterOrGroupVariant({ name: 'group', param: v }))
 
   const parameters = body.parameters && isArray(
     { name: 'parameters', param: body.parameters }
   )
 
-  parameters && parameters.param.map((p: any) => isProductParameterOrGroupProduct({ name: 'parameter', param: p }))
+  parameters && parameters.param.map((p: any) => isProductParameterOrGroupVariant({ name: 'parameter', param: p }))
 
   return {
     title: title.param,
@@ -189,8 +193,9 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
     primaryMedia: primaryMedia.param,
     categoryID: categoryID.param,
     vendorID: vendorID.param,
-    parameters: parameters?.param,
-    groups: groups?.param
+    groupID: groupID?.param,
+    variants: variants?.param,
+    parameters: parameters?.param
   }
 }
 
@@ -713,33 +718,21 @@ export const checkParameterUpdate = ({ body }: Request): ParameterUpdateInput =>
   return { name: name.param }
 }
 
-export const checkNewGroups = ({ body }: Request): GroupCreateInput => {
-  const names = R.pipe(
-    isProvided,
-    isArray
-  )({ name: 'group names', param: body })
-
-  names.param.map((p: any) => isStringOrNumber({ name: 'group name', param: p.name }))
-
-  return names.param
-}
-
-export const checkGroupUpdate = ({ body }: Request): GroupUpdateInput => {
+export const checkGroupVariant = ({ body }: Request): GroupVariantInput => {
   const name = R.pipe(
     isProvided,
     isString
   )({ name: 'name', param: body.name })
 
-  return { name: name.param }
-}
-
-export const checkGroupProduct = ({ body }: Request): GroupProductInput => {
   const value = R.pipe(
     isProvided,
     isString
   )({ name: 'value', param: body.value })
 
-  return { value: value.param }
+  return {
+    name: name.param,
+    value: value.param
+  }
 }
 
 export const checkProductParameter = ({ body }: Request): ProductParameterInput => {

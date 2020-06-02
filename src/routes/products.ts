@@ -39,21 +39,6 @@ router.post('/:productID/upload', isAdmin, multerUpload.array('productMedia', 10
   res.status(204).end()
 })
 
-router.get('/:productID/ratings', async (req, res) => {
-  const ratings = await ratingService.getRatingsByProduct(req)
-  res.json(ratings)
-})
-
-router.get('/:productID/questions', async (req, res) => {
-  const questions = await questionService.getQuestionsByProduct(req)
-  res.json(questions)
-})
-
-router.get('/:productID/groups', async (req, res) => {
-  const groups = await groupService.getGroupsByProduct(req)
-  res.json(groups)
-})
-
 router.get('/:productID/parameters', async (req, res) => {
   const parameters = await parameterService.getParametersByProduct(req)
   res.json(parameters)

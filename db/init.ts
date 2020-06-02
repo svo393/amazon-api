@@ -11,7 +11,7 @@ export const init = async (): Promise<void> => {
   await db('cartProducts').del()
   await db('productParameters').del()
   await db('parameters').del()
-  await db('groupProducts').del()
+  await db('GroupVariants').del()
   await db('groups').del()
   await db('answerComments').del()
   await db('answers').del()
@@ -34,19 +34,19 @@ export const init = async (): Promise<void> => {
 
   await db.raw(
     `
-    ALTER SEQUENCE "invoices_invoiceID_seq" START WITH 274 RESTART;
-    ALTER SEQUENCE "orders_orderID_seq" START WITH 512 RESTART;
-    ALTER SEQUENCE "answerComments_answerCommentID_seq" START WITH 553 RESTART;
-    ALTER SEQUENCE "answers_answerID_seq" START WITH 480 RESTART;
-    ALTER SEQUENCE "questions_questionID_seq" START WITH 308 RESTART;
-    ALTER SEQUENCE "ratingComments_ratingCommentID_seq" START WITH 505 RESTART;
-    ALTER SEQUENCE "ratings_ratingID_seq" START WITH 761 RESTART;
-    ALTER SEQUENCE "products_productID_seq" START WITH 14397 RESTART;
-    ALTER SEQUENCE "vendors_vendorID_seq" START WITH 527 RESTART;
-    ALTER SEQUENCE "categories_categoryID_seq" START WITH 361 RESTART;
-    ALTER SEQUENCE "lists_listID_seq" START WITH 735 RESTART;
-    ALTER SEQUENCE "users_userID_seq" START WITH 3814 RESTART;
-    ALTER SEQUENCE "addresses_addressID_seq" START WITH 307 RESTART;
+    ALTER SEQUENCE "invoices_invoiceID_seq" START WITH 274 INCREMENT BY 3 RESTART;
+    ALTER SEQUENCE "orders_orderID_seq" START WITH 512 INCREMENT BY 3 RESTART;
+    ALTER SEQUENCE "answerComments_answerCommentID_seq" START WITH 553 INCREMENT BY 3 RESTART;
+    ALTER SEQUENCE "answers_answerID_seq" START WITH 480 INCREMENT BY 3 RESTART;
+    ALTER SEQUENCE "questions_questionID_seq" START WITH 308 INCREMENT BY 3 RESTART;
+    ALTER SEQUENCE "ratingComments_ratingCommentID_seq" START WITH 505 INCREMENT BY 3 RESTART;
+    ALTER SEQUENCE "ratings_ratingID_seq" START WITH 761 INCREMENT BY 3 RESTART;
+    ALTER SEQUENCE "products_productID_seq" START WITH 14397 INCREMENT BY 3 RESTART;
+    ALTER SEQUENCE "vendors_vendorID_seq" START WITH 527 INCREMENT BY 3 RESTART;
+    ALTER SEQUENCE "categories_categoryID_seq" START WITH 361 INCREMENT BY 3 RESTART;
+    ALTER SEQUENCE "lists_listID_seq" START WITH 735 INCREMENT BY 3 RESTART;
+    ALTER SEQUENCE "users_userID_seq" START WITH 3814 INCREMENT BY 3 RESTART;
+    ALTER SEQUENCE "addresses_addressID_seq" START WITH 307 INCREMENT BY 3 RESTART;
     `
   )
 

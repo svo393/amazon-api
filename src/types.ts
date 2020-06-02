@@ -69,6 +69,10 @@ export type Vendor = {
   name: string;
 }
 
+export type Group = {
+  groupID: number;
+}
+
 export type Product = {
   productID: number;
   title: string;
@@ -85,6 +89,7 @@ export type Product = {
   userID: number;
   categoryID: number;
   vendorID: number;
+  groupID: number;
 }
 
 export type ListProduct = {
@@ -157,13 +162,9 @@ export type AnswerComment = {
   parentAnswerCommentID?: number;
 }
 
-export type Group = {
-  groupID: number;
+export type GroupVariant = {
   name: string;
-}
-
-export type GroupProduct = {
-  value: string | number;
+  value: string;
   groupID: number;
   productID: number;
 }
@@ -174,7 +175,7 @@ export type Parameter = {
 }
 
 export type ProductParameter = {
-  value: string | number;
+  value: string;
   parameterID: number;
   productID: number;
 }
@@ -315,12 +316,11 @@ export type ProductCreateInput = Omit<Product,
     name: string;
     value: string;
   }[];
-  groups?: {
+  groupID?: number;
+  variants?: {
     name: string;
-    groupID?: number;
     value: string;
   }[];
-
 }
 
 export type ProductUpdateInput = {
@@ -343,26 +343,24 @@ export type ProductPublicData = Omit<Product,
   | 'userID'
 >
 
-export type FormattedGroups = { [groupID: number]: Group & GroupProduct }
-
 export type FormattedParameters = { [parameterID: number]: Parameter & ProductParameter }
 
 export type ProductListData = Pick<Product,
-| 'productID'
-| 'title'
-| 'listPrice'
-| 'price'
-| 'primaryMedia'
+  | 'productID'
+  | 'title'
+  | 'listPrice'
+  | 'price'
+  | 'primaryMedia'
 > & {
   stars: number;
   ratingCount: number;
-  groups: FormattedGroups;
+  group: GroupVariant[];
 }
 
 export type ProductAllData = Product & {
   stars: number;
   ratingCount: number;
-  groups: FormattedGroups;
+  group: GroupVariant[];
 }
 
 export type RatingCreateInput = Pick<Rating,
@@ -431,11 +429,7 @@ export type AnswerCommentUpdateInput = Pick<AnswerComment,
   content?: string;
 }
 
-export type GroupCreateInput = Pick<Group, 'name'>[]
-
-export type GroupUpdateInput = Pick<Group, 'name'>
-
-export type GroupProductInput = Pick<GroupProduct, 'value'>
+export type GroupVariantInput = Pick<GroupVariant, 'name' | 'value'>
 
 export type ParameterCreateInput = Pick<Parameter, 'name'>[]
 

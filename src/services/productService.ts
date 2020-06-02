@@ -1,32 +1,37 @@
 import { Request, Response } from 'express'
 import Knex from 'knex'
 import R from 'ramda'
-import { FormattedGroups, Group, GroupProduct, Parameter, Product, ProductAllData, ProductCreateInput, ProductListData, ProductParameter, ProductPublicData, ProductUpdateInput } from '../types'
+import { GroupVariant, Parameter, Product, ProductAllData, ProductCreateInput, ProductListData, ProductUpdateInput } from '../types'
 import { db, dbTrans } from '../utils/db'
 import { uploadImages } from '../utils/img'
 import { getProductsQuery } from '../utils/queries'
 import StatusError from '../utils/StatusError'
 
-const addProduct = async (productInput: ProductCreateInput, res: Response): Promise<ProductPublicData & { parameters?: Parameter[] }> => {
+const addProduct = async (productInput: ProductCreateInput, res: Response): Promise<Product> => {
   const now = new Date()
 
   return await dbTrans(async (trx: Knex.Transaction) => {
-    let parameters
-    let groups
+    const groupID = productInput.groupID
+      ? productInput.groupID
+      : (await trx('groups').insert({}, [ '*' ]))[0].groupID
 
     const [ addedProduct ]: Product[] = await trx('products')
       .insert({
-        ...R.omit([ 'parameters', 'groups' ], productInput),
+        ...R.omit([ 'parameters', 'group' ], productInput),
         userID: res.locals.userID,
         productCreatedAt: now,
         productUpdatedAt: now
       }, [ '*' ])
 
-    const publicProduct = R.omit([
-      'productCreatedAt',
-      'productUpdatedAt',
-      'userID'
-    ], addedProduct)
+    if (productInput.variants) {
+      await trx('groupVariants')
+        .insert(productInput.variants.map((gv) => ({
+          name: gv.name,
+          value: gv.value,
+          groupID: groupID,
+          productID: addedProduct.productID
+        })), [ '*' ])
+    }
 
     if (productInput.parameters && !R.isEmpty(productInput.parameters)) {
       const { rows: addedParameters }: { rows: Parameter[] } = await trx.raw(
@@ -40,51 +45,14 @@ const addProduct = async (productInput: ProductCreateInput, res: Response): Prom
         ]
       )
 
-      const addedProductParameters: ProductParameter[] = await trx('productParameters')
+      await trx('productParameters')
         .insert(productInput.parameters.map((pp) => ({
           value: pp.value,
           parameterID: (addedParameters.find((p) => p.name === pp.name))?.parameterID,
           productID: addedProduct.productID
         })), [ '*' ])
-
-      parameters = addedParameters.map((p) => ({
-        [p.name]: {
-          ...p,
-          ...addedProductParameters.find((pp) => pp.parameterID === p.parameterID)
-        }
-      }))
     }
-
-    if (productInput.groups && !R.isEmpty(productInput.groups)) {
-      const addedGroups: Group[] = await Promise.all(productInput.groups.map(async (g) => {
-        if (g.groupID) return { name: g.name, groupID: g.groupID }
-
-        const [ group ]: Group[] = await trx('groups')
-          .insert({ name: g.name }, [ '*' ])
-
-        return group
-      }))
-
-      const addedGroupProducts: GroupProduct[] = await trx('groupProducts')
-        .insert(productInput.groups.map((gg) => ({
-          value: gg.value,
-          groupID: (addedGroups.find((g) => g.name === gg.name))?.groupID,
-          productID: addedProduct.productID
-        })), [ '*' ])
-
-      groups = addedGroups.map((g) => ({
-        [g.name]: {
-          ...g,
-          ...addedGroupProducts.find((gg) => gg.groupID === g.groupID)
-        }
-      }))
-    }
-
-    return {
-      ...publicProduct,
-      groups,
-      parameters
-    }
+    return addedProduct
   })
 }
 
@@ -93,29 +61,17 @@ export const getProducts = async (): Promise<ProductListData[]> => {
 }
 
 const getProductByID = async (req: Request, res: Response): Promise<ProductListData| ProductAllData> => {
-  const [ product ]: ProductAllData[] = await getProductsQuery.clone()
+  const [ product ] = await getProductsQuery.clone()
     .select('productCreatedAt', 'productUpdatedAt', 'p.userID')
     .where('p.productID', req.params.productID)
+    .leftJoin('groupVariants as gv', 'p.groupID', 'gv.groupID')
 
   if (!product) throw new StatusError(404, 'Not Found')
 
-  const groupIDs = await db('groupProducts as gp')
-    .select('g.groupID')
-    .leftJoin('groups as g', 'gp.groupID', 'g.groupID')
-    .where('productID', product.productID)
+  const groupVariants = await db<GroupVariant>('groupVariants')
+    .where('groupID', product.groupID)
 
-  const groups = await db('groups as g')
-    .leftJoin('groupProducts as gp', 'gp.groupID', 'g.groupID')
-    .whereIn('g.groupID', groupIDs.map((id) => id.groupID))
-    .orderBy('g.name')
-
-  const formattedGroups: FormattedGroups = groups.reduce((acc, cur) => {
-    return acc[cur.name]
-      ? { ...acc, [cur.name]: [ ...acc[cur.name], cur ] }
-      : { ...acc, [cur.name]: [ cur ] }
-  }, {})
-
-  const fullProduct = { ...product, groups: formattedGroups }
+  const fullProduct = { ...product, group: groupVariants }
 
   const role: string | undefined = res.locals.userRole
 
