@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoryCreateInput, CategoryUpdateInput, GroupVariantInput, InvoiceCreateInput, InvoiceStatusInput, InvoiceUpdateInput, ListCreateInput, OrderCreateInput, OrderProductCreateInput, OrderProductUpdateInput, OrderStatusInput, ParameterCreateInput, ParameterUpdateInput, PasswordRequestInput, PasswordResetInput, PaymentMethodInput, ProductCreateInput, ProductParameterInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, RoleInput, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput } from '../types'
+import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoryCreateInput, CategoryUpdateInput, GroupVariantCreateInput, GroupVariantUpdateInput, InvoiceCreateInput, InvoiceStatusInput, InvoiceUpdateInput, ListCreateInput, OrderCreateInput, OrderProductCreateInput, OrderProductUpdateInput, OrderStatusInput, ParameterCreateInput, ParameterUpdateInput, PasswordRequestInput, PasswordResetInput, PaymentMethodInput, ProductCreateInput, ProductParameterInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, RoleInput, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput } from '../types'
 import { hasDefinedProps, isArray, isBoolean, isEmail, isInputProvided, isNumber, isPasswordValid, isProductParameterOrGroupVariant, isProvided, isString, isStringOrNumber } from './validatorLib'
 
 export const checkNewUser = ({ body }: Request): UserSignupInput => {
@@ -397,9 +397,10 @@ export const checkNewCartProduct = ({ body }: Request): CartProduct => {
 }
 
 export const checkCartProductUpdate = ({ body }: Request): CartProductInput => {
-  const qty = body.qty && isNumber(
-    { name: 'qty', param: body.qty }
-  )
+  const qty = R.pipe(
+    isProvided,
+    isNumber
+  )({ name: 'qty', param: body.qty })
   return { qty: qty.param }
 }
 
@@ -501,17 +502,17 @@ export const checkNewRating = ({ body }: Request): RatingCreateInput => {
     isNumber
   )({ name: 'stars', param: body.stars })
 
-  const productID = R.pipe(
+  const groupID = R.pipe(
     isProvided,
     isNumber
-  )({ name: 'productID', param: body.productID })
+  )({ name: 'groupID', param: body.groupID })
 
   return {
     title: title?.param,
     review: review?.param,
     media: media?.param,
     stars: stars.param,
-    productID: productID.param
+    groupID: groupID.param
   }
 }
 
@@ -576,10 +577,10 @@ export const checkRatingCommentUpdate = ({ body }: Request): RatingCommentUpdate
     { name: 'media', param: body.media }
   )
 
-  return {
+  return hasDefinedProps({
     content: content?.param,
     media: media?.param
-  }
+  })
 }
 
 export const checkNewQuestion = ({ body }: Request): QuestionCreateInput => {
@@ -592,15 +593,15 @@ export const checkNewQuestion = ({ body }: Request): QuestionCreateInput => {
     { name: 'media', param: body.media }
   )
 
-  const productID = R.pipe(
+  const groupID = R.pipe(
     isProvided,
     isNumber
-  )({ name: 'productID', param: body.productID })
+  )({ name: 'groupID', param: body.groupID })
 
   return {
     content: content.param,
     media: media?.param,
-    productID: productID.param
+    groupID: groupID.param
   }
 }
 
@@ -650,10 +651,10 @@ export const checkAnswerUpdate = ({ body }: Request): AnswerUpdateInput => {
     { name: 'media', param: body.media }
   )
 
-  return {
+  return hasDefinedProps({
     content: content?.param,
     media: media?.param
-  }
+  })
 }
 
 export const checkNewAnswerComment = ({ body }: Request): AnswerCommentCreateInput => {
@@ -692,10 +693,10 @@ export const checkAnswerCommentUpdate = ({ body }: Request): AnswerCommentUpdate
     { name: 'media', param: body.media }
   )
 
-  return {
+  return hasDefinedProps({
     content: content?.param,
     media: media?.param
-  }
+  })
 }
 
 export const checkNewParameters = ({ body }: Request): ParameterCreateInput => {
@@ -718,7 +719,7 @@ export const checkParameterUpdate = ({ body }: Request): ParameterUpdateInput =>
   return { name: name.param }
 }
 
-export const checkGroupVariant = ({ body }: Request): GroupVariantInput => {
+export const checkNewGroupVariant = ({ body }: Request): GroupVariantCreateInput => {
   const name = R.pipe(
     isProvided,
     isString
@@ -733,6 +734,15 @@ export const checkGroupVariant = ({ body }: Request): GroupVariantInput => {
     name: name.param,
     value: value.param
   }
+}
+
+export const checkGroupVariantUpdate = ({ body }: Request): GroupVariantUpdateInput => {
+  const value = R.pipe(
+    isProvided,
+    isString
+  )({ name: 'value', param: body.value })
+
+  return { value: value.param }
 }
 
 export const checkProductParameter = ({ body }: Request): ProductParameterInput => {
@@ -826,10 +836,10 @@ export const checkOrderProductUpdate = ({ body }: Request): OrderProductUpdateIn
   const qty = body.qty && isNumber({ name: 'qty', param: body.qty })
   const price = body.price && isNumber({ name: 'price', param: body.price })
 
-  return {
+  return hasDefinedProps({
     qty: qty?.param,
     price: price?.param
-  }
+  })
 }
 
 export const checkNewInvoice = ({ body }: Request): InvoiceCreateInput => {

@@ -21,7 +21,7 @@ describe('Question adding', () => {
     await api
       .post(apiURL)
       .set('Cookie', `token=${token}`)
-      .send(newQuestion(addedProduct.productID))
+      .send(newQuestion(addedProduct.groupID))
       .expect(201)
       .expect('Content-Type', /application\/json/)
 
@@ -53,11 +53,11 @@ describe('Question fetching', () => {
     expect(body).toBeDefined()
   })
 
-  test('200 questions by product', async () => {
-    const { productID } = await createOneQuestion()
+  test('200 questions by group', async () => {
+    const { groupID } = await createOneQuestion()
 
     const { body } = await api
-      .get(`${apiURLs.products}/${productID}/questions`)
+      .get(`${apiURLs.groups}/${groupID}/questions`)
       .expect(200)
 
     expect(body).toBeDefined()

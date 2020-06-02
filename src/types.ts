@@ -109,7 +109,7 @@ export type Rating = {
   dislikes: number;
   isVerified: boolean;
   userID: number;
-  productID: number;
+  groupID: number;
 }
 
 export type RatingComment = {
@@ -134,7 +134,7 @@ export type Question = {
   dislikes: number;
   isVerified: boolean;
   userID: number;
-  productID: number;
+  groupID: number;
 }
 
 export type Answer = {
@@ -368,7 +368,7 @@ export type RatingCreateInput = Pick<Rating,
   | 'review'
   | 'media'
   | 'stars'
-  | 'productID'
+  | 'groupID'
 >
 
 export type RatingUpdateInput = Pick<Rating,
@@ -395,7 +395,7 @@ export type RatingCommentUpdateInput = Pick<RatingComment,
 export type QuestionCreateInput = Pick<Question,
   | 'content'
   | 'media'
-  | 'productID'
+  | 'groupID'
 >
 
 export type QuestionUpdateInput = Pick<Question,
@@ -429,7 +429,12 @@ export type AnswerCommentUpdateInput = Pick<AnswerComment,
   content?: string;
 }
 
-export type GroupVariantInput = Pick<GroupVariant, 'name' | 'value'>
+export type GroupVariantCreateInput = {
+  name: string;
+  value: string;
+}
+
+export type GroupVariantUpdateInput = Pick<GroupVariant, | 'value'>
 
 export type ParameterCreateInput = Pick<Parameter, 'name'>[]
 

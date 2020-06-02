@@ -190,12 +190,12 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .onDelete('CASCADE')
 
       t
-        .integer('productID')
-        .references('products.productID')
+        .integer('groupID')
+        .references('groups.groupID')
         .notNullable()
     })
     .alterTable('ratings', (t) => {
-      t.unique([ 'userID', 'productID' ])
+      t.unique([ 'userID', 'groupID' ])
     })
 
     .createTable('ratingComments', (t) => {
@@ -241,8 +241,8 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .onDelete('CASCADE')
 
       t
-        .integer('productID')
-        .references('products.productID')
+        .integer('groupID')
+        .references('groups.groupID')
         .notNullable()
     })
 
@@ -303,15 +303,14 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .integer('groupID')
         .references('groups.groupID')
         .notNullable()
-        .onDelete('CASCADE')
 
       t
         .integer('productID')
         .references('products.productID')
         .notNullable()
     })
-    .alterTable('GroupVariants', (t) => {
-      t.primary([ 'groupID', 'productID' ])
+    .alterTable('groupVariants', (t) => {
+      t.primary([ 'groupID', 'productID', 'name' ])
     })
 
     .createTable('parameters', (t) => {

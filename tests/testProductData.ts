@@ -1,6 +1,6 @@
 import { ProductCreateInput } from '../src/types'
 
-export const products: Omit<ProductCreateInput, 'categoryID' | 'vendorID'>[] = [
+export const products: Omit<ProductCreateInput, 'categoryID' | 'vendorID' | 'groupID'>[] = [
   {
     title: 'Acer Aspire Z24-890-UA91 AIO Desktop, 23.8 inches Full HD, 9th Gen Intel Core i5-9400T, 12GB DDR4, 512GB SSD, 802.11ac Wifi, USB 3.1 Type C, Wireless Keyboard and Mouse, Windows 10 Home, Silver',
     listPrice: 79999,
@@ -11,7 +11,7 @@ export const products: Omit<ProductCreateInput, 'categoryID' | 'vendorID'>[] = [
     media: 7,
     primaryMedia: 0,
     isAvailable: true,
-    groups: [
+    variants: [
       { name: 'Style', value: 'No Touch Screen' },
       { name: 'Size', value: '12GB / 512GB SSD' }
     ],

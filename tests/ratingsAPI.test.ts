@@ -21,7 +21,7 @@ describe('Rating adding', () => {
     await api
       .post(apiURL)
       .set('Cookie', `token=${token}`)
-      .send(newRating(addedProduct.productID))
+      .send(newRating(addedProduct.groupID))
       .expect(201)
       .expect('Content-Type', /application\/json/)
 
@@ -53,11 +53,11 @@ describe('Rating fetching', () => {
     expect(body).toBeDefined()
   })
 
-  test('200 ratings by product', async () => {
-    const { productID } = await createOneRating()
+  test('200 ratings by group', async () => {
+    const { groupID } = await createOneRating()
 
     const { body } = await api
-      .get(`${apiURLs.products}/${productID}/ratings`)
+      .get(`${apiURLs.groups}/${groupID}/ratings`)
       .expect(200)
 
     expect(body).toBeDefined()

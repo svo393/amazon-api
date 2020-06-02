@@ -2,30 +2,30 @@ import Router from 'express'
 import groupService from '../services/groupService'
 import questionService from '../services/questionService'
 import ratingService from '../services/ratingService'
-import { checkGroupVariant } from '../utils/inputValidator'
+import { checkGroupVariantUpdate, checkNewGroupVariant } from '../utils/inputValidator'
 import { isAdmin } from '../utils/middleware'
 
 const router = Router()
 
 router.get('/:groupID/ratings', async (req, res) => {
-  const ratings = await ratingService.getRatingsByProduct(req)
+  const ratings = await ratingService.getRatingsByGroup(req)
   res.json(ratings)
 })
 
 router.get('/:groupID/questions', async (req, res) => {
-  const questions = await questionService.getQuestionsByProduct(req)
+  const questions = await questionService.getQuestionsByGroup(req)
   res.json(questions)
 })
 
 router.post('/:groupID/product/:productID', isAdmin, async (req, res) => {
-  const groupVariantCreateInput = checkGroupVariant(req)
+  const groupVariantCreateInput = checkNewGroupVariant(req)
   const addedGroupVariant = await groupService.addGroupVariant(groupVariantCreateInput, req)
   res.status(201).json(addedGroupVariant)
 })
 
-router.post('/:groupID/product/:productID', isAdmin, async (req, res) => {
-  const groupVariantUpdateInput = checkGroupVariant(req)
-  const updatedGroupVariant = await groupService.addGroupVariant(groupVariantUpdateInput, req)
+router.put('/:groupID/product/:productID/name/:name', isAdmin, async (req, res) => {
+  const groupVariantUpdateInput = checkGroupVariantUpdate(req)
+  const updatedGroupVariant = await groupService.updateGroupVariant(groupVariantUpdateInput, req)
   res.status(200).json(updatedGroupVariant)
 })
 

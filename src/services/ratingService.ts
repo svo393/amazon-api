@@ -32,9 +32,9 @@ const getRatingsByUser = async (req: Request): Promise<Rating[]> => {
     .where('userID', req.params.userID)
 }
 
-const getRatingsByProduct = async (req: Request): Promise<Rating[]> => {
+const getRatingsByGroup = async (req: Request): Promise<Rating[]> => {
   return await db('ratings')
-    .where('productID', req.params.productID)
+    .where('groupID', req.params.groupID)
 }
 
 const getRatingByID = async (req: Request): Promise<Rating> => {
@@ -82,7 +82,7 @@ const uploadRatingImages = (files: Express.Multer.File[], req: Request): void =>
 export default {
   addRating,
   getRatingsByUser,
-  getRatingsByProduct,
+  getRatingsByGroup,
   getRatingByID,
   updateRating,
   deleteRating,

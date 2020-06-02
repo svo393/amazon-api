@@ -45,7 +45,7 @@ export const initialProducts = {
           media: 7,
           primaryMedia: 0,
           isAvailable: true,
-          groupVariants: [
+          variants: [
             { name: 'Style', value: 'No Touch Screen' },
             { name: 'Size', value: '12GB / 512GB SSD' }
           ],
@@ -85,7 +85,7 @@ export const initialProducts = {
           media: 7,
           primaryMedia: 0,
           isAvailable: true,
-          groups: [
+          variants: [
             { name: 'Style', value: 'Touch Screen' },
             { name: 'Size', value: '8GB / 1TB HDD' }
           ],
@@ -119,7 +119,7 @@ export const initialProducts = {
           media: 7,
           primaryMedia: 0,
           isAvailable: true,
-          groups: [
+          variants: [
             { name: 'Style', value: 'No Touch Screen' },
             { name: 'Size', value: '8GB / 512GB SSD' }
           ],

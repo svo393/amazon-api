@@ -17,10 +17,11 @@ const addProduct = async (productInput: ProductCreateInput, res: Response): Prom
 
     const [ addedProduct ]: Product[] = await trx('products')
       .insert({
-        ...R.omit([ 'parameters', 'group' ], productInput),
+        ...R.omit([ 'parameters', 'variants' ], productInput),
         userID: res.locals.userID,
         productCreatedAt: now,
-        productUpdatedAt: now
+        productUpdatedAt: now,
+        groupID
       }, [ '*' ])
 
     if (productInput.variants) {
@@ -28,7 +29,7 @@ const addProduct = async (productInput: ProductCreateInput, res: Response): Prom
         .insert(productInput.variants.map((gv) => ({
           name: gv.name,
           value: gv.value,
-          groupID: groupID,
+          groupID,
           productID: addedProduct.productID
         })), [ '*' ])
     }

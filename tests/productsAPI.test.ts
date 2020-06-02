@@ -116,7 +116,7 @@ describe('Product fetching', () => {
     const { body } = await api
       .get(`${apiURL}/${addedProduct.productID}`)
       .expect(200)
-    expect(Object.keys(body)).toHaveLength(8)
+    expect(Object.keys(body)).toHaveLength(9)
   })
 
   test('full product if admin or root', async () => {
@@ -127,7 +127,7 @@ describe('Product fetching', () => {
       .set('Cookie', `token=${token}`)
       .expect(200)
 
-    expect(Object.keys(body)).toHaveLength(11)
+    expect(Object.keys(body)).toHaveLength(12)
   })
 })
 

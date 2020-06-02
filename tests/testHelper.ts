@@ -1,6 +1,6 @@
 import supertest from 'supertest'
 import app from '../src/app'
-import { Address, AddressCreateInput, AddressType, AddressTypeInput, Answer, AnswerComment, AnswerCommentCreateInput, AnswerCreateInput, CartProduct, Category, CategoryCreateInput, Follower, Group, GroupCreateInput, GroupVariant, Invoice, InvoiceCreateInput, InvoiceStatus, InvoiceStatusInput, List, ListCreateInput, ListProduct, Order, OrderCreateInput, OrderProduct, OrderProductCreateInput, OrderStatus, OrderStatusInput, Parameter, ParameterCreateInput, PaymentMethod, PaymentMethodInput, Product, ProductParameter, ProductPublicData, Question, QuestionCreateInput, Rating, RatingComment, RatingCommentCreateInput, RatingCreateInput, Role, RoleInput, ShippingMethod, ShippingMethodInput, User, UserAddress, Vendor, VendorInput } from '../src/types'
+import { Address, AddressCreateInput, AddressType, AddressTypeInput, Answer, AnswerComment, AnswerCommentCreateInput, AnswerCreateInput, CartProduct, Category, CategoryCreateInput, Follower, Group, GroupVariant, GroupVariantCreateInput, Invoice, InvoiceCreateInput, InvoiceStatus, InvoiceStatusInput, List, ListCreateInput, ListProduct, Order, OrderCreateInput, OrderProduct, OrderProductCreateInput, OrderStatus, OrderStatusInput, Parameter, ParameterCreateInput, PaymentMethod, PaymentMethodInput, Product, ProductParameter, ProductPublicData, Question, QuestionCreateInput, Rating, RatingComment, RatingCommentCreateInput, RatingCreateInput, Role, RoleInput, ShippingMethod, ShippingMethodInput, User, UserAddress, Vendor, VendorInput } from '../src/types'
 import { apiURLs } from '../src/utils/constants'
 import { db } from '../src/utils/db'
 import StatusError from '../src/utils/StatusError'
@@ -50,8 +50,8 @@ export const groupsInDB = async (): Promise<Group[]> => {
   return await db('groups')
 }
 
-export const GroupVariantsInDB = async (): Promise<GroupVariant[]> => {
-  return await db('GroupVariants')
+export const groupVariantsInDB = async (): Promise<GroupVariant[]> => {
+  return await db('groupVariants')
 }
 
 export const productParametersInDB = async (): Promise<ProductParameter[]> => {
@@ -145,8 +145,7 @@ export const purge = async (): Promise<void> => {
   await db('cartProducts').del()
   await db('productParameters').del()
   await db('parameters').del()
-  await db('GroupVariants').del()
-  await db('groups').del()
+  await db('groupVariants').del()
   await db('answerComments').del()
   await db('answers').del()
   await db('questions').del()
@@ -154,6 +153,7 @@ export const purge = async (): Promise<void> => {
   await db('ratings').del()
   await db('listProducts').del()
   await db('products').del()
+  await db('groups').del()
   await db('vendors').del()
   await db('categories').del()
   await db('lists').del()
@@ -386,10 +386,10 @@ export const createOneListProduct = async (): Promise<ListProduct & { token: str
   return { ...body, token, userID }
 }
 
-export const newRating = (productID: number): RatingCreateInput => ({
+export const newRating = (groupID: number): RatingCreateInput => ({
   title: `New Rating ${(new Date().getTime()).toString()}`,
   stars: 4,
-  productID
+  groupID
 })
 
 export const createOneRating = async (): Promise<Rating & { token: string }> => {
@@ -399,7 +399,7 @@ export const createOneRating = async (): Promise<Rating & { token: string }> => 
   const { body }: { body: Rating } = await api
     .post(apiURLs.ratings)
     .set('Cookie', `token=${token}`)
-    .send(newRating(addedProduct.productID))
+    .send(newRating(addedProduct.groupID))
 
   return { ...body, token }
 }
@@ -421,9 +421,9 @@ export const createOneRatingComment = async (): Promise<RatingComment & { token:
   return { ...body, token }
 }
 
-export const newQuestion = (productID: number): QuestionCreateInput => ({
+export const newQuestion = (groupID: number): QuestionCreateInput => ({
   content: `New Question ${(new Date().getTime()).toString()}`,
-  productID
+  groupID
 })
 
 export const createOneQuestion = async (): Promise<Question & { token: string }> => {
@@ -433,7 +433,7 @@ export const createOneQuestion = async (): Promise<Question & { token: string }>
   const { body }: { body: Question } = await api
     .post(apiURLs.questions)
     .set('Cookie', `token=${token}`)
-    .send(newQuestion(addedProduct.productID))
+    .send(newQuestion(addedProduct.groupID))
 
   return { ...body, token }
 }
@@ -472,21 +472,18 @@ export const createOneAnswerComment = async (): Promise<AnswerComment & { token:
   return { ...body, token }
 }
 
-export const newGroupVariant = (groupID: number, productID: number, name?: string, value?: string): GroupVariant => ({
+export const newGroupVariant = (name?: string, value?: string): GroupVariantCreateInput => ({
   name: name ?? `New GroupVariant Name ${(new Date().getTime()).toString()}`,
-  value: value ?? `New GroupVariant Value ${(new Date().getTime()).toString()}`,
-  groupID,
-  productID
+  value: value ?? `New GroupVariant Value ${(new Date().getTime()).toString()}`
 })
 
 export const createOneGroupVariant = async (role: string, name?: string): Promise<{ addedGroupVariant: GroupVariant; token: string}> => {
-  const { addedGroup, token } = await createOneGroup(role)
-  const { addedProduct } = await createOneProduct(role)
+  const { addedProduct, token } = await createOneProduct(role)
 
   const { body } = await api
-    .post(`${apiURLs.groups}/${addedGroup.groupID}/product/${addedProduct.productID}`)
+    .post(`${apiURLs.groups}/${addedProduct.groupID}/product/${addedProduct.productID}`)
     .set('Cookie', `token=${token}`)
-    .send(newGroupVariant(addedGroup.groupID, addedProduct.productID, name))
+    .send(newGroupVariant(name))
 
   return { addedGroupVariant: body, token }
 }

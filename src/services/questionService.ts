@@ -32,9 +32,9 @@ const getQuestionsByUser = async (req: Request): Promise<Question[]> => {
     .where('userID', req.params.userID)
 }
 
-const getQuestionsByProduct = async (req: Request): Promise<Question[]> => {
+const getQuestionsByGroup = async (req: Request): Promise<Question[]> => {
   return await db('questions')
-    .where('productID', req.params.productID)
+    .where('groupID', req.params.groupID)
 }
 
 const getQuestionByID = async (req: Request): Promise<Question> => {
@@ -82,7 +82,7 @@ const uploadQuestionImages = (files: Express.Multer.File[], req: Request): void 
 export default {
   addQuestion,
   getQuestionsByUser,
-  getQuestionsByProduct,
+  getQuestionsByGroup,
   getQuestionByID,
   updateQuestion,
   deleteQuestion,

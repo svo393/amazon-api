@@ -2,7 +2,7 @@ import supertest from 'supertest'
 import app from '../src/app'
 import { apiURLs } from '../src/utils/constants'
 import { db } from '../src/utils/db'
-import { createOneGroup, loginAs, newGroup, populateUsers, purge, groupsInDB, createOneProduct, GroupVariantsInDB, newGroupVariant, createOneGroupVariant } from './testHelper'
+import { createOneProduct, groupVariantsInDB, loginAs, newGroupVariant, populateUsers, purge } from './testHelper'
 
 const api = supertest(app)
 const apiURL = apiURLs.groups
@@ -13,80 +13,52 @@ beforeEach(async () => {
 })
 
 describe('Group adding', () => {
-  test('201', async () => {
-    const { token } = await loginAs('admin')
-
-    await api
-      .post(apiURL)
-      .set('Cookie', `token=${token}`)
-      .send(newGroup())
-      .expect(201)
-      .expect('Content-Type', /application\/json/)
-
-    const groupsAtEnd = await groupsInDB()
-    expect(groupsAtEnd).toHaveLength(1)
-  })
-
-  test('403 if not admin or root', async () => {
-    const { token } = await loginAs('customer')
-
-    await api
-      .post(apiURL)
-      .set('Cookie', `token=${token}`)
-      .send(newGroup())
-      .expect(403)
-  })
-
   test('201 GroupVariant', async () => {
-    const { addedGroup, token } = await createOneGroup('admin')
-    const { addedProduct } = await createOneProduct('admin')
+    const { addedProduct, token } = await createOneProduct('admin')
 
-    const groupsAtStart = await GroupVariantsInDB()
+    const groupsAtStart = await groupVariantsInDB()
 
     await api
-      .post(`${apiURL}/${addedGroup.groupID}/product/${addedProduct.productID}`)
+      .post(`${apiURL}/${addedProduct.groupID}/product/${addedProduct.productID}`)
       .set('Cookie', `token=${token}`)
-      .send(newGroupVariant(addedGroup.groupID, addedProduct.productID))
+      .send(newGroupVariant())
       .expect(201)
       .expect('Content-Type', /application\/json/)
 
-    const groupsAtEnd = await GroupVariantsInDB()
+    const groupsAtEnd = await groupVariantsInDB()
     expect(groupsAtEnd).toHaveLength(groupsAtStart.length + 1)
   })
 })
 
-describe('Group fetching', () => {
-  test('200 groups by product', async () => {
-    const { addedGroupVariant } = await createOneGroupVariant('admin')
-
-    const { body } = await api
-      .get(`${apiURLs.products}/${addedGroupVariant.productID}/groups`)
-      .expect(200)
-    expect(body).toBeDefined()
-  })
-})
-
-describe('Group updating', () => {
+describe('Group variant updating', () => {
   test('200 if admin or root', async () => {
-    const { addedGroup, token } = await createOneGroup('admin')
+    const { addedProduct, token } = await createOneProduct('admin')
+
+    const product = await api
+      .get(`${apiURLs.products}/${addedProduct.productID}`)
+      .set('Cookie', `token=${token}`)
 
     const { body } = await api
-      .put(`${apiURL}/${addedGroup.groupID}`)
+      .put(`${apiURL}/${product.body.groupID}/product/${product.body.productID}/name/${product.body.group[0].name}`)
       .set('Cookie', `token=${token}`)
-      .send({ name: 'Updated Group' })
+      .send({ value: 'Updated Group Variant' })
       .expect(200)
 
-    expect(body.name).toBe('Updated Group')
+    expect(body.value).toBe('Updated Group Variant')
   })
 
   test('403 if not admin or root', async () => {
-    const { addedGroup } = await createOneGroup('admin')
+    const { addedProduct } = await createOneProduct('admin')
     const { token } = await loginAs('customer')
 
-    await api
-      .put(`${apiURL}/${addedGroup.groupID}`)
+    const product = await api
+      .get(`${apiURLs.products}/${addedProduct.productID}`)
       .set('Cookie', `token=${token}`)
-      .send({ name: 'Updated Group' })
+
+    await api
+      .put(`${apiURL}/${product.body.groupID}/product/${product.body.productID}/name/${product.body.group[0].name}`)
+      .set('Cookie', `token=${token}`)
+      .send({ value: 'Updated Group Variant' })
       .expect(403)
   })
 })
