@@ -472,23 +472,9 @@ export const createOneAnswerComment = async (): Promise<AnswerComment & { token:
   return { ...body, token }
 }
 
-export const newGroup = (name?: string): GroupCreateInput => ([ {
-  name: name ?? `New Group ${(new Date().getTime()).toString()}`
-} ])
-
-export const createOneGroup = async (role: string, name?: string): Promise<{ addedGroup: Group; token: string}> => {
-  const { token } = await loginAs(role)
-
-  const { body } = await api
-    .post(apiURLs.groups)
-    .set('Cookie', `token=${token}`)
-    .send(newGroup(name))
-
-  return { addedGroup: body[0], token }
-}
-
-export const newGroupVariant = (groupID: number, productID: number, value?: string): GroupVariant => ({
-  value: value ?? `New GroupVariant ${(new Date().getTime()).toString()}`,
+export const newGroupVariant = (groupID: number, productID: number, name?: string, value?: string): GroupVariant => ({
+  name: name ?? `New GroupVariant Name ${(new Date().getTime()).toString()}`,
+  value: value ?? `New GroupVariant Value ${(new Date().getTime()).toString()}`,
   groupID,
   productID
 })
