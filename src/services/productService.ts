@@ -145,8 +145,8 @@ const uploadProductImages = (files: Express.Multer.File[], req: Request): void =
     imagePath: './public/media/products',
     maxWidth: 1500,
     maxHeight: 1500,
-    previewWidth: 450,
-    previewHeight: 450,
+    previewWidth: 425,
+    previewHeight: 425,
     thumbWidth: 40,
     thumbHeight: 40
   }

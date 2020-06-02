@@ -70,7 +70,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
     })
 
     .createTable('userAddresses', (t) => {
-      t.boolean('isDefault').defaultTo(false).notNullable()
+      t.boolean('isDefault').defaultTo(true).notNullable()
 
       t
         .integer('userID')

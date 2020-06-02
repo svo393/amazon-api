@@ -1,42 +1,14 @@
-import { apiURLs } from '../../src/utils/constants'
-import { db } from '../../src/utils/db'
+import path from 'path'
+import R from 'ramda'
 import supertest from 'supertest'
 import app from '../../src/app'
-import { purge, populateUsers } from '../testHelper'
-import { init } from '../../db/init'
-import R from 'ramda'
-import path from 'path'
+import { apiURLs } from '../../src/utils/constants'
+import { db } from '../../src/utils/db'
+import { populateUsers, purge } from '../testHelper'
+import { initialUsers } from './seedData'
+import { AddressType } from '../../src/types'
 
 const api = supertest(app)
-
-const initialUsers = [
-  {
-    email: 'bob@example.com',
-    password: '0q7#Wy#WHyKX',
-    name: 'Bob Smith',
-    avatar: true,
-    info: 'Work on electronics to maintain their electrical component. Enjoy testing the durability of items.'
-  },
-  {
-    email: 'alice@example.com',
-    password: '8I&o9FSv%VrU',
-    name: 'Alice',
-    avatar: true,
-    info: 'Wife... & Mother of 3. Love Shopping ( mainly on Amazon!) and Crafting. Addicted to my Cricut, Home Renovation shows and my kiddos.'
-  },
-  {
-    email: 'john@example.com',
-    password: 'VgJ48q&8%^Dm',
-    name: 'Jools'
-  },
-  {
-    email: 'mary@example.com',
-    password: 'p2&MR5w$Z7pF',
-    name: 'Marette',
-    avatar: true,
-    info: 'I run a home-based business. I don\'t have time to go to the store all the time so I shop on amazon. We donate a lot to our local animal shelter and help with fundraisers, so we are always in need of giveaways. Amazon is always our go-to for all our home, office needs, donation needs. Please do not contact me for doing reviews. I do reviews on what I purchase already.'
-  }
-]
 
 const seed = async (): Promise<void> => {
   await purge()
@@ -61,6 +33,11 @@ const seed = async (): Promise<void> => {
       .send(R.omit([ 'email', 'password', 'userID', 'token' ], u))
   }))
 
+  const addressTypes = await api
+    .get(apiURLs.addressTypes)
+
+  const shippingAddressTypeID = addressTypes.body.find((at: AddressType) => at.name === 'SHIPPING')
+
   await Promise.all(users.map(async (u) => {
     const nameMatch = /^\w+?(?=@)/.exec(u.email)
 
@@ -70,7 +47,35 @@ const seed = async (): Promise<void> => {
       .attach('userAvatar', path.join(
         __dirname, `images/avatars/${nameMatch[0]}.jpg`
       ))
+
+    await api
+      .post(apiURLs.addresses)
+      .set('Cookie', `token=${u.token}`)
+      .send({
+        addr: u.address,
+        addressTypeID: shippingAddressTypeID.addressTypeID
+      })
   }))
+
+  await api
+    .post(`${apiURLs.users}/${users[0].userID}/follows/${users[3].userID}`)
+    .set('Cookie', `token=${users[0].token}`)
+    .send({ userID: users[0].userID, follows: users[3].userID })
+
+  await api
+    .post(`${apiURLs.users}/${users[1].userID}/follows/${users[2].userID}`)
+    .set('Cookie', `token=${users[1].token}`)
+    .send({ userID: users[0].userID, follows: users[3].userID })
+
+  await api
+    .post(`${apiURLs.users}/${users[2].userID}/follows/${users[3].userID}`)
+    .set('Cookie', `token=${users[2].token}`)
+    .send({ userID: users[0].userID, follows: users[3].userID })
+
+  await api
+    .post(`${apiURLs.users}/${users[1].userID}/follows/${users[0].userID}`)
+    .set('Cookie', `token=${users[1].token}`)
+    .send({ userID: users[0].userID, follows: users[3].userID })
 }
 
 seed().then(async () => await db.destroy())
