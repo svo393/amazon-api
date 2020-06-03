@@ -377,6 +377,8 @@ export type RatingUpdateInput = Pick<Rating,
   | 'media'
 > & {
   stars?: number;
+  isVerified?: boolean;
+  isApproved?: boolean;
 }
 
 export type RatingCommentCreateInput = Pick<RatingComment,
@@ -390,6 +392,7 @@ export type RatingCommentUpdateInput = Pick<RatingComment,
   | 'media'
 > & {
   content?: string;
+  isApproved?: boolean;
 }
 
 export type QuestionCreateInput = Pick<Question,
@@ -402,6 +405,7 @@ export type QuestionUpdateInput = Pick<Question,
   | 'media'
 > & {
   content?: string;
+  isApproved?: boolean;
 }
 
 export type AnswerCreateInput = Pick<Answer,
@@ -414,6 +418,7 @@ export type AnswerUpdateInput = Pick<Answer,
   | 'media'
 > & {
   content?: string;
+  isApproved?: boolean;
 }
 
 export type AnswerCommentCreateInput = Pick<AnswerComment,
@@ -427,6 +432,7 @@ export type AnswerCommentUpdateInput = Pick<AnswerComment,
   | 'media'
 > & {
   content?: string;
+  isApproved?: boolean;
 }
 
 export type GroupVariantCreateInput = {
@@ -452,7 +458,11 @@ export type OrderCreateInput = Pick<Order,
   | 'address'
   | 'userID'
   | 'shippingMethodID'
-> & { cart: CartProduct[] }
+> & {
+  details: string;
+  paymentMethodID: number;
+  cart: CartProduct[];
+}
 
 export type OrderUpdateInput = {
   address?: string;

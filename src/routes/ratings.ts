@@ -3,7 +3,7 @@ import ratingCommentService from '../services/ratingCommentService'
 import ratingService from '../services/ratingService'
 import { UPLOAD_TIMEOUT } from '../utils/config'
 import { checkMediaUpload, checkNewRating, checkNewRatingComment, checkRatingUpdate } from '../utils/inputValidator'
-import { isCreator, isLoggedIn, multerUpload } from '../utils/middleware'
+import { isCreator, isCreatorOrAdmin, isLoggedIn, multerUpload } from '../utils/middleware'
 
 const router = Router()
 
@@ -18,7 +18,7 @@ router.get('/:ratingID', async (req, res) => {
   res.json(rating)
 })
 
-router.put('/:ratingID', isCreator('ratings', 'ratingID', 'params'), async (req, res) => {
+router.put('/:ratingID', isCreatorOrAdmin('ratings', 'ratingID', 'params'), async (req, res) => {
   const ratingUpdateInput = checkRatingUpdate(req)
   const updatedRating = await ratingService.updateRating(ratingUpdateInput, req)
   res.json(updatedRating)

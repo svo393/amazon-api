@@ -3,7 +3,7 @@ import answerCommentService from '../services/answerCommentService'
 import answerService from '../services/answerService'
 import { UPLOAD_TIMEOUT } from '../utils/config'
 import { checkAnswerUpdate, checkMediaUpload, checkNewAnswerComment } from '../utils/inputValidator'
-import { isCreator, isLoggedIn, multerUpload } from '../utils/middleware'
+import { isCreator, isCreatorOrAdmin, isLoggedIn, multerUpload } from '../utils/middleware'
 
 const router = Router()
 
@@ -12,7 +12,7 @@ router.get('/:answerID', async (req, res) => {
   res.json(answer)
 })
 
-router.put('/:answerID', isCreator('answers', 'answerID', 'params'), async (req, res) => {
+router.put('/:answerID', isCreatorOrAdmin('answers', 'answerID', 'params'), async (req, res) => {
   const answerUpdateInput = checkAnswerUpdate(req)
   const updatedAnswer = await answerService.updateAnswer(answerUpdateInput, req)
   res.json(updatedAnswer)

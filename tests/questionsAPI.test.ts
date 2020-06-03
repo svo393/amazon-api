@@ -86,17 +86,6 @@ describe('Question updating', () => {
 
     expect(body.content).toBe('Updated Question')
   })
-
-  test('403 if not creator', async () => {
-    const { questionID } = await createOneQuestion()
-    const { token } = await loginAs('admin')
-
-    await api
-      .put(`${apiURL}/${questionID}`)
-      .set('Cookie', `token=${token}`)
-      .send({ content: 'Updated Question' })
-      .expect(403)
-  })
 })
 
 describe('Questions deleting', () => {

@@ -1,7 +1,7 @@
 import Router from 'express'
 import ratingCommentService from '../services/ratingCommentService'
 import { checkRatingCommentUpdate } from '../utils/inputValidator'
-import { isCreator } from '../utils/middleware'
+import { isCreator, isCreatorOrAdmin } from '../utils/middleware'
 
 const router = Router()
 
@@ -10,7 +10,7 @@ router.get('/:ratingCommentID', async (req, res) => {
   res.json(ratingComment)
 })
 
-router.put('/:ratingCommentID', isCreator('ratingComments', 'ratingCommentID', 'params'), async (req, res) => {
+router.put('/:ratingCommentID', isCreatorOrAdmin('ratingComments', 'ratingCommentID', 'params'), async (req, res) => {
   const ratingCommentUpdateInput = checkRatingCommentUpdate(req)
   const updatedRatingComment = await ratingCommentService.updateRatingComment(ratingCommentUpdateInput, req)
   res.json(updatedRatingComment)

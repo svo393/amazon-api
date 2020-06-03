@@ -533,11 +533,21 @@ export const checkRatingUpdate = ({ body }: Request): RatingUpdateInput => {
     { name: 'stars', param: body.stars }
   )
 
+  const isVerified = 'isVerified' in body
+    ? isBoolean({ name: 'isVerified', param: body.isVerified })
+    : undefined
+
+  const isApproved = 'isApproved' in body
+    ? isBoolean({ name: 'isApproved', param: body.isApproved })
+    : undefined
+
   return hasDefinedProps({
     title: title?.param,
     review: review?.param,
     media: media?.param,
-    stars: stars?.param
+    stars: stars?.param,
+    isVerified: isVerified?.param,
+    isApproved: isApproved?.param
   })
 }
 
@@ -577,9 +587,14 @@ export const checkRatingCommentUpdate = ({ body }: Request): RatingCommentUpdate
     { name: 'media', param: body.media }
   )
 
+  const isApproved = 'isApproved' in body
+    ? isBoolean({ name: 'isApproved', param: body.isApproved })
+    : undefined
+
   return hasDefinedProps({
     content: content?.param,
-    media: media?.param
+    media: media?.param,
+    isApproved: isApproved?.param
   })
 }
 
@@ -614,9 +629,14 @@ export const checkQuestionUpdate = ({ body }: Request): QuestionUpdateInput => {
     { name: 'media', param: body.media }
   )
 
+  const isApproved = 'isApproved' in body
+    ? isBoolean({ name: 'isApproved', param: body.isApproved })
+    : undefined
+
   return hasDefinedProps({
     content: content?.param,
-    media: media?.param
+    media: media?.param,
+    isApproved: isApproved?.param
   })
 }
 
@@ -651,9 +671,14 @@ export const checkAnswerUpdate = ({ body }: Request): AnswerUpdateInput => {
     { name: 'media', param: body.media }
   )
 
+  const isApproved = 'isApproved' in body
+    ? isBoolean({ name: 'isApproved', param: body.isApproved })
+    : undefined
+
   return hasDefinedProps({
     content: content?.param,
-    media: media?.param
+    media: media?.param,
+    isApproved: isApproved?.param
   })
 }
 
@@ -693,9 +718,14 @@ export const checkAnswerCommentUpdate = ({ body }: Request): AnswerCommentUpdate
     { name: 'media', param: body.media }
   )
 
+  const isApproved = 'isApproved' in body
+    ? isBoolean({ name: 'isApproved', param: body.isApproved })
+    : undefined
+
   return hasDefinedProps({
     content: content?.param,
-    media: media?.param
+    media: media?.param,
+    isApproved: isApproved?.param
   })
 }
 
@@ -770,6 +800,16 @@ export const checkNewOrder = ({ body }: Request): OrderCreateInput => {
     isNumber
   )({ name: 'userID', param: body.userID })
 
+  const details = R.pipe(
+    isProvided,
+    isString
+  )({ name: 'details', param: body.details })
+
+  const paymentMethodID = R.pipe(
+    isProvided,
+    isNumber
+  )({ name: 'paymentMethodID', param: body.paymentMethodID })
+
   const cart = R.pipe(
     isProvided,
     isArray
@@ -785,6 +825,8 @@ export const checkNewOrder = ({ body }: Request): OrderCreateInput => {
     address: address.param,
     userID: userID.param,
     shippingMethodID: shippingMethodID.param,
+    details: details.param,
+    paymentMethodID: paymentMethodID.param,
     cart: cart.param
   }
 }

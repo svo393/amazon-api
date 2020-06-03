@@ -1,11 +1,11 @@
 import { Request } from 'express'
 import Knex from 'knex'
 import R from 'ramda'
-import { Order, OrderCreateInput, OrderProduct, OrderStatus, OrderUpdateInput } from '../types'
+import { Order, OrderCreateInput, OrderProduct, OrderStatus, OrderUpdateInput, Invoice, InvoiceStatus } from '../types'
 import { db, dbTrans } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
-const addOrder = async (orderInput: OrderCreateInput): Promise<Order> => {
+const addOrder = async (orderInput: OrderCreateInput): Promise<Order & Invoice> => {
   const { cart } = orderInput
   const now = new Date()
 
@@ -16,7 +16,7 @@ const addOrder = async (orderInput: OrderCreateInput): Promise<Order> => {
 
     const [ addedOrder ]: Order[] = await trx('orders')
       .insert({
-        ...R.omit([ 'cart' ], orderInput),
+        ...R.omit([ 'cart', 'details', 'paymentMethodID' ], orderInput),
         orderStatusID: orderStatusID?.orderStatusID,
         orderCreatedAt: now,
         orderUpdatedAt: now
@@ -42,7 +42,27 @@ const addOrder = async (orderInput: OrderCreateInput): Promise<Order> => {
     const addedOrderProducts: OrderProduct[] = await trx('orderProducts')
       .insert(newOrderProducts, [ '*' ])
 
-    return { ...addedOrder, orderProducts: addedOrderProducts }
+    const invoiceStatusID = await trx<InvoiceStatus>('invoiceStatuses')
+      .first()
+      .where('name', 'NEW')
+
+    const [ addedInvoice ]: Invoice[] = await trx('invoices')
+      .insert({
+        amount: R.sum(addedOrderProducts.map((op) => op.qty * op.price)),
+        details: orderInput.details,
+        orderID: addedOrder.orderID,
+        userID: orderInput.userID,
+        paymentMethodID: orderInput.paymentMethodID,
+        invoiceStatusID: invoiceStatusID?.invoiceStatusID,
+        invoiceCreatedAt: now,
+        invoiceUpdatedAt: now
+      }, [ '*' ])
+
+    return {
+      ...addedOrder,
+      ...addedInvoice,
+      orderProducts: addedOrderProducts
+    }
   })
 }
 

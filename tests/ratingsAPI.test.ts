@@ -86,17 +86,6 @@ describe('Rating updating', () => {
 
     expect(body.title).toBe('Updated Rating')
   })
-
-  test('403 if not creator', async () => {
-    const { ratingID } = await createOneRating()
-    const { token } = await loginAs('admin')
-
-    await api
-      .put(`${apiURL}/${ratingID}`)
-      .set('Cookie', `token=${token}`)
-      .send({ title: 'Updated Rating' })
-      .expect(403)
-  })
 })
 
 describe('Ratings deleting', () => {

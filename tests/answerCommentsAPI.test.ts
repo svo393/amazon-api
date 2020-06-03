@@ -76,17 +76,6 @@ describe('AnswerComment updating', () => {
 
     expect(body.content).toBe('Updated AnswerComment')
   })
-
-  test('403 if not creator', async () => {
-    const { answerCommentID } = await createOneAnswerComment()
-    const { token } = await loginAs('admin')
-
-    await api
-      .put(`${apiURL}/${answerCommentID}`)
-      .set('Cookie', `token=${token}`)
-      .send({ title: 'Updated answerComment' })
-      .expect(403)
-  })
 })
 
 describe('AnswerComments deleting', () => {

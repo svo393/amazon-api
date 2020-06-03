@@ -3,7 +3,7 @@ import app from '../src/app'
 import { Order } from '../src/types'
 import { apiURLs } from '../src/utils/constants'
 import { db } from '../src/utils/db'
-import { createOneAddress, createOneOrder, createOneShippingMethod, newOrder, ordersInDB, populateUsers, purge, createOneCartProduct } from './testHelper'
+import { createOneAddress, createOneCartProduct, createOneOrder, createOnePaymentMethod, createOneShippingMethod, newOrder, ordersInDB, populateUsers, purge } from './testHelper'
 
 const api = supertest(app)
 const apiURL = apiURLs.orders
@@ -15,6 +15,7 @@ beforeEach(async () => {
 
 describe('Order adding', () => {
   test('201', async () => {
+    const { addedPaymentMethod } = await createOnePaymentMethod('admin')
     const { addedShippingMethod } = await createOneShippingMethod('admin')
     const { addedAddress, token, userID } = await createOneAddress('customer')
     const { addedCartProduct: addedCartProduct1 } = await createOneCartProduct('customer')
@@ -29,7 +30,8 @@ describe('Order adding', () => {
         addedAddress.addr,
         addedShippingMethod.shippingMethodID,
         userID,
-        [ addedCartProduct1, addedCartProduct2 ]
+        [ addedCartProduct1, addedCartProduct2 ],
+        addedPaymentMethod.paymentMethodID
       ))
       .expect(201)
       .expect('Content-Type', /application\/json/)

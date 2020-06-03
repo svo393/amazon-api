@@ -21,9 +21,9 @@ const config = {
     client: 'pg',
     connection: {
       host: '127.0.0.1',
-      user: 'mosh',
-      password: '123456',
-      database: 'sql_store'
+      user: 'knex',
+      password: '12345678',
+      database: 'amazon-api'
     }
   }
 }

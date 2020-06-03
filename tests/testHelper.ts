@@ -569,14 +569,17 @@ export const createOneInvoiceStatus = async (invoiceStatus: string): Promise<{ a
   return { addedInvoiceStatus: body, token }
 }
 
-export const newOrder = (address: string, shippingMethodID: number, userID: number, cart: CartProduct[]): OrderCreateInput => ({
+export const newOrder = (address: string, shippingMethodID: number, userID: number, cart: CartProduct[], paymentMethodID: number): OrderCreateInput => ({
   address,
+  details: 'Card 4242 4242 4242 4242',
+  paymentMethodID,
   shippingMethodID,
   userID,
   cart
 })
 
 export const createOneOrder = async (role: string): Promise<{ addedOrder: Order; token: string }> => {
+  const { addedPaymentMethod } = await createOnePaymentMethod('admin')
   const { addedShippingMethod } = await createOneShippingMethod('admin')
   const { addedAddress, token, userID } = await createOneAddress(role)
   const { addedCartProduct: addedCartProduct1 } = await createOneCartProduct(role)
@@ -589,7 +592,8 @@ export const createOneOrder = async (role: string): Promise<{ addedOrder: Order;
       addedAddress.addr,
       addedShippingMethod.shippingMethodID,
       userID,
-      [ addedCartProduct1, addedCartProduct2 ]
+      [ addedCartProduct1, addedCartProduct2 ],
+      addedPaymentMethod.paymentMethodID
     ))
   return { addedOrder: body, token }
 }

@@ -3,7 +3,7 @@ import answerService from '../services/answerService'
 import questionService from '../services/questionService'
 import { UPLOAD_TIMEOUT } from '../utils/config'
 import { checkMediaUpload, checkNewAnswer, checkNewQuestion, checkQuestionUpdate } from '../utils/inputValidator'
-import { isCreator, isLoggedIn, multerUpload } from '../utils/middleware'
+import { isCreator, isCreatorOrAdmin, isLoggedIn, multerUpload } from '../utils/middleware'
 
 const router = Router()
 
@@ -18,7 +18,7 @@ router.get('/:questionID', async (req, res) => {
   res.json(question)
 })
 
-router.put('/:questionID', isCreator('questions', 'questionID', 'params'), async (req, res) => {
+router.put('/:questionID', isCreatorOrAdmin('questions', 'questionID', 'params'), async (req, res) => {
   const questionUpdateInput = checkQuestionUpdate(req)
   const updatedQuestion = await questionService.updateQuestion(questionUpdateInput, req)
   res.json(updatedQuestion)
