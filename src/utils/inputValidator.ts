@@ -556,7 +556,7 @@ export const checkNewRatingComment = ({ body }: Request): RatingCommentCreateInp
     isNumber
   )({ name: 'ratingID', param: body.ratingID })
 
-  const parentRatingCommentID = body.media && isNumber(
+  const parentRatingCommentID = body.parentRatingCommentID && isNumber(
     { name: 'parentRatingCommentID', param: body.parentRatingCommentID }
   )
 
@@ -672,7 +672,7 @@ export const checkNewAnswerComment = ({ body }: Request): AnswerCommentCreateInp
     isNumber
   )({ name: 'answerID', param: body.answerID })
 
-  const parentAnswerCommentID = body.media && isNumber(
+  const parentAnswerCommentID = body.parentAnswerCommentID && isNumber(
     { name: 'parentAnswerCommentID', param: body.parentAnswerCommentID }
   )
 

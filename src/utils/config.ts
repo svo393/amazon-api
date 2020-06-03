@@ -28,7 +28,7 @@ envVars.BASE_URL = process.env.NODE_ENV === 'production'
   ? process.env.PROD_URL
   : process.env.DEV_URL
 
-export const UPLOAD_TIMEOUT = 10000
+export const UPLOAD_TIMEOUT = 20000
 
 if (R.any(R.isNil)(R.values(envVars))) {
   console.error('Missing environment variables. Shutting down...')

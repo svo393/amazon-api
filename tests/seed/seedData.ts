@@ -81,7 +81,12 @@ export const initialProducts = {
               title: 'Brand New ACER AIO has dead pixel.',
               review: 'PC is ok, less than thrilled that this brand new machine has a dead pixel and it is required that it have 2 dead pixels to be covered under warranty. Acer customer service was not helpful. They suggested troubleshooting solutions that I completed but were pointless. Their customer service staff also clearly did not communicate well with one another. On a subsequent call it appeared that the notes provided by the previous CSR were inadequate to communicate the steps we already took. They are unwilling to provide a positive outcome.. Will never buy another Acer product. Very unhappy.',
               comments: [
-                { author: 1, content: 'This product is worthless.' }
+                {
+                  author: 1,
+                  content: 'This product is worthless.',
+                  media: 1,
+                  mediaFiles: [ 1 ]
+                }
               ]
             },
             {
@@ -105,8 +110,8 @@ export const initialProducts = {
               -It’s convenient. Plug in the power cord and you’re ready to go.
               
               My husband is in IT and works with this stuff every day. He loves this computer. We have installed it in a public area and created accounts for everyone. The whole family uses it, and the kids are getting a jump on back to school assignments using this. It’s amazing!`,
-              media: 3,
-              mediaFiles: [ 1, 2, 3 ]
+              media: 2,
+              mediaFiles: [ 1, 2 ]
             }
           ],
           questions: [
@@ -114,9 +119,18 @@ export const initialProducts = {
               author: 1,
               content: 'What is the height of the unit as it sits on the desk?',
               answers: [
-                { author: 0, content: 'From the top of the table to the top of the web cam is 17 3/8 inches by my measurement.' },
-                { author: 1, content: '17 inch' },
-                { author: 2, content: '17.5"' }
+                {
+                  author: 0,
+                  content: 'From the top of the table to the top of the web cam is 17 3/8 inches by my measurement.'
+                },
+                { author: 3, content: '17 inch' },
+                {
+                  author: 2,
+                  content: '17.5"',
+                  comments: [
+                    { author: 1, content: 'Will check it out, thanks.' }
+                  ]
+                }
               ]
             }
           ]

@@ -182,7 +182,7 @@ export const errorHandler = (
 
 const storage = multer.diskStorage({
   destination: './tmp',
-  filename (_req, file, cb) { cb(null, file.originalname) }
+  filename (_req, file, cb) { cb(null, `${Date.now()}_${file.originalname}`) }
 })
 
 export const multerUpload = multer({
