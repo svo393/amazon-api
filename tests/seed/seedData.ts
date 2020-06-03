@@ -73,6 +73,52 @@ export const initialProducts = {
             { name: 'Hard Drive Interface', value: 'Solid State' },
             { name: 'Hard Drive Rotational Speed', value: '0.1 RPM' },
             { name: 'Optical Drive Type', value: 'DVD-RW' }
+          ],
+          ratings: [
+            {
+              author: 0,
+              stars: 1,
+              title: 'Brand New ACER AIO has dead pixel.',
+              review: 'PC is ok, less than thrilled that this brand new machine has a dead pixel and it is required that it have 2 dead pixels to be covered under warranty. Acer customer service was not helpful. They suggested troubleshooting solutions that I completed but were pointless. Their customer service staff also clearly did not communicate well with one another. On a subsequent call it appeared that the notes provided by the previous CSR were inadequate to communicate the steps we already took. They are unwilling to provide a positive outcome.. Will never buy another Acer product. Very unhappy.',
+              comments: [
+                { author: 1, content: 'This product is worthless.' }
+              ]
+            },
+            {
+              author: 2,
+              stars: 5,
+              title: 'We Would Give More Stars If We Could',
+              review: `Wow. This is a great computer. Any complaints made about the C24-865 have been resoundingly addressed here.
+
+              Notable features:
+              -The keyboard USB dongle is in the bottom edge of the monitor. This is a great improvement, as often they plug into the back causing bad/choppy keyboard response.
+              -The mouse is already plugged in and ready to go.
+              -The SD reader, audio jack, and keyboard dongle are all on the bottom edge. Easy access!
+              -You can easily add a second/dual monitor.
+              -This monitor is nice and bright with a great, wide viewing angle.
+              -It does have a disc drive, which is becoming rare these days.
+              -Because it has a solid state drive, it reboots ridiculously fast.
+              -It has a dual mic, and the sound quality of the speakers is fantastic.
+              -Alexa works very well with it.
+              -The webcan quality is better.
+              -We did plug our Firestick into the HDMI port (oh yeah, it has one) and it works. You can use this like a TV if you wanted to.
+              -It’s convenient. Plug in the power cord and you’re ready to go.
+              
+              My husband is in IT and works with this stuff every day. He loves this computer. We have installed it in a public area and created accounts for everyone. The whole family uses it, and the kids are getting a jump on back to school assignments using this. It’s amazing!`,
+              media: 3,
+              mediaFiles: [ 1, 2, 3 ]
+            }
+          ],
+          questions: [
+            {
+              author: 1,
+              content: 'What is the height of the unit as it sits on the desk?',
+              answers: [
+                { author: 0, content: 'From the top of the table to the top of the web cam is 17 3/8 inches by my measurement.' },
+                { author: 1, content: '17 inch' },
+                { author: 2, content: '17.5"' }
+              ]
+            }
           ]
         },
         {

@@ -95,13 +95,41 @@ const seed = async (): Promise<void> => {
               .post(apiURLs.products)
               .set('Cookie', `token=${token}`)
               .send({
-                ...p,
+                ...R.omit([ 'ratings', 'questions' ], p),
                 userID,
                 categoryID: addedCategory.categoryID,
                 vendorID: addedVendor.vendorID,
                 groupID
               })
             groupID = body.groupID
+
+            if (p.ratings) {
+              await Promise.all(p.ratings.map(async (r) => {
+                const token = users[r.author].token
+
+                const { body } = await api
+                  .post(apiURLs.ratings)
+                  .set('Cookie', `token=${token}`)
+                  .send({
+                    ...R.omit([ 'author', 'comments', 'mediaFiles' ], r),
+                    groupID
+                  })
+
+                if (r.media) {
+                  const uploadAPI = api
+                    .post(`${apiURLs.ratings}/${body.ratingID}/upload`)
+                    .set('Cookie', `token=${token}`)
+
+                  r.mediaFiles.map((m) => {
+                    uploadAPI
+                      .attach('ratingMedia', path.join(
+                        __dirname, `images/ratings/${m}.jpg`
+                      ))
+                  })
+                  await uploadAPI
+                }
+              }))
+            }
 
             if (p.media) {
               const uploadAPI = api
