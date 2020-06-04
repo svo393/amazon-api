@@ -1,7 +1,7 @@
 import { Request } from 'express'
 import R from 'ramda'
 import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoryCreateInput, CategoryUpdateInput, GroupVariantCreateInput, GroupVariantUpdateInput, InvoiceCreateInput, InvoiceStatusInput, InvoiceUpdateInput, ListCreateInput, OrderCreateInput, OrderProductCreateInput, OrderProductUpdateInput, OrderStatusInput, ParameterCreateInput, ParameterUpdateInput, PasswordRequestInput, PasswordResetInput, PaymentMethodInput, ProductCreateInput, ProductParameterInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, RoleInput, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput } from '../types'
-import { hasDefinedProps, isArray, isBoolean, isEmail, isInputProvided, isNumber, isPasswordValid, isProductParameterOrGroupVariant, isProvided, isString, isStringOrNumber } from './validatorLib'
+import { canBeNumber, hasDefinedProps, isArray, isBoolean, isEmail, isInputProvided, isPasswordValid, isProductParameterOrGroupVariant, isProvided, isString, isStringOrNumber } from './validatorLib'
 
 export const checkNewUser = ({ body }: Request): UserSignupInput => {
   const email = R.pipe(
@@ -69,7 +69,7 @@ export const checkUserUpdate = ({ body }: Request): UserUpdateInput => {
     ? isBoolean({ name: 'avatar', param: body.avatar })
     : undefined
 
-  const roleID = body.roleID && isNumber(
+  const roleID = body.roleID && canBeNumber(
     { name: 'roleID', param: body.roleID }
   )
 
@@ -119,12 +119,12 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
 
   const listPrice = R.pipe(
     isProvided,
-    isNumber
+    canBeNumber
   )({ name: 'listPrice', param: body.listPrice })
 
   const price = R.pipe(
     isProvided,
-    isNumber
+    canBeNumber
   )({ name: 'price', param: body.price })
 
   const description = R.pipe(
@@ -138,17 +138,17 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
 
   const stock = R.pipe(
     isProvided,
-    isNumber
+    canBeNumber
   )({ name: 'stock', param: body.stock })
 
   const media = R.pipe(
     isProvided,
-    isNumber
+    canBeNumber
   )({ name: 'media', param: body.media })
 
   const primaryMedia = R.pipe(
     isProvided,
-    isNumber
+    canBeNumber
   )({ name: 'primaryMedia', param: body.primaryMedia })
 
   const isAvailable = 'isAvailable' in body
@@ -157,15 +157,15 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
 
   const categoryID = R.pipe(
     isProvided,
-    isNumber
+    canBeNumber
   )({ name: 'categoryID', param: body.categoryID })
 
   const vendorID = R.pipe(
     isProvided,
-    isNumber
+    canBeNumber
   )({ name: 'vendorID', param: body.vendorID })
 
-  const groupID = body.groupID && isNumber(
+  const groupID = body.groupID && canBeNumber(
     { name: 'groupID', param: body.groupID }
   )
 
@@ -204,11 +204,11 @@ export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
     { name: 'title', param: body.title }
   )
 
-  const listPrice = body.listPrice && isNumber(
+  const listPrice = body.listPrice && canBeNumber(
     { name: 'listPrice', param: body.listPrice }
   )
 
-  const price = body.price && isNumber(
+  const price = body.price && canBeNumber(
     { name: 'price', param: body.price }
   )
 
@@ -220,15 +220,15 @@ export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
     { name: 'brandSection', param: body.brandSection }
   )
 
-  const stock = body.stock && isNumber(
+  const stock = body.stock && canBeNumber(
     { name: 'stock', param: body.stock }
   )
 
-  const media = body.media && isNumber(
+  const media = body.media && canBeNumber(
     { name: 'media', param: body.media }
   )
 
-  const primaryMedia = body.primaryMedia && isNumber(
+  const primaryMedia = body.primaryMedia && canBeNumber(
     { name: 'primaryMedia', param: body.primaryMedia }
   )
 
@@ -236,11 +236,11 @@ export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
     ? isBoolean({ name: 'isAvailable', param: body.isAvailable })
     : undefined
 
-  const categoryID = body.categoryID && isNumber(
+  const categoryID = body.categoryID && canBeNumber(
     { name: 'categoryID', param: body.categoryID }
   )
 
-  const vendorID = body.vendorID && isNumber(
+  const vendorID = body.vendorID && canBeNumber(
     { name: 'vendorID', param: body.vendorID }
   )
 
@@ -276,7 +276,7 @@ export const checkNewCategory = ({ body }: Request): CategoryCreateInput => {
     isString
   )({ name: 'name', param: body.name })
 
-  const parentCategoryID = body.parentCategoryID && isNumber(
+  const parentCategoryID = body.parentCategoryID && canBeNumber(
     { name: 'parentCategoryID', param: body.parentCategoryID }
   )
 
@@ -291,7 +291,7 @@ export const checkCategoryUpdate = ({ body }: Request): CategoryUpdateInput => {
     { name: 'name', param: body.name }
   )
 
-  const parentCategoryID = body.parentCategoryID && isNumber(
+  const parentCategoryID = body.parentCategoryID && canBeNumber(
     { name: 'parentCategoryID', param: body.parentCategoryID }
   )
 
@@ -376,17 +376,17 @@ export const checkAddressType = ({ body }: Request): AddressTypeInput => {
 export const checkNewCartProduct = ({ body }: Request): CartProduct => {
   const qty = R.pipe(
     isProvided,
-    isNumber
+    canBeNumber
   )({ name: 'qty', param: body.qty })
 
   const userID = R.pipe(
     isProvided,
-    isNumber
+    canBeNumber
   )({ name: 'userID', param: body.userID })
 
   const productID = R.pipe(
     isProvided,
-    isNumber
+    canBeNumber
   )({ name: 'productID', param: body.productID })
 
   return {
@@ -399,7 +399,7 @@ export const checkNewCartProduct = ({ body }: Request): CartProduct => {
 export const checkCartProductUpdate = ({ body }: Request): CartProductInput => {
   const qty = R.pipe(
     isProvided,
-    isNumber
+    canBeNumber
   )({ name: 'qty', param: body.qty })
   return { qty: qty.param }
 }
@@ -425,7 +425,7 @@ export const checkNewAddress = ({ body }: Request): AddressCreateInput => {
 
   const addressTypeID = R.pipe(
     isProvided,
-    isNumber
+    canBeNumber
   )({ name: 'addressTypeID', param: body.addressTypeID })
 
   return {
@@ -442,12 +442,12 @@ export const checkNewUserAddress = ({ body }: Request): UserAddressCreateInput =
 
   const userID = R.pipe(
     isProvided,
-    isNumber
+    canBeNumber
   )({ name: 'userID', param: body.userID })
 
   const addressID = R.pipe(
     isProvided,
-    isNumber
+    canBeNumber
   )({ name: 'addressID', param: body.addressID })
 
   return {
@@ -493,18 +493,18 @@ export const checkNewRating = ({ body }: Request): RatingCreateInput => {
     { name: 'review', param: body.review }
   )
 
-  const media = body.media && isNumber(
+  const media = body.media && canBeNumber(
     { name: 'media', param: body.media }
   )
 
   const stars = R.pipe(
     isProvided,
-    isNumber
+    canBeNumber
   )({ name: 'stars', param: body.stars })
 
   const groupID = R.pipe(
     isProvided,
-    isNumber
+    canBeNumber
   )({ name: 'groupID', param: body.groupID })
 
   return {
@@ -525,11 +525,11 @@ export const checkRatingUpdate = ({ body }: Request): RatingUpdateInput => {
     { name: 'review', param: body.review }
   )
 
-  const media = body.media && isNumber(
+  const media = body.media && canBeNumber(
     { name: 'media', param: body.media }
   )
 
-  const stars = body.review && isNumber(
+  const stars = body.review && canBeNumber(
     { name: 'stars', param: body.stars }
   )
 
@@ -557,16 +557,16 @@ export const checkNewRatingComment = ({ body }: Request): RatingCommentCreateInp
     isString
   )({ name: 'content', param: body.content })
 
-  const media = body.media && isNumber(
+  const media = body.media && canBeNumber(
     { name: 'media', param: body.media }
   )
 
   const ratingID = R.pipe(
     isProvided,
-    isNumber
+    canBeNumber
   )({ name: 'ratingID', param: body.ratingID })
 
-  const parentRatingCommentID = body.parentRatingCommentID && isNumber(
+  const parentRatingCommentID = body.parentRatingCommentID && canBeNumber(
     { name: 'parentRatingCommentID', param: body.parentRatingCommentID }
   )
 
@@ -583,7 +583,7 @@ export const checkRatingCommentUpdate = ({ body }: Request): RatingCommentUpdate
     { name: 'content', param: body.content }
   )
 
-  const media = body.media && isNumber(
+  const media = body.media && canBeNumber(
     { name: 'media', param: body.media }
   )
 
@@ -604,13 +604,13 @@ export const checkNewQuestion = ({ body }: Request): QuestionCreateInput => {
     isString
   )({ name: 'content', param: body.content })
 
-  const media = body.media && isNumber(
+  const media = body.media && canBeNumber(
     { name: 'media', param: body.media }
   )
 
   const groupID = R.pipe(
     isProvided,
-    isNumber
+    canBeNumber
   )({ name: 'groupID', param: body.groupID })
 
   return {
@@ -625,7 +625,7 @@ export const checkQuestionUpdate = ({ body }: Request): QuestionUpdateInput => {
     { name: 'content', param: body.content }
   )
 
-  const media = body.media && isNumber(
+  const media = body.media && canBeNumber(
     { name: 'media', param: body.media }
   )
 
@@ -646,13 +646,13 @@ export const checkNewAnswer = ({ body }: Request): AnswerCreateInput => {
     isString
   )({ name: 'content', param: body.content })
 
-  const media = body.media && isNumber(
+  const media = body.media && canBeNumber(
     { name: 'media', param: body.media }
   )
 
   const questionID = R.pipe(
     isProvided,
-    isNumber
+    canBeNumber
   )({ name: 'questionID', param: body.questionID })
 
   return {
@@ -667,7 +667,7 @@ export const checkAnswerUpdate = ({ body }: Request): AnswerUpdateInput => {
     { name: 'content', param: body.content }
   )
 
-  const media = body.media && isNumber(
+  const media = body.media && canBeNumber(
     { name: 'media', param: body.media }
   )
 
@@ -688,16 +688,16 @@ export const checkNewAnswerComment = ({ body }: Request): AnswerCommentCreateInp
     isString
   )({ name: 'content', param: body.content })
 
-  const media = body.media && isNumber(
+  const media = body.media && canBeNumber(
     { name: 'media', param: body.media }
   )
 
   const answerID = R.pipe(
     isProvided,
-    isNumber
+    canBeNumber
   )({ name: 'answerID', param: body.answerID })
 
-  const parentAnswerCommentID = body.parentAnswerCommentID && isNumber(
+  const parentAnswerCommentID = body.parentAnswerCommentID && canBeNumber(
     { name: 'parentAnswerCommentID', param: body.parentAnswerCommentID }
   )
 
@@ -714,7 +714,7 @@ export const checkAnswerCommentUpdate = ({ body }: Request): AnswerCommentUpdate
     { name: 'content', param: body.content }
   )
 
-  const media = body.media && isNumber(
+  const media = body.media && canBeNumber(
     { name: 'media', param: body.media }
   )
 
@@ -792,12 +792,12 @@ export const checkNewOrder = ({ body }: Request): OrderCreateInput => {
 
   const shippingMethodID = R.pipe(
     isProvided,
-    isNumber
+    canBeNumber
   )({ name: 'shippingMethodID', param: body.shippingMethodID })
 
   const userID = R.pipe(
     isProvided,
-    isNumber
+    canBeNumber
   )({ name: 'userID', param: body.userID })
 
   const details = R.pipe(
@@ -807,7 +807,7 @@ export const checkNewOrder = ({ body }: Request): OrderCreateInput => {
 
   const paymentMethodID = R.pipe(
     isProvided,
-    isNumber
+    canBeNumber
   )({ name: 'paymentMethodID', param: body.paymentMethodID })
 
   const cart = R.pipe(
@@ -816,9 +816,9 @@ export const checkNewOrder = ({ body }: Request): OrderCreateInput => {
   )({ name: 'cart', param: body.cart })
 
   cart.param.map((cp: any) => {
-    isNumber({ name: 'productID', param: cp.productID })
-    isNumber({ name: 'userID', param: cp.userID })
-    isNumber({ name: 'qty', param: cp.qty })
+    canBeNumber({ name: 'productID', param: cp.productID })
+    canBeNumber({ name: 'userID', param: cp.userID })
+    canBeNumber({ name: 'qty', param: cp.qty })
   })
 
   return {
@@ -836,11 +836,11 @@ export const checkOrderUpdate = ({ body }: Request): OrderCreateInput => {
     { name: 'address', param: body.address }
   )
 
-  const orderStatusID = body.orderStatusID && isNumber(
+  const orderStatusID = body.orderStatusID && canBeNumber(
     { name: 'orderStatusID', param: body.orderStatusID }
   )
 
-  const shippingMethodID = body.shippingMethodID && isNumber(
+  const shippingMethodID = body.shippingMethodID && canBeNumber(
     { name: 'shippingMethodID', param: body.shippingMethodID }
   )
 
@@ -854,17 +854,17 @@ export const checkOrderUpdate = ({ body }: Request): OrderCreateInput => {
 export const checkNewOrderProduct = ({ body }: Request): OrderProductCreateInput => {
   const qty = R.pipe(
     isProvided,
-    isNumber
+    canBeNumber
   )({ name: 'qty', param: body.qty })
 
   const price = R.pipe(
     isProvided,
-    isNumber
+    canBeNumber
   )({ name: 'price', param: body.price })
 
   const productID = R.pipe(
     isProvided,
-    isNumber
+    canBeNumber
   )({ name: 'productID', param: body.productID })
 
   return {
@@ -875,8 +875,8 @@ export const checkNewOrderProduct = ({ body }: Request): OrderProductCreateInput
 }
 
 export const checkOrderProductUpdate = ({ body }: Request): OrderProductUpdateInput => {
-  const qty = body.qty && isNumber({ name: 'qty', param: body.qty })
-  const price = body.price && isNumber({ name: 'price', param: body.price })
+  const qty = body.qty && canBeNumber({ name: 'qty', param: body.qty })
+  const price = body.price && canBeNumber({ name: 'price', param: body.price })
 
   return hasDefinedProps({
     qty: qty?.param,
@@ -892,22 +892,22 @@ export const checkNewInvoice = ({ body }: Request): InvoiceCreateInput => {
 
   const amount = R.pipe(
     isProvided,
-    isNumber
+    canBeNumber
   )({ name: 'amount', param: body.amount })
 
   const paymentMethodID = R.pipe(
     isProvided,
-    isNumber
+    canBeNumber
   )({ name: 'paymentMethodID', param: body.paymentMethodID })
 
   const userID = R.pipe(
     isProvided,
-    isNumber
+    canBeNumber
   )({ name: 'userID', param: body.userID })
 
   const orderID = R.pipe(
     isProvided,
-    isNumber
+    canBeNumber
   )({ name: 'orderID', param: body.orderID })
 
   return {
@@ -920,7 +920,7 @@ export const checkNewInvoice = ({ body }: Request): InvoiceCreateInput => {
 }
 
 export const checkInvoiceUpdate = ({ body }: Request): InvoiceUpdateInput => {
-  const amount = body.amount && isNumber(
+  const amount = body.amount && canBeNumber(
     { name: 'amount', param: body.amount }
   )
 
@@ -928,11 +928,11 @@ export const checkInvoiceUpdate = ({ body }: Request): InvoiceUpdateInput => {
     { name: 'details', param: body.details }
   )
 
-  const invoiceStatusID = body.invoiceStatusID && isNumber(
+  const invoiceStatusID = body.invoiceStatusID && canBeNumber(
     { name: 'invoiceStatusID', param: body.invoiceStatusID }
   )
 
-  const paymentMethodID = body.paymentMethodID && isNumber(
+  const paymentMethodID = body.paymentMethodID && canBeNumber(
     { name: 'paymentMethodID', param: body.paymentMethodID }
   )
 

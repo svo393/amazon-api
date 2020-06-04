@@ -63,7 +63,7 @@
   "name": "amazon-api",
   "private": true,
   "scripts": {
-    "dev": "cross-env NODE_ENV=development DEBUG=knex:query ts-node-dev src/index.ts",
+    "dev": "cross-env NODE_ENV=development ts-node-dev src/index.ts",
     "init": "cross-env NODE_ENV=development ts-node ./db/init.ts",
     "knex": "knex",
     "migrate:down": "knex migrate:down --knexfile ./db/knexfile.ts",
