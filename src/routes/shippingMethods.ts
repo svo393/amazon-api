@@ -27,4 +27,9 @@ router.put('/:shippingMethodID', isAdmin, async (req, res) => {
   res.json(updatedItem)
 })
 
+router.delete('/:shippingMethodID', isAdmin, async (req, res) => {
+  await shippingMethodService.deleteShippingMethod(req)
+  res.status(204).end()
+})
+
 export default router

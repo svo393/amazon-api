@@ -32,8 +32,17 @@ const updateOrderStatus = async (orderStatusInput: OrderStatusInput, req: Reques
   return updatedOrderStatus
 }
 
+const deleteOrderStatus = async (req: Request): Promise<void> => {
+  const deleteCount = await db('orderStatuses')
+    .del()
+    .where('orderStatusID', req.params.orderStatusID)
+
+  if (deleteCount === 0) throw new StatusError(404, 'Not Found')
+}
+
 export default {
   addOrderStatus,
   getOrderStatuses,
-  updateOrderStatus
+  updateOrderStatus,
+  deleteOrderStatus
 }

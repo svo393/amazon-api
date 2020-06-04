@@ -69,9 +69,18 @@ const updateRole = async (roleInput: RoleInput, req: Request): Promise<SingleRol
   }
 }
 
+const deleteRole = async (req: Request): Promise<void> => {
+  const deleteCount = await db('roles')
+    .del()
+    .where('roleID', req.params.roleID)
+
+  if (deleteCount === 0) throw new StatusError(404, 'Not Found')
+}
+
 export default {
   addRole,
   getRoles,
   getRoleByID,
-  updateRole
+  updateRole,
+  deleteRole
 }

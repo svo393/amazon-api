@@ -32,8 +32,17 @@ const updateInvoiceStatus = async (invoiceStatusInput: InvoiceStatusInput, req: 
   return updatedInvoiceStatus
 }
 
+const deleteInvoiceStatus = async (req: Request): Promise<void> => {
+  const deleteCount = await db('invoiceStatuses')
+    .del()
+    .where('invoiceStatusID', req.params.invoiceStatusID)
+
+  if (deleteCount === 0) throw new StatusError(404, 'Not Found')
+}
+
 export default {
   addInvoiceStatus,
   getInvoiceStatuses,
-  updateInvoiceStatus
+  updateInvoiceStatus,
+  deleteInvoiceStatus
 }

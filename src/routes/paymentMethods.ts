@@ -27,4 +27,9 @@ router.put('/:paymentMethodID', isAdmin, async (req, res) => {
   res.json(updatedPaymentMethod)
 })
 
+router.delete('/:paymentMethodID', isAdmin, async (req, res) => {
+  await paymentMethodService.deletePaymentMethod(req)
+  res.status(204).end()
+})
+
 export default router

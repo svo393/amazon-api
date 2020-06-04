@@ -22,4 +22,9 @@ router.put('/:invoiceStatusID', isAdmin, async (req, res) => {
   res.json(updatedInvoiceStatus)
 })
 
+router.delete('/:invoiceStatusID', isAdmin, async (req, res) => {
+  await invoiceStatusService.deleteInvoiceStatus(req)
+  res.status(204).end()
+})
+
 export default router

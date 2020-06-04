@@ -41,9 +41,18 @@ const updateShippingMethod = async (smInput: SMInput, req: Request): Promise<SM>
   return updatedSM
 }
 
+const deleteShippingMethod = async (req: Request): Promise<void> => {
+  const deleteCount = await db('shippingMethodes')
+    .del()
+    .where('shippingMethodID', req.params.shippingMethodID)
+
+  if (deleteCount === 0) throw new StatusError(404, 'Not Found')
+}
+
 export default {
   addShippingMethod,
   getShippingMethods,
   getShippingMethodByID,
-  updateShippingMethod
+  updateShippingMethod,
+  deleteShippingMethod
 }

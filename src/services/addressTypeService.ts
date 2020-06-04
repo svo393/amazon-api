@@ -56,9 +56,18 @@ const updateAddressType = async (res: Response, atInput: ATInput, req: Request):
   return getAddressTypeByID(res, req)
 }
 
+const deleteAddressType = async (req: Request): Promise<void> => {
+  const deleteCount = await db('addressTypes')
+    .del()
+    .where('addressTypeID', req.params.addressTypeID)
+
+  if (deleteCount === 0) throw new StatusError(404, 'Not Found')
+}
+
 export default {
   addAddressType,
   getAddressTypes,
   getAddressTypeByID,
-  updateAddressType
+  updateAddressType,
+  deleteAddressType
 }

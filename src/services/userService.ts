@@ -132,7 +132,7 @@ const getUsers = async (): Promise<UserListData[]> => {
   return users
 }
 
-type UserPersonalData = UserBaseData & {
+type UserPersonalData = UserSafeData & {
   orders: Order[];
   ratings: Rating[];
   ratingComments: RatingComment[];
@@ -145,6 +145,7 @@ type UserPublicData = Omit<UserPersonalData,
   | 'email'
   | 'userCreatedAt'
   | 'orders'
+  | 'roleID'
 >
 
 const getUserByID = async (req: Request, res: Response): Promise<UserPersonalData | UserPublicData> => {
@@ -183,8 +184,7 @@ const getUserByID = async (req: Request, res: Response): Promise<UserPersonalDat
     ? R.omit([
       'password',
       'resetToken',
-      'resetTokenCreatedAt',
-      'roleID'
+      'resetTokenCreatedAt'
     ], user)
     : R.pick([
       'userID',

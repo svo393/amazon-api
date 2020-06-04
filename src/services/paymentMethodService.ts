@@ -39,9 +39,18 @@ const updatePaymentMethod = async (paymentMethodInput: PaymentMethodInput, req: 
   return updatedPaymentMethod
 }
 
+const deletePaymentMethod = async (req: Request): Promise<void> => {
+  const deleteCount = await db('paymentMethodes')
+    .del()
+    .where('paymentMethodID', req.params.paymentMethodID)
+
+  if (deleteCount === 0) throw new StatusError(404, 'Not Found')
+}
+
 export default {
   addPaymentMethod,
   getPaymentMethods,
   getPaymentMethodByID,
-  updatePaymentMethod
+  updatePaymentMethod,
+  deletePaymentMethod
 }

@@ -22,4 +22,9 @@ router.put('/:orderStatusID', isAdmin, async (req, res) => {
   res.json(updatedOrderStatus)
 })
 
+router.delete('/:orderStatusID', isAdmin, async (req, res) => {
+  await orderStatusService.deleteOrderStatus(req)
+  res.status(204).end()
+})
+
 export default router

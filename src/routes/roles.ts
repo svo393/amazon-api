@@ -27,4 +27,9 @@ router.put('/:roleID', isRoot, async (req, res) => {
   res.json(updatedRole)
 })
 
+router.delete('/:roleID', isRoot, async (req, res) => {
+  await roleService.deleteRole(req)
+  res.status(204).end()
+})
+
 export default router

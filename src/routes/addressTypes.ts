@@ -33,4 +33,9 @@ router.get('/:addressTypeID/addresses', isAdmin, async (req, res) => {
   res.json(addresses)
 })
 
+router.delete('/:addressTypeID', isAdmin, async (req, res) => {
+  await addressTypeService.deleteAddressType(req)
+  res.status(204).end()
+})
+
 export default router

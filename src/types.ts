@@ -108,6 +108,7 @@ export type Rating = {
   likes: number;
   dislikes: number;
   isVerified: boolean;
+  isApproved: string;
   userID: number;
   groupID: number;
 }
@@ -118,7 +119,7 @@ export type RatingComment = {
   ratingCommentUpdatedAt: Date;
   content: string;
   media?: number;
-  isVerified: boolean;
+  isApproved: boolean;
   userID: number;
   ratingID: number;
   parentRatingCommentID?: number;
@@ -132,7 +133,7 @@ export type Question = {
   media?: number;
   likes: number;
   dislikes: number;
-  isVerified: boolean;
+  isApproved: boolean;
   userID: number;
   groupID: number;
 }
@@ -145,7 +146,7 @@ export type Answer = {
   media?: number;
   likes: number;
   dislikes: number;
-  isVerified: boolean;
+  isApproved: boolean;
   userID: number;
   questionID: number;
 }
@@ -156,7 +157,7 @@ export type AnswerComment = {
   answerCommentUpdatedAt: Date;
   content: string;
   media?: number;
-  isVerified: boolean;
+  isApproved: boolean;
   userID: number;
   answerID: number;
   parentAnswerCommentID?: number;

@@ -1,5 +1,6 @@
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
+import path from 'path'
 import express from 'express'
 import helmet from 'helmet'
 import logger from 'morgan'
@@ -15,6 +16,10 @@ app.use(cors({
   origin: env.BASE_URL,
   optionsSuccessStatus: 200
 }))
+
+// TODO consider enabling cache
+
+app.use(express.static(path.join(process.cwd(), 'public'))) // TODO migrate to nginx
 
 app.use(cookieParser())
 app.use(getUserID)
