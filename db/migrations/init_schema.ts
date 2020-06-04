@@ -3,23 +3,19 @@ import Knex from 'knex'
 export const up = (knex: Knex): Knex.SchemaBuilder =>
   knex.schema
     .createTable('roles', (t) => {
-      t.increments('roleID')
-      t.string('name', 50).unique().notNullable()
+      t.string('roleName', 50).primary()
     })
 
     .createTable('shippingMethods', (t) => {
-      t.increments('shippingMethodID')
-      t.string('name', 50).unique().notNullable()
+      t.string('shippingMethodName', 50).primary()
     })
 
     .createTable('paymentMethods', (t) => {
-      t.increments('paymentMethodID')
-      t.string('name', 50).unique().notNullable()
+      t.string('paymentMethodName', 50).primary()
     })
 
     .createTable('addressTypes', (t) => {
-      t.increments('addressTypeID')
-      t.string('name', 50).unique().notNullable()
+      t.string('addressTypeName', 50).primary()
     })
 
     .createTable('addresses', (t) => {
@@ -27,12 +23,12 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.string('addr').notNullable()
 
       t
-        .integer('addressTypeID')
-        .references('addressTypes.addressTypeID')
+        .string('addressType')
+        .references('addressTypes.addressTypeName')
         .notNullable()
     })
     .alterTable('addresses', (t) => {
-      t.unique([ 'addr', 'addressTypeID' ])
+      t.unique([ 'addr', 'addressType' ])
     })
 
     .createTable('users', (t) => {
@@ -47,8 +43,8 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.dateTime('resetTokenCreatedAt')
 
       t
-        .integer('roleID')
-        .references('roles.roleID')
+        .string('role')
+        .references('roles.roleName')
         .notNullable()
     })
 
@@ -356,8 +352,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
     })
 
     .createTable('orderStatuses', (t) => {
-      t.increments('orderStatusID')
-      t.string('name', 50).unique().notNullable()
+      t.string('orderStatusName', 50).primary()
     })
 
     .createTable('orders', (t) => {
@@ -372,13 +367,13 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .onDelete('SET NULL')
 
       t
-        .integer('orderStatusID')
-        .references('orderStatuses.orderStatusID')
+        .string('orderStatus')
+        .references('orderStatuses.orderStatusName')
         .notNullable()
 
       t
-        .integer('shippingMethodID')
-        .references('shippingMethods.shippingMethodID')
+        .string('shippingMethod')
+        .references('shippingMethods.shippingMethodName')
         .notNullable()
     })
 
@@ -401,8 +396,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
     })
 
     .createTable('invoiceStatuses', (t) => {
-      t.increments('invoiceStatusID')
-      t.string('name', 50).unique().notNullable()
+      t.string('invoiceStatusName', 50).primary()
     })
 
     .createTable('invoices', (t) => {
@@ -423,13 +417,13 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .notNullable()
 
       t
-        .integer('invoiceStatusID')
-        .references('invoiceStatuses.invoiceStatusID')
+        .string('invoiceStatus')
+        .references('invoiceStatuses.invoiceStatusName')
         .notNullable()
 
       t
-        .integer('paymentMethodID')
-        .references('paymentMethods.paymentMethodID')
+        .string('paymentMethod')
+        .references('paymentMethods.paymentMethodName')
         .notNullable()
     })
 

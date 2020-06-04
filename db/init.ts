@@ -50,22 +50,22 @@ export const init = async (): Promise<void> => {
     `
   )
 
-  await db('roles').insert(roles.map((r) => ({ name: r })))
+  await db('roles').insert(roles.map((r) => ({ roleName: r })))
 
-  await db('shippingMethods').insert(shippingMethods.map((sm) => ({ name: sm })))
+  await db('shippingMethods').insert(shippingMethods.map((sm) => ({ shippingMethodName: sm })))
 
   const ats: AddressType[] = await db('addressTypes')
-    .insert(addressTypes.map((at) => ({ name: at })), [ '*' ])
+    .insert(addressTypes.map((at) => ({ addressTypeName: at })), [ '*' ])
 
-  await db('paymentMethods').insert(paymentMethods.map((pt) => ({ name: pt })))
+  await db('paymentMethods').insert(paymentMethods.map((pt) => ({ paymentMethodName: pt })))
 
   await db('addresses').insert(lockerAddresses.map((a) => ({
-    addr: a, addressTypeID: ats.find((at) => at.name === 'LOCKER')?.addressTypeID
+    addr: a, addressType: ats.find((at) => at.addressTypeName === 'LOCKER')?.addressTypeName
   })))
 
-  await db('orderStatuses').insert(orderStatuses.map((os) => ({ name: os })))
+  await db('orderStatuses').insert(orderStatuses.map((os) => ({ orderStatusName: os })))
 
-  await db('invoiceStatuses').insert(invoiceStatuses.map((os) => ({ name: os })))
+  await db('invoiceStatuses').insert(invoiceStatuses.map((os) => ({ invoiceStatusName: os })))
 }
 
 init().then(async () => db.destroy())

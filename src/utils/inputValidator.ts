@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoryCreateInput, CategoryUpdateInput, GroupVariantCreateInput, GroupVariantUpdateInput, InvoiceCreateInput, InvoiceStatusInput, InvoiceUpdateInput, ListCreateInput, OrderCreateInput, OrderProductCreateInput, OrderProductUpdateInput, OrderStatusInput, ParameterCreateInput, ParameterUpdateInput, PasswordRequestInput, PasswordResetInput, PaymentMethodInput, ProductCreateInput, ProductParameterInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, RoleInput, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput } from '../types'
+import { AddressCreateInput, AddressType, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoryCreateInput, CategoryUpdateInput, GroupVariantCreateInput, GroupVariantUpdateInput, InvoiceCreateInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, OrderCreateInput, OrderProductCreateInput, OrderProductUpdateInput, OrderStatus, OrderUpdateInput, ParameterCreateInput, ParameterUpdateInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductParameterInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, Role, ShippingMethod, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput } from '../types'
 import { canBeNumber, hasDefinedProps, isArray, isBoolean, isEmail, isInputProvided, isPasswordValid, isProductParameterOrGroupVariant, isProvided, isString, isStringOrNumber } from './validatorLib'
 
 export const checkNewUser = ({ body }: Request): UserSignupInput => {
@@ -69,17 +69,17 @@ export const checkUserUpdate = ({ body }: Request): UserUpdateInput => {
     ? isBoolean({ name: 'avatar', param: body.avatar })
     : undefined
 
-  const roleID = body.roleID && canBeNumber(
-    { name: 'roleID', param: body.roleID }
+  const role = body.role && isString(
+    { name: 'role', param: body.role }
   )
 
-  return hasDefinedProps({
+  return hasDefinedProps<UserUpdateInput>({
     name: name?.param,
     info: info?.param,
     email: email?.param.toLowerCase(),
     password: password?.param,
     avatar: avatar?.param,
-    roleID: roleID?.param
+    role: role?.param
   })
 }
 
@@ -244,7 +244,7 @@ export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
     { name: 'vendorID', param: body.vendorID }
   )
 
-  return hasDefinedProps({
+  return hasDefinedProps<ProductUpdateInput>({
     title: title?.param,
     listPrice: listPrice?.param,
     price: price?.param,
@@ -295,7 +295,7 @@ export const checkCategoryUpdate = ({ body }: Request): CategoryUpdateInput => {
     { name: 'parentCategoryID', param: body.parentCategoryID }
   )
 
-  return hasDefinedProps({
+  return hasDefinedProps<CategoryUpdateInput>({
     name: name?.param,
     parentCategoryID: parentCategoryID?.param
   })
@@ -310,67 +310,67 @@ export const checkVendor = ({ body }: Request): VendorInput => {
   return { name: name.param }
 }
 
-export const checkRole = ({ body }: Request): RoleInput => {
-  const name = R.pipe(
+export const checkRole = ({ body }: Request): Role => {
+  const roleName = R.pipe(
     isProvided,
     isString
-  )({ name: 'name', param: body.name })
+  )({ name: 'roleName', param: body.roleName })
 
-  return { name: name.param }
+  return { roleName: roleName.param }
 }
 
-export const checkNewOrderStatus = ({ body }: Request): OrderStatusInput => {
-  const name = R.pipe(
+export const checkNewOrderStatus = ({ body }: Request): OrderStatus => {
+  const orderStatusName = R.pipe(
     isProvided,
     isString
-  )({ name: 'name', param: body.name })
+  )({ name: 'orderStatusName', param: body.orderStatusName })
 
-  return { name: name.param }
+  return { orderStatusName: orderStatusName.param }
 }
 
-export const checkNewInvoiceStatus = ({ body }: Request): InvoiceStatusInput => {
-  const name = R.pipe(
+export const checkNewInvoiceStatus = ({ body }: Request): InvoiceStatus => {
+  const invoiceStatusName = R.pipe(
     isProvided,
     isString
-  )({ name: 'name', param: body.name })
+  )({ name: 'invoiceStatusName', param: body.invoiceStatusName })
 
-  return { name: name.param }
+  return { invoiceStatusName: invoiceStatusName.param }
 }
 
-export const checkOrderStatusUpdate = ({ body }: Request): OrderStatusInput => {
-  const name = R.pipe(
+export const checkOrderStatusUpdate = ({ body }: Request): OrderStatus => {
+  const orderStatusName = R.pipe(
     isProvided,
     isString
-  )({ name: 'name', param: body.name })
+  )({ name: 'orderStatusName', param: body.orderStatusName })
 
-  return { name: name.param }
+  return { orderStatusName: orderStatusName.param }
 }
 
-export const checkInvoiceStatusUpdate = ({ body }: Request): InvoiceStatusInput => {
-  const name = R.pipe(
+export const checkInvoiceStatusUpdate = ({ body }: Request): InvoiceStatus => {
+  const invoiceStatusName = R.pipe(
     isProvided,
     isString
-  )({ name: 'name', param: body.name })
+  )({ name: 'invoiceStatusName', param: body.invoiceStatusName })
 
-  return { name: name.param }
+  return { invoiceStatusName: invoiceStatusName.param }
 }
 
-export const checkShippingMethod = ({ body }: Request): ShippingMethodInput => {
-  const name = R.pipe(
+export const checkShippingMethod = ({ body }: Request): ShippingMethod => {
+  const shippingMethodName = R.pipe(
     isProvided,
     isString
-  )({ name: 'name', param: body.name })
+  )({ name: 'shippingMethodName', param: body.shippingMethodName })
 
-  return { name: name.param }
+  return { shippingMethodName: shippingMethodName.param }
 }
 
-export const checkAddressType = ({ body }: Request): AddressTypeInput => {
-  const name = R.pipe(
+export const checkAddressType = ({ body }: Request): AddressType => {
+  const addressTypeName = R.pipe(
     isProvided,
     isString
-  )({ name: 'name', param: body.name })
+  )({ name: 'addressTypeName', param: body.addressTypeName })
 
-  return { name: name.param }
+  return { addressTypeName: addressTypeName.param }
 }
 
 export const checkNewCartProduct = ({ body }: Request): CartProduct => {
@@ -404,13 +404,13 @@ export const checkCartProductUpdate = ({ body }: Request): CartProductInput => {
   return { qty: qty.param }
 }
 
-export const checkPaymentMethod = ({ body }: Request): PaymentMethodInput => {
-  const name = R.pipe(
+export const checkPaymentMethod = ({ body }: Request): PaymentMethod => {
+  const paymentMethodName = R.pipe(
     isProvided,
     isString
-  )({ name: 'name', param: body.name })
+  )({ name: 'paymentMethodName', param: body.paymentMethodName })
 
-  return { name: name.param }
+  return { paymentMethodName: paymentMethodName.param }
 }
 
 export const checkNewAddress = ({ body }: Request): AddressCreateInput => {
@@ -423,15 +423,15 @@ export const checkNewAddress = ({ body }: Request): AddressCreateInput => {
     isString
   )({ name: 'addr', param: body.addr })
 
-  const addressTypeID = R.pipe(
+  const addressType = R.pipe(
     isProvided,
     canBeNumber
-  )({ name: 'addressTypeID', param: body.addressTypeID })
+  )({ name: 'addressType', param: body.addressType })
 
   return {
     isDefault: isDefault?.param,
     addr: addr.param,
-    addressTypeID: addressTypeID.param
+    addressType: addressType.param
   }
 }
 
@@ -541,7 +541,7 @@ export const checkRatingUpdate = ({ body }: Request): RatingUpdateInput => {
     ? isBoolean({ name: 'isApproved', param: body.isApproved })
     : undefined
 
-  return hasDefinedProps({
+  return hasDefinedProps<RatingUpdateInput>({
     title: title?.param,
     review: review?.param,
     media: media?.param,
@@ -591,7 +591,7 @@ export const checkRatingCommentUpdate = ({ body }: Request): RatingCommentUpdate
     ? isBoolean({ name: 'isApproved', param: body.isApproved })
     : undefined
 
-  return hasDefinedProps({
+  return hasDefinedProps<RatingCommentUpdateInput>({
     content: content?.param,
     media: media?.param,
     isApproved: isApproved?.param
@@ -633,7 +633,7 @@ export const checkQuestionUpdate = ({ body }: Request): QuestionUpdateInput => {
     ? isBoolean({ name: 'isApproved', param: body.isApproved })
     : undefined
 
-  return hasDefinedProps({
+  return hasDefinedProps<QuestionUpdateInput>({
     content: content?.param,
     media: media?.param,
     isApproved: isApproved?.param
@@ -675,7 +675,7 @@ export const checkAnswerUpdate = ({ body }: Request): AnswerUpdateInput => {
     ? isBoolean({ name: 'isApproved', param: body.isApproved })
     : undefined
 
-  return hasDefinedProps({
+  return hasDefinedProps<AnswerUpdateInput>({
     content: content?.param,
     media: media?.param,
     isApproved: isApproved?.param
@@ -722,7 +722,7 @@ export const checkAnswerCommentUpdate = ({ body }: Request): AnswerCommentUpdate
     ? isBoolean({ name: 'isApproved', param: body.isApproved })
     : undefined
 
-  return hasDefinedProps({
+  return hasDefinedProps<AnswerCommentUpdateInput>({
     content: content?.param,
     media: media?.param,
     isApproved: isApproved?.param
@@ -790,10 +790,10 @@ export const checkNewOrder = ({ body }: Request): OrderCreateInput => {
     isString
   )({ name: 'address', param: body.address })
 
-  const shippingMethodID = R.pipe(
+  const shippingMethod = R.pipe(
     isProvided,
-    canBeNumber
-  )({ name: 'shippingMethodID', param: body.shippingMethodID })
+    isString
+  )({ name: 'shippingMethod', param: body.shippingMethod })
 
   const userID = R.pipe(
     isProvided,
@@ -805,10 +805,10 @@ export const checkNewOrder = ({ body }: Request): OrderCreateInput => {
     isString
   )({ name: 'details', param: body.details })
 
-  const paymentMethodID = R.pipe(
+  const paymentMethod = R.pipe(
     isProvided,
-    canBeNumber
-  )({ name: 'paymentMethodID', param: body.paymentMethodID })
+    isString
+  )({ name: 'paymentMethod', param: body.paymentMethod })
 
   const cart = R.pipe(
     isProvided,
@@ -824,30 +824,30 @@ export const checkNewOrder = ({ body }: Request): OrderCreateInput => {
   return {
     address: address.param,
     userID: userID.param,
-    shippingMethodID: shippingMethodID.param,
+    shippingMethod: shippingMethod.param,
     details: details.param,
-    paymentMethodID: paymentMethodID.param,
+    paymentMethod: paymentMethod.param,
     cart: cart.param
   }
 }
 
-export const checkOrderUpdate = ({ body }: Request): OrderCreateInput => {
+export const checkOrderUpdate = ({ body }: Request): OrderUpdateInput => {
   const address = body.address && isString(
     { name: 'address', param: body.address }
   )
 
-  const orderStatusID = body.orderStatusID && canBeNumber(
-    { name: 'orderStatusID', param: body.orderStatusID }
+  const orderStatus = body.orderStatus && isString(
+    { name: 'orderStatus', param: body.orderStatus }
   )
 
-  const shippingMethodID = body.shippingMethodID && canBeNumber(
-    { name: 'shippingMethodID', param: body.shippingMethodID }
+  const shippingMethod = body.shippingMethod && isString(
+    { name: 'shippingMethod', param: body.shippingMethod }
   )
 
-  return hasDefinedProps({
+  return hasDefinedProps<OrderUpdateInput>({
     address: address?.param,
-    orderStatusID: orderStatusID?.param,
-    shippingMethodID: shippingMethodID?.param
+    orderStatus: orderStatus?.param,
+    shippingMethod: shippingMethod?.param
   })
 }
 
@@ -878,7 +878,7 @@ export const checkOrderProductUpdate = ({ body }: Request): OrderProductUpdateIn
   const qty = body.qty && canBeNumber({ name: 'qty', param: body.qty })
   const price = body.price && canBeNumber({ name: 'price', param: body.price })
 
-  return hasDefinedProps({
+  return hasDefinedProps<OrderProductUpdateInput>({
     qty: qty?.param,
     price: price?.param
   })
@@ -895,10 +895,10 @@ export const checkNewInvoice = ({ body }: Request): InvoiceCreateInput => {
     canBeNumber
   )({ name: 'amount', param: body.amount })
 
-  const paymentMethodID = R.pipe(
+  const paymentMethod = R.pipe(
     isProvided,
-    canBeNumber
-  )({ name: 'paymentMethodID', param: body.paymentMethodID })
+    isString
+  )({ name: 'paymentMethod', param: body.paymentMethod })
 
   const userID = R.pipe(
     isProvided,
@@ -915,7 +915,7 @@ export const checkNewInvoice = ({ body }: Request): InvoiceCreateInput => {
     details: details.param,
     orderID: orderID.param,
     userID: userID.param,
-    paymentMethodID: paymentMethodID.param
+    paymentMethod: paymentMethod.param
   }
 }
 
@@ -928,18 +928,18 @@ export const checkInvoiceUpdate = ({ body }: Request): InvoiceUpdateInput => {
     { name: 'details', param: body.details }
   )
 
-  const invoiceStatusID = body.invoiceStatusID && canBeNumber(
-    { name: 'invoiceStatusID', param: body.invoiceStatusID }
+  const invoiceStatus = body.invoiceStatus && isString(
+    { name: 'invoiceStatus', param: body.invoiceStatus }
   )
 
-  const paymentMethodID = body.paymentMethodID && canBeNumber(
-    { name: 'paymentMethodID', param: body.paymentMethodID }
+  const paymentMethod = body.paymentMethod && isString(
+    { name: 'paymentMethod', param: body.paymentMethod }
   )
 
-  return hasDefinedProps({
+  return hasDefinedProps<InvoiceUpdateInput>({
     amount: amount?.param,
     details: details?.param,
-    invoiceStatusID: invoiceStatusID?.param,
-    paymentMethodID: paymentMethodID?.param
+    invoiceStatus: invoiceStatus?.param,
+    paymentMethod: paymentMethod?.param
   })
 }

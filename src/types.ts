@@ -3,29 +3,25 @@
 //
 
 export type Role = {
-  roleID: number;
-  name: string;
+  roleName: string;
 }
 
 export type ShippingMethod = {
-  shippingMethodID: number;
-  name: string;
+  shippingMethodName: string;
 }
 
 export type AddressType = {
-  addressTypeID: number;
-  name: string;
+  addressTypeName: string;
 }
 
 export type PaymentMethod = {
-  paymentMethodID: number;
-  name: string;
+  paymentMethodName: string;
 }
 
 export type Address = {
   addressID: number;
   addr: string;
-  addressTypeID: number;
+  addressType: number;
 }
 
 export type User = {
@@ -38,7 +34,7 @@ export type User = {
   userCreatedAt: Date;
   resetToken?: string | null;
   resetTokenCreatedAt?: Date | null;
-  roleID: number;
+  role: string;
 }
 
 export type Follower = {
@@ -188,8 +184,7 @@ export type CartProduct = {
 }
 
 export type OrderStatus = {
-  orderStatusID: number;
-  name: string;
+  orderStatusName: string;
 }
 
 export type Order = {
@@ -198,8 +193,8 @@ export type Order = {
   orderCreatedAt: Date;
   orderUpdatedAt: Date;
   userID: number | null;
-  orderStatusID: number;
-  shippingMethodID: number;
+  orderStatus: string;
+  shippingMethod: string;
 }
 
 export type OrderProduct = {
@@ -210,8 +205,7 @@ export type OrderProduct = {
 }
 
 export type InvoiceStatus = {
-  invoiceStatusID: number;
-  name: string;
+  invoiceStatusName: string;
 }
 
 export type Invoice = {
@@ -222,8 +216,8 @@ export type Invoice = {
   invoiceUpdatedAt: Date;
   orderID: number;
   userID: number;
-  invoiceStatusID: number;
-  paymentMethodID: number;
+  invoiceStatus: string;
+  paymentMethod: string;
 }
 
 //
@@ -238,10 +232,11 @@ export type UserLoginInput = UserSignupInput & {
 
 export type UserUpdateInput = {
   name?: string;
+  info?: string;
   email?: string;
   password?: string;
   avatar?: boolean;
-  roleID?: number;
+  role?: string;
 }
 
 export type PasswordRequestInput = Pick<User, 'email'>
@@ -270,26 +265,18 @@ export type UserSafeData = Omit<User,
   | 'resetTokenCreatedAt'
 >
 
-export type RoleInput = Pick<Role, 'name'>
-
-export type ShippingMethodInput = Pick<ShippingMethod, 'name'>
-
-export type AddressTypeInput = Pick<AddressType, 'name'>
-
-export type AddressCreateInput = Pick<Address, 'addr' | 'addressTypeID'> & {
+export type AddressCreateInput = Pick<Address, 'addr' | 'addressType'> & {
   isDefault?: boolean;
 }
 
-export type PaymentMethodInput = Pick<PaymentMethod, 'name'>
-
 export type AddressFetchInput = {
   userID?: number;
-  addressTypeID?: number;
+  addressType?: string;
 }
 
 export type AddressUpdateInput = {
   name?: string;
-  addressTypeID?: number;
+  addressType?: string;
 }
 
 export type FollowerFetchInput = {
@@ -451,24 +438,20 @@ export type ProductParameterInput = Pick<ProductParameter, 'value'>
 
 export type CartProductInput = Pick<CartProduct, 'qty'>
 
-export type OrderStatusInput = Pick<OrderStatus, 'name'>
-
-export type InvoiceStatusInput = Pick<InvoiceStatus, 'name'>
-
 export type OrderCreateInput = Pick<Order,
   | 'address'
   | 'userID'
-  | 'shippingMethodID'
+  | 'shippingMethod'
 > & {
   details: string;
-  paymentMethodID: number;
+  paymentMethod: string;
   cart: CartProduct[];
 }
 
 export type OrderUpdateInput = {
   address?: string;
-  orderStatusID?: number;
-  shippingMethodID?: number;
+  orderStatus?: string;
+  shippingMethod?: string;
 }
 
 export type OrderProductCreateInput = Omit<OrderProduct, | 'orderID'>
@@ -479,13 +462,13 @@ export type InvoiceCreateInput = Pick<Invoice,
   | 'amount'
   | 'details'
   | 'orderID'
-  | 'paymentMethodID'
+  | 'paymentMethod'
   | 'userID'
 >
 
 export type InvoiceUpdateInput = {
   amount?: number;
   details?: string;
-  paymentMethodID?: number;
-  invoiceStatusID?: number;
+  paymentMethod?: string;
+  invoiceStatus?: string;
 }
