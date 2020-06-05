@@ -7,6 +7,10 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.string('roleName', 50).primary()
     })
 
+    .createTable('moderationStatuses', (t) => {
+      t.string('moderationStatusName', 50).primary()
+    })
+
     .createTable('shippingMethods', (t) => {
       t.string('shippingMethodName', 50).primary()
       t.boolean('isPrivate').defaultTo(false).notNullable()
@@ -181,7 +185,6 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.integer('likes').notNullable().unsigned().defaultTo(0)
       t.integer('dislikes').notNullable().unsigned().defaultTo(0)
       t.boolean('isVerified').defaultTo(false).notNullable()
-      t.boolean('isApproved').defaultTo(false).notNullable()
 
       t
         .integer('userID')
@@ -192,6 +195,11 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t
         .integer('groupID')
         .references('groups.groupID')
+        .notNullable()
+
+      t
+        .string('moderationStatus')
+        .references('moderationStatuses.moderationStatusName')
         .notNullable()
     })
     .alterTable('ratings', (t) => {
@@ -204,7 +212,6 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.dateTime('ratingCommentUpdatedAt').notNullable()
       t.string('content', 65535).notNullable()
       t.integer('media').unsigned()
-      t.boolean('isApproved').defaultTo(false).notNullable()
 
       t
         .integer('userID')
@@ -222,6 +229,11 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .integer('parentRatingCommentID')
         .references('ratingComments.ratingCommentID')
         .onDelete('SET NULL')
+
+      t
+        .string('moderationStatus')
+        .references('moderationStatuses.moderationStatusName')
+        .notNullable()
     })
 
     .createTable('questions', (t) => {
@@ -232,7 +244,6 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.integer('media').unsigned()
       t.integer('likes').notNullable().unsigned().defaultTo(0)
       t.integer('dislikes').notNullable().unsigned().defaultTo(0)
-      t.boolean('isApproved').defaultTo(false).notNullable()
 
       t
         .integer('userID')
@@ -244,6 +255,11 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .integer('groupID')
         .references('groups.groupID')
         .notNullable()
+
+      t
+        .string('moderationStatus')
+        .references('moderationStatuses.moderationStatusName')
+        .notNullable()
     })
 
     .createTable('answers', (t) => {
@@ -254,7 +270,6 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.integer('media').unsigned()
       t.integer('likes').notNullable().unsigned().defaultTo(0)
       t.integer('dislikes').notNullable().unsigned().defaultTo(0)
-      t.boolean('isApproved').defaultTo(false).notNullable()
 
       t
         .integer('userID')
@@ -267,6 +282,11 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .references('questions.questionID')
         .notNullable()
         .onDelete('CASCADE')
+
+      t
+        .string('moderationStatus')
+        .references('moderationStatuses.moderationStatusName')
+        .notNullable()
     })
 
     .createTable('answerComments', (t) => {
@@ -275,7 +295,6 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.dateTime('answerCommentUpdatedAt').notNullable()
       t.string('content', 65535).notNullable()
       t.integer('media').unsigned()
-      t.boolean('isApproved').defaultTo(false).notNullable()
 
       t
         .integer('userID')
@@ -293,6 +312,11 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .integer('parentAnswerCommentID')
         .references('answerComments.answerCommentID')
         .onDelete('SET NULL')
+
+      t
+        .string('moderationStatus')
+        .references('moderationStatuses.moderationStatusName')
+        .notNullable()
     })
 
     .createTable('groupVariants', (t) => {
@@ -459,4 +483,5 @@ export const down = (knex: Knex): Knex.SchemaBuilder =>
     .dropTableIfExists('paymentMethods')
     .dropTableIfExists('addressTypes')
     .dropTableIfExists('shippingMethods')
+    .dropTableIfExists('moderationStatuses')
     .dropTableIfExists('roles')

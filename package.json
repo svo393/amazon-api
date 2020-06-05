@@ -49,8 +49,8 @@
     "jest": "^25.5.4",
     "supertest": "^4.0.2",
     "ts-jest": "^25.5.1",
-    "ts-node-dev": "^1.0.0-pre.44",
     "ts-node": "^8.10.1",
+    "ts-node-dev": "^1.0.0-pre.44",
     "typescript": "^3.9.3"
   },
   "jest": {
@@ -85,6 +85,7 @@
     "test:is": "cross-env NODE_ENV=development jest ./tests/invoiceStatusesAPI.test.ts --verbose  --runInBand",
     "test:lists": "cross-env NODE_ENV=development jest ./tests/listsAPI.test.ts --verbose  --runInBand",
     "test:lp": "cross-env NODE_ENV=development jest ./tests/listProductsAPI.test.ts --verbose  --runInBand",
+    "test:ms": "cross-env NODE_ENV=development jest ./tests/moderationStatusesAPI.test.ts --verbose  --runInBand",
     "test:op": "cross-env NODE_ENV=development jest ./tests/orderProductsAPI.test.ts --verbose  --runInBand",
     "test:orders": "cross-env NODE_ENV=development jest ./tests/ordersAPI.test.ts --verbose  --runInBand",
     "test:os": "cross-env NODE_ENV=development jest ./tests/orderStatusesAPI.test.ts --verbose  --runInBand",

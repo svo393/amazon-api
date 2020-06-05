@@ -17,7 +17,8 @@ const addRating = async (ratingInput: RatingCreateInput, res: Response): Promise
       ...ratingInput,
       userID: res.locals.userID,
       ratingCreatedAt: now,
-      ratingUpdatedAt: now
+      ratingUpdatedAt: now,
+      moderationStatus: 'NEW'
     }) ]
   )
 

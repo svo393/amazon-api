@@ -10,6 +10,7 @@ import groupsRouter from './groups'
 import invoiceStatusesRouter from './invoiceStatuses'
 import listsRouter from './lists'
 import orderStatusesRouter from './orderStatuses'
+import moderationStatusesRouter from './moderationStatuses'
 import parametersRouter from './parameters'
 import paymentMethodsRouter from './paymentMethods'
 import productsRouter from './products'
@@ -35,6 +36,7 @@ export default Router()
   .use(apiURLs.parameters, parametersRouter)
   .use(apiURLs.roles, rolesRouter)
   .use(apiURLs.orderStatuses, orderStatusesRouter)
+  .use(apiURLs.moderationStatuses, moderationStatusesRouter)
   .use(apiURLs.invoiceStatuses, invoiceStatusesRouter)
   .use(apiURLs.shippingMethods, shippingMethodsRouter)
   .use(apiURLs.addressTypes, addressTypesRouter)

@@ -12,7 +12,8 @@ const addAnswerComment = async (answerCommentInput: AnswerCommentCreateInput, re
       ...answerCommentInput,
       userID: res.locals.userID,
       answerCommentCreatedAt: now,
-      answerCommentUpdatedAt: now
+      answerCommentUpdatedAt: now,
+      moderationStatus: 'NEW'
     }, [ '*' ])
 
   return addedAnswerComment

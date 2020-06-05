@@ -106,7 +106,7 @@ export type Rating = {
   likes: number;
   dislikes: number;
   isVerified: boolean;
-  isApproved: string;
+  moderationStatus: string;
   userID: number;
   groupID: number;
 }
@@ -117,7 +117,7 @@ export type RatingComment = {
   ratingCommentUpdatedAt: Date;
   content: string;
   media?: number;
-  isApproved: boolean;
+  moderationStatus: string;
   userID: number;
   ratingID: number;
   parentRatingCommentID?: number;
@@ -131,7 +131,7 @@ export type Question = {
   media?: number;
   likes: number;
   dislikes: number;
-  isApproved: boolean;
+  moderationStatus: string;
   userID: number;
   groupID: number;
 }
@@ -144,7 +144,7 @@ export type Answer = {
   media?: number;
   likes: number;
   dislikes: number;
-  isApproved: boolean;
+  moderationStatus: string;
   userID: number;
   questionID: number;
 }
@@ -155,7 +155,7 @@ export type AnswerComment = {
   answerCommentUpdatedAt: Date;
   content: string;
   media?: number;
-  isApproved: boolean;
+  moderationStatus: string;
   userID: number;
   answerID: number;
   parentAnswerCommentID?: number;
@@ -187,6 +187,10 @@ export type CartProduct = {
 
 export type OrderStatus = {
   orderStatusName: string;
+}
+
+export type ModerationStatus = {
+  moderationStatusName: string;
 }
 
 export type Order = {
@@ -378,7 +382,7 @@ export type RatingUpdateInput = Pick<Rating,
 > & {
   stars?: number;
   isVerified?: boolean;
-  isApproved?: boolean;
+  moderationStatus?: string;
 }
 
 export type RatingCommentCreateInput = Pick<RatingComment,
@@ -392,7 +396,7 @@ export type RatingCommentUpdateInput = Pick<RatingComment,
   | 'media'
 > & {
   content?: string;
-  isApproved?: boolean;
+  moderationStatus?: string;
 }
 
 export type QuestionCreateInput = Pick<Question,
@@ -405,7 +409,7 @@ export type QuestionUpdateInput = Pick<Question,
   | 'media'
 > & {
   content?: string;
-  isApproved?: boolean;
+  moderationStatus?: string;
 }
 
 export type AnswerCreateInput = Pick<Answer,
@@ -418,7 +422,7 @@ export type AnswerUpdateInput = Pick<Answer,
   | 'media'
 > & {
   content?: string;
-  isApproved?: boolean;
+  moderationStatus?: string;
 }
 
 export type AnswerCommentCreateInput = Pick<AnswerComment,
@@ -432,7 +436,7 @@ export type AnswerCommentUpdateInput = Pick<AnswerComment,
   | 'media'
 > & {
   content?: string;
-  isApproved?: boolean;
+  moderationStatus?: string;
 }
 
 export type GroupVariantCreateInput = {

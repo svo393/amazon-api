@@ -129,7 +129,7 @@ describe('User updating', () => {
       .send({ name: 'Jack' })
       .expect(200)
 
-    expect(Object.keys(body)).toHaveLength(3)
+    expect(Object.keys(body)).toHaveLength(6)
     expect(body.name).toBe('Jack')
   })
 

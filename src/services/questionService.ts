@@ -17,7 +17,8 @@ const addQuestion = async (questionInput: QuestionCreateInput, res: Response): P
       ...questionInput,
       userID: res.locals.userID,
       questionCreatedAt: now,
-      questionUpdatedAt: now
+      questionUpdatedAt: now,
+      moderationStatus: 'NEW'
     }) ]
   )
 

@@ -1,4 +1,5 @@
 export const roles = [ 'ROOT', 'ADMIN', 'CUSTOMER' ]
+export const moderationStatuses = [ 'NEW', 'APPROVED', 'REJECTED' ]
 export const shippingMethods = [
   { shippingMethodName: 'INTL', isPrivate: true },
   { shippingMethodName: 'DOOR', isPrivate: true },
@@ -23,6 +24,7 @@ export const apiURLs = {
   vendors: `${baseAPI}/vendors`,
   roles: `${baseAPI}/roles`,
   orderStatuses: `${baseAPI}/order-statuses`,
+  moderationStatuses: `${baseAPI}/moderation-statuses`,
   invoiceStatuses: `${baseAPI}/invoice-statuses`,
   shippingMethods: `${baseAPI}/shipping-methods`,
   addressTypes: `${baseAPI}/address-types`,

@@ -131,7 +131,7 @@ const seed = async (): Promise<void> => {
                 await api
                   .put(`${apiURLs.ratings}/${body.ratingID}`)
                   .set('Cookie', `token=${adminToken}`)
-                  .send({ isVerified: true, isApproved: true })
+                  .send({ isVerified: true, moderationStatus: 'APPROVED' })
 
                 if (r.media) {
                   const uploadAPI = api
@@ -162,7 +162,7 @@ const seed = async (): Promise<void> => {
                     await api
                       .put(`${apiURLs.ratingComments}/${ratingComment.body.ratingCommentID}`)
                       .set('Cookie', `token=${adminToken}`)
-                      .send({ isApproved: true })
+                      .send({ moderationStatus: 'APPROVED' })
 
                     if (cm.media) {
                       const uploadAPI = api
@@ -197,7 +197,7 @@ const seed = async (): Promise<void> => {
                 await api
                   .put(`${apiURLs.questions}/${body.questionID}`)
                   .set('Cookie', `token=${adminToken}`)
-                  .send({ isApproved: true })
+                  .send({ moderationStatus: 'APPROVED' })
 
                 if (q.media) {
                   const uploadAPI = api
@@ -228,7 +228,7 @@ const seed = async (): Promise<void> => {
                     await api
                       .put(`${apiURLs.answers}/${answer.body.answerID}`)
                       .set('Cookie', `token=${adminToken}`)
-                      .send({ isApproved: true })
+                      .send({ moderationStatus: 'APPROVED' })
 
                     if (a.media) {
                       const uploadAPI = api
@@ -259,7 +259,7 @@ const seed = async (): Promise<void> => {
                         await api
                           .put(`${apiURLs.answerComments}/${answerComment.body.answerCommentID}`)
                           .set('Cookie', `token=${adminToken}`)
-                          .send({ isApproved: true })
+                          .send({ moderationStatus: 'APPROVED' })
 
                         if (ac.media) {
                           const uploadAPI = api

@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoryCreateInput, CategoryUpdateInput, GroupVariantCreateInput, GroupVariantUpdateInput, InvoiceCreateInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, OrderCreateInput, OrderProductCreateInput, OrderProductUpdateInput, OrderStatus, OrderUpdateInput, ParameterCreateInput, ParameterUpdateInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductParameterInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput } from '../types'
+import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoryCreateInput, CategoryUpdateInput, GroupVariantCreateInput, GroupVariantUpdateInput, InvoiceCreateInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, OrderCreateInput, OrderProductCreateInput, OrderProductUpdateInput, OrderStatus, OrderUpdateInput, ParameterCreateInput, ParameterUpdateInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductParameterInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput, ModerationStatus } from '../types'
 import { canBeNumber, hasDefinedProps, isArray, isBoolean, isEmail, isInputProvided, isPasswordValid, isProductParameterOrGroupVariant, isProvided, isString, isStringOrNumber } from './validatorLib'
 
 export const checkNewUser = ({ body }: Request): UserSignupInput => {
@@ -319,7 +319,34 @@ export const checkRole = ({ body }: Request): Role => {
   return { roleName: roleName.param }
 }
 
+export const checkNewModerationStatus = ({ body }: Request): ModerationStatus => {
+  const moderationStatusName = R.pipe(
+    isProvided,
+    isString
+  )({ name: 'moderationStatusName', param: body.moderationStatusName })
+
+  return { moderationStatusName: moderationStatusName.param }
+}
+
+export const checkModerationStatusUpdate = ({ body }: Request): ModerationStatus => {
+  const moderationStatusName = R.pipe(
+    isProvided,
+    isString
+  )({ name: 'moderationStatusName', param: body.moderationStatusName })
+
+  return { moderationStatusName: moderationStatusName.param }
+}
+
 export const checkNewOrderStatus = ({ body }: Request): OrderStatus => {
+  const orderStatusName = R.pipe(
+    isProvided,
+    isString
+  )({ name: 'orderStatusName', param: body.orderStatusName })
+
+  return { orderStatusName: orderStatusName.param }
+}
+
+export const checkOrderStatusUpdate = ({ body }: Request): OrderStatus => {
   const orderStatusName = R.pipe(
     isProvided,
     isString
@@ -335,15 +362,6 @@ export const checkNewInvoiceStatus = ({ body }: Request): InvoiceStatus => {
   )({ name: 'invoiceStatusName', param: body.invoiceStatusName })
 
   return { invoiceStatusName: invoiceStatusName.param }
-}
-
-export const checkOrderStatusUpdate = ({ body }: Request): OrderStatus => {
-  const orderStatusName = R.pipe(
-    isProvided,
-    isString
-  )({ name: 'orderStatusName', param: body.orderStatusName })
-
-  return { orderStatusName: orderStatusName.param }
 }
 
 export const checkInvoiceStatusUpdate = ({ body }: Request): InvoiceStatus => {
@@ -551,9 +569,9 @@ export const checkRatingUpdate = ({ body }: Request): RatingUpdateInput => {
     ? isBoolean({ name: 'isVerified', param: body.isVerified })
     : undefined
 
-  const isApproved = 'isApproved' in body
-    ? isBoolean({ name: 'isApproved', param: body.isApproved })
-    : undefined
+  const moderationStatus = body.moderationStatus && isString(
+    { name: 'moderationStatus', param: body.moderationStatus }
+  )
 
   return hasDefinedProps<RatingUpdateInput>({
     title: title?.param,
@@ -561,7 +579,7 @@ export const checkRatingUpdate = ({ body }: Request): RatingUpdateInput => {
     media: media?.param,
     stars: stars?.param,
     isVerified: isVerified?.param,
-    isApproved: isApproved?.param
+    moderationStatus: moderationStatus?.param
   })
 }
 
@@ -601,14 +619,14 @@ export const checkRatingCommentUpdate = ({ body }: Request): RatingCommentUpdate
     { name: 'media', param: body.media }
   )
 
-  const isApproved = 'isApproved' in body
-    ? isBoolean({ name: 'isApproved', param: body.isApproved })
-    : undefined
+  const moderationStatus = body.moderationStatus && isString(
+    { name: 'moderationStatus', param: body.moderationStatus }
+  )
 
   return hasDefinedProps<RatingCommentUpdateInput>({
     content: content?.param,
     media: media?.param,
-    isApproved: isApproved?.param
+    moderationStatus: moderationStatus?.param
   })
 }
 
@@ -643,14 +661,14 @@ export const checkQuestionUpdate = ({ body }: Request): QuestionUpdateInput => {
     { name: 'media', param: body.media }
   )
 
-  const isApproved = 'isApproved' in body
-    ? isBoolean({ name: 'isApproved', param: body.isApproved })
-    : undefined
+  const moderationStatus = body.moderationStatus && isString(
+    { name: 'moderationStatus', param: body.moderationStatus }
+  )
 
   return hasDefinedProps<QuestionUpdateInput>({
     content: content?.param,
     media: media?.param,
-    isApproved: isApproved?.param
+    moderationStatus: moderationStatus?.param
   })
 }
 
@@ -685,14 +703,14 @@ export const checkAnswerUpdate = ({ body }: Request): AnswerUpdateInput => {
     { name: 'media', param: body.media }
   )
 
-  const isApproved = 'isApproved' in body
-    ? isBoolean({ name: 'isApproved', param: body.isApproved })
-    : undefined
+  const moderationStatus = body.moderationStatus && isString(
+    { name: 'moderationStatus', param: body.moderationStatus }
+  )
 
   return hasDefinedProps<AnswerUpdateInput>({
     content: content?.param,
     media: media?.param,
-    isApproved: isApproved?.param
+    moderationStatus: moderationStatus?.param
   })
 }
 
@@ -732,14 +750,14 @@ export const checkAnswerCommentUpdate = ({ body }: Request): AnswerCommentUpdate
     { name: 'media', param: body.media }
   )
 
-  const isApproved = 'isApproved' in body
-    ? isBoolean({ name: 'isApproved', param: body.isApproved })
-    : undefined
+  const moderationStatus = body.moderationStatus && isString(
+    { name: 'moderationStatus', param: body.moderationStatus }
+  )
 
   return hasDefinedProps<AnswerCommentUpdateInput>({
     content: content?.param,
     media: media?.param,
-    isApproved: isApproved?.param
+    moderationStatus: moderationStatus?.param
   })
 }
 

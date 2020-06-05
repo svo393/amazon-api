@@ -12,7 +12,8 @@ const addAnswer = async (answerInput: AnswerCreateInput, res: Response): Promise
       ...answerInput,
       userID: res.locals.userID,
       answerCreatedAt: now,
-      answerUpdatedAt: now
+      answerUpdatedAt: now,
+      moderationStatus: 'NEW'
     }, [ '*' ])
 
   return addedAnswer

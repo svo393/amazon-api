@@ -12,7 +12,8 @@ const addRatingComment = async (ratingCommentInput: RatingCommentCreateInput, re
       ...ratingCommentInput,
       userID: res.locals.userID,
       ratingCommentCreatedAt: now,
-      ratingCommentUpdatedAt: now
+      ratingCommentUpdatedAt: now,
+      moderationStatus: 'NEW'
     }, [ '*' ])
 
   return addedRatingComment
