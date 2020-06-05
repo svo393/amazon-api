@@ -195,24 +195,21 @@ const getUserByID = async (req: Request, res: Response): Promise<UserPersonalDat
   }
 }
 
-type UserUpdatedData = Pick<User,
-  | 'name'
-  | 'email'
-  | 'avatar'
-> & { role?: string }
-
-const updateUser = async (userInput: UserUpdateInput, res: Response, req: Request): Promise<UserUpdatedData> => {
+const updateUser = async (userInput: UserUpdateInput, res: Response, req: Request): Promise<UserSafeData> => {
   const role: string | undefined = res.locals.userRole
 
-  const [ updatedUser ] = await db<User>('users')
-    .update(userInput,
-      [ 'name', 'email', 'avatar', 'role' ])
+  const [ updatedUser ]: User[] = await db('users')
+    .update(userInput, [ '*' ])
     .where('userID', req.params.userID)
 
   if (!updatedUser) { throw new StatusError(404, 'Not Found') }
 
   role !== 'ROOT' && delete updatedUser.role
-  return updatedUser
+  return R.omit([
+    'password',
+    'resetToken',
+    'resetTokenCreatedAt'
+  ], updatedUser)
 }
 
 const deleteUser = async (req: Request, res: Response): Promise<void> => {
