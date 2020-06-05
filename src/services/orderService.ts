@@ -10,14 +10,10 @@ const addOrder = async (orderInput: OrderCreateInput): Promise<Order & Invoice> 
   const now = new Date()
 
   return await dbTrans(async (trx: Knex.Transaction) => {
-    const orderStatusID = await trx<OrderStatus>('orderStatuses')
-      .first()
-      .where('name', 'NEW')
-
     const [ addedOrder ]: Order[] = await trx('orders')
       .insert({
-        ...R.omit([ 'cart', 'details', 'paymentMethodID' ], orderInput),
-        orderStatusID: orderStatusID?.orderStatusID,
+        ...R.omit([ 'cart', 'details', 'paymentMethod' ], orderInput),
+        orderStatus: 'NEW',
         orderCreatedAt: now,
         orderUpdatedAt: now
       }, [ '*' ])
@@ -42,18 +38,14 @@ const addOrder = async (orderInput: OrderCreateInput): Promise<Order & Invoice> 
     const addedOrderProducts: OrderProduct[] = await trx('orderProducts')
       .insert(newOrderProducts, [ '*' ])
 
-    const invoiceStatusID = await trx<InvoiceStatus>('invoiceStatuses')
-      .first()
-      .where('name', 'NEW')
-
     const [ addedInvoice ]: Invoice[] = await trx('invoices')
       .insert({
         amount: R.sum(addedOrderProducts.map((op) => op.qty * op.price)),
         details: orderInput.details,
         orderID: addedOrder.orderID,
         userID: orderInput.userID,
-        paymentMethodID: orderInput.paymentMethodID,
-        invoiceStatusID: invoiceStatusID?.invoiceStatusID,
+        paymentMethod: orderInput.paymentMethod,
+        invoiceStatus: 'NEW',
         invoiceCreatedAt: now,
         invoiceUpdatedAt: now
       }, [ '*' ])
@@ -86,10 +78,10 @@ const getOrderByID = async (req: Request): Promise<Order> => {
 
 const updateOrder = async (orderInput: OrderUpdateInput, req: Request): Promise<Order> => {
   return await dbTrans(async (trx: Knex.Transaction) => {
-    const order: { orderStatusName: string } = await trx('orders')
-      .first('os.name as orderStatusName')
+    const order: { orderStatusName: string } = await trx('orders as o')
+      .first('os.orderStatusName')
       .where('orderID', req.params.orderID)
-      .joinRaw('JOIN "orderStatuses" as os USING ("orderStatusID")')
+      .join('orderStatuses as os', 'o.orderStatus', 'os.orderStatusName')
 
     if ([ 'DONE', 'CANCELED' ].includes(order.orderStatusName)) {
       throw new StatusError(410, 'This order can\'t be updated anymore')

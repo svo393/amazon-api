@@ -54,7 +54,7 @@ describe('ShippingMethods fetching', () => {
     const { addedShippingMethod } = await createOneShippingMethod('root')
 
     const { body } = await api
-      .get(`${apiURL}/${addedShippingMethod.shippingMethodID}`)
+      .get(`${apiURL}/${addedShippingMethod.shippingMethodName}`)
       .expect(200)
 
     expect(body).toBeDefined()
@@ -66,12 +66,12 @@ describe('ShippingMethod updating', () => {
     const { addedShippingMethod, token } = await createOneShippingMethod('admin')
 
     const { body } = await api
-      .put(`${apiURL}/${addedShippingMethod.shippingMethodID}`)
+      .put(`${apiURL}/${addedShippingMethod.shippingMethodName}`)
       .set('Cookie', `token=${token}`)
-      .send({ name: `Updated ShippingMethod ${(new Date().getTime()).toString()}` })
+      .send({ shippingMethodName: `Updated ShippingMethod ${(new Date().getTime()).toString()}` })
       .expect(200)
 
-    expect(body.name).toContain('Updated ShippingMethod')
+    expect(body.shippingMethodName).toContain('Updated ShippingMethod')
   })
 
   test('403 if not admin or root', async () => {
@@ -79,9 +79,9 @@ describe('ShippingMethod updating', () => {
     const { token } = await loginAs('customer')
 
     await api
-      .put(`${apiURL}/${addedShippingMethod.shippingMethodID}`)
+      .put(`${apiURL}/${addedShippingMethod.shippingMethodName}`)
       .set('Cookie', `token=${token}`)
-      .send({ name: `Updated ShippingMethod ${(new Date().getTime()).toString()}` })
+      .send({ shippingMethodName: `Updated ShippingMethod ${(new Date().getTime()).toString()}` })
       .expect(403)
   })
 })

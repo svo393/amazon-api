@@ -1,5 +1,6 @@
 import Knex from 'knex'
 
+// TODO indexes
 export const up = (knex: Knex): Knex.SchemaBuilder =>
   knex.schema
     .createTable('roles', (t) => {
@@ -8,6 +9,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
 
     .createTable('shippingMethods', (t) => {
       t.string('shippingMethodName', 50).primary()
+      t.boolean('isPrivate').defaultTo(false).notNullable()
     })
 
     .createTable('paymentMethods', (t) => {
@@ -16,6 +18,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
 
     .createTable('addressTypes', (t) => {
       t.string('addressTypeName', 50).primary()
+      t.boolean('isPrivate').defaultTo(false).notNullable()
     })
 
     .createTable('addresses', (t) => {

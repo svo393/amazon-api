@@ -45,7 +45,7 @@ describe('Addresses fetching', () => {
     const { addedAddress, token } = await createOneAddress('root')
 
     const { body }: { body: Address[] } = await api
-      .get(`${apiURLs.addressTypes}/${addedAddress.addressTypeID}/addresses`)
+      .get(`${apiURLs.addressTypes}/${addedAddress.addressType}/addresses`)
       .set('Cookie', `token=${token}`)
       .expect(200)
 

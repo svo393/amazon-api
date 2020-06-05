@@ -1,27 +1,21 @@
 import { Request } from 'express'
 import Knex from 'knex'
-import { Invoice, InvoiceCreateInput, InvoiceStatus, InvoiceUpdateInput } from '../types'
+import { Invoice, InvoiceCreateInput, InvoiceUpdateInput } from '../types'
 import { db, dbTrans } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
 const addInvoice = async (invoiceInput: InvoiceCreateInput): Promise<Invoice> => {
   const now = new Date()
 
-  return await dbTrans(async (trx: Knex.Transaction) => {
-    const invoiceStatusID = await trx<InvoiceStatus>('invoiceStatuses')
-      .first()
-      .where('name', 'NEW')
+  const [ addedInvoice ]: Invoice[] = await db('invoices')
+    .insert({
+      ...invoiceInput,
+      invoiceStatus: 'NEW',
+      invoiceCreatedAt: now,
+      invoiceUpdatedAt: now
+    }, [ '*' ])
 
-    const [ addedInvoice ]: Invoice[] = await trx('invoices')
-      .insert({
-        ...invoiceInput,
-        invoiceStatusID: invoiceStatusID?.invoiceStatusID,
-        invoiceCreatedAt: now,
-        invoiceUpdatedAt: now
-      }, [ '*' ])
-
-    return addedInvoice
-  })
+  return addedInvoice
 }
 
 const getInvoices = async (): Promise<Invoice[]> => {
@@ -44,10 +38,10 @@ const getInvoiceByID = async (req: Request): Promise<Invoice> => {
 
 const updateInvoice = async (invoiceInput: InvoiceUpdateInput, req: Request): Promise<Invoice> => {
   return await dbTrans(async (trx: Knex.Transaction) => {
-    const invoice: { invoiceStatusName: string } = await trx('invoices')
-      .first('os.name as invoiceStatusName')
+    const invoice: { invoiceStatusName: string } = await trx('invoices as i')
+      .first('is.invoiceStatusName')
       .where('invoiceID', req.params.invoiceID)
-      .joinRaw('JOIN "invoiceStatuses" as os USING ("invoiceStatusID")')
+      .join('invoiceStatuses as is', 'i.invoiceStatus', 'is.invoiceStatusName')
 
     if ([ 'DONE', 'CANCELED' ].includes(invoice.invoiceStatusName)) {
       throw new StatusError(410, 'This invoice can\'t be updated anymore')

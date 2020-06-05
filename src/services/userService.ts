@@ -4,15 +4,15 @@ import { CookieOptions, Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
 import R from 'ramda'
 import { promisify } from 'util'
-import { db } from '../utils/db'
-import { Answer, Order, PasswordRequestInput, PasswordResetInput, Question, Rating, Role, User, UserLoginInput, UserSafeData, UserSignupInput, UserUpdateInput, RatingComment, AnswerComment } from '../types'
+import { Answer, AnswerComment, Order, PasswordRequestInput, PasswordResetInput, Question, Rating, RatingComment, User, UserLoginInput, UserSafeData, UserSignupInput, UserUpdateInput } from '../types'
 import env from '../utils/config'
-import StatusError from '../utils/StatusError'
+import { db } from '../utils/db'
 import { uploadImages } from '../utils/img'
+import StatusError from '../utils/StatusError'
 // import { makeANiceEmail, transport } from '../utils/mail'
 
 type UserBaseData = Omit<UserSafeData,
-  | 'roleID'
+  | 'role'
 >
 
 const setTokenCookie = (res: Response, token: string, remember: boolean): void => {
@@ -40,18 +40,12 @@ const addUser = async (userInput: UserSignupInput, res: Response): Promise<UserS
 
   const passwordHash = await bcrypt.hash(password, 10)
 
-  const customerRoleID = await db<Role>('roles')
-    .first('roleID')
-    .where('name', 'CUSTOMER')
-
-  if (!customerRoleID) { throw new StatusError() }
-
   const [ addedUser ]: UserSignupData[] = await db('users')
     .insert({
       email,
       password: passwordHash,
       userCreatedAt: new Date(),
-      roleID: customerRoleID.roleID
+      role: 'CUSTOMER'
     }, [ 'userID', 'email' ])
 
   if (!addedUser) { throw new StatusError() }
@@ -94,8 +88,7 @@ const loginUser = async (userInput: UserLoginInput, res: Response): Promise<User
   return R.omit([
     'password',
     'resetToken',
-    'resetTokenCreatedAt',
-    'roleID'
+    'resetTokenCreatedAt'
   ], existingUser)
 }
 
@@ -103,9 +96,8 @@ type UserListData = Omit<User,
   | 'password'
   | 'resetToken'
   | 'resetTokenCreatedAt'
-  | 'roleID'
+  | 'role'
 > & {
-  role: string;
   orderCount: number;
   ratingCount: number;
   questionCount: number;
@@ -115,7 +107,7 @@ type UserListData = Omit<User,
 const getUsers = async (): Promise<UserListData[]> => {
   const users: UserListData[] = await db('users as u')
     .select('email', 'u.name', 'info', 'avatar',
-      'userCreatedAt', 'u.userID', 'rl.name as role')
+      'userCreatedAt', 'u.userID', 'role')
     .count('o.orderID as orderCount')
     .count('r.ratingID as ratingCount')
     .count('q.questionID as questionCount')
@@ -124,9 +116,8 @@ const getUsers = async (): Promise<UserListData[]> => {
     .leftJoin('ratings as r', 'u.userID', 'r.userID')
     .leftJoin('questions as q', 'u.userID', 'q.userID')
     .leftJoin('answers as a', 'u.userID', 'a.userID')
-    .leftJoin('roles as rl', 'u.roleID', 'rl.roleID')
-    .where('rl.name', '!=', 'ROOT')
-    .groupBy('u.userID', 'rl.name')
+    .where('role', '!=', 'ROOT')
+    .groupBy('u.userID')
 
   if (!users) { throw new StatusError(404, 'Not Found') }
   return users
@@ -145,7 +136,7 @@ type UserPublicData = Omit<UserPersonalData,
   | 'email'
   | 'userCreatedAt'
   | 'orders'
-  | 'roleID'
+  | 'role'
 >
 
 const getUserByID = async (req: Request, res: Response): Promise<UserPersonalData | UserPublicData> => {
@@ -208,21 +199,19 @@ type UserUpdatedData = Pick<User,
   | 'name'
   | 'email'
   | 'avatar'
-> & {
-  roleID?: number;
-}
+> & { role?: string }
 
 const updateUser = async (userInput: UserUpdateInput, res: Response, req: Request): Promise<UserUpdatedData> => {
   const role: string | undefined = res.locals.userRole
 
   const [ updatedUser ] = await db<User>('users')
     .update(userInput,
-      [ 'name', 'email', 'avatar', 'roleID' ])
+      [ 'name', 'email', 'avatar', 'role' ])
     .where('userID', req.params.userID)
 
   if (!updatedUser) { throw new StatusError(404, 'Not Found') }
 
-  role !== 'ROOT' && delete updatedUser.roleID
+  role !== 'ROOT' && delete updatedUser.role
   return updatedUser
 }
 
@@ -287,7 +276,7 @@ const resetPassword = async ({ password, resetToken }: PasswordResetInput, res: 
       resetTokenCreatedAt: null,
       password: passwordHash
     },
-    [ 'name', 'userID', 'email', 'info', 'avatar', 'userCreatedAt' ])
+    [ 'name', 'userID', 'email', 'info', 'avatar', 'userCreatedAt', 'role' ])
     .where('userID', user.userID)
 
   const token = jwt.sign(

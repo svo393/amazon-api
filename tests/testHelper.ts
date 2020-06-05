@@ -1,6 +1,6 @@
 import supertest from 'supertest'
 import app from '../src/app'
-import { Address, AddressCreateInput, AddressType, AddressTypeInput, Answer, AnswerComment, AnswerCommentCreateInput, AnswerCreateInput, CartProduct, Category, CategoryCreateInput, Follower, Group, GroupVariant, GroupVariantCreateInput, Invoice, InvoiceCreateInput, InvoiceStatus, InvoiceStatusInput, List, ListCreateInput, ListProduct, Order, OrderCreateInput, OrderProduct, OrderProductCreateInput, OrderStatus, OrderStatusInput, Parameter, ParameterCreateInput, PaymentMethod, PaymentMethodInput, Product, ProductParameter, ProductPublicData, Question, QuestionCreateInput, Rating, RatingComment, RatingCommentCreateInput, RatingCreateInput, Role, RoleInput, ShippingMethod, ShippingMethodInput, User, UserAddress, Vendor, VendorInput } from '../src/types'
+import { Address, AddressCreateInput, AddressType, AddressTypeInput, Answer, AnswerComment, AnswerCommentCreateInput, AnswerCreateInput, CartProduct, Category, CategoryCreateInput, Follower, Group, GroupVariant, GroupVariantCreateInput, Invoice, InvoiceCreateInput, InvoiceStatus, List, ListCreateInput, ListProduct, Order, OrderCreateInput, OrderProduct, OrderProductCreateInput, OrderStatus, Parameter, ParameterCreateInput, PaymentMethod, Product, ProductParameter, ProductPublicData, Question, QuestionCreateInput, Rating, RatingComment, RatingCommentCreateInput, RatingCreateInput, Role, ShippingMethod, ShippingMethodInput, User, UserAddress, Vendor, VendorInput } from '../src/types'
 import { apiURLs } from '../src/utils/constants'
 import { db } from '../src/utils/db'
 import StatusError from '../src/utils/StatusError'
@@ -175,18 +175,12 @@ export const populateUsers = async (): Promise<void> => {
     .post('/api/users')
     .send(rootUser)
 
-  const roles = await db<Role>('roles')
-  const adminRole = roles.find((r) => r.name === 'ADMIN')
-  const rootRole = roles.find((r) => r.name === 'ROOT')
-
-  if (!adminRole || !rootRole) { throw new StatusError() }
-
   await db('users')
-    .update('roleID', adminRole.roleID)
+    .update('role', 'ADMIN')
     .where('email', adminUser.email)
 
   await db('users')
-    .update('roleID', rootRole.roleID)
+    .update('role', 'ROOT')
     .where('email', rootUser.email)
 }
 
@@ -205,8 +199,8 @@ export const loginAs = async (role: string): Promise<{token: string; userID: num
   return { token, userID: res.body.userID }
 }
 
-export const newRole = (): RoleInput => ({
-  name: `New Role ${(new Date().getTime()).toString()}`
+export const newRole = (): Role => ({
+  roleName: `New Role ${(new Date().getTime()).toString()}`
 })
 
 export const createOneRole = async (role: string): Promise<{ addedRole: Role; token: string}> => {
@@ -221,7 +215,7 @@ export const createOneRole = async (role: string): Promise<{ addedRole: Role; to
 }
 
 export const newShippingMethod = (): ShippingMethodInput => ({
-  name: `New ShippingMethod ${(new Date().getTime()).toString()}`
+  shippingMethodName: `New ShippingMethod ${(new Date().getTime()).toString()}`
 })
 
 export const createOneShippingMethod = async (role: string): Promise<{ addedShippingMethod: ShippingMethod; token: string}> => {
@@ -236,7 +230,7 @@ export const createOneShippingMethod = async (role: string): Promise<{ addedShip
 }
 
 export const newAddressType = (): AddressTypeInput => ({
-  name: `New AddressType ${(new Date().getTime()).toString()}`
+  addressTypeName: `New AddressType ${(new Date().getTime()).toString()}`
 })
 
 export const createOneAddressType = async (role: string): Promise<{ addedAddressType: AddressType; token: string}> => {
@@ -250,8 +244,8 @@ export const createOneAddressType = async (role: string): Promise<{ addedAddress
   return { addedAddressType: body, token }
 }
 
-export const newPaymentMethod = (): PaymentMethodInput => ({
-  name: `New PaymentMethod ${(new Date().getTime()).toString()}`
+export const newPaymentMethod = (): PaymentMethod => ({
+  paymentMethodName: `New PaymentMethod ${(new Date().getTime()).toString()}`
 })
 
 export const createOnePaymentMethod = async (role: string): Promise<{ addedPaymentMethod: PaymentMethod; token: string}> => {
@@ -265,15 +259,6 @@ export const createOnePaymentMethod = async (role: string): Promise<{ addedPayme
   return { addedPaymentMethod: body, token }
 }
 
-export const newAddress = async (): Promise<AddressCreateInput> => {
-  const { addedAddressType } = await createOneAddressType('root')
-  return {
-    addr: `New Address ${(new Date().getTime()).toString()}`,
-    addressTypeID: addedAddressType.addressTypeID,
-    isDefault: true
-  }
-}
-
 export const createOneFollower = async (): Promise<Follower & { token: string }> => {
   const { token, userID } = await loginAs('root')
   const { userID: follows } = await loginAs('customer')
@@ -284,6 +269,15 @@ export const createOneFollower = async (): Promise<Follower & { token: string }>
     .send({ userID, follows })
 
   return { ...body, token }
+}
+
+export const newAddress = async (): Promise<AddressCreateInput> => {
+  const { addedAddressType } = await createOneAddressType('root')
+  return {
+    addr: `New Address ${(new Date().getTime()).toString()}`,
+    addressType: addedAddressType.addressTypeName,
+    isDefault: true
+  }
 }
 
 export const createOneAddress = async (role: string): Promise<{ addedAddress: Address; token: string; userID: number}> => {
@@ -539,8 +533,8 @@ export const createOneCartProduct = async (role: string): Promise<{ addedCartPro
   return { addedCartProduct: body, token }
 }
 
-export const newOrderStatus = (): OrderStatusInput => ({
-  name: `New OrderStatus ${(new Date().getTime()).toString()}`
+export const newOrderStatus = (): OrderStatus => ({
+  orderStatusName: `New OrderStatus ${(new Date().getTime()).toString()}`
 })
 
 export const createOneOrderStatus = async (orderStatus: string): Promise<{ addedOrderStatus: OrderStatus; token: string}> => {
@@ -554,8 +548,8 @@ export const createOneOrderStatus = async (orderStatus: string): Promise<{ added
   return { addedOrderStatus: body, token }
 }
 
-export const newInvoiceStatus = (): InvoiceStatusInput => ({
-  name: `New InvoiceStatus ${(new Date().getTime()).toString()}`
+export const newInvoiceStatus = (): InvoiceStatus => ({
+  invoiceStatusName: `New InvoiceStatus ${(new Date().getTime()).toString()}`
 })
 
 export const createOneInvoiceStatus = async (invoiceStatus: string): Promise<{ addedInvoiceStatus: InvoiceStatus; token: string }> => {
@@ -569,11 +563,11 @@ export const createOneInvoiceStatus = async (invoiceStatus: string): Promise<{ a
   return { addedInvoiceStatus: body, token }
 }
 
-export const newOrder = (address: string, shippingMethodID: number, userID: number, cart: CartProduct[], paymentMethodID: number): OrderCreateInput => ({
+export const newOrder = (address: string, shippingMethod: string, userID: number, cart: CartProduct[], paymentMethod: string): OrderCreateInput => ({
   address,
   details: 'Card 4242 4242 4242 4242',
-  paymentMethodID,
-  shippingMethodID,
+  paymentMethod,
+  shippingMethod,
   userID,
   cart
 })
@@ -590,10 +584,10 @@ export const createOneOrder = async (role: string): Promise<{ addedOrder: Order;
     .set('Cookie', `token=${token}`)
     .send(newOrder(
       addedAddress.addr,
-      addedShippingMethod.shippingMethodID,
+      addedShippingMethod.shippingMethodName,
       userID,
       [ addedCartProduct1, addedCartProduct2 ],
-      addedPaymentMethod.paymentMethodID
+      addedPaymentMethod.paymentMethodName
     ))
   return { addedOrder: body, token }
 }
@@ -615,11 +609,11 @@ export const createOneOrderProduct = async (role: string): Promise<{ addedOrderP
   return { addedOrderProduct: body, token }
 }
 
-export const newInvoice = (orderID: number, paymentMethodID: number, userID: number): InvoiceCreateInput => ({
+export const newInvoice = (orderID: number, paymentMethod: string, userID: number): InvoiceCreateInput => ({
   amount: 1899,
   details: 'Card 4242 4242 4242 4242',
   orderID,
-  paymentMethodID,
+  paymentMethod,
   userID
 })
 
@@ -630,6 +624,6 @@ export const createOneInvoice = async (role: string): Promise<{ addedInvoice: In
   const { body }: { body: Invoice } = await api
     .post(apiURLs.invoices)
     .set('Cookie', `token=${token}`)
-    .send(newInvoice(addedOrder.orderID, addedPaymentMethod.paymentMethodID, addedOrder.userID as number))
+    .send(newInvoice(addedOrder.orderID, addedPaymentMethod.paymentMethodName, addedOrder.userID as number))
   return { addedInvoice: body, token }
 }

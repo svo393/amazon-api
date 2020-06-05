@@ -14,7 +14,7 @@ const addShippingMethod = async (smInput: SMInput): Promise<SM> => {
   )
 
   if (!addedSM) {
-    throw new StatusError(409, `ShippingMethod with name "${smInput.name}" already exists`)
+    throw new StatusError(409, `ShippingMethod with name "${smInput.shippingMethodName}" already exists`)
   }
   return addedSM
 }
@@ -23,19 +23,19 @@ const getShippingMethods = async (): Promise<SM[]> => {
   return await db('shippingMethods')
 }
 
-const getShippingMethodByID = async (req: Request): Promise<SM> => {
+const getShippingMethodByName = async (req: Request): Promise<SM> => {
   const sm = await db<SM>('shippingMethods')
     .first()
-    .where('shippingMethodID', req.params.shippingMethodID)
+    .where('shippingMethodName', req.params.shippingMethodName)
 
   if (!sm) throw new StatusError(404, 'Not Found')
   return sm
 }
 
 const updateShippingMethod = async (smInput: SMInput, req: Request): Promise<SM> => {
-  const [ updatedSM ] = await db<SM>('shippingMethods')
-    .update(smInput, [ 'shippingMethodID', 'name' ])
-    .where('shippingMethodID', req.params.shippingMethodID)
+  const [ updatedSM ]: SM[] = await db('shippingMethods')
+    .update(smInput, [ '*' ])
+    .where('shippingMethodName', req.params.shippingMethodName)
 
   if (!updatedSM) throw new StatusError(404, 'Not Found')
   return updatedSM
@@ -44,7 +44,7 @@ const updateShippingMethod = async (smInput: SMInput, req: Request): Promise<SM>
 const deleteShippingMethod = async (req: Request): Promise<void> => {
   const deleteCount = await db('shippingMethodes')
     .del()
-    .where('shippingMethodID', req.params.shippingMethodID)
+    .where('shippingMethodName', req.params.shippingMethodName)
 
   if (deleteCount === 0) throw new StatusError(404, 'Not Found')
 }
@@ -52,7 +52,7 @@ const deleteShippingMethod = async (req: Request): Promise<void> => {
 export default {
   addShippingMethod,
   getShippingMethods,
-  getShippingMethodByID,
+  getShippingMethodByName,
   updateShippingMethod,
   deleteShippingMethod
 }

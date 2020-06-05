@@ -16,18 +16,18 @@ router.get('/', async (_req, res) => {
   res.json(paymentMethods)
 })
 
-router.get('/:paymentMethodID', async (req, res) => {
-  const paymentMethod = await paymentMethodService.getPaymentMethodByID(req)
+router.get('/:paymentMethodName', async (req, res) => {
+  const paymentMethod = await paymentMethodService.getPaymentMethodByName(req)
   res.json(paymentMethod)
 })
 
-router.put('/:paymentMethodID', isAdmin, async (req, res) => {
+router.put('/:paymentMethodName', isAdmin, async (req, res) => {
   const paymentMethodUpdateInput = checkPaymentMethod(req)
   const updatedPaymentMethod = await paymentMethodService.updatePaymentMethod(paymentMethodUpdateInput, req)
   res.json(updatedPaymentMethod)
 })
 
-router.delete('/:paymentMethodID', isAdmin, async (req, res) => {
+router.delete('/:paymentMethodName', isAdmin, async (req, res) => {
   await paymentMethodService.deletePaymentMethod(req)
   res.status(204).end()
 })

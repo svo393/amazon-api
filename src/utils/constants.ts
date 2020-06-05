@@ -1,9 +1,14 @@
 export const roles = [ 'ROOT', 'ADMIN', 'CUSTOMER' ]
-export const shippingMethods = [ 'INTL', 'DOOR', 'LOCKER' ]
-export const sensitiveShippingMethods = [ 'INTL', 'DOOR' ]
+export const shippingMethods = [
+  { shippingMethodName: 'INTL', isPrivate: true },
+  { shippingMethodName: 'DOOR', isPrivate: true },
+  { shippingMethodName: 'LOCKER' }
+]
 export const paymentMethods = [ 'CARD', 'CASH' ]
-export const addressTypes = [ 'SHIPPING', 'LOCKER' ]
-export const sensitiveAddressTypes = [ 'SHIPPING' ]
+export const addressTypes = [
+  { addressTypeName: 'SHIPPING', isPrivate: true },
+  { addressTypeName: 'LOCKER' }
+]
 export const lockerAddresses = [
   'Pokrovka St, 17, Moscow, 101000 Russian Federation',
   'Altuf\'yevskoye Shosse, 70к1, Moscow, 127549 Russian Federation'

@@ -3,6 +3,7 @@ import app from '../src/app'
 import { apiURLs } from '../src/utils/constants'
 import { db } from '../src/utils/db'
 import { createOneRole, loginAs, newRole, populateUsers, purge, rolesInDB } from './testHelper'
+import { Role } from '../src/types'
 
 const api = supertest(app)
 const apiURL = apiURLs.roles
@@ -45,30 +46,19 @@ describe('Roles fetching', () => {
       .get(apiURL)
       .expect(403)
   })
-
-  test('200 role if root', async () => {
-    const { addedRole, token } = await createOneRole('root')
-
-    const { body } = await api
-      .get(`${apiURL}/${addedRole.roleID}`)
-      .set('Cookie', `token=${token}`)
-      .expect(200)
-
-    expect(body).toBeDefined()
-  })
 })
 
 describe('Role updating', () => {
   test('200 if root', async () => {
     const { addedRole, token } = await createOneRole('root')
 
-    const { body } = await api
-      .put(`${apiURL}/${addedRole.roleID}`)
+    const { body }: { body: Role } = await api
+      .put(`${apiURL}/${addedRole.roleName}`)
       .set('Cookie', `token=${token}`)
-      .send({ name: `Updated Role ${(new Date().getTime()).toString()}` })
+      .send({ roleName: `Updated Role ${(new Date().getTime()).toString()}` })
       .expect(200)
 
-    expect(body.name).toContain('Updated Role')
+    expect(body.roleName).toContain('Updated Role')
   })
 
   test('403 if not root', async () => {
@@ -76,9 +66,9 @@ describe('Role updating', () => {
     const { token } = await loginAs('admin')
 
     await api
-      .put(`${apiURL}/${addedRole.roleID}`)
+      .put(`${apiURL}/${addedRole.roleName}`)
       .set('Cookie', `token=${token}`)
-      .send({ name: `Updated Role ${(new Date().getTime()).toString()}` })
+      .send({ roleName: `Updated Role ${(new Date().getTime()).toString()}` })
       .expect(403)
   })
 })

@@ -8,10 +8,12 @@ export type Role = {
 
 export type ShippingMethod = {
   shippingMethodName: string;
+  isPrivate: boolean;
 }
 
 export type AddressType = {
   addressTypeName: string;
+  isPrivate: boolean;
 }
 
 export type PaymentMethod = {
@@ -21,7 +23,7 @@ export type PaymentMethod = {
 export type Address = {
   addressID: number;
   addr: string;
-  addressType: number;
+  addressType: string;
 }
 
 export type User = {
@@ -264,6 +266,16 @@ export type UserSafeData = Omit<User,
   | 'resetToken'
   | 'resetTokenCreatedAt'
 >
+
+export type AddressTypeInput = {
+  addressTypeName: string;
+  isPrivate?: boolean;
+}
+
+export type ShippingMethodInput = {
+  shippingMethodName: string;
+  isPrivate?: boolean;
+}
 
 export type AddressCreateInput = Pick<Address, 'addr' | 'addressType'> & {
   isDefault?: boolean;

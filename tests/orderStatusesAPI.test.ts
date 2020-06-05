@@ -55,12 +55,12 @@ describe('OrderStatus updating', () => {
     const { addedOrderStatus, token } = await createOneOrderStatus('admin')
 
     const { body } = await api
-      .put(`${apiURL}/${addedOrderStatus.orderStatusID}`)
+      .put(`${apiURL}/${addedOrderStatus.orderStatusName}`)
       .set('Cookie', `token=${token}`)
-      .send({ name: `Updated OrderStatus ${(new Date().getTime()).toString()}` })
+      .send({ orderStatusName: `Updated OrderStatus ${(new Date().getTime()).toString()}` })
       .expect(200)
 
-    expect(body.name).toContain('Updated OrderStatus')
+    expect(body.orderStatusName).toContain('Updated OrderStatus')
   })
 
   test('403 if not admin', async () => {
@@ -68,9 +68,9 @@ describe('OrderStatus updating', () => {
     const { token } = await loginAs('customer')
 
     await api
-      .put(`${apiURL}/${addedOrderStatus.orderStatusID}`)
+      .put(`${apiURL}/${addedOrderStatus.orderStatusName}`)
       .set('Cookie', `token=${token}`)
-      .send({ name: `Updated OrderStatus ${(new Date().getTime()).toString()}` })
+      .send({ orderStatusName: `Updated OrderStatus ${(new Date().getTime()).toString()}` })
       .expect(403)
   })
 })

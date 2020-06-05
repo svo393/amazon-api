@@ -17,23 +17,23 @@ router.get('/', async (_req, res) => {
   res.json(addressTypes)
 })
 
-router.get('/:addressTypeID', async (req, res) => {
-  const addressType = await addressTypeService.getAddressTypeByID(res, req)
+router.get('/:addressTypeName', async (req, res) => {
+  const addressType = await addressTypeService.getAddressTypeByName(res, req)
   res.json(addressType)
 })
 
-router.put('/:addressTypeID', isAdmin, async (req, res) => {
+router.put('/:addressTypeName', isAdmin, async (req, res) => {
   const addressTypeUpdateInput = checkAddressType(req)
   const updatedAddressType = await addressTypeService.updateAddressType(res, addressTypeUpdateInput, req)
   res.json(updatedAddressType)
 })
 
-router.get('/:addressTypeID/addresses', isAdmin, async (req, res) => {
+router.get('/:addressTypeName/addresses', isAdmin, async (req, res) => {
   const addresses = await addressService.getAddressesByType(req)
   res.json(addresses)
 })
 
-router.delete('/:addressTypeID', isAdmin, async (req, res) => {
+router.delete('/:addressTypeName', isAdmin, async (req, res) => {
   await addressTypeService.deleteAddressType(req)
   res.status(204).end()
 })

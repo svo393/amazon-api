@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { AddressCreateInput, AddressType, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoryCreateInput, CategoryUpdateInput, GroupVariantCreateInput, GroupVariantUpdateInput, InvoiceCreateInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, OrderCreateInput, OrderProductCreateInput, OrderProductUpdateInput, OrderStatus, OrderUpdateInput, ParameterCreateInput, ParameterUpdateInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductParameterInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, Role, ShippingMethod, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput } from '../types'
+import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoryCreateInput, CategoryUpdateInput, GroupVariantCreateInput, GroupVariantUpdateInput, InvoiceCreateInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, OrderCreateInput, OrderProductCreateInput, OrderProductUpdateInput, OrderStatus, OrderUpdateInput, ParameterCreateInput, ParameterUpdateInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductParameterInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput } from '../types'
 import { canBeNumber, hasDefinedProps, isArray, isBoolean, isEmail, isInputProvided, isPasswordValid, isProductParameterOrGroupVariant, isProvided, isString, isStringOrNumber } from './validatorLib'
 
 export const checkNewUser = ({ body }: Request): UserSignupInput => {
@@ -355,22 +355,36 @@ export const checkInvoiceStatusUpdate = ({ body }: Request): InvoiceStatus => {
   return { invoiceStatusName: invoiceStatusName.param }
 }
 
-export const checkShippingMethod = ({ body }: Request): ShippingMethod => {
+export const checkShippingMethod = ({ body }: Request): ShippingMethodInput => {
   const shippingMethodName = R.pipe(
     isProvided,
     isString
   )({ name: 'shippingMethodName', param: body.shippingMethodName })
 
-  return { shippingMethodName: shippingMethodName.param }
+  const isPrivate = 'isPrivate' in body
+    ? isBoolean({ name: 'isPrivate', param: body.isPrivate })
+    : undefined
+
+  return {
+    shippingMethodName: shippingMethodName.param,
+    isPrivate: isPrivate?.param
+  }
 }
 
-export const checkAddressType = ({ body }: Request): AddressType => {
+export const checkAddressType = ({ body }: Request): AddressTypeInput => {
   const addressTypeName = R.pipe(
     isProvided,
     isString
   )({ name: 'addressTypeName', param: body.addressTypeName })
 
-  return { addressTypeName: addressTypeName.param }
+  const isPrivate = 'isPrivate' in body
+    ? isBoolean({ name: 'isPrivate', param: body.isPrivate })
+    : undefined
+
+  return {
+    addressTypeName: addressTypeName.param,
+    isPrivate: isPrivate?.param
+  }
 }
 
 export const checkNewCartProduct = ({ body }: Request): CartProduct => {

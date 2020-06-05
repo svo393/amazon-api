@@ -54,7 +54,7 @@ describe('PaymentMethods fetching', () => {
     const { addedPaymentMethod } = await createOnePaymentMethod('root')
 
     const { body } = await api
-      .get(`${apiURL}/${addedPaymentMethod.paymentMethodID}`)
+      .get(`${apiURL}/${addedPaymentMethod.paymentMethodName}`)
       .expect(200)
 
     expect(body).toBeDefined()
@@ -66,12 +66,12 @@ describe('PaymentMethod updating', () => {
     const { addedPaymentMethod, token } = await createOnePaymentMethod('admin')
 
     const { body } = await api
-      .put(`${apiURL}/${addedPaymentMethod.paymentMethodID}`)
+      .put(`${apiURL}/${addedPaymentMethod.paymentMethodName}`)
       .set('Cookie', `token=${token}`)
-      .send({ name: `Updated PaymentMethod ${(new Date().getTime()).toString()}` })
+      .send({ paymentMethodName: `Updated PaymentMethod ${(new Date().getTime()).toString()}` })
       .expect(200)
 
-    expect(body.name).toContain('Updated PaymentMethod')
+    expect(body.paymentMethodName).toContain('Updated PaymentMethod')
   })
 
   test('403 if not admin or root', async () => {
@@ -79,9 +79,9 @@ describe('PaymentMethod updating', () => {
     const { token } = await loginAs('customer')
 
     await api
-      .put(`${apiURL}/${addedPaymentMethod.paymentMethodID}`)
+      .put(`${apiURL}/${addedPaymentMethod.paymentMethodName}`)
       .set('Cookie', `token=${token}`)
-      .send({ name: `Updated PaymentMethod ${(new Date().getTime()).toString()}` })
+      .send({ paymentMethodName: `Updated PaymentMethod ${(new Date().getTime()).toString()}` })
       .expect(403)
   })
 })

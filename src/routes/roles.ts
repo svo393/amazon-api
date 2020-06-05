@@ -16,18 +16,13 @@ router.get('/', isRoot, async (_req, res) => {
   res.json(roles)
 })
 
-router.get('/:roleID', isRoot, async (req, res) => {
-  const role = await roleService.getRoleByID(req)
-  res.json(role)
-})
-
-router.put('/:roleID', isRoot, async (req, res) => {
+router.put('/:roleName', isRoot, async (req, res) => {
   const roleUpdateInput = checkRole(req)
   const updatedRole = await roleService.updateRole(roleUpdateInput, req)
   res.json(updatedRole)
 })
 
-router.delete('/:roleID', isRoot, async (req, res) => {
+router.delete('/:roleName', isRoot, async (req, res) => {
   await roleService.deleteRole(req)
   res.status(204).end()
 })

@@ -1,9 +1,9 @@
 import { Request } from 'express'
-import { InvoiceStatus, InvoiceStatusInput } from '../types'
+import { InvoiceStatus } from '../types'
 import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
-const addInvoiceStatus = async (invoiceStatusInput: InvoiceStatusInput): Promise<InvoiceStatus> => {
+const addInvoiceStatus = async (invoiceStatusInput: InvoiceStatus): Promise<InvoiceStatus> => {
   const { rows: [ addedInvoiceStatus ] }: { rows: InvoiceStatus[] } = await db.raw(
     `
     ? ON CONFLICT
@@ -14,7 +14,7 @@ const addInvoiceStatus = async (invoiceStatusInput: InvoiceStatusInput): Promise
   )
 
   if (!addedInvoiceStatus) {
-    throw new StatusError(409, `InvoiceStatus with name "${invoiceStatusInput.name}" already exists`)
+    throw new StatusError(409, `InvoiceStatus with name "${invoiceStatusInput.invoiceStatusName}" already exists`)
   }
   return addedInvoiceStatus
 }
@@ -23,10 +23,10 @@ const getInvoiceStatuses = async (): Promise<InvoiceStatus[]> => {
   return await db('invoiceStatuses')
 }
 
-const updateInvoiceStatus = async (invoiceStatusInput: InvoiceStatusInput, req: Request): Promise<InvoiceStatus> => {
+const updateInvoiceStatus = async (invoiceStatusInput: InvoiceStatus, req: Request): Promise<InvoiceStatus> => {
   const [ updatedInvoiceStatus ]: InvoiceStatus[] = await db('invoiceStatuses')
     .update(invoiceStatusInput, [ '*' ])
-    .where('invoiceStatusID', req.params.invoiceStatusID)
+    .where('invoiceStatusName', req.params.invoiceStatusName)
 
   if (!updatedInvoiceStatus) throw new StatusError(404, 'Not Found')
   return updatedInvoiceStatus
@@ -35,7 +35,7 @@ const updateInvoiceStatus = async (invoiceStatusInput: InvoiceStatusInput, req: 
 const deleteInvoiceStatus = async (req: Request): Promise<void> => {
   const deleteCount = await db('invoiceStatuses')
     .del()
-    .where('invoiceStatusID', req.params.invoiceStatusID)
+    .where('invoiceStatusName', req.params.invoiceStatusName)
 
   if (deleteCount === 0) throw new StatusError(404, 'Not Found')
 }

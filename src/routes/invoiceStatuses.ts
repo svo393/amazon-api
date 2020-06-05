@@ -16,13 +16,13 @@ router.get('/', isAdmin, async (_req, res) => {
   res.json(invoiceStatuses)
 })
 
-router.put('/:invoiceStatusID', isAdmin, async (req, res) => {
+router.put('/:invoiceStatusName', isAdmin, async (req, res) => {
   const invoiceStatusUpdateInput = checkInvoiceStatusUpdate(req)
   const updatedInvoiceStatus = await invoiceStatusService.updateInvoiceStatus(invoiceStatusUpdateInput, req)
   res.json(updatedInvoiceStatus)
 })
 
-router.delete('/:invoiceStatusID', isAdmin, async (req, res) => {
+router.delete('/:invoiceStatusName', isAdmin, async (req, res) => {
   await invoiceStatusService.deleteInvoiceStatus(req)
   res.status(204).end()
 })

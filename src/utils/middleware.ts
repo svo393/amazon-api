@@ -144,16 +144,15 @@ export const getUserID: Middleware = async (req, res, next) => {
       const decodedToken = jwt.verify(req.cookies.token, env.JWT_SECRET)
       res.locals.userID = (decodedToken as DecodedToken).userID
 
-      const role: { name: string } | null = await db('users')
-        .first('r.name')
+      const user = await db<User>('users')
+        .first('role')
         .where('userID', res.locals.userID)
-        .joinRaw('JOIN roles as r USING ("roleID")')
 
-      if (!role) {
+      if (!user) {
         res.clearCookie('token')
         throw new StatusError(403, 'Forbidden')
       }
-      res.locals.userRole = role.name
+      res.locals.userRole = user.role
     } catch (_err) {
       res.clearCookie('token')
       throw new StatusError(403, 'Forbidden')

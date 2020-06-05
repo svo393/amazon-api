@@ -28,10 +28,10 @@ describe('Order adding', () => {
       .set('Cookie', `token=${token}`)
       .send(newOrder(
         addedAddress.addr,
-        addedShippingMethod.shippingMethodID,
+        addedShippingMethod.shippingMethodName,
         userID,
         [ addedCartProduct1, addedCartProduct2 ],
-        addedPaymentMethod.paymentMethodID
+        addedPaymentMethod.paymentMethodName
       ))
       .expect(201)
       .expect('Content-Type', /application\/json/)

@@ -1,9 +1,9 @@
 import { Request } from 'express'
-import { OrderStatus, OrderStatusInput } from '../types'
+import { OrderStatus } from '../types'
 import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
-const addOrderStatus = async (orderStatusInput: OrderStatusInput): Promise<OrderStatus> => {
+const addOrderStatus = async (orderStatusInput: OrderStatus): Promise<OrderStatus> => {
   const { rows: [ addedOrderStatus ] }: { rows: OrderStatus[] } = await db.raw(
     `
     ? ON CONFLICT
@@ -14,7 +14,7 @@ const addOrderStatus = async (orderStatusInput: OrderStatusInput): Promise<Order
   )
 
   if (!addedOrderStatus) {
-    throw new StatusError(409, `OrderStatus with name "${orderStatusInput.name}" already exists`)
+    throw new StatusError(409, `OrderStatus with name "${orderStatusInput.orderStatusName}" already exists`)
   }
   return addedOrderStatus
 }
@@ -23,10 +23,10 @@ const getOrderStatuses = async (): Promise<OrderStatus[]> => {
   return await db('orderStatuses')
 }
 
-const updateOrderStatus = async (orderStatusInput: OrderStatusInput, req: Request): Promise<OrderStatus> => {
+const updateOrderStatus = async (orderStatusInput: OrderStatus, req: Request): Promise<OrderStatus> => {
   const [ updatedOrderStatus ]: OrderStatus[] = await db('orderStatuses')
     .update(orderStatusInput, [ '*' ])
-    .where('orderStatusID', req.params.orderStatusID)
+    .where('orderStatusName', req.params.orderStatusName)
 
   if (!updatedOrderStatus) throw new StatusError(404, 'Not Found')
   return updatedOrderStatus
@@ -35,7 +35,7 @@ const updateOrderStatus = async (orderStatusInput: OrderStatusInput, req: Reques
 const deleteOrderStatus = async (req: Request): Promise<void> => {
   const deleteCount = await db('orderStatuses')
     .del()
-    .where('orderStatusID', req.params.orderStatusID)
+    .where('orderStatusName', req.params.orderStatusName)
 
   if (deleteCount === 0) throw new StatusError(404, 'Not Found')
 }

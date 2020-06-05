@@ -104,7 +104,7 @@ describe('User fetching', () => {
       .set('Cookie', `token=${token}`)
       .expect(200)
 
-    expect(Object.keys(body)).toHaveLength(12)
+    expect(Object.keys(body)).toHaveLength(13)
   })
 
   test('full user if own profile', async () => {
@@ -115,7 +115,7 @@ describe('User fetching', () => {
       .set('Cookie', `token=${token}`)
       .expect(200)
 
-    expect(Object.keys(body)).toHaveLength(12)
+    expect(Object.keys(body)).toHaveLength(13)
   })
 })
 

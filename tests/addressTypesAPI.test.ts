@@ -54,7 +54,7 @@ describe('AddressTypes fetching', () => {
     const { addedAddressType } = await createOneAddressType('root')
 
     const { body } = await api
-      .get(`${apiURL}/${addedAddressType.addressTypeID}`)
+      .get(`${apiURL}/${addedAddressType.addressTypeName}`)
       .expect(200)
 
     expect(body).toBeDefined()
@@ -66,12 +66,12 @@ describe('AddressType updating', () => {
     const { addedAddressType, token } = await createOneAddressType('admin')
 
     const { body } = await api
-      .put(`${apiURL}/${addedAddressType.addressTypeID}`)
+      .put(`${apiURL}/${addedAddressType.addressTypeName}`)
       .set('Cookie', `token=${token}`)
-      .send({ name: `Updated AddressType ${(new Date().getTime()).toString()}` })
+      .send({ addressTypeName: `Updated AddressType ${(new Date().getTime()).toString()}` })
       .expect(200)
 
-    expect(body.name).toContain('Updated AddressType')
+    expect(body.addressTypeName).toContain('Updated AddressType')
   })
 
   test('403 if not admin or root', async () => {
@@ -79,9 +79,9 @@ describe('AddressType updating', () => {
     const { token } = await loginAs('customer')
 
     await api
-      .put(`${apiURL}/${addedAddressType.addressTypeID}`)
+      .put(`${apiURL}/${addedAddressType.addressTypeName}`)
       .set('Cookie', `token=${token}`)
-      .send({ name: `Updated AddressType ${(new Date().getTime()).toString()}` })
+      .send({ addressTypeName: `Updated AddressType ${(new Date().getTime()).toString()}` })
       .expect(403)
   })
 })

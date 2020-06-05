@@ -1,6 +1,5 @@
 import { Request, Response } from 'express'
-import { Address, AddressType as AT, AddressTypeInput as ATInput } from '../types'
-import { sensitiveAddressTypes as sensitiveATs } from '../utils/constants'
+import { Address, AddressType as AT, AddressTypeInput as ATInput, AddressType } from '../types'
 import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
@@ -15,7 +14,7 @@ const addAddressType = async (atInput: ATInput): Promise<AT> => {
   )
 
   if (!addedAT) {
-    throw new StatusError(409, `AddressType with name "${atInput.name}" already exists`)
+    throw new StatusError(409, `AddressType with name "${atInput.addressTypeName}" already exists`)
   }
   return addedAT
 }
@@ -24,42 +23,45 @@ const getAddressTypes = async (): Promise<AT[]> => {
   return await db('addressTypes')
 }
 
-type SingleAddressTypeData = {
-  name: string;
+type SingleAddressTypeData = AddressType & {
   addresses: Address[];
 }
 
-const getAddressTypeByID = async (res: Response, req: Request): Promise<SingleAddressTypeData> => {
-  const addressTypeID = Number(req.params.addressTypeID)
+const getAddressTypeByName = async (res: Response, req: Request): Promise<SingleAddressTypeData> => {
+  const { addressTypeName } = req.params
 
   const ats = await db<AT>('addressTypes')
 
   const filteredATs = [ 'ROOT', 'ADMIN' ].includes(res.locals.userRole)
     ? ats
-    : ats.filter((at) => !sensitiveATs.includes(at.name))
+    : ats.filter((at) => !at.isPrivate)
 
-  const [ at ] = filteredATs.filter((shm) => shm.addressTypeID === Number(addressTypeID))
+  const [ at ] = filteredATs.filter((shm) => shm.addressTypeName === addressTypeName)
   if (!at) throw new StatusError(404, 'Not Found')
 
   const addresses = await db<Address>('addresses')
-    .where('addressTypeID', addressTypeID)
+    .where('addressType', addressTypeName)
 
   return { ...at, addresses }
 }
 
 const updateAddressType = async (res: Response, atInput: ATInput, req: Request): Promise<SingleAddressTypeData> => {
-  const [ updatedAT ] = await db<AT>('addressTypes')
-    .update(atInput, [ 'addressTypeID' ])
-    .where('addressTypeID', req.params.addressTypeID)
+  const [ updatedAT ]: AT[] = await db('addressTypes')
+    .update(atInput, [ '*' ])
+    .where('addressTypeName', req.params.addressTypeName)
 
   if (!updatedAT) throw new StatusError(404, 'Not Found')
-  return getAddressTypeByID(res, req)
+
+  const addresses = await db<Address>('addresses')
+    .where('addressType', updatedAT.addressTypeName)
+
+  return { ...updatedAT, addresses }
 }
 
 const deleteAddressType = async (req: Request): Promise<void> => {
   const deleteCount = await db('addressTypes')
     .del()
-    .where('addressTypeID', req.params.addressTypeID)
+    .where('addressTypeName', req.params.addressTypeName)
 
   if (deleteCount === 0) throw new StatusError(404, 'Not Found')
 }
@@ -67,7 +69,7 @@ const deleteAddressType = async (req: Request): Promise<void> => {
 export default {
   addAddressType,
   getAddressTypes,
-  getAddressTypeByID,
+  getAddressTypeByName,
   updateAddressType,
   deleteAddressType
 }

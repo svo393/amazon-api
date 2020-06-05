@@ -2,7 +2,7 @@ import path from 'path'
 import R from 'ramda'
 import supertest from 'supertest'
 import app from '../../src/app'
-import { AddressType, Answer, AnswerComment, CartProduct, List, Order, OrderStatus, PaymentMethod, Product, Question, Rating, RatingComment, ShippingMethod, InvoiceStatus, Invoice } from '../../src/types'
+import { Answer, AnswerComment, CartProduct, Invoice, List, Order, Product, Question, Rating, RatingComment } from '../../src/types'
 import { apiURLs } from '../../src/utils/constants'
 import { db } from '../../src/utils/db'
 import { createOneCategory, createOneVendor, loginAs, populateUsers, purge } from '../testHelper'
@@ -36,11 +36,6 @@ const seed = async (): Promise<void> => {
         .send(R.omit([ 'email', 'password', 'userID', 'token' ], u))
     }))
 
-    const addressTypes: { body: AddressType[] } = await api
-      .get(apiURLs.addressTypes)
-
-    const shippingAddressTypeID = addressTypes.body.find((at) => at.name === 'SHIPPING')
-
     await Promise.all(users.map(async (u) => {
       const nameMatch = /^\w+?(?=@)/.exec(u.email)
 
@@ -58,7 +53,7 @@ const seed = async (): Promise<void> => {
         .set('Cookie', `token=${u.token}`)
         .send({
           addr: u.address,
-          addressTypeID: shippingAddressTypeID?.addressTypeID
+          addressType: 'SHIPPING'
         })
     }))
 
@@ -319,24 +314,6 @@ const seed = async (): Promise<void> => {
       )
       .set('Cookie', `token=${users[2].token}`)
 
-    const shippingMethods: { body: ShippingMethod[] } = await api
-      .get(apiURLs.shippingMethods)
-
-    const paymentMethods: { body: PaymentMethod[] } = await api
-      .get(apiURLs.paymentMethods)
-
-    const orderStatuses: { body: OrderStatus[] } = await api
-      .get(apiURLs.orderStatuses)
-      .set('Cookie', `token=${adminToken}`)
-
-    const orderStatusDone = orderStatuses.body.find((os) => os.name === 'DONE')?.orderStatusID
-
-    const invoiceStatuses: { body: InvoiceStatus[] } = await api
-      .get(apiURLs.invoiceStatuses)
-      .set('Cookie', `token=${adminToken}`)
-
-    const invoiceStatusDone = invoiceStatuses.body.find((os) => os.name === 'DONE')?.invoiceStatusID
-
     const cartProduct1: { body: CartProduct } = await api
       .post(`${apiURLs.users}/${users[0].userID}/cartProducts`)
       .set('Cookie', `token=${users[0].token}`)
@@ -352,8 +329,8 @@ const seed = async (): Promise<void> => {
       .send({
         address: users[0].address,
         details: 'Card 4242 4242 4242 4242',
-        shippingMethodID: shippingMethods.body.find((sm) => sm.name === 'DOOR')?.shippingMethodID,
-        paymentMethodID: paymentMethods.body.find((sm) => sm.name === 'CARD')?.paymentMethodID,
+        shippingMethod: 'DOOR',
+        paymentMethod: 'CARD',
         userID: users[0].userID,
         cart: [ cartProduct1.body ]
       })
@@ -361,12 +338,12 @@ const seed = async (): Promise<void> => {
     await api
       .put(`${apiURLs.orders}/${order1.body.orderID}`)
       .set('Cookie', `token=${adminToken}`)
-      .send({ orderStatusID: orderStatusDone })
+      .send({ orderStatus: 'DONE' })
 
     await api
       .put(`${apiURLs.invoices}/${order1.body.invoiceID}`)
       .set('Cookie', `token=${adminToken}`)
-      .send({ invoiceStatusID: invoiceStatusDone })
+      .send({ invoiceStatus: 'DONE' })
 
     const cartProduct2: { body: CartProduct } = await api
       .post(`${apiURLs.users}/${users[2].userID}/cartProducts`)
@@ -383,8 +360,8 @@ const seed = async (): Promise<void> => {
       .send({
         address: users[2].address,
         details: '',
-        shippingMethodID: shippingMethods.body.find((sm) => sm.name === 'LOCKER')?.shippingMethodID,
-        paymentMethodID: paymentMethods.body.find((sm) => sm.name === 'CASH')?.paymentMethodID,
+        shippingMethod: 'LOCKER',
+        paymentMethod: 'CASH',
         userID: users[2].userID,
         cart: [ cartProduct2.body ]
       })
@@ -392,12 +369,12 @@ const seed = async (): Promise<void> => {
     await api
       .put(`${apiURLs.orders}/${order2.body.orderID}`)
       .set('Cookie', `token=${adminToken}`)
-      .send({ orderStatusID: orderStatusDone })
+      .send({ orderStatus: 'DONE' })
 
     await api
       .put(`${apiURLs.invoices}/${order2.body.invoiceID}`)
       .set('Cookie', `token=${adminToken}`)
-      .send({ invoiceStatusID: invoiceStatusDone })
+      .send({ invoiceStatus: 'DONE' })
   } catch (error) { console.error(error) }
 }
 

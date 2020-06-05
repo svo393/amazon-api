@@ -4,18 +4,17 @@ import R from 'ramda'
 import { Address, AddressCreateInput, UserAddress } from '../types'
 import { db, dbTrans } from '../utils/db'
 import StatusError from '../utils/StatusError'
-import { sensitiveAddressTypes } from '../utils/constants'
 
 const addAddress = async (addressInput: AddressCreateInput, res: Response): Promise<Address & UserAddress> => {
   // TODO if new address isDefault, set false to the previous
-  // TODO transfor all sequence db calls to transactions
+  // TODO transfer all sequence db calls to transactions
 
-  const { isDefault, addr, addressTypeID } = addressInput
+  const { isDefault, addr, addressType } = addressInput
 
   const existingAddresses = await db<Address & UserAddress>('addresses as a')
     .joinRaw('LEFT JOIN "userAddresses" as ua USING ("addressID")')
     .where('addr', addr)
-    .andWhere('addressTypeID', addressTypeID)
+    .andWhere('addressType', addressType)
 
   let curUA // aka currentUserAddress
 
@@ -44,7 +43,7 @@ const addAddress = async (addressInput: AddressCreateInput, res: Response): Prom
 
       curUA = {
         addr,
-        addressTypeID,
+        addressType,
         ...addedUserAddress
       }
     }
@@ -77,30 +76,30 @@ const getAddressesByUser = async (req: Request): Promise<(Address & UserAddress)
 
 const getAddressesByType = async (req: Request): Promise<Address[]> => {
   return await db('addresses')
-    .where('addressTypeID', req.params.addressTypeID)
+    .where('addressType', req.params.addressTypeName)
 }
 
-type AddressFullData = Address & { userID: string; name: string }
+type AddressFullData = Address & { userID: string; isPrivate: boolean }
 
 const getAddressByID = async (req: Request, res: Response): Promise<AddressFullData> => {
   const address: AddressFullData = await db('addresses as a')
     .first(
       'a.addressID',
       'a.addr',
-      'a.addressTypeID',
+      'a.addressType',
       'ua.userID',
-      'at.name'
+      'at.isPrivate'
     )
     .where('addressID', req.params.addressID)
     .joinRaw('JOIN "userAddresses" as ua USING ("addressID")')
-    .joinRaw('LEFT JOIN "addressTypes" as at USING ("addressTypeID")')
+    .leftJoin('addressTypes as at', 'a.addressType', 'at.addressTypeName')
 
   if (!address) throw new StatusError(404, 'Not Found')
 
   const role: string | undefined = res.locals.userRole
 
   if (
-    sensitiveAddressTypes.includes(address.name) &&
+    address.isPrivate &&
     (!role || ![ 'ROOT', 'ADMIN' ].includes(role)) &&
     address.userID !== res.locals.userID
   ) {

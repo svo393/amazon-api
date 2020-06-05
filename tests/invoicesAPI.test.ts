@@ -23,7 +23,7 @@ describe('Invoice adding', () => {
     await api
       .post(apiURLs.invoices)
       .set('Cookie', `token=${token}`)
-      .send(newInvoice(addedOrder.orderID, addedPaymentMethod.paymentMethodID, addedOrder.userID as number))
+      .send(newInvoice(addedOrder.orderID, addedPaymentMethod.paymentMethodName, addedOrder.userID as number))
       .expect(201)
       .expect('Content-Type', /application\/json/)
 

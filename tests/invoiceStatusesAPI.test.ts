@@ -55,12 +55,12 @@ describe('InvoiceStatus updating', () => {
     const { addedInvoiceStatus, token } = await createOneInvoiceStatus('admin')
 
     const { body } = await api
-      .put(`${apiURL}/${addedInvoiceStatus.invoiceStatusID}`)
+      .put(`${apiURL}/${addedInvoiceStatus.invoiceStatusName}`)
       .set('Cookie', `token=${token}`)
-      .send({ name: `Updated InvoiceStatus ${(new Date().getTime()).toString()}` })
+      .send({ invoiceStatusName: `Updated InvoiceStatus ${(new Date().getTime()).toString()}` })
       .expect(200)
 
-    expect(body.name).toContain('Updated InvoiceStatus')
+    expect(body.invoiceStatusName).toContain('Updated InvoiceStatus')
   })
 
   test('403 if not admin', async () => {
@@ -68,9 +68,9 @@ describe('InvoiceStatus updating', () => {
     const { token } = await loginAs('customer')
 
     await api
-      .put(`${apiURL}/${addedInvoiceStatus.invoiceStatusID}`)
+      .put(`${apiURL}/${addedInvoiceStatus.invoiceStatusName}`)
       .set('Cookie', `token=${token}`)
-      .send({ name: `Updated InvoiceStatus ${(new Date().getTime()).toString()}` })
+      .send({ invoiceStatusName: `Updated InvoiceStatus ${(new Date().getTime()).toString()}` })
       .expect(403)
   })
 })
