@@ -201,6 +201,8 @@ export type Order = {
   userID: number | null;
   orderStatus: string;
   shippingMethod: string;
+  amount: number;
+  invoiceID: number;
 }
 
 export type OrderProduct = {

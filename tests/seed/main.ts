@@ -194,10 +194,10 @@ const seed = async (): Promise<void> => {
                     groupID
                   })
 
-                await api
-                  .put(`${apiURLs.questions}/${body.questionID}`)
-                  .set('Cookie', `token=${adminToken}`)
-                  .send({ moderationStatus: 'APPROVED' })
+                // await api
+                //   .put(`${apiURLs.questions}/${body.questionID}`)
+                //   .set('Cookie', `token=${adminToken}`)
+                //   .send({ moderationStatus: 'APPROVED' })
 
                 if (q.media) {
                   const uploadAPI = api
@@ -225,10 +225,10 @@ const seed = async (): Promise<void> => {
                         questionID: body.questionID
                       })
 
-                    await api
-                      .put(`${apiURLs.answers}/${answer.body.answerID}`)
-                      .set('Cookie', `token=${adminToken}`)
-                      .send({ moderationStatus: 'APPROVED' })
+                    // await api
+                    //   .put(`${apiURLs.answers}/${answer.body.answerID}`)
+                    //   .set('Cookie', `token=${adminToken}`)
+                    //   .send({ moderationStatus: 'APPROVED' })
 
                     if (a.media) {
                       const uploadAPI = api
@@ -256,10 +256,10 @@ const seed = async (): Promise<void> => {
                             answerID: answer.body.answerID
                           })
 
-                        await api
-                          .put(`${apiURLs.answerComments}/${answerComment.body.answerCommentID}`)
-                          .set('Cookie', `token=${adminToken}`)
-                          .send({ moderationStatus: 'APPROVED' })
+                        // await api
+                        //   .put(`${apiURLs.answerComments}/${answerComment.body.answerCommentID}`)
+                        //   .set('Cookie', `token=${adminToken}`)
+                        //   .send({ moderationStatus: 'APPROVED' })
 
                         if (ac.media) {
                           const uploadAPI = api

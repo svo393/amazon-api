@@ -1,7 +1,7 @@
 import { Request } from 'express'
 import Knex from 'knex'
 import R from 'ramda'
-import { Order, OrderCreateInput, OrderProduct, OrderStatus, OrderUpdateInput, Invoice, InvoiceStatus } from '../types'
+import { Invoice, Order, OrderCreateInput, OrderProduct, OrderUpdateInput } from '../types'
 import { db, dbTrans } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
@@ -59,21 +59,46 @@ const addOrder = async (orderInput: OrderCreateInput): Promise<Order & Invoice> 
 }
 
 const getOrders = async (): Promise<Order[]> => {
-  return await db('orders')
+  const orders = await db<Order>('orders')
+    .joinRaw('JOIN invoices USING ("orderID")')
+
+  return orders.map((o) => R.omit([
+    'details',
+    'invoiceCreatedAt',
+    'invoiceUpdatedAt',
+    'invoiceStatus',
+    'paymentMethod'
+  ], o))
 }
 
 const getOrdersByUser = async (req: Request): Promise<Order[]> => {
-  return await db('orders')
+  const orders = await db<Order>('orders')
+    .joinRaw('JOIN invoices USING ("orderID")')
     .where('userID', req.params.userID)
+
+  return orders.map((o) => R.omit([
+    'details',
+    'invoiceCreatedAt',
+    'invoiceUpdatedAt',
+    'invoiceStatus',
+    'paymentMethod'
+  ], o))
 }
 
 const getOrderByID = async (req: Request): Promise<Order> => {
   const order = await db<Order>('orders')
     .first()
+    .joinRaw('JOIN invoices USING ("orderID")')
     .where('orderID', req.params.orderID)
 
   if (!order) throw new StatusError(404, 'Not Found')
-  return order
+  return R.omit([
+    'details',
+    'invoiceCreatedAt',
+    'invoiceUpdatedAt',
+    'invoiceStatus',
+    'paymentMethod'
+  ], order)
 }
 
 const updateOrder = async (orderInput: OrderUpdateInput, req: Request): Promise<Order> => {
