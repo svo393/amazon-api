@@ -1,11 +1,11 @@
 import { Request } from 'express'
 import Knex from 'knex'
 import R from 'ramda'
-import { Invoice, Order, OrderCreateInput, OrderProduct, OrderUpdateInput } from '../types'
+import { Invoice, Order, OrderCreateInput, OrderFullData, OrderProduct, OrderUpdateInput, OrderProductFullData } from '../types'
 import { db, dbTrans } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
-const addOrder = async (orderInput: OrderCreateInput): Promise<Order & Invoice> => {
+const addOrder = async (orderInput: OrderCreateInput): Promise<OrderFullData & Invoice> => {
   const { cart } = orderInput
   const now = new Date()
 
@@ -72,9 +72,9 @@ const getOrders = async (): Promise<Order[]> => {
 }
 
 const getOrdersByUser = async (req: Request): Promise<Order[]> => {
-  const orders = await db<Order>('orders')
+  const orders = await db<Order>('orders as o')
     .joinRaw('JOIN invoices USING ("orderID")')
-    .where('userID', req.params.userID)
+    .where('o.userID', req.params.userID)
 
   return orders.map((o) => R.omit([
     'details',
@@ -85,20 +85,41 @@ const getOrdersByUser = async (req: Request): Promise<Order[]> => {
   ], o))
 }
 
-const getOrderByID = async (req: Request): Promise<Order> => {
-  const order = await db<Order>('orders')
-    .first()
-    .joinRaw('JOIN invoices USING ("orderID")')
+const getOrderByID = async (req: Request): Promise<OrderFullData> => {
+  const order: Order = await db('orders as o')
+    .first(
+      'o.orderID',
+      'o.address',
+      'u.email as userEmail',
+      'o.orderCreatedAt',
+      'o.orderUpdatedAt',
+      'o.userID',
+      'o.orderStatus',
+      'o.shippingMethod',
+      'i.amount',
+      'i.invoiceID'
+    )
+    .joinRaw('JOIN users as u USING ("userID")')
+    .joinRaw('JOIN invoices as i USING ("orderID")')
     .where('orderID', req.params.orderID)
 
+  const orderProducts: OrderProductFullData[] = await db('orderProducts as op')
+    .select(
+      'op.price',
+      'op.qty',
+      'op.productID',
+      'op.orderID',
+      'p.title',
+      'p.primaryMedia'
+    )
+    .where('orderID', req.params.orderID)
+    .joinRaw('JOIN products as p USING ("productID")')
+
   if (!order) throw new StatusError(404, 'Not Found')
-  return R.omit([
-    'details',
-    'invoiceCreatedAt',
-    'invoiceUpdatedAt',
-    'invoiceStatus',
-    'paymentMethod'
-  ], order)
+  return {
+    ...order,
+    orderProducts
+  }
 }
 
 const updateOrder = async (orderInput: OrderUpdateInput, req: Request): Promise<Order> => {

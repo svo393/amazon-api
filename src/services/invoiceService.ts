@@ -28,9 +28,21 @@ const getInvoicesByUser = async (req: Request): Promise<Invoice[]> => {
 }
 
 const getInvoiceByID = async (req: Request): Promise<Invoice> => {
-  const invoice = await db<Invoice>('invoices')
-    .first()
+  const invoice = await db<Invoice>('invoices as i')
+    .first(
+      'i.invoiceID',
+      'i.amount',
+      'i.details',
+      'i.invoiceCreatedAt',
+      'i.invoiceUpdatedAt',
+      'i.orderID',
+      'i.userID',
+      'i.invoiceStatus',
+      'i.paymentMethod',
+      'u.email as userEmail',
+    )
     .where('invoiceID', req.params.invoiceID)
+    .joinRaw('JOIN users as u USING ("userID")')
 
   if (!invoice) throw new StatusError(404, 'Not Found')
   return invoice

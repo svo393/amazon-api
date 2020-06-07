@@ -335,15 +335,15 @@ const seed = async (): Promise<void> => {
         cart: [ cartProduct1.body ]
       })
 
-    await api
-      .put(`${apiURLs.orders}/${order1.body.orderID}`)
-      .set('Cookie', `token=${adminToken}`)
-      .send({ orderStatus: 'DONE' })
+    // await api
+    //   .put(`${apiURLs.orders}/${order1.body.orderID}`)
+    //   .set('Cookie', `token=${adminToken}`)
+    //   .send({ orderStatus: 'DONE' })
 
-    await api
-      .put(`${apiURLs.invoices}/${order1.body.invoiceID}`)
-      .set('Cookie', `token=${adminToken}`)
-      .send({ invoiceStatus: 'DONE' })
+    // await api
+    //   .put(`${apiURLs.invoices}/${order1.body.invoiceID}`)
+    //   .set('Cookie', `token=${adminToken}`)
+    //   .send({ invoiceStatus: 'DONE' })
 
     const cartProduct2: { body: CartProduct } = await api
       .post(`${apiURLs.users}/${users[2].userID}/cartProducts`)
@@ -359,22 +359,22 @@ const seed = async (): Promise<void> => {
       .set('Cookie', `token=${users[2].token}`)
       .send({
         address: users[2].address,
-        details: '',
+        details: 'Take my money',
         shippingMethod: 'LOCKER',
         paymentMethod: 'CASH',
         userID: users[2].userID,
         cart: [ cartProduct2.body ]
       })
 
-    await api
-      .put(`${apiURLs.orders}/${order2.body.orderID}`)
-      .set('Cookie', `token=${adminToken}`)
-      .send({ orderStatus: 'DONE' })
+    // await api
+    //   .put(`${apiURLs.orders}/${order2.body.orderID}`)
+    //   .set('Cookie', `token=${adminToken}`)
+    //   .send({ orderStatus: 'DONE' })
 
-    await api
-      .put(`${apiURLs.invoices}/${order2.body.invoiceID}`)
-      .set('Cookie', `token=${adminToken}`)
-      .send({ invoiceStatus: 'DONE' })
+    // await api
+    //   .put(`${apiURLs.invoices}/${order2.body.invoiceID}`)
+    //   .set('Cookie', `token=${adminToken}`)
+    //   .send({ invoiceStatus: 'DONE' })
   } catch (error) { console.error(error) }
 }
 

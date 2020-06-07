@@ -196,6 +196,7 @@ export type ModerationStatus = {
 export type Order = {
   orderID: number;
   address: string;
+  userEmail: string;
   orderCreatedAt: Date;
   orderUpdatedAt: Date;
   userID: number | null;
@@ -222,6 +223,7 @@ export type Invoice = {
   details: string;
   invoiceCreatedAt: Date;
   invoiceUpdatedAt: Date;
+  userEmail: string;
   orderID: number;
   userID: number;
   invoiceStatus: string;
@@ -489,4 +491,18 @@ export type InvoiceUpdateInput = {
   details?: string;
   paymentMethod?: string;
   invoiceStatus?: string;
+}
+
+export type OrderProductFullData = Pick<Product,
+  | 'title'
+  | 'primaryMedia'
+> & Pick<OrderProduct,
+  | 'productID'
+  | 'orderID'
+  | 'price'
+  | 'qty'
+>
+
+export type OrderFullData = Order & {
+  orderProducts: OrderProductFullData[];
 }
