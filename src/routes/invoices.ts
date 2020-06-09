@@ -11,8 +11,8 @@ router.post('/', isLoggedIn, async (req, res) => {
   res.status(201).json(addedInvoice)
 })
 
-router.get('/', isAdmin, async (_req, res) => {
-  const roles = await invoiceService.getInvoices()
+router.get('/', isAdmin, async (req, res) => {
+  const roles = await invoiceService.getInvoices(req)
   res.json(roles)
 })
 

@@ -18,8 +18,10 @@ const addInvoice = async (invoiceInput: InvoiceCreateInput): Promise<Invoice> =>
   return addedInvoice
 }
 
-const getInvoices = async (): Promise<Invoice[]> => {
+const getInvoices = async (req: Request): Promise<Invoice[]> => {
   return await db('invoices')
+    .where('invoiceStatus', 'ilike', `%${req.query.q ?? ''}%`)
+    .orWhere('paymentMethod', 'ilike', `%${req.query.q ?? ''}%`)
 }
 
 const getInvoicesByUser = async (req: Request): Promise<Invoice[]> => {
@@ -39,7 +41,7 @@ const getInvoiceByID = async (req: Request): Promise<Invoice> => {
       'i.userID',
       'i.invoiceStatus',
       'i.paymentMethod',
-      'u.email as userEmail',
+      'u.email as userEmail'
     )
     .where('invoiceID', req.params.invoiceID)
     .joinRaw('JOIN users as u USING ("userID")')

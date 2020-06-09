@@ -58,9 +58,11 @@ const addOrder = async (orderInput: OrderCreateInput): Promise<OrderFullData & I
   })
 }
 
-const getOrders = async (): Promise<Order[]> => {
+const getOrders = async (req: Request): Promise<Order[]> => {
   const orders = await db<Order>('orders')
     .joinRaw('JOIN invoices USING ("orderID")')
+    .where('orderStatus', 'ilike', `%${req.query.q ?? ''}%`)
+    .orWhere('shippingMethod', 'ilike', `%${req.query.q ?? ''}%`)
 
   return orders.map((o) => R.omit([
     'details',

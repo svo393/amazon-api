@@ -12,9 +12,9 @@ router.post('/', isLoggedIn, async (req, res) => {
   res.status(201).json(addedOrder)
 })
 
-router.get('/', isAdmin, async (_req, res) => {
-  const roles = await orderService.getOrders()
-  res.json(roles)
+router.get('/', isAdmin, async (req, res) => {
+  const orders = await orderService.getOrders(req)
+  res.json(orders)
 })
 
 router.get('/:orderID', isCreatorOrAdmin('orders', 'orderID', 'params'), async (req, res) => {
