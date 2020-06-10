@@ -1,7 +1,6 @@
 import { Request } from 'express'
+import { Category, CategoryCreateInput, CategoryUpdateInput } from '../types'
 import { db } from '../utils/db'
-import { Category, CategoryCreateInput, CategoryUpdateInput, ProductListData } from '../types'
-import { getProductsQuery } from '../utils/queries'
 import StatusError from '../utils/StatusError'
 
 const addCategory = async (categoryInput: CategoryCreateInput): Promise<Category> => {
@@ -20,10 +19,14 @@ const addCategory = async (categoryInput: CategoryCreateInput): Promise<Category
   return addedCategory
 }
 
-type CategoryBaseData = Category & { children: number[] }
+type CategoryListData = Category & { children: number[]; productCount: number }
 
-const getCategories = async (): Promise<CategoryBaseData[]> => {
-  const categories = await db<Category>('categories')
+const getCategories = async (): Promise<CategoryListData[]> => {
+  const categories: (Category & { productCount: number })[] = await db('categories as c')
+    .select('c.categoryID', 'c.name')
+    .count('p.productID as productCount')
+    .joinRaw('JOIN products as p USING ("categoryID")')
+    .groupBy('c.categoryID')
 
   return categories.map((c) => ({
     ...c,
@@ -33,21 +36,19 @@ const getCategories = async (): Promise<CategoryBaseData[]> => {
   }))
 }
 
-type Parent = {
-  name: string;
-  categoryID: number;
-};
+type Parent = { name: string; categoryID: number };
 
-type SingleCategoryData = Category & {
-  children: number[];
-  parentChain: Parent[];
-  products: ProductListData[];
-}
+type SingleCategoryData = CategoryListData & { parentChain: Parent[] }
 
 const getCategoryByID = async (req: Request): Promise<SingleCategoryData> => {
   const categoryID = Number(req.params.categoryID)
 
-  const categories = await db<Category>('categories')
+  const categories: (Category & { productCount: number })[] = await db('categories as c')
+    .select('c.categoryID', 'c.name')
+    .count('p.productID as productCount')
+    .joinRaw('JOIN products as p USING ("categoryID")')
+    .groupBy('c.categoryID')
+
   const [ category ] = categories.filter((c) => c.categoryID === categoryID)
   if (!category) throw new StatusError(404, 'Not Found')
 
@@ -67,12 +68,8 @@ const getCategoryByID = async (req: Request): Promise<SingleCategoryData> => {
     .filter((c) => c.parentCategoryID === categoryID)
     .map((c) => c.categoryID)
 
-  const products: ProductListData[] = await getProductsQuery.clone()
-    .where('categoryID', categoryID)
-
   return {
     ...category,
-    products,
     children,
     parentChain
   }

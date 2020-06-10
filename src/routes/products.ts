@@ -1,9 +1,6 @@
 import Router from 'express'
-import groupService from '../services/groupService'
 import parameterService from '../services/parameterService'
 import productService from '../services/productService'
-import questionService from '../services/questionService'
-import ratingService from '../services/ratingService'
 import { UPLOAD_TIMEOUT } from '../utils/config'
 import { checkMediaUpload, checkNewProduct, checkProductUpdate } from '../utils/inputValidator'
 import { isAdmin, isCreator, multerUpload } from '../utils/middleware'
@@ -14,11 +11,6 @@ router.post('/', isAdmin, async (req, res) => {
   const productInput = checkNewProduct(req)
   const addedProduct = await productService.addProduct(productInput, res)
   res.status(201).json(addedProduct)
-})
-
-router.get('/', async (_req, res) => {
-  const products = await productService.getProducts()
-  res.json(products)
 })
 
 router.get('/:productID', async (req, res) => {

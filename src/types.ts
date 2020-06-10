@@ -353,18 +353,6 @@ export type ProductPublicData = Omit<Product,
 
 export type FormattedParameters = { [parameterID: number]: Parameter & ProductParameter }
 
-export type ProductListData = Pick<Product,
-  | 'productID'
-  | 'title'
-  | 'listPrice'
-  | 'price'
-  | 'primaryMedia'
-> & {
-  stars: number;
-  ratingCount: number;
-  group: GroupVariant[];
-}
-
 export type ProductAllData = Product & {
   stars: number;
   ratingCount: number;

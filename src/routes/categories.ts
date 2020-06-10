@@ -1,5 +1,6 @@
 import Router from 'express'
 import categoryService from '../services/categoryService'
+import productService from '../services/productService'
 import { checkCategoryUpdate, checkNewCategory } from '../utils/inputValidator'
 import { isAdmin } from '../utils/middleware'
 
@@ -25,6 +26,11 @@ router.put('/:categoryID', isAdmin, async (req, res) => {
   const categoryUpdateInput = checkCategoryUpdate(req)
   const updatedItem = await categoryService.updateCategory(categoryUpdateInput, req)
   res.json(updatedItem)
+})
+
+router.get('/:categoryID/products', async (req, res) => {
+  const products = await productService.getProductsByCategory(req)
+  res.json(products)
 })
 
 export default router

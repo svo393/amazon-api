@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import Knex from 'knex'
 import R from 'ramda'
-import { GroupVariant, Parameter, Product, ProductAllData, ProductCreateInput, ProductListData, ProductUpdateInput } from '../types'
+import { GroupVariant, Parameter, Product, ProductAllData, ProductCreateInput, ProductUpdateInput } from '../types'
 import { db, dbTrans } from '../utils/db'
 import { uploadImages } from '../utils/img'
 import { getProductsQuery } from '../utils/queries'
@@ -57,8 +57,26 @@ const addProduct = async (productInput: ProductCreateInput, res: Response): Prom
   })
 }
 
-export const getProducts = async (): Promise<ProductListData[]> => {
+type ProductListData = Pick<Product,
+  | 'productID'
+  | 'title'
+  | 'listPrice'
+  | 'price'
+  | 'primaryMedia'
+> & {
+  stars: number;
+  ratingCount: number;
+  group: GroupVariant[];
+}
+
+export const getProductsByCategory = async (req: Request): Promise<ProductListData[]> => {
   return await getProductsQuery.clone()
+    .where('categoryID', req.params.categoryID)
+}
+
+export const getProductsByVendor = async (req: Request): Promise<ProductListData[]> => {
+  return await getProductsQuery.clone()
+    .where('vendorID', req.params.vendorID)
 }
 
 const getProductByID = async (req: Request, res: Response): Promise<ProductListData| ProductAllData> => {
@@ -112,7 +130,8 @@ const uploadProductImages = (files: Express.Multer.File[], req: Request): void =
 
 export default {
   addProduct,
-  getProducts,
+  getProductsByCategory,
+  getProductsByVendor,
   getProductByID,
   updateProduct,
   uploadProductImages
