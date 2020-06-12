@@ -59,10 +59,16 @@ const addOrder = async (orderInput: OrderCreateInput): Promise<OrderFullData & I
 }
 
 const getOrders = async (req: Request): Promise<Order[]> => {
-  const orders = await db<Order>('orders')
+  const query = db<Order & Invoice>('orders')
     .joinRaw('JOIN invoices USING ("orderID")')
-    .where('orderStatus', 'ilike', `%${req.query.q ?? ''}%`)
-    .orWhere('shippingMethod', 'ilike', `%${req.query.q ?? ''}%`)
+
+  req.query.statuses &&
+  query.where('orderStatus', 'in', req.query.statuses.toString().split(','))
+
+  req.query.shippingMethods &&
+  query.where('shippingMethod', 'in', req.query.shippingMethods.toString().split(','))
+
+  const orders = await query
 
   return orders.map((o) => R.omit([
     'details',
