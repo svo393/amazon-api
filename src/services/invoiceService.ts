@@ -19,9 +19,15 @@ const addInvoice = async (invoiceInput: InvoiceCreateInput): Promise<Invoice> =>
 }
 
 const getInvoices = async (req: Request): Promise<Invoice[]> => {
-  return await db('invoices')
-    .where('invoiceStatus', 'ilike', `%${req.query.q ?? ''}%`)
-    .orWhere('paymentMethod', 'ilike', `%${req.query.q ?? ''}%`)
+  const query = db<Invoice>('invoices')
+
+  req.query.statuses &&
+  query.where('invoiceStatus', 'in', req.query.statuses.toString().split(','))
+
+  req.query.paymentMethods &&
+  query.where('paymentMethod', 'in', req.query.paymentMethods.toString().split(','))
+
+  return await query
 }
 
 const getInvoicesByUser = async (req: Request): Promise<Invoice[]> => {
