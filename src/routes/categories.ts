@@ -12,8 +12,8 @@ router.post('/', isAdmin, async (req, res) => {
   res.status(201).json(addedCategory)
 })
 
-router.get('/', async (_req, res) => {
-  const categories = await categoryService.getCategories()
+router.get('/', async (req, res) => {
+  const categories = await categoryService.getCategories(req)
   res.json(categories)
 })
 

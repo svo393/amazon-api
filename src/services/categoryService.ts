@@ -21,24 +21,25 @@ const addCategory = async (categoryInput: CategoryCreateInput): Promise<Category
 
 type CategoryListData = Category & { children: number[]; productCount: number }
 
-const getCategories = async (): Promise<CategoryListData[]> => {
+const getCategories = async (req: Request): Promise<CategoryListData[]> => {
   const categories: (Category & { productCount: number })[] = await db('categories as c')
     .select('c.categoryID', 'c.name')
     .count('p.productID as productCount')
+    .where('name', 'ilike', `%${req.query.q ?? ''}%`)
     .joinRaw('JOIN products as p USING ("categoryID")')
     .groupBy('c.categoryID')
 
   return categories.map((c) => ({
     ...c,
     children: categories
-      .filter((i) => i.parentCategoryID === c.categoryID)
-      .map((i) => i.categoryID)
+      .filter((c) => c.parentCategoryID === c.categoryID)
+      .map((c) => c.categoryID)
   }))
 }
 
 type Parent = { name: string; categoryID: number };
 
-type SingleCategoryData = CategoryListData & { parentChain: Parent[] }
+type SingleCategoryData = Omit<CategoryListData, 'parentCategoryID'> & { parentChain: Parent[] }
 
 const getCategoryByID = async (req: Request): Promise<SingleCategoryData> => {
   const categoryID = Number(req.params.categoryID)
@@ -67,6 +68,8 @@ const getCategoryByID = async (req: Request): Promise<SingleCategoryData> => {
   const children = categories
     .filter((c) => c.parentCategoryID === categoryID)
     .map((c) => c.categoryID)
+
+  delete category.parentCategoryID
 
   return {
     ...category,

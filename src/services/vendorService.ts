@@ -21,10 +21,11 @@ const addVendor = async (vendorInput: VendorInput): Promise<Vendor> => {
 
 type VendorListData = Vendor & { productCount: number }
 
-const getVendors = async (): Promise<VendorListData[]> => {
+const getVendors = async (req: Request): Promise<VendorListData[]> => {
   return await db('vendors as v')
     .select('v.vendorID', 'v.name')
     .count('p.productID as productCount')
+    .where('name', 'ilike', `%${req.query.q ?? ''}%`)
     .joinRaw('JOIN products as p USING ("vendorID")')
     .groupBy('v.vendorID')
 }

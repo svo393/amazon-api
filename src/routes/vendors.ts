@@ -12,8 +12,8 @@ router.post('/', isAdmin, async (req, res) => {
   res.status(201).json(addedVendor)
 })
 
-router.get('/', async (_req, res) => {
-  const vendors = await vendorService.getVendors()
+router.get('/', async (req, res) => {
+  const vendors = await vendorService.getVendors(req)
   res.json(vendors)
 })
 
