@@ -1,6 +1,6 @@
 import Router from 'express'
 import invoiceService from '../services/invoiceService'
-import { checkInvoiceUpdate, checkNewInvoice } from '../utils/inputValidator'
+import { checkInvoiceUpdate, checkNewInvoice, checkInvoiceFilters } from '../utils/inputValidator'
 import { isAdmin, isLoggedIn, isCreatorOrAdmin } from '../utils/middleware'
 
 const router = Router()
@@ -12,6 +12,7 @@ router.post('/', isLoggedIn, async (req, res) => {
 })
 
 router.get('/', isAdmin, async (req, res) => {
+  checkInvoiceFilters(req)
   const roles = await invoiceService.getInvoices(req)
   res.json(roles)
 })

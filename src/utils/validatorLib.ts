@@ -76,7 +76,7 @@ export const isNumber: CP = ({ name, param }) => {
 }
 
 export const canBeNumber: CP = ({ name, param }) => {
-  if (typeof (parseInt(param)) !== 'number') {
+  if (!/^\d+(?:\.\d{2})?$/.test(param)) {
     throw new StatusError(400, `Incorrect ${name}: ${param}`)
   }
   return { name, param }

@@ -462,6 +462,13 @@ export type OrderUpdateInput = {
   shippingMethod?: string;
 }
 
+export type OrderFiltersInput = {
+  amountMin: string;
+  amountMax: string;
+  orderStatuses: string;
+  shippingMethods: string;
+}
+
 export type OrderProductCreateInput = Omit<OrderProduct, | 'orderID'>
 
 export type OrderProductUpdateInput = Omit<OrderProductCreateInput, | 'productID'>
@@ -479,6 +486,13 @@ export type InvoiceUpdateInput = {
   details?: string;
   paymentMethod?: string;
   invoiceStatus?: string;
+}
+
+export type InvoiceFiltersInput = {
+  amountMin: string;
+  amountMax: string;
+  invoiceStatuses: string;
+  paymentMethods: string;
 }
 
 export type OrderProductFullData = Pick<Product,

@@ -58,15 +58,21 @@ const addOrder = async (orderInput: OrderCreateInput): Promise<OrderFullData & I
   })
 }
 
-const getOrders = async (req: Request): Promise<Order[]> => {
+const getOrders = async ({ query: queryArgs }: Request): Promise<Order[]> => {
   const query = db<Order & Invoice>('orders')
     .joinRaw('JOIN invoices USING ("orderID")')
 
-  req.query.statuses &&
-  query.where('orderStatus', 'in', req.query.statuses.toString().split(','))
+  queryArgs.orderStatuses &&
+  query.where('orderStatus', 'in', queryArgs.orderStatuses.toString().split(','))
 
-  req.query.shippingMethods &&
-  query.where('shippingMethod', 'in', req.query.shippingMethods.toString().split(','))
+  queryArgs.shippingMethods &&
+  query.where('shippingMethod', 'in', queryArgs.shippingMethods.toString().split(','))
+
+  queryArgs.amountMin &&
+  query.where('amount', '>=', Number(queryArgs.amountMin) * 100)
+
+  queryArgs.amountMax &&
+  query.where('amount', '<=', Number(queryArgs.amountMax) * 100)
 
   const orders = await query
 

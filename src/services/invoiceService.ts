@@ -18,14 +18,20 @@ const addInvoice = async (invoiceInput: InvoiceCreateInput): Promise<Invoice> =>
   return addedInvoice
 }
 
-const getInvoices = async (req: Request): Promise<Invoice[]> => {
+const getInvoices = async ({ query: queryArgs }: Request): Promise<Invoice[]> => {
   const query = db<Invoice>('invoices')
 
-  req.query.statuses &&
-  query.where('invoiceStatus', 'in', req.query.statuses.toString().split(','))
+  queryArgs.invoiceStatuses &&
+  query.where('invoiceStatus', 'in', queryArgs.invoiceStatuses.toString().split(','))
 
-  req.query.paymentMethods &&
-  query.where('paymentMethod', 'in', req.query.paymentMethods.toString().split(','))
+  queryArgs.paymentMethods &&
+  query.where('paymentMethod', 'in', queryArgs.paymentMethods.toString().split(','))
+
+  queryArgs.amountMin &&
+  query.where('amount', '>=', Number(queryArgs.amountMin) * 100)
+
+  queryArgs.amountMax &&
+  query.where('amount', '<=', Number(queryArgs.amountMax) * 100)
 
   return await query
 }

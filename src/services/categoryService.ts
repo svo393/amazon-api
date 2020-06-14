@@ -19,15 +19,19 @@ const addCategory = async (categoryInput: CategoryCreateInput): Promise<Category
   return addedCategory
 }
 
-type CategoryListData = Category & { children: number[]; productCount: number }
+type CategoryWithProductCount = Category & { productCount: number }
+type CategoryListData = CategoryWithProductCount & { children: number[] }
 
-const getCategories = async (req: Request): Promise<CategoryListData[]> => {
-  const categories: (Category & { productCount: number })[] = await db('categories as c')
+const getCategories = async ({ query: queryArgs }: Request): Promise<CategoryListData[]> => {
+  const query = db<Category>('categories as c')
     .select('c.categoryID', 'c.name')
     .count('p.productID as productCount')
-    .where('name', 'ilike', `%${req.query.q ?? ''}%`)
     .joinRaw('JOIN products as p USING ("categoryID")')
     .groupBy('c.categoryID')
+
+  queryArgs.q && query.where('name', 'ilike', `%${queryArgs.q}%`)
+
+  const categories: CategoryWithProductCount[] = await query
 
   return categories.map((c) => ({
     ...c,

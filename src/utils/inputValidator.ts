@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoryCreateInput, CategoryUpdateInput, GroupVariantCreateInput, GroupVariantUpdateInput, InvoiceCreateInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, OrderCreateInput, OrderProductCreateInput, OrderProductUpdateInput, OrderStatus, OrderUpdateInput, ParameterCreateInput, ParameterUpdateInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductParameterInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput, ModerationStatus } from '../types'
+import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoryCreateInput, CategoryUpdateInput, GroupVariantCreateInput, GroupVariantUpdateInput, InvoiceCreateInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, OrderCreateInput, OrderProductCreateInput, OrderProductUpdateInput, OrderStatus, OrderUpdateInput, ParameterCreateInput, ParameterUpdateInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductParameterInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput, ModerationStatus, InvoiceFiltersInput } from '../types'
 import { canBeNumber, hasDefinedProps, isArray, isBoolean, isEmail, isInputProvided, isPasswordValid, isProductParameterOrGroupVariant, isProvided, isString, isStringOrNumber } from './validatorLib'
 
 export const checkNewUser = ({ body }: Request): UserSignupInput => {
@@ -974,4 +974,54 @@ export const checkInvoiceUpdate = ({ body }: Request): InvoiceUpdateInput => {
     invoiceStatus: invoiceStatus?.param,
     paymentMethod: paymentMethod?.param
   })
+}
+
+export const checkInvoiceFilters = ({ query }: Request): InvoiceFiltersInput => {
+  const amountMin = 'amountMin' in query
+    ? canBeNumber({ name: 'amountMin', param: query.amountMin })
+    : undefined
+
+  const amountMax = 'amountMax' in query
+    ? canBeNumber({ name: 'amountMax', param: query.amountMax })
+    : undefined
+
+  const invoiceStatuses = 'invoiceStatuses' in query
+    ? isString({ name: 'invoiceStatuses', param: query.invoiceStatuses })
+    : undefined
+
+  const paymentMethods = 'paymentMethods' in query
+    ? isString({ name: 'paymentMethods', param: query.paymentMethods })
+    : undefined
+
+  return {
+    amountMin: amountMin?.param,
+    amountMax: amountMax?.param,
+    invoiceStatuses: invoiceStatuses?.param,
+    paymentMethods: paymentMethods?.param
+  }
+}
+
+export const checkOrderFilters = ({ query }: Request): OrderFiltersInput => {
+  const amountMin = 'amountMin' in query
+    ? canBeNumber({ name: 'amountMin', param: query.amountMin })
+    : undefined
+
+  const amountMax = 'amountMax' in query
+    ? canBeNumber({ name: 'amountMax', param: query.amountMax })
+    : undefined
+
+  const orderStatuses = 'orderStatuses' in query
+    ? isString({ name: 'orderStatuses', param: query.orderStatuses })
+    : undefined
+
+  const paymentMethods = 'paymentMethods' in query
+    ? isString({ name: 'paymentMethods', param: query.paymentMethods })
+    : undefined
+
+  return {
+    amountMin: amountMin?.param,
+    amountMax: amountMax?.param,
+    orderStatuses: orderStatuses?.param,
+    paymentMethods: paymentMethods?.param
+  }
 }

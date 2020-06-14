@@ -1,7 +1,7 @@
 import Router from 'express'
 import orderProductService from '../services/orderProductService'
 import orderService from '../services/orderService'
-import { checkNewOrder, checkNewOrderProduct, checkOrderProductUpdate, checkOrderUpdate } from '../utils/inputValidator'
+import { checkNewOrder, checkNewOrderProduct, checkOrderFilters, checkOrderProductUpdate, checkOrderUpdate } from '../utils/inputValidator'
 import { isAdmin, isCreatorOrAdmin, isLoggedIn } from '../utils/middleware'
 
 const router = Router()
@@ -13,6 +13,7 @@ router.post('/', isLoggedIn, async (req, res) => {
 })
 
 router.get('/', isAdmin, async (req, res) => {
+  checkOrderFilters(req)
   const orders = await orderService.getOrders(req)
   res.json(orders)
 })
