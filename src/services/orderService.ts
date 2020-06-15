@@ -74,6 +74,12 @@ const getOrders = async ({ query: queryArgs }: Request): Promise<Order[]> => {
   queryArgs.amountMax &&
   query.where('amount', '<=', Number(queryArgs.amountMax) * 100)
 
+  queryArgs.createdFrom &&
+  query.where('orderCreatedAt', '>=', queryArgs.createdFrom.toString())
+
+  queryArgs.createdTo &&
+  query.where('orderCreatedAt', '<=', queryArgs.createdTo.toString())
+
   const orders = await query
 
   return orders.map((o) => R.omit([

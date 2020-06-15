@@ -463,10 +463,12 @@ export type OrderUpdateInput = {
 }
 
 export type OrderFiltersInput = {
-  amountMin: string;
-  amountMax: string;
-  orderStatuses: string;
-  shippingMethods: string;
+  amountMin?: string;
+  amountMax?: string;
+  createdFrom?: string;
+  createdTo?: string;
+  orderStatuses?: string;
+  shippingMethods?: string;
 }
 
 export type OrderProductCreateInput = Omit<OrderProduct, | 'orderID'>
@@ -489,10 +491,12 @@ export type InvoiceUpdateInput = {
 }
 
 export type InvoiceFiltersInput = {
-  amountMin: string;
-  amountMax: string;
-  invoiceStatuses: string;
-  paymentMethods: string;
+  amountMin?: string;
+  amountMax?: string;
+  createdFrom?: string;
+  createdTo?: string;
+  invoiceStatuses?: string;
+  paymentMethods?: string;
 }
 
 export type OrderProductFullData = Pick<Product,

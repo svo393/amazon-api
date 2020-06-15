@@ -76,7 +76,14 @@ export const isNumber: CP = ({ name, param }) => {
 }
 
 export const canBeNumber: CP = ({ name, param }) => {
-  if (!/^\d+(?:\.\d{2})?$/.test(param)) {
+  if (param && !/^\d+(?:\.\d{2})?$/.test(param)) {
+    throw new StatusError(400, `Incorrect ${name}: ${param}`)
+  }
+  return { name, param }
+}
+
+export const isDate: CP = ({ name, param }) => {
+  if (!/^\d{4}\/[0|1]\d\/[0-3]\d$/.test(param)) {
     throw new StatusError(400, `Incorrect ${name}: ${param}`)
   }
   return { name, param }

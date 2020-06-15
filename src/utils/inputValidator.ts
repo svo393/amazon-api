@@ -1,7 +1,7 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoryCreateInput, CategoryUpdateInput, GroupVariantCreateInput, GroupVariantUpdateInput, InvoiceCreateInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, OrderCreateInput, OrderProductCreateInput, OrderProductUpdateInput, OrderStatus, OrderUpdateInput, ParameterCreateInput, ParameterUpdateInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductParameterInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput, ModerationStatus, InvoiceFiltersInput } from '../types'
-import { canBeNumber, hasDefinedProps, isArray, isBoolean, isEmail, isInputProvided, isPasswordValid, isProductParameterOrGroupVariant, isProvided, isString, isStringOrNumber } from './validatorLib'
+import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoryCreateInput, CategoryUpdateInput, GroupVariantCreateInput, GroupVariantUpdateInput, InvoiceCreateInput, InvoiceFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ModerationStatus, OrderCreateInput, OrderFiltersInput, OrderProductCreateInput, OrderProductUpdateInput, OrderStatus, OrderUpdateInput, ParameterCreateInput, ParameterUpdateInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductParameterInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput } from '../types'
+import { canBeNumber, hasDefinedProps, isArray, isBoolean, isDate, isEmail, isInputProvided, isPasswordValid, isProductParameterOrGroupVariant, isProvided, isString, isStringOrNumber } from './validatorLib'
 
 export const checkNewUser = ({ body }: Request): UserSignupInput => {
   const email = R.pipe(
@@ -985,6 +985,14 @@ export const checkInvoiceFilters = ({ query }: Request): InvoiceFiltersInput => 
     ? canBeNumber({ name: 'amountMax', param: query.amountMax })
     : undefined
 
+  const createdFrom = 'createdFrom' in query
+    ? isDate({ name: 'createdFrom', param: query.createdFrom })
+    : undefined
+
+  const createdTo = 'createdTo' in query
+    ? isDate({ name: 'createdTo', param: query.createdTo })
+    : undefined
+
   const invoiceStatuses = 'invoiceStatuses' in query
     ? isString({ name: 'invoiceStatuses', param: query.invoiceStatuses })
     : undefined
@@ -996,6 +1004,8 @@ export const checkInvoiceFilters = ({ query }: Request): InvoiceFiltersInput => 
   return {
     amountMin: amountMin?.param,
     amountMax: amountMax?.param,
+    createdFrom: createdFrom?.param,
+    createdTo: createdTo?.param,
     invoiceStatuses: invoiceStatuses?.param,
     paymentMethods: paymentMethods?.param
   }
@@ -1010,18 +1020,28 @@ export const checkOrderFilters = ({ query }: Request): OrderFiltersInput => {
     ? canBeNumber({ name: 'amountMax', param: query.amountMax })
     : undefined
 
+  const createdFrom = 'createdFrom' in query
+    ? isDate({ name: 'createdFrom', param: query.createdFrom })
+    : undefined
+
+  const createdTo = 'createdTo' in query
+    ? isDate({ name: 'createdTo', param: query.createdTo })
+    : undefined
+
   const orderStatuses = 'orderStatuses' in query
     ? isString({ name: 'orderStatuses', param: query.orderStatuses })
     : undefined
 
-  const paymentMethods = 'paymentMethods' in query
-    ? isString({ name: 'paymentMethods', param: query.paymentMethods })
+  const shippingMethods = 'shippingMethods' in query
+    ? isString({ name: 'shippingMethods', param: query.shippingMethods })
     : undefined
 
   return {
     amountMin: amountMin?.param,
     amountMax: amountMax?.param,
+    createdFrom: createdFrom?.param,
+    createdTo: createdTo?.param,
     orderStatuses: orderStatuses?.param,
-    paymentMethods: paymentMethods?.param
+    shippingMethods: shippingMethods?.param
   }
 }

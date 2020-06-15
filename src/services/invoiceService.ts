@@ -33,6 +33,12 @@ const getInvoices = async ({ query: queryArgs }: Request): Promise<Invoice[]> =>
   queryArgs.amountMax &&
   query.where('amount', '<=', Number(queryArgs.amountMax) * 100)
 
+  queryArgs.createdFrom &&
+  query.where('invoiceCreatedAt', '>=', queryArgs.createdFrom.toString())
+
+  queryArgs.createdTo &&
+  query.where('invoiceCreatedAt', '<=', queryArgs.createdTo.toString())
+
   return await query
 }
 
