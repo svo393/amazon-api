@@ -22,6 +22,7 @@ const addRole = async (roleInput: Role): Promise<Role> => {
 
 const getRoles = async (): Promise<Role[]> => {
   return await db('roles')
+    .where('roleName', '!=', 'ROOT')
 }
 
 type SingleRoleData = Role & {

@@ -96,16 +96,17 @@ type UserListData = Omit<User,
   | 'password'
   | 'resetToken'
   | 'resetTokenCreatedAt'
-  | 'role'
 > & {
   orderCount: number;
   ratingCount: number;
+  ratingCommentCount: number;
   questionCount: number;
   answerCount: number;
+  answerCommentCount: number;
 }
 
-const getUsers = async (): Promise<UserListData[]> => {
-  const users: UserListData[] = await db('users as u')
+const getUsers = async ({ query: queryArgs }: Request): Promise<UserListData[]> => {
+  let users: UserListData[] = await db('users as u')
     .select('email',
       'u.name',
       'info',
@@ -116,14 +117,108 @@ const getUsers = async (): Promise<UserListData[]> => {
     )
     .count('o.orderID as orderCount')
     .count('r.ratingID as ratingCount')
+    .count('rc.ratingID as ratingCommentCount')
     .count('q.questionID as questionCount')
     .count('a.answerID as answerCount')
+    .count('ac.answerID as answerCommentCount')
     .leftJoin('orders as o', 'u.userID', 'o.userID')
     .leftJoin('ratings as r', 'u.userID', 'r.userID')
+    .leftJoin('ratingComments as rc', 'u.userID', 'r.userID')
     .leftJoin('questions as q', 'u.userID', 'q.userID')
     .leftJoin('answers as a', 'u.userID', 'a.userID')
+    .leftJoin('answerComments as ac', 'u.userID', 'a.userID')
     .where('role', '!=', 'ROOT')
     .groupBy('u.userID')
+
+  if ('roles' in queryArgs && !R.isEmpty(queryArgs.roles)) {
+    users = users.filter((u) =>
+      queryArgs.roles.toString().split(',').includes(u.role)
+    )
+  }
+
+  if ('createdFrom' in queryArgs && !R.isEmpty(queryArgs.createdFrom)) {
+    users = users.filter((u) =>
+      u.userCreatedAt >= new Date(queryArgs.createdFrom.toString())
+    )
+  }
+
+  if ('createdTo' in queryArgs && !R.isEmpty(queryArgs.createdTo)) {
+    users = users.filter((u) =>
+      u.userCreatedAt <= new Date(queryArgs.createdTo.toString())
+    )
+  }
+
+  if ('orderCountMin' in queryArgs && !R.isEmpty(queryArgs.orderCountMin)) {
+    users = users.filter((u) =>
+      u.orderCount >= Number(queryArgs.orderCountMin)
+    )
+  }
+
+  if ('orderCountMax' in queryArgs && !R.isEmpty(queryArgs.orderCountMax)) {
+    users = users.filter((u) =>
+      u.orderCount <= Number(queryArgs.orderCountMax)
+    )
+  }
+
+  if ('ratingCountMin' in queryArgs && !R.isEmpty(queryArgs.ratingCountMin)) {
+    users = users.filter((u) =>
+      u.ratingCount >= Number(queryArgs.ratingCountMin)
+    )
+  }
+
+  if ('ratingCountMax' in queryArgs && !R.isEmpty(queryArgs.ratingCountMax)) {
+    users = users.filter((u) =>
+      u.ratingCount <= Number(queryArgs.ratingCountMax)
+    )
+  }
+
+  if ('ratingCommentCountMin' in queryArgs && !R.isEmpty(queryArgs.ratingCommentCountMin)) {
+    users = users.filter((u) =>
+      u.ratingCommentCount >= Number(queryArgs.ratingCommentCountMin)
+    )
+  }
+
+  if ('ratingCommentCountMax' in queryArgs && !R.isEmpty(queryArgs.ratingCommentCountMax)) {
+    users = users.filter((u) =>
+      u.ratingCommentCount <= Number(queryArgs.ratingCommentCountMax)
+    )
+  }
+
+  if ('questionCountMin' in queryArgs && !R.isEmpty(queryArgs.questionCountMin)) {
+    users = users.filter((u) =>
+      u.questionCount >= Number(queryArgs.questionCountMin)
+    )
+  }
+
+  if ('questionCountMax' in queryArgs && !R.isEmpty(queryArgs.questionCountMax)) {
+    users = users.filter((u) =>
+      u.questionCount <= Number(queryArgs.questionCountMax)
+    )
+  }
+
+  if ('answerCountMin' in queryArgs && !R.isEmpty(queryArgs.answerCountMin)) {
+    users = users.filter((u) =>
+      u.answerCount >= Number(queryArgs.answerCountMin)
+    )
+  }
+
+  if ('answerCountMax' in queryArgs && !R.isEmpty(queryArgs.answerCountMax)) {
+    users = users.filter((u) =>
+      u.answerCount <= Number(queryArgs.answerCountMax)
+    )
+  }
+
+  if ('answerCommentCountMin' in queryArgs && !R.isEmpty(queryArgs.answerCommentCountMin)) {
+    users = users.filter((u) =>
+      u.answerCommentCount >= Number(queryArgs.answerCommentCountMin)
+    )
+  }
+
+  if ('answerCommentCountMax' in queryArgs && !R.isEmpty(queryArgs.answerCommentCountMax)) {
+    users = users.filter((u) =>
+      u.answerCommentCount <= Number(queryArgs.answerCommentCountMax)
+    )
+  }
 
   if (!users) { throw new StatusError(404, 'Not Found') }
   return users

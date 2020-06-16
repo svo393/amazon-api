@@ -13,6 +13,7 @@ router.post('/', isAdmin, async (req, res) => {
 })
 
 router.get('/', async (req, res) => {
+  checkCategoryFilters(req)
   const categories = await categoryService.getCategories(req)
   res.json(categories)
 })

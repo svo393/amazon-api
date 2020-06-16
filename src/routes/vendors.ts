@@ -1,7 +1,7 @@
 import Router from 'express'
 import productService from '../services/productService'
 import vendorService from '../services/vendorService'
-import { checkVendor } from '../utils/inputValidator'
+import { checkVendor, checkVendorFilters } from '../utils/inputValidator'
 import { isAdmin } from '../utils/middleware'
 
 const router = Router()
@@ -13,6 +13,7 @@ router.post('/', isAdmin, async (req, res) => {
 })
 
 router.get('/', async (req, res) => {
+  checkVendorFilters(req)
   const vendors = await vendorService.getVendors(req)
   res.json(vendors)
 })

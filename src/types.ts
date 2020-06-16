@@ -196,7 +196,7 @@ export type ModerationStatus = {
 export type Order = {
   orderID: number;
   address: string;
-  userEmail: string;
+  userEmail: string | null;
   orderCreatedAt: Date;
   orderUpdatedAt: Date;
   userID: number | null;
@@ -223,9 +223,9 @@ export type Invoice = {
   details: string;
   invoiceCreatedAt: Date;
   invoiceUpdatedAt: Date;
-  userEmail: string;
+  userEmail: string | null;
   orderID: number;
-  userID: number;
+  userID: number | null;
   invoiceStatus: string;
   paymentMethod: string;
 }
@@ -469,6 +469,7 @@ export type OrderFiltersInput = {
   createdTo?: string;
   orderStatuses?: string;
   shippingMethods?: string;
+  userEmail?: string;
 }
 
 export type OrderProductCreateInput = Omit<OrderProduct, | 'orderID'>
@@ -497,6 +498,33 @@ export type InvoiceFiltersInput = {
   createdTo?: string;
   invoiceStatuses?: string;
   paymentMethods?: string;
+  userEmail?: string;
+}
+
+export type VendorFiltersInput = {
+  q?: string;
+}
+
+export type CategoryFiltersInput = {
+  q?: string;
+}
+
+export type UsersFiltersInput = {
+  roles: string;
+  createdFrom: string;
+  createdTo: string;
+  orderCountMin: string;
+  orderCountMax: string;
+  ratingCountMin: string;
+  ratingCountMax: string;
+  ratingCommentCountMin: string;
+  ratingCommentCountMax: string;
+  questionCountMin: string;
+  questionCountMax: string;
+  answerCountMin: string;
+  answerCountMax: string;
+  answerCommentCountMin: string;
+  answerCommentCountMax: string;
 }
 
 export type OrderProductFullData = Pick<Product,

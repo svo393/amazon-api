@@ -19,7 +19,21 @@ const addInvoice = async (invoiceInput: InvoiceCreateInput): Promise<Invoice> =>
 }
 
 const getInvoices = async ({ query: queryArgs }: Request): Promise<Invoice[]> => {
-  const query = db<Invoice>('invoices')
+  const query = db<Invoice>('invoices as i')
+    .select(
+      'i.invoiceID',
+      'i.amount',
+      'i.details',
+      'i.invoiceCreatedAt',
+      'i.invoiceUpdatedAt',
+      'u.email as userEmail',
+      'i.orderID',
+      'i.userID',
+      'i.invoiceStatus',
+      'i.paymentMethod'
+    )
+    .join('users as u', 'i.userID', 'u.userID')
+    .groupBy('i.invoiceID', 'userEmail')
 
   queryArgs.invoiceStatuses &&
   query.where('invoiceStatus', 'in', queryArgs.invoiceStatuses.toString().split(','))
@@ -38,6 +52,8 @@ const getInvoices = async ({ query: queryArgs }: Request): Promise<Invoice[]> =>
 
   queryArgs.createdTo &&
   query.where('invoiceCreatedAt', '<=', queryArgs.createdTo.toString())
+
+  queryArgs.userEmail && query.where('u.email', 'ilike', `%${queryArgs.userEmail}%`)
 
   return await query
 }

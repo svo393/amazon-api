@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoryCreateInput, CategoryUpdateInput, GroupVariantCreateInput, GroupVariantUpdateInput, InvoiceCreateInput, InvoiceFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ModerationStatus, OrderCreateInput, OrderFiltersInput, OrderProductCreateInput, OrderProductUpdateInput, OrderStatus, OrderUpdateInput, ParameterCreateInput, ParameterUpdateInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductParameterInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UserSignupInput, UserUpdateInput, VendorInput } from '../types'
+import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoryCreateInput, CategoryFiltersInput, CategoryUpdateInput, GroupVariantCreateInput, GroupVariantUpdateInput, InvoiceCreateInput, InvoiceFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ModerationStatus, OrderCreateInput, OrderFiltersInput, OrderProductCreateInput, OrderProductUpdateInput, OrderStatus, OrderUpdateInput, ParameterCreateInput, ParameterUpdateInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductParameterInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorFiltersInput, VendorInput } from '../types'
 import { canBeNumber, hasDefinedProps, isArray, isBoolean, isDate, isEmail, isInputProvided, isPasswordValid, isProductParameterOrGroupVariant, isProvided, isString, isStringOrNumber } from './validatorLib'
 
 export const checkNewUser = ({ body }: Request): UserSignupInput => {
@@ -1001,13 +1001,18 @@ export const checkInvoiceFilters = ({ query }: Request): InvoiceFiltersInput => 
     ? isString({ name: 'paymentMethods', param: query.paymentMethods })
     : undefined
 
+  const userEmail = 'userEmail' in query
+    ? isString({ name: 'userEmail', param: query.userEmail })
+    : undefined
+
   return {
     amountMin: amountMin?.param,
     amountMax: amountMax?.param,
     createdFrom: createdFrom?.param,
     createdTo: createdTo?.param,
     invoiceStatuses: invoiceStatuses?.param,
-    paymentMethods: paymentMethods?.param
+    paymentMethods: paymentMethods?.param,
+    userEmail: userEmail?.param
   }
 }
 
@@ -1036,12 +1041,113 @@ export const checkOrderFilters = ({ query }: Request): OrderFiltersInput => {
     ? isString({ name: 'shippingMethods', param: query.shippingMethods })
     : undefined
 
+  const userEmail = 'userEmail' in query
+    ? isString({ name: 'userEmail', param: query.userEmail })
+    : undefined
+
   return {
     amountMin: amountMin?.param,
     amountMax: amountMax?.param,
     createdFrom: createdFrom?.param,
     createdTo: createdTo?.param,
     orderStatuses: orderStatuses?.param,
-    shippingMethods: shippingMethods?.param
+    shippingMethods: shippingMethods?.param,
+    userEmail: userEmail?.param
+  }
+}
+
+export const checkVendorFilters = ({ query }: Request): VendorFiltersInput => {
+  const q = 'q' in query
+    ? isString({ name: 'q', param: query.q })
+    : undefined
+
+  return { q: q?.param }
+}
+
+export const checkCategoryFilters = ({ query }: Request): CategoryFiltersInput => {
+  const q = 'q' in query
+    ? isString({ name: 'q', param: query.q })
+    : undefined
+
+  return { q: q?.param }
+}
+
+export const checkUserFilters = ({ query }: Request): UsersFiltersInput => {
+  const roles = 'roles' in query
+    ? isString({ name: 'roles', param: query.roles })
+    : undefined
+
+  const createdFrom = 'createdFrom' in query
+    ? isDate({ name: 'createdFrom', param: query.createdFrom })
+    : undefined
+
+  const createdTo = 'createdTo' in query
+    ? isDate({ name: 'createdTo', param: query.createdTo })
+    : undefined
+
+  const orderCountMin = 'orderCountMin' in query
+    ? canBeNumber({ name: 'orderCountMin', param: query.orderCountMin })
+    : undefined
+
+  const orderCountMax = 'orderCountMax' in query
+    ? canBeNumber({ name: 'orderCountMax', param: query.orderCountMax })
+    : undefined
+
+  const ratingCountMin = 'ratingCountMin' in query
+    ? canBeNumber({ name: 'ratingCountMin', param: query.ratingCountMin })
+    : undefined
+
+  const ratingCountMax = 'ratingCountMax' in query
+    ? canBeNumber({ name: 'ratingCountMax', param: query.ratingCountMax })
+    : undefined
+
+  const ratingCommentCountMin = 'ratingCommentCountMin' in query
+    ? canBeNumber({ name: 'ratingCommentCountMin', param: query.ratingCommentCountMin })
+    : undefined
+
+  const ratingCommentCountMax = 'ratingCommentCountMax' in query
+    ? canBeNumber({ name: 'ratingCommentCountMax', param: query.ratingCommentCountMax })
+    : undefined
+
+  const questionCountMin = 'questionCountMin' in query
+    ? canBeNumber({ name: 'questionCountMin', param: query.questionCountMin })
+    : undefined
+
+  const questionCountMax = 'questionCountMax' in query
+    ? canBeNumber({ name: 'questionCountMax', param: query.questionCountMax })
+    : undefined
+
+  const answerCountMin = 'answerCountMin' in query
+    ? canBeNumber({ name: 'answerCountMin', param: query.answerCountMin })
+    : undefined
+
+  const answerCountMax = 'answerCountMax' in query
+    ? canBeNumber({ name: 'answerCountMax', param: query.answerCountMax })
+    : undefined
+
+  const answerCommentCountMin = 'answerCommentCountMin' in query
+    ? canBeNumber({ name: 'answerCommentCountMin', param: query.answerCommentCountMin })
+    : undefined
+
+  const answerCommentCountMax = 'answerCommentCountMax' in query
+    ? canBeNumber({ name: 'answerCommentCountMax', param: query.answerCommentCountMax })
+    : undefined
+
+  return {
+    roles: roles?.param,
+    createdFrom: createdFrom?.param,
+    createdTo: createdTo?.param,
+    orderCountMin: orderCountMin?.param,
+    orderCountMax: orderCountMax?.param,
+    ratingCountMin: ratingCountMin?.param,
+    ratingCountMax: ratingCountMax?.param,
+    ratingCommentCountMin: ratingCommentCountMin?.param,
+    ratingCommentCountMax: ratingCommentCountMax?.param,
+    questionCountMin: questionCountMin?.param,
+    questionCountMax: questionCountMax?.param,
+    answerCountMin: answerCountMin?.param,
+    answerCountMax: answerCountMax?.param,
+    answerCommentCountMin: answerCommentCountMin?.param,
+    answerCommentCountMax: answerCommentCountMax?.param
   }
 }

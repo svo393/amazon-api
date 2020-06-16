@@ -10,7 +10,7 @@ import ratingService from '../services/ratingService'
 import userAddressService from '../services/userAddressService'
 import userService from '../services/userService'
 import { UPLOAD_TIMEOUT } from '../utils/config'
-import { checkCartProductUpdate, checkNewCartProduct, checkNewUser, checkSingleMediaUpload, checkUserAddressesUpdate, checkUserLogin, checkUserResetRequest, checkUserResetToken, checkUserUpdate } from '../utils/inputValidator'
+import { checkCartProductUpdate, checkNewCartProduct, checkNewUser, checkSingleMediaUpload, checkUserAddressesUpdate, checkUserLogin, checkUserResetRequest, checkUserResetToken, checkUserFilters, checkUserUpdate } from '../utils/inputValidator'
 import { isAdmin, isLoggedIn, isSameUser, isSameUserOrAdmin, multerUpload } from '../utils/middleware'
 
 const router = Router()
@@ -32,8 +32,9 @@ router.post('/logout', (_req, res) => {
   res.status(204).end()
 })
 
-router.get('/', isAdmin, async (_req, res) => {
-  const users = await userService.getUsers()
+router.get('/', isAdmin, async (req, res) => {
+  checkUserFilters(req)
+  const users = await userService.getUsers(req)
   res.json(users)
 })
 
