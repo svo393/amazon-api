@@ -220,6 +220,12 @@ const getUsers = async ({ query: queryArgs }: Request): Promise<UserListData[]> 
     )
   }
 
+  if ('email' in queryArgs && !R.isEmpty(queryArgs.email)) {
+    users = users.filter((u) =>
+      u.email.includes(queryArgs.email.toString())
+    )
+  }
+
   if (!users) { throw new StatusError(404, 'Not Found') }
   return users
 }
