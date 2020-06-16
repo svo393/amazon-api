@@ -1,7 +1,7 @@
 import Router from 'express'
 import categoryService from '../services/categoryService'
 import productService from '../services/productService'
-import { checkCategoryUpdate, checkNewCategory } from '../utils/inputValidator'
+import { checkCategoryFilters, checkCategoryUpdate, checkNewCategory } from '../utils/inputValidator'
 import { isAdmin } from '../utils/middleware'
 
 const router = Router()
