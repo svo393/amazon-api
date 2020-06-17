@@ -1157,5 +1157,12 @@ export const checkFeedFilters = ({ query }: Request): FeedFiltersInput => {
     ? isString({ name: 'types', param: query.types })
     : undefined
 
-  return { types: types?.param }
+  const moderationStatuses = 'moderationStatuses' in query
+    ? isString({ name: 'moderationStatuses', param: query.moderationStatuses })
+    : undefined
+
+  return {
+    types: types?.param,
+    moderationStatuses: moderationStatuses?.param
+  }
 }

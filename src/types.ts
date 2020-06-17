@@ -1,3 +1,5 @@
+export interface ObjIndexed { [key: string]: any }
+
 //
 // Types from schema in order of creation
 //
@@ -511,6 +513,7 @@ export type CategoryFiltersInput = {
 
 export type FeedFiltersInput = {
   types?: string;
+  moderationStatuses?: string;
 }
 
 export type UsersFiltersInput = {
