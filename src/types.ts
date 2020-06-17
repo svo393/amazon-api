@@ -509,6 +509,10 @@ export type CategoryFiltersInput = {
   q?: string;
 }
 
+export type FeedFiltersInput = {
+  types?: string;
+}
+
 export type UsersFiltersInput = {
   roles: string;
   createdFrom: string;

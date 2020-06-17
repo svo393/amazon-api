@@ -80,7 +80,6 @@
     "test:cart": "cross-env NODE_ENV=development jest ./tests/cartProductsAPI.test.ts --verbose  --runInBand",
     "test:cats": "cross-env NODE_ENV=development jest ./tests/categoriesAPI.test.ts --verbose  --runInBand",
     "test:dev": "cross-env NODE_ENV=development jest --verbose --runInBand --watch",
-    "test:feed": "cross-env NODE_ENV=development jest ./tests/feedAPI.test.ts --verbose  --runInBand",
     "test:follow": "cross-env NODE_ENV=development jest ./tests/followersAPI.test.ts --verbose  --runInBand",
     "test:groups": "cross-env NODE_ENV=development jest ./tests/groupsAPI.test.ts --verbose  --runInBand",
     "test:invoices": "cross-env NODE_ENV=development jest ./tests/invoicesAPI.test.ts --verbose  --runInBand",

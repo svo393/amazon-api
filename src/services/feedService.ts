@@ -3,7 +3,12 @@ import R from 'ramda'
 import { Answer, AnswerComment, Question, RatingComment } from '../types'
 import { db } from '../utils/db'
 
-type Feed = (RatingComment | Question | Answer | AnswerComment)[]
+type Feed = {
+  ratingComments: RatingComment[];
+  questions: Question[];
+  answers: Answer[];
+  answerComments: AnswerComment[];
+}
 
 const getFeed = async ({ query: queryArgs }: Request): Promise<Feed> => {
   const ratingComments = await db<RatingComment>('ratingComments')
@@ -11,18 +16,15 @@ const getFeed = async ({ query: queryArgs }: Request): Promise<Feed> => {
   const answers = await db<Answer>('answers')
   const answerComments = await db<AnswerComment>('answerComments')
 
-  let feed = [
-    ...ratingComments,
-    ...questions,
-    ...answers,
-    ...answerComments
-  ]
+  let feed = {
+    ratingComments: [ ...ratingComments.map((x) => ({ ...x, type: 'ratingComment' })) ],
+    questions: [ ...questions.map((x) => ({ ...x, type: 'question' })) ],
+    answers: [ ...answers.map((x) => ({ ...x, type: 'answer' })) ],
+    answerComments: [ ...answerComments.map((x) => ({ ...x, type: 'answerComment' })) ]
+  }
 
-  if ('activities' in queryArgs && !R.isEmpty(queryArgs.activities)) {
-    feed = feed.filter((a) =>
-      Object.keys(a).some((k) =>
-        queryArgs.activities.toString().split(',').includes(k))
-    )
+  if ('types' in queryArgs && !R.isEmpty(queryArgs.types)) {
+    feed = R.pick(queryArgs.types.toString().split(',').map((a) => a + 's'), feed)
   }
   return feed
 }

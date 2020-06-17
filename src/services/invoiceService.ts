@@ -48,10 +48,10 @@ const getInvoices = async ({ query: queryArgs }: Request): Promise<Invoice[]> =>
   query.where('amount', '<=', Number(queryArgs.amountMax) * 100)
 
   queryArgs.createdFrom &&
-  query.where('createdAt', '>=', queryArgs.createdFrom.toString())
+  query.where('i.createdAt', '>=', queryArgs.createdFrom.toString())
 
   queryArgs.createdTo &&
-  query.where('createdAt', '<=', queryArgs.createdTo.toString())
+  query.where('i.createdAt', '<=', queryArgs.createdTo.toString())
 
   queryArgs.userEmail && query.where('u.email', 'ilike', `%${queryArgs.userEmail}%`)
 

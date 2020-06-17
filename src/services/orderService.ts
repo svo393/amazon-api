@@ -89,10 +89,10 @@ const getOrders = async ({ query: queryArgs }: Request): Promise<Order[]> => {
   query.where('amount', '<=', Number(queryArgs.amountMax) * 100)
 
   queryArgs.createdFrom &&
-  query.where('createdAt', '>=', queryArgs.createdFrom.toString())
+  query.where('o.createdAt', '>=', queryArgs.createdFrom.toString())
 
   queryArgs.createdTo &&
-  query.where('createdAt', '<=', queryArgs.createdTo.toString())
+  query.where('o.createdAt', '<=', queryArgs.createdTo.toString())
 
   queryArgs.userEmail && query.where('u.email', 'ilike', `%${queryArgs.userEmail}%`)
 
