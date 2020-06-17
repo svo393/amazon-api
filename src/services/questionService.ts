@@ -16,8 +16,8 @@ const addQuestion = async (questionInput: QuestionCreateInput, res: Response): P
     [ db('questions').insert({
       ...questionInput,
       userID: res.locals.userID,
-      questionCreatedAt: now,
-      questionUpdatedAt: now,
+      createdAt: now,
+      updatedAt: now,
       moderationStatus: 'NEW'
     }) ]
   )
@@ -51,7 +51,7 @@ const updateQuestion = async (questionInput: QuestionUpdateInput, req: Request):
   const [ updatedQuestion ]: Question[] = await db('questions')
     .update({
       ...questionInput,
-      questionUpdatedAt: new Date()
+      updatedAt: new Date()
     }, [ '*' ])
     .where('questionID', req.params.questionID)
 

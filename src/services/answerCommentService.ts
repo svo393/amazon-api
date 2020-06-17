@@ -11,8 +11,8 @@ const addAnswerComment = async (answerCommentInput: AnswerCommentCreateInput, re
     .insert({
       ...answerCommentInput,
       userID: res.locals.userID,
-      answerCommentCreatedAt: now,
-      answerCommentUpdatedAt: now,
+      createdAt: now,
+      updatedAt: now,
       moderationStatus: 'NEW'
     }, [ '*' ])
 
@@ -37,7 +37,7 @@ const updateAnswerComment = async (answerCommentInput: AnswerCommentUpdateInput,
   const [ updatedRC ]: AnswerComment[] = await db('answerComments')
     .update({
       ...answerCommentInput,
-      answerCommentUpdatedAt: new Date()
+      updatedAt: new Date()
     }, [ '*' ])
     .where('answerCommentID', req.params.answerCommentID)
 

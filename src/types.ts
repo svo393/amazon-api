@@ -33,7 +33,7 @@ export type User = {
   email: string;
   password: string;
   avatar: boolean;
-  userCreatedAt: Date;
+  createdAt: Date;
   resetToken?: string | null;
   resetTokenCreatedAt?: Date | null;
   role: string;
@@ -81,8 +81,8 @@ export type Product = {
   stock: number;
   media: number;
   primaryMedia: number;
-  productCreatedAt: Date;
-  productUpdatedAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
   isAvailable: boolean;
   userID: number;
   categoryID: number;
@@ -97,8 +97,8 @@ export type ListProduct = {
 
 export type Rating = {
   ratingID: number;
-  ratingCreatedAt: Date;
-  ratingUpdatedAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
   title?: string;
   review?: string;
   media?: number;
@@ -113,8 +113,8 @@ export type Rating = {
 
 export type RatingComment = {
   ratingCommentID: number;
-  ratingCommentCreatedAt: Date;
-  ratingCommentUpdatedAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
   content: string;
   media?: number;
   moderationStatus: string;
@@ -125,8 +125,8 @@ export type RatingComment = {
 
 export type Question = {
   questionID: number;
-  questionCreatedAt: Date;
-  questionUpdatedAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
   content: string;
   media?: number;
   likes: number;
@@ -138,8 +138,8 @@ export type Question = {
 
 export type Answer = {
   answerID: number;
-  answerCreatedAt: Date;
-  answerUpdatedAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
   content: string;
   media?: number;
   likes: number;
@@ -151,8 +151,8 @@ export type Answer = {
 
 export type AnswerComment = {
   answerCommentID: number;
-  answerCommentCreatedAt: Date;
-  answerCommentUpdatedAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
   content: string;
   media?: number;
   moderationStatus: string;
@@ -197,8 +197,8 @@ export type Order = {
   orderID: number;
   address: string;
   userEmail: string | null;
-  orderCreatedAt: Date;
-  orderUpdatedAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
   userID: number | null;
   orderStatus: string;
   shippingMethod: string;
@@ -221,8 +221,8 @@ export type Invoice = {
   invoiceID: number;
   amount: number;
   details: string;
-  invoiceCreatedAt: Date;
-  invoiceUpdatedAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
   userEmail: string | null;
   orderID: number;
   userID: number | null;
@@ -314,8 +314,8 @@ export type UserAddressFetchInput = Pick<UserAddress, 'userID'>
 
 export type ProductCreateInput = Omit<Product,
   | 'productID'
-  | 'productCreatedAt'
-  | 'productUpdatedAt'
+  | 'createdAt'
+  | 'updatedAt'
   | 'userID'
   | 'isAvailable'
 > & {
@@ -346,8 +346,8 @@ export type ProductUpdateInput = {
 }
 
 export type ProductPublicData = Omit<Product,
-  | 'productCreatedAt'
-  | 'productUpdatedAt'
+  | 'createdAt'
+  | 'updatedAt'
   | 'userID'
 >
 

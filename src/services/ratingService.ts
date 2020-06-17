@@ -16,8 +16,8 @@ const addRating = async (ratingInput: RatingCreateInput, res: Response): Promise
     [ db('ratings').insert({
       ...ratingInput,
       userID: res.locals.userID,
-      ratingCreatedAt: now,
-      ratingUpdatedAt: now,
+      createdAt: now,
+      updatedAt: now,
       moderationStatus: 'NEW'
     }) ]
   )
@@ -51,7 +51,7 @@ const updateRating = async (ratingInput: RatingUpdateInput, req: Request): Promi
   const [ updatedRating ]: Rating[] = await db('ratings')
     .update({
       ...ratingInput,
-      ratingUpdatedAt: new Date()
+      updatedAt: new Date()
     }, [ '*' ])
     .where('ratingID', req.params.ratingID)
 

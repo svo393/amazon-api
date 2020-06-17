@@ -11,8 +11,8 @@ const addRatingComment = async (ratingCommentInput: RatingCommentCreateInput, re
     .insert({
       ...ratingCommentInput,
       userID: res.locals.userID,
-      ratingCommentCreatedAt: now,
-      ratingCommentUpdatedAt: now,
+      createdAt: now,
+      updatedAt: now,
       moderationStatus: 'NEW'
     }, [ '*' ])
 
@@ -37,7 +37,7 @@ const updateRatingComment = async (ratingCommentInput: RatingCommentUpdateInput,
   const [ updatedRC ]: RatingComment[] = await db('ratingComments')
     .update({
       ...ratingCommentInput,
-      ratingCommentUpdatedAt: new Date()
+      updatedAt: new Date()
     }, [ '*' ])
     .where('ratingCommentID', req.params.ratingCommentID)
 

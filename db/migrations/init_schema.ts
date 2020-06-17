@@ -45,7 +45,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.string('email').unique().notNullable()
       t.string('password').notNullable()
       t.boolean('avatar').defaultTo(false).notNullable()
-      t.dateTime('userCreatedAt').notNullable()
+      t.dateTime('createdAt').notNullable()
       t.string('resetToken', 50)
       t.dateTime('resetTokenCreatedAt')
 
@@ -133,8 +133,8 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.integer('stock').notNullable().unsigned()
       t.integer('media').notNullable().unsigned()
       t.integer('primaryMedia').notNullable().unsigned()
-      t.dateTime('productCreatedAt').notNullable()
-      t.dateTime('productUpdatedAt').notNullable()
+      t.dateTime('createdAt').notNullable()
+      t.dateTime('updatedAt').notNullable()
       t.boolean('isAvailable').defaultTo(true).notNullable()
 
       t
@@ -176,8 +176,8 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
 
     .createTable('ratings', (t) => {
       t.increments('ratingID')
-      t.dateTime('ratingCreatedAt').notNullable()
-      t.dateTime('ratingUpdatedAt').notNullable()
+      t.dateTime('createdAt').notNullable()
+      t.dateTime('updatedAt').notNullable()
       t.string('title')
       t.string('review', 65535)
       t.integer('media').unsigned()
@@ -208,8 +208,8 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
 
     .createTable('ratingComments', (t) => {
       t.increments('ratingCommentID')
-      t.dateTime('ratingCommentCreatedAt').notNullable()
-      t.dateTime('ratingCommentUpdatedAt').notNullable()
+      t.dateTime('createdAt').notNullable()
+      t.dateTime('updatedAt').notNullable()
       t.string('content', 65535).notNullable()
       t.integer('media').unsigned()
 
@@ -238,8 +238,8 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
 
     .createTable('questions', (t) => {
       t.increments('questionID')
-      t.dateTime('questionCreatedAt').notNullable()
-      t.dateTime('questionUpdatedAt').notNullable()
+      t.dateTime('createdAt').notNullable()
+      t.dateTime('updatedAt').notNullable()
       t.string('content', 65535).unique().notNullable()
       t.integer('media').unsigned()
       t.integer('likes').notNullable().unsigned().defaultTo(0)
@@ -264,8 +264,8 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
 
     .createTable('answers', (t) => {
       t.increments('answerID')
-      t.dateTime('answerCreatedAt').notNullable()
-      t.dateTime('answerUpdatedAt').notNullable()
+      t.dateTime('createdAt').notNullable()
+      t.dateTime('updatedAt').notNullable()
       t.string('content', 65535).unique().notNullable()
       t.integer('media').unsigned()
       t.integer('likes').notNullable().unsigned().defaultTo(0)
@@ -291,8 +291,8 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
 
     .createTable('answerComments', (t) => {
       t.increments('answerCommentID')
-      t.dateTime('answerCommentCreatedAt').notNullable()
-      t.dateTime('answerCommentUpdatedAt').notNullable()
+      t.dateTime('createdAt').notNullable()
+      t.dateTime('updatedAt').notNullable()
       t.string('content', 65535).notNullable()
       t.integer('media').unsigned()
 
@@ -385,8 +385,8 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
     .createTable('orders', (t) => {
       t.increments('orderID')
       t.string('address').notNullable()
-      t.dateTime('orderCreatedAt').notNullable()
-      t.dateTime('orderUpdatedAt').notNullable()
+      t.dateTime('createdAt').notNullable()
+      t.dateTime('updatedAt').notNullable()
 
       t
         .integer('userID')
@@ -430,8 +430,8 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.increments('invoiceID')
       t.integer('amount').notNullable().unsigned()
       t.string('details', 65535).notNullable()
-      t.dateTime('invoiceCreatedAt').notNullable()
-      t.dateTime('invoiceUpdatedAt').notNullable()
+      t.dateTime('createdAt').notNullable()
+      t.dateTime('updatedAt').notNullable()
 
       t
         .integer('userID')

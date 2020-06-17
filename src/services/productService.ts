@@ -19,8 +19,8 @@ const addProduct = async (productInput: ProductCreateInput, res: Response): Prom
       .insert({
         ...R.omit([ 'parameters', 'variants' ], productInput),
         userID: res.locals.userID,
-        productCreatedAt: now,
-        productUpdatedAt: now,
+        createdAt: now,
+        updatedAt: now,
         groupID
       }, [ '*' ])
 
@@ -81,7 +81,7 @@ export const getProductsByVendor = async (req: Request): Promise<ProductListData
 
 const getProductByID = async (req: Request, res: Response): Promise<ProductListData| ProductAllData> => {
   const [ product ] = await getProductsQuery.clone()
-    .select('productCreatedAt', 'productUpdatedAt', 'p.userID')
+    .select('p.createdAt', 'p.updatedAt', 'p.userID')
     .where('p.productID', req.params.productID)
     .leftJoin('groupVariants as gv', 'p.groupID', 'gv.groupID')
 
@@ -97,8 +97,8 @@ const getProductByID = async (req: Request, res: Response): Promise<ProductListD
   return role && [ 'ROOT', 'ADMIN' ].includes(role)
     ? fullProduct
     : R.omit([
-      'productCreatedAt',
-      'productUpdatedAt',
+      'createdAt',
+      'updatedAt',
       'userID'
     ], fullProduct)
 }
@@ -107,7 +107,7 @@ const updateProduct = async (productInput: ProductUpdateInput, req: Request): Pr
   const [ updatedProduct ]: Product[] = await db('products')
     .update({
       ...productInput,
-      productUpdatedAt: new Date()
+      updatedAt: new Date()
     }, [ '*' ])
     .where('productID', req.params.productID)
 

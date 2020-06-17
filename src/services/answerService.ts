@@ -11,8 +11,8 @@ const addAnswer = async (answerInput: AnswerCreateInput, res: Response): Promise
     .insert({
       ...answerInput,
       userID: res.locals.userID,
-      answerCreatedAt: now,
-      answerUpdatedAt: now,
+      createdAt: now,
+      updatedAt: now,
       moderationStatus: 'NEW'
     }, [ '*' ])
 
@@ -37,7 +37,7 @@ const updateAnswer = async (answerInput: AnswerUpdateInput, req: Request): Promi
   const [ updatedRC ]: Answer[] = await db('answers')
     .update({
       ...answerInput,
-      answerUpdatedAt: new Date()
+      updatedAt: new Date()
     }, [ '*' ])
     .where('answerID', req.params.answerID)
 

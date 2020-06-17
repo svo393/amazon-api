@@ -11,8 +11,8 @@ const addInvoice = async (invoiceInput: InvoiceCreateInput): Promise<Invoice> =>
     .insert({
       ...invoiceInput,
       invoiceStatus: 'NEW',
-      invoiceCreatedAt: now,
-      invoiceUpdatedAt: now
+      createdAt: now,
+      updatedAt: now
     }, [ '*' ])
 
   return addedInvoice
@@ -24,8 +24,8 @@ const getInvoices = async ({ query: queryArgs }: Request): Promise<Invoice[]> =>
       'i.invoiceID',
       'i.amount',
       'i.details',
-      'i.invoiceCreatedAt',
-      'i.invoiceUpdatedAt',
+      'i.createdAt',
+      'i.updatedAt',
       'u.email as userEmail',
       'i.orderID',
       'i.userID',
@@ -48,10 +48,10 @@ const getInvoices = async ({ query: queryArgs }: Request): Promise<Invoice[]> =>
   query.where('amount', '<=', Number(queryArgs.amountMax) * 100)
 
   queryArgs.createdFrom &&
-  query.where('invoiceCreatedAt', '>=', queryArgs.createdFrom.toString())
+  query.where('createdAt', '>=', queryArgs.createdFrom.toString())
 
   queryArgs.createdTo &&
-  query.where('invoiceCreatedAt', '<=', queryArgs.createdTo.toString())
+  query.where('createdAt', '<=', queryArgs.createdTo.toString())
 
   queryArgs.userEmail && query.where('u.email', 'ilike', `%${queryArgs.userEmail}%`)
 
@@ -69,8 +69,8 @@ const getInvoiceByID = async (req: Request): Promise<Invoice> => {
       'i.invoiceID',
       'i.amount',
       'i.details',
-      'i.invoiceCreatedAt',
-      'i.invoiceUpdatedAt',
+      'i.createdAt',
+      'i.updatedAt',
       'i.orderID',
       'i.userID',
       'i.invoiceStatus',
@@ -98,7 +98,7 @@ const updateInvoice = async (invoiceInput: InvoiceUpdateInput, req: Request): Pr
     const [ updatedInvoice ]: Invoice[] = await trx('invoices')
       .update({
         ...invoiceInput,
-        invoiceUpdatedAt: new Date()
+        updatedAt: new Date()
       }, [ '*' ])
       .where('invoiceID', req.params.invoiceID)
 

@@ -44,7 +44,7 @@ const addUser = async (userInput: UserSignupInput, res: Response): Promise<UserS
     .insert({
       email,
       password: passwordHash,
-      userCreatedAt: new Date(),
+      createdAt: new Date(),
       role: 'CUSTOMER'
     }, [ 'userID', 'email' ])
 
@@ -111,7 +111,7 @@ const getUsers = async ({ query: queryArgs }: Request): Promise<UserListData[]> 
       'u.name',
       'info',
       'avatar',
-      'userCreatedAt',
+      'u.createdAt',
       'u.userID',
       'role'
     )
@@ -138,13 +138,13 @@ const getUsers = async ({ query: queryArgs }: Request): Promise<UserListData[]> 
 
   if ('createdFrom' in queryArgs && !R.isEmpty(queryArgs.createdFrom)) {
     users = users.filter((u) =>
-      u.userCreatedAt >= new Date(queryArgs.createdFrom.toString())
+      u.createdAt >= new Date(queryArgs.createdFrom.toString())
     )
   }
 
   if ('createdTo' in queryArgs && !R.isEmpty(queryArgs.createdTo)) {
     users = users.filter((u) =>
-      u.userCreatedAt <= new Date(queryArgs.createdTo.toString())
+      u.createdAt <= new Date(queryArgs.createdTo.toString())
     )
   }
 
@@ -241,7 +241,7 @@ type UserPersonalData = UserSafeData & {
 
 type UserPublicData = Omit<UserPersonalData,
   | 'email'
-  | 'userCreatedAt'
+  | 'createdAt'
   | 'orders'
   | 'role'
 >
@@ -380,7 +380,7 @@ const resetPassword = async ({ password, resetToken }: PasswordResetInput, res: 
       resetTokenCreatedAt: null,
       password: passwordHash
     },
-    [ 'name', 'userID', 'email', 'info', 'avatar', 'userCreatedAt', 'role' ])
+    [ 'name', 'userID', 'email', 'info', 'avatar', 'createdAt', 'role' ])
     .where('userID', user.userID)
 
   const token = jwt.sign(

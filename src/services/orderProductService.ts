@@ -33,7 +33,7 @@ const updateOrderProduct = async (orderProductInput: OrderProductUpdateInput, re
     if (!updatedOrderProduct) throw new StatusError(404, 'Not Found')
 
     await trx('orders')
-      .update({ orderUpdatedAt: new Date() })
+      .update({ updatedAt: new Date() })
       .where('orderID', updatedOrderProduct.orderID)
 
     return updatedOrderProduct

@@ -14,8 +14,8 @@ const addOrder = async (orderInput: OrderCreateInput): Promise<OrderFullData & I
       .insert({
         ...R.omit([ 'cart', 'details', 'paymentMethod' ], orderInput),
         orderStatus: 'NEW',
-        orderCreatedAt: now,
-        orderUpdatedAt: now
+        createdAt: now,
+        updatedAt: now
       }, [ '*' ])
 
     const cartProducts: {
@@ -46,8 +46,8 @@ const addOrder = async (orderInput: OrderCreateInput): Promise<OrderFullData & I
         userID: orderInput.userID,
         paymentMethod: orderInput.paymentMethod,
         invoiceStatus: 'NEW',
-        invoiceCreatedAt: now,
-        invoiceUpdatedAt: now
+        createdAt: now,
+        updatedAt: now
       }, [ '*' ])
 
     return {
@@ -64,8 +64,8 @@ const getOrders = async ({ query: queryArgs }: Request): Promise<Order[]> => {
       'o.orderID',
       'o.address',
       'u.email as userEmail',
-      'o.orderCreatedAt',
-      'o.orderUpdatedAt',
+      'o.createdAt',
+      'o.updatedAt',
       'o.userID',
       'o.orderStatus',
       'o.shippingMethod',
@@ -89,10 +89,10 @@ const getOrders = async ({ query: queryArgs }: Request): Promise<Order[]> => {
   query.where('amount', '<=', Number(queryArgs.amountMax) * 100)
 
   queryArgs.createdFrom &&
-  query.where('orderCreatedAt', '>=', queryArgs.createdFrom.toString())
+  query.where('createdAt', '>=', queryArgs.createdFrom.toString())
 
   queryArgs.createdTo &&
-  query.where('orderCreatedAt', '<=', queryArgs.createdTo.toString())
+  query.where('createdAt', '<=', queryArgs.createdTo.toString())
 
   queryArgs.userEmail && query.where('u.email', 'ilike', `%${queryArgs.userEmail}%`)
 
@@ -100,17 +100,22 @@ const getOrders = async ({ query: queryArgs }: Request): Promise<Order[]> => {
 }
 
 const getOrdersByUser = async (req: Request): Promise<Order[]> => {
-  const orders = await db<Order>('orders as o')
-    .joinRaw('JOIN invoices USING ("orderID")')
+  return await db<Order>('orders as o')
+    .select(
+      'o.orderID',
+      'o.address',
+      'u.email as userEmail',
+      'o.createdAt',
+      'o.updatedAt',
+      'o.userID',
+      'o.orderStatus',
+      'o.shippingMethod',
+      'i.amount',
+      'i.invoiceID'
+    )
+    .join('invoices as i', 'o.orderID', 'i.orderID')
+    .join('users as u', 'o.userID', 'u.userID')
     .where('o.userID', req.params.userID)
-
-  return orders.map((o) => R.omit([
-    'details',
-    'invoiceCreatedAt',
-    'invoiceUpdatedAt',
-    'invoiceStatus',
-    'paymentMethod'
-  ], o))
 }
 
 const getOrderByID = async (req: Request): Promise<OrderFullData> => {
@@ -119,8 +124,8 @@ const getOrderByID = async (req: Request): Promise<OrderFullData> => {
       'o.orderID',
       'o.address',
       'u.email as userEmail',
-      'o.orderCreatedAt',
-      'o.orderUpdatedAt',
+      'o.createdAt',
+      'o.updatedAt',
       'o.userID',
       'o.orderStatus',
       'o.shippingMethod',
@@ -164,7 +169,7 @@ const updateOrder = async (orderInput: OrderUpdateInput, req: Request): Promise<
     const [ updatedOrder ]: Order[] = await trx('orders')
       .update({
         ...orderInput,
-        orderUpdatedAt: new Date()
+        updatedAt: new Date()
       }, [ '*' ])
       .where('orderID', req.params.orderID)
 
