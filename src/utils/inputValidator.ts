@@ -457,7 +457,7 @@ export const checkNewAddress = ({ body }: Request): AddressCreateInput => {
 
   const addressType = R.pipe(
     isProvided,
-    canBeNumber
+    isString
   )({ name: 'addressType', param: body.addressType })
 
   return {

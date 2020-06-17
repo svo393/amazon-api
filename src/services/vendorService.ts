@@ -36,9 +36,9 @@ const getVendors = async ({ query: queryArgs }: Request): Promise<VendorListData
 const getVendorByID = async (req: Request): Promise<VendorListData> => {
   const vendor: VendorListData = await db<Vendor>('vendors as v')
     .first('v.vendorID', 'name')
-    .where('vendorID', req.params.vendorID)
+    .where('v.vendorID', req.params.vendorID)
     .count('p.productID as productCount')
-    .joinRaw('JOIN products as p USING ("vendorID")')
+    .joinRaw('LEFT JOIN products as p USING ("vendorID")')
     .groupBy('v.vendorID')
 
   if (!vendor) throw new StatusError(404, 'Not Found')

@@ -100,15 +100,15 @@ describe('Product adding', () => {
 })
 
 describe('Product fetching', () => {
-  test('200', async () => {
-    await createOneProduct('admin')
+  // test('200', async () => {
+  //   await createOneProduct('admin')
 
-    const { body } = await api
-      .get(apiURL)
-      .expect(200)
+  //   const { body } = await api
+  //     .get(apiURL)
+  //     .expect(200)
 
-    expect(body).toBeDefined()
-  })
+  //   expect(body).toBeDefined()
+  // })
 
   test('public product if not admin or root', async () => {
     const { addedProduct } = await createOneProduct('admin')
