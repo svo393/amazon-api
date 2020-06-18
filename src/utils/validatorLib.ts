@@ -20,14 +20,14 @@ export const isProvided: CP = ({ name, param }) => {
 export const hasDefinedProps = <T>(param: T): T => {
   const strippedObject = JSON.parse(JSON.stringify(param))
 
-  if (R.isEmpty(strippedObject)) {
+  if (strippedObject.length === 0) {
     throw new StatusError(400, 'Invalid input')
   }
   return strippedObject
 }
 
 export const isInputProvided = (param: object, msg = 'Missing input'): void => {
-  if (R.isEmpty(param) || R.isNil(param)) {
+  if (typeof (param) === 'undefined') {
     throw new StatusError(400, msg)
   }
 }
@@ -76,10 +76,10 @@ export const isNumber: CP = ({ name, param }) => {
 }
 
 export const canBeNumber: CP = ({ name, param }) => {
-  if (param && !/^\d+(?:\.\d{2})?$/.test(param)) {
+  if (typeof (param) !== 'undefined' && !/^\d+(?:\.\d{2})?$/.test(param)) {
     throw new StatusError(400, `Incorrect ${name}: ${param}`)
   }
-  return { name, param }
+  return { name, param: Number(param) }
 }
 
 export const isDate: CP = ({ name, param }) => {

@@ -23,8 +23,6 @@ export const dbTrans = async (cb: any): Promise<any> => {
 
         resolve(ret)
       } catch (err) {
-        // if it was due to transaction serialization error then retry the transaction
-        // see https://www.postgresql.org/docs/9.5/transaction-iso.html
         if (err.toString().includes('could not serialize access')) {
           __tryTransaction()
         } else {

@@ -29,20 +29,20 @@ const getAnswerByID = async (req: Request): Promise<Answer> => {
     .first()
     .where('answerID', req.params.answerID)
 
-  if (!answer) throw new StatusError(404, 'Not Found')
+  if (typeof (answer) === 'undefined') throw new StatusError(404, 'Not Found')
   return answer
 }
 
 const updateAnswer = async (answerInput: AnswerUpdateInput, req: Request): Promise<Answer> => {
-  const [ updatedRC ]: Answer[] = await db('answers')
+  const [ updatedAnswer ]: Answer[] = await db('answers')
     .update({
       ...answerInput,
       updatedAt: new Date()
     }, [ '*' ])
     .where('answerID', req.params.answerID)
 
-  if (!updatedRC) throw new StatusError(404, 'Not Found')
-  return updatedRC
+  if (typeof (updatedAnswer) === 'undefined') throw new StatusError(404, 'Not Found')
+  return updatedAnswer
 }
 
 const deleteAnswer = async (req: Request): Promise<void> => {

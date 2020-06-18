@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { Vendor, VendorInput } from '../types'
+import { Vendor, VendorInput, VendorFiltersInput } from '../types'
 import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
@@ -14,7 +14,7 @@ const addVendor = async (vendorInput: VendorInput): Promise<Vendor> => {
     [ db('vendors').insert(vendorInput) ]
   )
 
-  if (!addedVendor) {
+  if (typeof (addedVendor) === 'undefined') {
     throw new StatusError(409, `Vendor with name "${vendorInput.name}" already exists`)
   }
   return addedVendor
@@ -22,17 +22,20 @@ const addVendor = async (vendorInput: VendorInput): Promise<Vendor> => {
 
 type VendorListData = Vendor & { productCount: number }
 
-const getVendors = async ({ query: queryArgs }: Request): Promise<VendorListData[]> => {
+const getVendors = async (vendorFilterInput: VendorFiltersInput): Promise<VendorListData[]> => {
+  const { name } = vendorFilterInput
+
   let vendors: VendorListData[] = await db<Vendor>('vendors as v')
     .select('v.vendorID', 'v.name')
     .count('p.productID as productCount')
     .joinRaw('JOIN products as p USING ("vendorID")')
     .groupBy('v.vendorID')
 
-  if ('name' in queryArgs && !R.isEmpty(queryArgs.name)) {
-    vendors = vendors.filter((p) =>
-      p.name.toLowerCase().includes(queryArgs.name.toString().toLowerCase()))
+  if (typeof (name) !== 'undefined') {
+    vendors = vendors
+      .filter((v) => v.name.toLowerCase().includes(name.toLowerCase()))
   }
+
   return vendors
 }
 
@@ -44,7 +47,7 @@ const getVendorByID = async (req: Request): Promise<VendorListData> => {
     .joinRaw('LEFT JOIN products as p USING ("vendorID")')
     .groupBy('v.vendorID')
 
-  if (!vendor) throw new StatusError(404, 'Not Found')
+  if (typeof (vendor) === 'undefined') throw new StatusError(404, 'Not Found')
   return vendor
 }
 
@@ -53,7 +56,7 @@ const updateVendor = async (vendorInput: VendorInput, req: Request): Promise<Ven
     .update(vendorInput, [ '*' ])
     .where('vendorID', req.params.vendorID)
 
-  if (!updatedVendor) throw new StatusError(404, 'Not Found')
+  if (typeof (updatedVendor) === 'undefined') throw new StatusError(404, 'Not Found')
   return updatedVendor
 }
 

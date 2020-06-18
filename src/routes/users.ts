@@ -33,8 +33,8 @@ router.post('/logout', (_req, res) => {
 })
 
 router.get('/', isAdmin, async (req, res) => {
-  checkUserFilters(req)
-  const users = await userService.getUsers(req)
+  const userFilterInput = checkUserFilters(req)
+  const users = await userService.getUsers(userFilterInput)
   res.json(users)
 })
 

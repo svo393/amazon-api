@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import Knex from 'knex'
 import R from 'ramda'
-import { GroupVariant, Parameter, Product, ProductAllData, ProductCreateInput, ProductUpdateInput } from '../types'
+import { GroupVariant, Parameter, Product, ProductAllData, ProductCreateInput, ProductUpdateInput, ProductsFiltersInput } from '../types'
 import { db, dbTrans } from '../utils/db'
 import { uploadImages } from '../utils/img'
 import { getProductsQuery } from '../utils/queries'
@@ -34,7 +34,7 @@ const addProduct = async (productInput: ProductCreateInput, res: Response): Prom
         })), [ '*' ])
     }
 
-    if (productInput.parameters && !R.isEmpty(productInput.parameters)) {
+    if (typeof (productInput.parameters) !== 'undefined' && productInput.parameters.length !== 0) {
       const { rows: addedParameters }: { rows: Parameter[] } = await trx.raw(
         `? ON CONFLICT ("name")
            DO UPDATE SET
@@ -72,83 +72,88 @@ type ProductListData = Pick<Product,
   categoryName: string;
 }
 
-export const getProducts = async ({ query: queryArgs }: Request): Promise<ProductListData[]> => {
+export const getProducts = async (productFilterInput: ProductsFiltersInput): Promise<ProductListData[]> => {
+  const {
+    groupID,
+    title,
+    priceMin,
+    priceMax,
+    vendorName,
+    categoryName,
+    stockMin,
+    stockMax,
+    isAvailable,
+    starsMax,
+    starsMin,
+    ratingMax,
+    ratingMin
+  } = productFilterInput
   // TODO refactor reusable queries
   let products: ProductListData[] = await getProductsQuery.clone()
 
-  if ('groupID' in queryArgs && !R.isEmpty(queryArgs.groupID)) {
-    products = products.filter((p) =>
-      p.groupID === Number(queryArgs.groupID)
-    )
+  if (typeof (groupID) !== 'undefined') {
+    products = products
+      .filter((p) => p.groupID === groupID)
   }
 
-  if ('title' in queryArgs && !R.isEmpty(queryArgs.title)) {
-    products = products.filter((p) =>
-      p.title.toLowerCase().includes(queryArgs.title.toString().toLowerCase()))
+  if (typeof (title) !== 'undefined') {
+    products = products
+      .filter((p) => p.title.toLowerCase().includes(title.toLowerCase()))
   }
 
-  if ('priceMin' in queryArgs && !R.isEmpty(queryArgs.priceMin)) {
-    products = products.filter((p) =>
-      p.price >= Number(queryArgs.priceMin) * 100
-    )
+  if (typeof (priceMin) !== 'undefined') {
+    products = products
+      .filter((p) => p.price >= priceMin * 10)
   }
 
-  if ('priceMax' in queryArgs && !R.isEmpty(queryArgs.priceMax)) {
-    products = products.filter((p) =>
-      p.price <= Number(queryArgs.priceMax) * 100
-    )
+  if (typeof (priceMax) !== 'undefined') {
+    products = products
+      .filter((p) => p.price <= priceMax * 10)
   }
 
-  if ('vendorName' in queryArgs && !R.isEmpty(queryArgs.vendorName)) {
-    products = products.filter((p) =>
-      p.vendorName.includes(queryArgs.vendorName.toString()))
+  if (typeof (vendorName) !== 'undefined') {
+    products = products
+      .filter((p) => p.vendorName.includes(vendorName))
   }
 
-  if ('categoryName' in queryArgs && !R.isEmpty(queryArgs.categoryName)) {
-    products = products.filter((p) =>
-      p.categoryName.includes(queryArgs.categoryName.toString()))
+  if (typeof (categoryName) !== 'undefined') {
+    products = products
+      .filter((p) => p.categoryName.includes(categoryName))
   }
 
-  if ('stockMin' in queryArgs && !R.isEmpty(queryArgs.stockMin)) {
-    products = products.filter((p) =>
-      p.stock >= Number(queryArgs.stockMin)
-    )
+  if (typeof (stockMin) !== 'undefined') {
+    products = products
+      .filter((p) => p.stock >= stockMin)
   }
 
-  if ('stockMax' in queryArgs && !R.isEmpty(queryArgs.stockMax)) {
-    products = products.filter((p) =>
-      p.stock <= Number(queryArgs.stockMax)
-    )
+  if (typeof (stockMax) !== 'undefined') {
+    products = products
+      .filter((p) => p.stock <= stockMax)
   }
 
-  if ('isAvailable' in queryArgs && !R.isEmpty(queryArgs.isAvailable)) {
-    products = products.filter((p) =>
-      p.isAvailable === Boolean(queryArgs.isAvailable.toString())
-    )
+  if (typeof (isAvailable) !== 'undefined') {
+    products = products
+      .filter((p) => p.isAvailable === Boolean(isAvailable))
   }
 
-  if ('starsMax' in queryArgs && !R.isEmpty(queryArgs.starsMax)) {
-    products = products.filter((p) =>
-      p.stars <= Number(queryArgs.starsMax)
-    )
+  if (typeof (starsMin) !== 'undefined') {
+    products = products
+      .filter((p) => p.stars >= starsMin)
   }
 
-  if ('starsMin' in queryArgs && !R.isEmpty(queryArgs.starsMin)) {
-    products = products.filter((p) =>
-      p.stars >= Number(queryArgs.starsMin)
-    )
+  if (typeof (starsMax) !== 'undefined') {
+    products = products
+      .filter((p) => p.stars <= starsMax)
   }
 
-  if ('ratingMax' in queryArgs && !R.isEmpty(queryArgs.ratingMax)) {
-    products = products.filter((p) =>
-      p.ratingCount <= Number(queryArgs.ratingMax)
-    )
+  if (typeof (ratingMin) !== 'undefined') {
+    products = products
+      .filter((p) => p.ratingCount >= ratingMin)
   }
 
-  if ('ratingMin' in queryArgs && !R.isEmpty(queryArgs.ratingMin)) {
-    products = products.filter((p) =>
-      p.ratingCount >= Number(queryArgs.ratingMin)
-    )
+  if (typeof (ratingMax) !== 'undefined') {
+    products = products
+      .filter((p) => p.ratingCount <= ratingMax)
   }
 
   return products
@@ -160,7 +165,7 @@ const getProductByID = async (req: Request, res: Response): Promise<ProductListD
     .where('p.productID', req.params.productID)
     .leftJoin('groupVariants as gv', 'p.groupID', 'gv.groupID')
 
-  if (!product) throw new StatusError(404, 'Not Found')
+  if (typeof (product) === 'undefined') throw new StatusError(404, 'Not Found')
 
   const groupVariants = await db<GroupVariant>('groupVariants')
     .where('groupID', product.groupID)
@@ -186,7 +191,7 @@ const updateProduct = async (productInput: ProductUpdateInput, req: Request): Pr
     }, [ '*' ])
     .where('productID', req.params.productID)
 
-  if (!updatedProduct) throw new StatusError(404, 'Not Found')
+  if (typeof (updatedProduct) === 'undefined') throw new StatusError(404, 'Not Found')
   return updatedProduct
 }
 

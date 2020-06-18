@@ -114,7 +114,7 @@ const seed = async (): Promise<void> => {
               body = result.body
             }
 
-            if (p.media) {
+            if (typeof (p.media) !== 'undefined') {
               const uploadAPI = api
                 .post(`${apiURLs.products}/${body.productID}/upload`)
                 .set('Cookie', `token=${token}`)
@@ -130,7 +130,7 @@ const seed = async (): Promise<void> => {
               await uploadAPI
             }
 
-            if (p.ratings) {
+            if (typeof (p.ratings) !== 'undefined') {
               await Promise.all(p.ratings.map(async (r) => {
                 const token = users[r.author].token
 
@@ -147,12 +147,12 @@ const seed = async (): Promise<void> => {
                   .set('Cookie', `token=${adminToken}`)
                   .send({ isVerified: true, moderationStatus: 'APPROVED' })
 
-                if (r.media) {
+                if (typeof (r.media) !== 'undefined') {
                   const uploadAPI = api
                     .post(`${apiURLs.ratings}/${body.ratingID}/upload`)
                     .set('Cookie', `token=${token}`)
 
-                  r.mediaFiles.map((m) => {
+                  typeof (r.mediaFiles) !== 'undefined' && r.mediaFiles.map((m) => {
                     uploadAPI
                       .attach('ratingMedia', path.join(
                         __dirname, `images/ratings/${m}.jpg`
@@ -161,7 +161,7 @@ const seed = async (): Promise<void> => {
                   await uploadAPI
                 }
 
-                if (r.comments) {
+                if (typeof (r.comments) !== 'undefined') {
                   await Promise.all(r.comments.map(async (cm: any) => {
                     const token = users[cm.author].token
 
@@ -178,12 +178,12 @@ const seed = async (): Promise<void> => {
                       .set('Cookie', `token=${adminToken}`)
                       .send({ moderationStatus: 'APPROVED' })
 
-                    if (cm.media) {
+                    if (typeof (cm.media) !== 'undefined') {
                       const uploadAPI = api
                         .post(`${apiURLs.ratings}/${body.ratingID}/comments/${ratingComment.body.ratingCommentID}/upload`)
                         .set('Cookie', `token=${token}`)
 
-                      cm.mediaFiles.map((m: number) => {
+                      typeof (cm.mediaFiles) !== 'undefined' && cm.mediaFiles.map((m: number) => {
                         uploadAPI
                           .attach('ratingCommentMedia', path.join(
                             __dirname, `images/ratingComments/${m}.jpg`
@@ -196,7 +196,7 @@ const seed = async (): Promise<void> => {
               }))
             }
 
-            if (p.questions) {
+            if (typeof (p.questions) !== 'undefined') {
               await Promise.all(p.questions.map(async (q: any) => {
                 const token = users[q.author].token
 
@@ -213,12 +213,12 @@ const seed = async (): Promise<void> => {
                 //   .set('Cookie', `token=${adminToken}`)
                 //   .send({ moderationStatus: 'APPROVED' })
 
-                if (q.media) {
+                if (typeof (q.media) !== 'undefined') {
                   const uploadAPI = api
                     .post(`${apiURLs.questions}/${body.questionID}/upload`)
                     .set('Cookie', `token=${token}`)
 
-                  q.mediaFiles.map((m: number) => {
+                  typeof (q.mediaFiles) !== 'undefined' && q.mediaFiles.map((m: number) => {
                     uploadAPI
                       .attach('questionMedia', path.join(
                         __dirname, `images/questions/${m}.jpg`
@@ -227,7 +227,7 @@ const seed = async (): Promise<void> => {
                   await uploadAPI
                 }
 
-                if (q.answers) {
+                if (typeof (q.answers) !== 'undefined') {
                   await Promise.all(q.answers.map(async (a: any) => {
                     const token = users[a.author].token
 
@@ -244,12 +244,12 @@ const seed = async (): Promise<void> => {
                     //   .set('Cookie', `token=${adminToken}`)
                     //   .send({ moderationStatus: 'APPROVED' })
 
-                    if (a.media) {
+                    if (typeof (a.media) !== 'undefined') {
                       const uploadAPI = api
                         .post(`${apiURLs.answers}/${answer.body.answerID}/upload`)
                         .set('Cookie', `token=${token}`)
 
-                      a.mediaFiles.map((m: number) => {
+                      typeof (a.mediaFiles) !== 'undefined' && a.mediaFiles.map((m: number) => {
                         uploadAPI
                           .attach('answerMedia', path.join(
                             __dirname, `images/answers/${m}.jpg`
@@ -258,7 +258,7 @@ const seed = async (): Promise<void> => {
                       await uploadAPI
                     }
 
-                    if (a.comments) {
+                    if (typeof (a.comments) !== 'undefined') {
                       await Promise.all(a.comments.map(async (ac: any) => {
                         const token = users[ac.author].token
 
@@ -275,12 +275,12 @@ const seed = async (): Promise<void> => {
                         //   .set('Cookie', `token=${adminToken}`)
                         //   .send({ moderationStatus: 'APPROVED' })
 
-                        if (ac.media) {
+                        if (typeof (ac.media) !== 'undefined') {
                           const uploadAPI = api
                             .post(`${apiURLs.answers}/${answer.body.answerID}/comments/${answerComment.body.answerCommentID}/upload`)
                             .set('Cookie', `token=${token}`)
 
-                          ac.mediaFiles.map((m: number) => {
+                          typeof (ac.mediaFiles) !== 'undefined' && ac.mediaFiles.map((m: number) => {
                             uploadAPI
                               .attach('answerCommentMedia', path.join(
                                 __dirname, `images/answerComments/${m}.jpg`

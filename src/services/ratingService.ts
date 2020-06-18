@@ -22,7 +22,7 @@ const addRating = async (ratingInput: RatingCreateInput, res: Response): Promise
     }) ]
   )
 
-  if (!addedRating) {
+  if (typeof (addedRating) === 'undefined') {
     throw new StatusError(409, 'You\'ve already left a review for this product')
   }
   return addedRating
@@ -43,7 +43,7 @@ const getRatingByID = async (req: Request): Promise<Rating> => {
     .first()
     .where('ratingID', req.params.ratingID)
 
-  if (!rating) throw new StatusError(404, 'Not Found')
+  if (typeof (rating) === 'undefined') throw new StatusError(404, 'Not Found')
   return rating
 }
 
@@ -55,7 +55,7 @@ const updateRating = async (ratingInput: RatingUpdateInput, req: Request): Promi
     }, [ '*' ])
     .where('ratingID', req.params.ratingID)
 
-  if (!updatedRating) throw new StatusError(404, 'Not Found')
+  if (typeof (updatedRating) === 'undefined') throw new StatusError(404, 'Not Found')
   return updatedRating
 }
 

@@ -29,7 +29,7 @@ const getAnswerCommentByID = async (req: Request): Promise<AnswerComment> => {
     .first()
     .where('answerCommentID', req.params.answerCommentID)
 
-  if (!answerComment) throw new StatusError(404, 'Not Found')
+  if (typeof (answerComment) === 'undefined') throw new StatusError(404, 'Not Found')
   return answerComment
 }
 
@@ -41,7 +41,7 @@ const updateAnswerComment = async (answerCommentInput: AnswerCommentUpdateInput,
     }, [ '*' ])
     .where('answerCommentID', req.params.answerCommentID)
 
-  if (!updatedRC) throw new StatusError(404, 'Not Found')
+  if (typeof (updatedRC) === 'undefined') throw new StatusError(404, 'Not Found')
   return updatedRC
 }
 

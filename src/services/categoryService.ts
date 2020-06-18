@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { Category, CategoryCreateInput, CategoryUpdateInput } from '../types'
+import { Category, CategoryCreateInput, CategoryUpdateInput, CategoryFiltersInput } from '../types'
 import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
@@ -14,7 +14,7 @@ const addCategory = async (categoryInput: CategoryCreateInput): Promise<Category
     [ db('categories').insert(categoryInput) ]
   )
 
-  if (!addedCategory) {
+  if (typeof (addedCategory) === 'undefined') {
     throw new StatusError(409, `Category with name "${categoryInput.name}" already exists`)
   }
   return addedCategory
@@ -23,16 +23,18 @@ const addCategory = async (categoryInput: CategoryCreateInput): Promise<Category
 type CategoryWithProductCount = Category & { productCount: number }
 type CategoryListData = CategoryWithProductCount & { children: number[] }
 
-const getCategories = async ({ query: queryArgs }: Request): Promise<CategoryListData[]> => {
+const getCategories = async (categoryFilterInput: CategoryFiltersInput): Promise<CategoryListData[]> => {
+  const { name } = categoryFilterInput
+
   let categories: CategoryWithProductCount[] = await db('categories as c')
     .select('c.categoryID', 'c.name')
     .count('p.productID as productCount')
     .joinRaw('JOIN products as p USING ("categoryID")')
     .groupBy('c.categoryID')
 
-  if ('name' in queryArgs && !R.isEmpty(queryArgs.name)) {
-    categories = categories.filter((p) =>
-      p.name.toLowerCase().includes(queryArgs.name.toString().toLowerCase()))
+  if (typeof (name) !== 'undefined') {
+    categories = categories
+      .filter((v) => v.name.toLowerCase().includes(name.toLowerCase()))
   }
 
   return categories.map((c) => ({
@@ -57,7 +59,7 @@ const getCategoryByID = async (req: Request): Promise<SingleCategoryData> => {
     .groupBy('c.categoryID')
 
   const [ category ] = categories.filter((c) => c.categoryID === categoryID)
-  if (!category) throw new StatusError(404, 'Not Found')
+  if (typeof (category) === 'undefined') throw new StatusError(404, 'Not Found')
 
   let parentChain: Parent[] = []
   let parentCategoryID = category.parentCategoryID
@@ -65,7 +67,7 @@ const getCategoryByID = async (req: Request): Promise<SingleCategoryData> => {
   while (parentCategoryID) {
     const parent = categories.find((c) => c.categoryID === parentCategoryID)
 
-    if (parent) {
+    if (typeof (parent) !== 'undefined') {
       parentChain.push({ name: parent.name, categoryID: parent.categoryID })
       parentCategoryID = parent.parentCategoryID
     }
@@ -89,7 +91,7 @@ const updateCategory = async (categoryInput: CategoryUpdateInput, req: Request):
     .update(categoryInput, [ 'categoryID' ])
     .where('categoryID', req.params.categoryID)
 
-  if (!updatedCategory) throw new StatusError(404, 'Not Found')
+  if (typeof (updatedCategory) === 'undefined') throw new StatusError(404, 'Not Found')
   return getCategoryByID(req)
 }
 

@@ -13,7 +13,7 @@ const addUserAddress = async (UAInput: UACreateInput): Promise<UserAddress> => {
     [ db('userAddresses').insert(UAInput) ]
   )
 
-  if (!addedUA) throw new StatusError(409, 'Address is already added')
+  if (typeof (addedUA) === 'undefined') throw new StatusError(409, 'Address is already added')
   return addedUA
 }
 
@@ -23,7 +23,7 @@ const updateUserAddress = async (UAInput: UAUpdateInput, req: Request): Promise<
     .where('userID', req.params.userID)
     .andWhere('addressID', req.params.addressID)
 
-  if (!updatedUA) throw new StatusError(404, 'Not Found')
+  if (typeof (updatedUA) === 'undefined') throw new StatusError(404, 'Not Found')
   return updatedUA
 }
 

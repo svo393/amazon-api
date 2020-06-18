@@ -16,7 +16,7 @@ const addFollower = async (req: Request): Promise<Follower> => {
     }) ]
   )
 
-  if (!addedFollower) {
+  if (typeof (addedFollower) === 'undefined') {
     throw new StatusError(409, 'You\'are already following this user')
   }
   return addedFollower

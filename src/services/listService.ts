@@ -13,7 +13,7 @@ const addList = async (listInput: ListCreateInput, res: Response): Promise<List>
     [ db('lists').insert({ ...listInput, userID: res.locals.userID }) ]
   )
 
-  if (!addedList) {
+  if (typeof (addedList) === 'undefined') {
     throw new StatusError(409, `List with name "${listInput.name}" already exists`)
   }
   return addedList
@@ -29,7 +29,7 @@ const getListByID = async (req: Request): Promise<List> => {
     .first()
     .where('listID', req.params.listID)
 
-  if (!list) throw new StatusError(404, 'Not Found')
+  if (typeof (list) === 'undefined') throw new StatusError(404, 'Not Found')
   return list
 }
 
@@ -38,7 +38,7 @@ const updateList = async (listInput: ListCreateInput, req: Request): Promise<Lis
     .update(listInput, [ '*' ])
     .where('listID', req.params.listID)
 
-  if (!updatedList) throw new StatusError(404, 'Not Found')
+  if (typeof (updatedList) === 'undefined') throw new StatusError(404, 'Not Found')
   return updatedList
 }
 

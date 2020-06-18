@@ -470,8 +470,8 @@ export type OrderUpdateInput = {
 }
 
 export type OrderFiltersInput = {
-  amountMin?: string;
-  amountMax?: string;
+  amountMin?: number;
+  amountMax?: number;
   createdFrom?: string;
   createdTo?: string;
   orderStatuses?: string;
@@ -499,8 +499,8 @@ export type InvoiceUpdateInput = {
 }
 
 export type InvoiceFiltersInput = {
-  amountMin?: string;
-  amountMax?: string;
+  amountMin?: number;
+  amountMax?: number;
   createdFrom?: string;
   createdTo?: string;
   invoiceStatuses?: string;
@@ -526,31 +526,32 @@ export type FeedFiltersInput = {
 }
 
 export type ProductsFiltersInput = {
-  groupID?: string;
+  groupID?: number;
   title?: string;
-  priceMin?: string;
-  priceMax?: string;
+  priceMin?: number;
+  priceMax?: number;
   categoryName?: string;
   vendorName?: string;
-  stockMin?: string;
-  stockMax?: string;
+  stockMin?: number;
+  stockMax?: number;
   isAvailable?: string;
-  starsMin?: string;
-  starsMax?: string;
-  ratingMin?: string;
-  ratingMax?: string;
+  starsMin?: number;
+  starsMax?: number;
+  ratingMin?: number;
+  ratingMax?: number;
 }
 
 export type UsersFiltersInput = {
   roles?: string;
   createdFrom?: string;
   createdTo?: string;
-  orderCountMin?: string;
-  orderCountMax?: string;
-  ratingCountMin?: string;
-  ratingCountMax?: string;
-  activitiesCountMin?: string;
-  activitiesCountMax?: string;
+  orderCountMin?: number;
+  orderCountMax?: number;
+  ratingCountMin?: number;
+  ratingCountMax?: number;
+  activitiesCountMin?: number;
+  activitiesCountMax?: number;
+  email?: string;
 }
 
 export type OrderProductFullData = Pick<Product,

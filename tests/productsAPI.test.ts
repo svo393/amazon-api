@@ -100,15 +100,15 @@ describe('Product adding', () => {
 })
 
 describe('Product fetching', () => {
-  // test('200', async () => {
-  //   await createOneProduct('admin')
+  test('200', async () => {
+    await createOneProduct('admin')
 
-  //   const { body } = await api
-  //     .get(apiURL)
-  //     .expect(200)
+    const { body } = await api
+      .get(apiURL)
+      .expect(200)
 
-  //   expect(body).toBeDefined()
-  // })
+    expect(body).toBeDefined()
+  })
 
   test('public product if not admin or root', async () => {
     const { addedProduct } = await createOneProduct('admin')
@@ -116,7 +116,7 @@ describe('Product fetching', () => {
     const { body } = await api
       .get(`${apiURL}/${addedProduct.productID}`)
       .expect(200)
-    expect(Object.keys(body)).toHaveLength(9)
+    expect(Object.keys(body)).toHaveLength(12)
   })
 
   test('full product if admin or root', async () => {
@@ -127,7 +127,7 @@ describe('Product fetching', () => {
       .set('Cookie', `token=${token}`)
       .expect(200)
 
-    expect(Object.keys(body)).toHaveLength(12)
+    expect(Object.keys(body)).toHaveLength(15)
   })
 })
 

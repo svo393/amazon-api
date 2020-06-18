@@ -14,8 +14,8 @@ router.post('/', isAdmin, async (req, res) => {
 })
 
 router.get('/', async (req, res) => {
-  checkProductFilters(req)
-  const products = await productService.getProducts(req)
+  const productFilterInput = checkProductFilters(req)
+  const products = await productService.getProducts(productFilterInput)
   res.json(products)
 })
 

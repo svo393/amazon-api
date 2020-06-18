@@ -1069,7 +1069,6 @@ export const checkCategoryFilters = ({ query }: Request): CategoryFiltersInput =
     ? isString({ name: 'name', param: query.name })
     : undefined
 
-  // TODO pass this object to service instead of req
   return { name: name?.param }
 }
 
@@ -1110,6 +1109,10 @@ export const checkUserFilters = ({ query }: Request): UsersFiltersInput => {
     ? canBeNumber({ name: 'activitiesCountMax', param: query.activitiesCountMax })
     : undefined
 
+  const email = 'email' in query
+    ? isString({ name: 'email', param: query.email })
+    : undefined
+
   return {
     roles: roles?.param,
     createdFrom: createdFrom?.param,
@@ -1119,7 +1122,8 @@ export const checkUserFilters = ({ query }: Request): UsersFiltersInput => {
     ratingCountMin: ratingCountMin?.param,
     ratingCountMax: ratingCountMax?.param,
     activitiesCountMin: activitiesCountMin?.param,
-    activitiesCountMax: activitiesCountMax?.param
+    activitiesCountMax: activitiesCountMax?.param,
+    email: email?.param
   }
 }
 

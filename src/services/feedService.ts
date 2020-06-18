@@ -1,6 +1,5 @@
-import { Request } from 'express'
 import R from 'ramda'
-import { Answer, AnswerComment, ObjIndexed, Question, RatingComment } from '../types'
+import { Answer, AnswerComment, FeedFiltersInput, ObjIndexed, Question, RatingComment } from '../types'
 import { db } from '../utils/db'
 
 interface Feed extends ObjIndexed {
@@ -16,7 +15,16 @@ type Activity =
   Answer & { type: string } |
   AnswerComment & { type: string }
 
-const getFeed = async ({ query: queryArgs }: Request): Promise<Feed> => {
+const getFeed = async (feedFilterInput: FeedFiltersInput): Promise<Feed> => {
+  const {
+    types,
+    moderationStatuses,
+    createdFrom,
+    createdTo,
+    content,
+    userEmail
+  } = feedFilterInput
+
   const ratingComments = await db<RatingComment>('ratingComments as rc')
     .select(
       'rc.ratingCommentID',
@@ -85,48 +93,48 @@ const getFeed = async ({ query: queryArgs }: Request): Promise<Feed> => {
     answerComments: [ ...answerComments.map((x) => ({ ...x, type: 'answerComment' })) ]
   }
 
-  if ('types' in queryArgs && !R.isEmpty(queryArgs.types)) {
-    feed = R.pick(queryArgs.types.toString().split(',').map((a) => a + 's'), feed)
+  if (typeof (types) !== 'undefined') {
+    feed = R.pick(types.split(',').map((a) => a + 's'), feed)
   }
 
-  if ('moderationStatuses' in queryArgs && !R.isEmpty(queryArgs.moderationStatuses)) {
+  if (typeof (moderationStatuses) !== 'undefined') {
     for (const activity in feed) {
       feed[activity] = feed[activity].filter((a: Activity) =>
-        queryArgs.moderationStatuses.toString().split(',').includes(a.moderationStatus))
-      if (R.isEmpty(feed[activity])) delete feed[activity]
+        moderationStatuses.split(',').includes(a.moderationStatus))
+      if (feed[activity].length === 0) delete feed[activity]
     }
   }
 
-  if ('createdFrom' in queryArgs && !R.isEmpty(queryArgs.createdFrom)) {
+  if (typeof (createdFrom) !== 'undefined') {
     for (const activity in feed) {
       feed[activity] = feed[activity].filter((a: Activity) =>
-        a.createdAt >= new Date(queryArgs.createdFrom.toString()))
-      if (R.isEmpty(feed[activity])) delete feed[activity]
+        a.createdAt >= new Date(createdFrom))
+      if (feed[activity].length === 0) delete feed[activity]
     }
   }
 
   // TODO misses today in filter
-  if ('createdTo' in queryArgs && !R.isEmpty(queryArgs.createdTo)) {
+  if (typeof (createdTo) !== 'undefined') {
     for (const activity in feed) {
       feed[activity] = feed[activity].filter((a: Activity) =>
-        a.createdAt <= new Date(queryArgs.createdTo.toString()))
-      if (R.isEmpty(feed[activity])) delete feed[activity]
+        a.createdAt <= new Date(createdTo))
+      if (feed[activity].length === 0) delete feed[activity]
     }
   }
 
-  if ('content' in queryArgs && !R.isEmpty(queryArgs.content)) {
+  if (typeof (content) !== 'undefined') {
     for (const activity in feed) {
       feed[activity] = feed[activity].filter((a: Activity) =>
-        a.content.toLowerCase().includes(queryArgs.content.toString().toLowerCase()))
-      if (R.isEmpty(feed[activity])) delete feed[activity]
+        a.content.toLowerCase().includes(content.toLowerCase()))
+      if (feed[activity].length === 0) delete feed[activity]
     }
   }
 
-  if ('userEmail' in queryArgs && !R.isEmpty(queryArgs.userEmail)) {
+  if (typeof (userEmail) !== 'undefined') {
     for (const activity in feed) {
       feed[activity] = feed[activity].filter((a: Activity) =>
-        a.userEmail.toLowerCase().includes(queryArgs.userEmail.toString().toLowerCase()))
-      if (R.isEmpty(feed[activity])) delete feed[activity]
+        a.userEmail.toLowerCase().includes(userEmail.toLowerCase()))
+      if (feed[activity].length === 0) delete feed[activity]
     }
   }
 

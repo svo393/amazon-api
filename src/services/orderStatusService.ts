@@ -13,7 +13,7 @@ const addOrderStatus = async (orderStatusInput: OrderStatus): Promise<OrderStatu
     [ db('orderStatuses').insert(orderStatusInput) ]
   )
 
-  if (!addedOrderStatus) {
+  if (typeof (addedOrderStatus) === 'undefined') {
     throw new StatusError(409, `OrderStatus with name "${orderStatusInput.orderStatusName}" already exists`)
   }
   return addedOrderStatus
@@ -28,7 +28,7 @@ const updateOrderStatus = async (orderStatusInput: OrderStatus, req: Request): P
     .update(orderStatusInput, [ '*' ])
     .where('orderStatusName', req.params.orderStatusName)
 
-  if (!updatedOrderStatus) throw new StatusError(404, 'Not Found')
+  if (typeof (updatedOrderStatus) === 'undefined') throw new StatusError(404, 'Not Found')
   return updatedOrderStatus
 }
 

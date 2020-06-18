@@ -34,7 +34,7 @@ const updateCartProduct = async (cartProductInput: CartProductInput, req: Reques
     .where('userID', req.params.userID)
     .andWhere('productID', req.params.productID)
 
-  if (!updatedCP) throw new StatusError(404, 'Not Found')
+  if (typeof (updatedCP) === 'undefined') throw new StatusError(404, 'Not Found')
   return updatedCP
 }
 

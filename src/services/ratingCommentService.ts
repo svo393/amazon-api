@@ -29,20 +29,20 @@ const getRatingCommentByID = async (req: Request): Promise<RatingComment> => {
     .first()
     .where('ratingCommentID', req.params.ratingCommentID)
 
-  if (!ratingComment) throw new StatusError(404, 'Not Found')
+  if (typeof (ratingComment) === 'undefined') throw new StatusError(404, 'Not Found')
   return ratingComment
 }
 
 const updateRatingComment = async (ratingCommentInput: RatingCommentUpdateInput, req: Request): Promise<RatingComment> => {
-  const [ updatedRC ]: RatingComment[] = await db('ratingComments')
+  const [ updatedRatingComment ]: RatingComment[] = await db('ratingComments')
     .update({
       ...ratingCommentInput,
       updatedAt: new Date()
     }, [ '*' ])
     .where('ratingCommentID', req.params.ratingCommentID)
 
-  if (!updatedRC) throw new StatusError(404, 'Not Found')
-  return updatedRC
+  if (typeof (updatedRatingComment) === 'undefined') throw new StatusError(404, 'Not Found')
+  return updatedRatingComment
 }
 
 const deleteRatingComment = async (req: Request): Promise<void> => {

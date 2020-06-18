@@ -5,8 +5,8 @@ import { checkFeedFilters } from '../utils/inputValidator'
 const router = Router()
 
 router.get('/', async (req, res) => {
-  checkFeedFilters(req)
-  const feed = await feedService.getFeed(req)
+  const feedFilterInput = checkFeedFilters(req)
+  const feed = await feedService.getFeed(feedFilterInput)
   res.json(feed)
 })
 

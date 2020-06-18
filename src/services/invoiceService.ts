@@ -1,7 +1,6 @@
 import { Request } from 'express'
 import Knex from 'knex'
-import R from 'ramda'
-import { Invoice, InvoiceCreateInput, InvoiceUpdateInput } from '../types'
+import { Invoice, InvoiceCreateInput, InvoiceFiltersInput, InvoiceUpdateInput } from '../types'
 import { db, dbTrans } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
@@ -19,8 +18,18 @@ const addInvoice = async (invoiceInput: InvoiceCreateInput): Promise<Invoice> =>
   return addedInvoice
 }
 
-const getInvoices = async ({ query: queryArgs }: Request): Promise<Invoice[]> => {
-  let invoices: Invoice[] = await db<Invoice>('invoices as i')
+const getInvoices = async (invoiceFilterInput: InvoiceFiltersInput): Promise<Invoice[]> => {
+  const {
+    invoiceStatuses,
+    paymentMethods,
+    amountMin,
+    amountMax,
+    createdFrom,
+    createdTo,
+    userEmail
+  } = invoiceFilterInput
+
+  let invoices: Invoice[] = await db('invoices as i')
     .select(
       'i.invoiceID',
       'i.amount',
@@ -36,46 +45,39 @@ const getInvoices = async ({ query: queryArgs }: Request): Promise<Invoice[]> =>
     .join('users as u', 'i.userID', 'u.userID')
     .groupBy('i.invoiceID', 'userEmail')
 
-  if ('invoiceStatuses' in queryArgs && !R.isEmpty(queryArgs.invoiceStatuses)) {
-    invoices = invoices.filter((o) =>
-      queryArgs.invoiceStatuses.toString().split(',').includes(o.invoiceStatus)
-    )
+  if (typeof (invoiceStatuses) !== 'undefined') {
+    invoices = invoices
+      .filter((i) => invoiceStatuses.split(',').includes(i.invoiceStatus))
   }
 
-  if ('paymentMethods' in queryArgs && !R.isEmpty(queryArgs.paymentMethods)) {
-    invoices = invoices.filter((o) =>
-      queryArgs.paymentMethods.toString().split(',').includes(o.paymentMethod)
-    )
+  if (typeof (paymentMethods) !== 'undefined') {
+    invoices = invoices
+      .filter((i) => paymentMethods.split(',').includes(i.paymentMethod))
   }
 
-  if ('amountMin' in queryArgs && !R.isEmpty(queryArgs.amountMin)) {
-    invoices = invoices.filter((o) =>
-      o.amount >= Number(queryArgs.amountMin)
-    )
+  if (typeof (amountMin) !== 'undefined') {
+    invoices = invoices
+      .filter((i) => i.amount >= amountMin)
   }
 
-  if ('amountMax' in queryArgs && !R.isEmpty(queryArgs.amountMax)) {
-    invoices = invoices.filter((o) =>
-      o.amount <= Number(queryArgs.amountMax)
-    )
+  if (typeof (amountMax) !== 'undefined') {
+    invoices = invoices
+      .filter((i) => i.amount <= amountMax)
   }
 
-  if ('createdFrom' in queryArgs && !R.isEmpty(queryArgs.createdFrom)) {
-    invoices = invoices.filter((o) =>
-      o.createdAt >= new Date(queryArgs.createdFrom.toString())
-    )
+  if (typeof (createdFrom) !== 'undefined') {
+    invoices = invoices
+      .filter((i) => i.createdAt >= new Date(createdFrom))
   }
 
-  if ('createdTo' in queryArgs && !R.isEmpty(queryArgs.createdTo)) {
-    invoices = invoices.filter((o) =>
-      o.createdAt <= new Date(queryArgs.createdTo.toString())
-    )
+  if (typeof (createdTo) !== 'undefined') {
+    invoices = invoices
+      .filter((i) => i.createdAt <= new Date(createdTo))
   }
 
-  if ('userEmail' in queryArgs && !R.isEmpty(queryArgs.userEmail)) {
-    invoices = invoices.filter((o) =>
-        o.userEmail?.toLowerCase().includes(queryArgs.userEmail.toString().toLowerCase())
-    )
+  if (typeof (userEmail) !== 'undefined') {
+    invoices = invoices
+      .filter((i) => i.userEmail?.toLowerCase().includes(userEmail.toLowerCase()))
   }
 
   return invoices
@@ -87,7 +89,7 @@ const getInvoicesByUser = async (req: Request): Promise<Invoice[]> => {
 }
 
 const getInvoiceByID = async (req: Request): Promise<Invoice> => {
-  const invoice = await db<Invoice>('invoices as i')
+  const invoice: Invoice = await db('invoices as i')
     .first(
       'i.invoiceID',
       'i.amount',
@@ -103,7 +105,7 @@ const getInvoiceByID = async (req: Request): Promise<Invoice> => {
     .where('invoiceID', req.params.invoiceID)
     .joinRaw('JOIN users as u USING ("userID")')
 
-  if (!invoice) throw new StatusError(404, 'Not Found')
+  if (typeof (invoice) === 'undefined') throw new StatusError(404, 'Not Found')
   return invoice
 }
 
@@ -125,7 +127,7 @@ const updateInvoice = async (invoiceInput: InvoiceUpdateInput, req: Request): Pr
       }, [ '*' ])
       .where('invoiceID', req.params.invoiceID)
 
-    if (!updatedInvoice) throw new StatusError(404, 'Not Found')
+    if (typeof (updatedInvoice) === 'undefined') throw new StatusError(404, 'Not Found')
     return updatedInvoice
   })
 }

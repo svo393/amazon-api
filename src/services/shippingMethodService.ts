@@ -13,7 +13,7 @@ const addShippingMethod = async (smInput: SMInput): Promise<SM> => {
     [ db('shippingMethods').insert(smInput) ]
   )
 
-  if (!addedSM) {
+  if (typeof (addedSM) === 'undefined') {
     throw new StatusError(409, `ShippingMethod with name "${smInput.shippingMethodName}" already exists`)
   }
   return addedSM
@@ -28,7 +28,7 @@ const getShippingMethodByName = async (req: Request): Promise<SM> => {
     .first()
     .where('shippingMethodName', req.params.shippingMethodName)
 
-  if (!sm) throw new StatusError(404, 'Not Found')
+  if (typeof (sm) === 'undefined') throw new StatusError(404, 'Not Found')
   return sm
 }
 
@@ -37,7 +37,7 @@ const updateShippingMethod = async (smInput: SMInput, req: Request): Promise<SM>
     .update(smInput, [ '*' ])
     .where('shippingMethodName', req.params.shippingMethodName)
 
-  if (!updatedSM) throw new StatusError(404, 'Not Found')
+  if (typeof (updatedSM) === 'undefined') throw new StatusError(404, 'Not Found')
   return updatedSM
 }
 

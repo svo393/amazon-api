@@ -12,8 +12,8 @@ router.post('/', isLoggedIn, async (req, res) => {
 })
 
 router.get('/', isAdmin, async (req, res) => {
-  checkInvoiceFilters(req)
-  const roles = await invoiceService.getInvoices(req)
+  const invoiceFilterInput = checkInvoiceFilters(req)
+  const roles = await invoiceService.getInvoices(invoiceFilterInput)
   res.json(roles)
 })
 

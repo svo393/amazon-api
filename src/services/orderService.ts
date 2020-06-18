@@ -1,7 +1,7 @@
 import { Request } from 'express'
 import Knex from 'knex'
 import R from 'ramda'
-import { Invoice, Order, OrderCreateInput, OrderFullData, OrderProduct, OrderProductFullData, OrderUpdateInput } from '../types'
+import { Invoice, Order, OrderCreateInput, OrderFiltersInput, OrderFullData, OrderProduct, OrderProductFullData, OrderUpdateInput } from '../types'
 import { db, dbTrans } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
@@ -58,8 +58,18 @@ const addOrder = async (orderInput: OrderCreateInput): Promise<OrderFullData & I
   })
 }
 
-const getOrders = async ({ query: queryArgs }: Request): Promise<Order[]> => {
-  let orders: Order[] = await db<Order>('orders as o')
+const getOrders = async (orderFilterInput: OrderFiltersInput): Promise<Order[]> => {
+  const {
+    orderStatuses,
+    shippingMethods,
+    amountMin,
+    amountMax,
+    createdFrom,
+    createdTo,
+    userEmail
+  } = orderFilterInput
+
+  let orders: Order[] = await db('orders as o')
     .select(
       'o.orderID',
       'o.address',
@@ -76,46 +86,39 @@ const getOrders = async ({ query: queryArgs }: Request): Promise<Order[]> => {
     .join('users as u', 'o.userID', 'u.userID')
     .groupBy('o.orderID', 'i.amount', 'i.invoiceID', 'userEmail')
 
-  if ('orderStatuses' in queryArgs && !R.isEmpty(queryArgs.orderStatuses)) {
-    orders = orders.filter((o) =>
-      queryArgs.orderStatuses.toString().split(',').includes(o.orderStatus)
-    )
+  if (typeof (orderStatuses) !== 'undefined') {
+    orders = orders
+      .filter((o) => orderStatuses.split(',').includes(o.orderStatus))
   }
 
-  if ('shippingMethods' in queryArgs && !R.isEmpty(queryArgs.shippingMethods)) {
-    orders = orders.filter((o) =>
-      queryArgs.shippingMethods.toString().split(',').includes(o.shippingMethod)
-    )
+  if (typeof (shippingMethods) !== 'undefined') {
+    orders = orders
+      .filter((o) => shippingMethods.split(',').includes(o.shippingMethod))
   }
 
-  if ('amountMin' in queryArgs && !R.isEmpty(queryArgs.amountMin)) {
-    orders = orders.filter((o) =>
-      o.amount >= Number(queryArgs.amountMin)
-    )
+  if (typeof (amountMin) !== 'undefined') {
+    orders = orders
+      .filter((o) => o.amount >= amountMin)
   }
 
-  if ('amountMax' in queryArgs && !R.isEmpty(queryArgs.amountMax)) {
-    orders = orders.filter((o) =>
-      o.amount <= Number(queryArgs.amountMax)
-    )
+  if (typeof (amountMax) !== 'undefined') {
+    orders = orders
+      .filter((o) => o.amount <= amountMax)
   }
 
-  if ('createdFrom' in queryArgs && !R.isEmpty(queryArgs.createdFrom)) {
-    orders = orders.filter((o) =>
-      o.createdAt >= new Date(queryArgs.createdFrom.toString())
-    )
+  if (typeof (createdFrom) !== 'undefined') {
+    orders = orders
+      .filter((o) => o.createdAt >= new Date(createdFrom))
   }
 
-  if ('createdTo' in queryArgs && !R.isEmpty(queryArgs.createdTo)) {
-    orders = orders.filter((o) =>
-      o.createdAt <= new Date(queryArgs.createdTo.toString())
-    )
+  if (typeof (createdTo) !== 'undefined') {
+    orders = orders
+      .filter((o) => o.createdAt <= new Date(createdTo))
   }
 
-  if ('userEmail' in queryArgs && !R.isEmpty(queryArgs.userEmail)) {
-    orders = orders.filter((o) =>
-      o.userEmail?.toLowerCase().includes(queryArgs.userEmail.toString().toLowerCase())
-    )
+  if (typeof (userEmail) !== 'undefined') {
+    orders = orders
+      .filter((o) => o.userEmail?.toLowerCase().includes(userEmail.toLowerCase()))
   }
 
   return orders
@@ -170,7 +173,7 @@ const getOrderByID = async (req: Request): Promise<OrderFullData> => {
     .where('orderID', req.params.orderID)
     .joinRaw('JOIN products as p USING ("productID")')
 
-  if (!order) throw new StatusError(404, 'Not Found')
+  if (typeof (order) === 'undefined') throw new StatusError(404, 'Not Found')
   return {
     ...order,
     orderProducts
@@ -195,7 +198,7 @@ const updateOrder = async (orderInput: OrderUpdateInput, req: Request): Promise<
       }, [ '*' ])
       .where('orderID', req.params.orderID)
 
-    if (!updatedOrder) throw new StatusError(404, 'Not Found')
+    if (typeof (updatedOrder) === 'undefined') throw new StatusError(404, 'Not Found')
     return updatedOrder
   })
 }

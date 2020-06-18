@@ -119,10 +119,6 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.string('name', 50).unique().notNullable()
     })
 
-    .createTable('groups', (t) => {
-      t.increments('groupID')
-    })
-
     .createTable('products', (t) => {
       t.increments('productID')
       t.string('title').notNullable()
@@ -156,6 +152,10 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .integer('groupID')
         .references('groups.groupID')
         .notNullable()
+    })
+
+    .createTable('groups', (t) => {
+      t.increments('groupID')
     })
 
     .createTable('listProducts', (t) => {

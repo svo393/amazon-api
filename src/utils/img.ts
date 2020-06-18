@@ -57,7 +57,7 @@ export const uploadImages = (files: Express.Multer.File[], req: Request, uploadC
         )
     }
 
-    if (previewWidth && previewHeight) {
+    if (typeof (previewWidth) === 'undefined' && typeof (previewHeight) === 'undefined') {
       await image
         .resize(previewWidth, previewHeight, { fit: 'inside' })
         .jpeg({ progressive: true })

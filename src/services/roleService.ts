@@ -14,7 +14,7 @@ const addRole = async (roleInput: Role): Promise<Role> => {
     [ db('roles').insert(roleInput) ]
   )
 
-  if (!addedRole) {
+  if (typeof (addedRole) === 'undefined') {
     throw new StatusError(409, `Role with name "${roleInput.roleName}" already exists`)
   }
   return addedRole
@@ -34,7 +34,7 @@ const updateRole = async (roleInput: Role, req: Request): Promise<SingleRoleData
     .update(roleInput, [ '*' ])
     .where('roleName', req.params.roleName)
 
-  if (!updatedRole) throw new StatusError(404, 'Not Found')
+  if (typeof (updatedRole) === 'undefined') throw new StatusError(404, 'Not Found')
 
   const users = await db<User>('users')
     .where('role', req.params.roleName)

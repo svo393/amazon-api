@@ -4,7 +4,7 @@ import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
 const addPaymentMethod = async (paymentMethodInput: PaymentMethod): Promise<PaymentMethod> => {
-  const { rows: [ addedPT ] }: { rows: PaymentMethod[] } = await db.raw(
+  const { rows: [ addedPaymentMethod ] }: { rows: PaymentMethod[] } = await db.raw(
     `
     ? ON CONFLICT
       DO NOTHING
@@ -13,10 +13,10 @@ const addPaymentMethod = async (paymentMethodInput: PaymentMethod): Promise<Paym
     [ db('paymentMethods').insert(paymentMethodInput) ]
   )
 
-  if (!addedPT) {
+  if (typeof (addedPaymentMethod) === 'undefined') {
     throw new StatusError(409, `PaymentMethod with name "${paymentMethodInput.paymentMethodName}" already exists`)
   }
-  return addedPT
+  return addedPaymentMethod
 }
 
 const getPaymentMethods = async (): Promise<PaymentMethod[]> => {
@@ -35,7 +35,7 @@ const updatePaymentMethod = async (paymentMethodInput: PaymentMethod, req: Reque
     .update(paymentMethodInput, [ '*' ])
     .where('paymentMethodName', req.params.paymentMethodName)
 
-  if (!updatedPaymentMethod) throw new StatusError(404, 'Not Found')
+  if (typeof (updatedPaymentMethod) === 'undefined') throw new StatusError(404, 'Not Found')
   return updatedPaymentMethod
 }
 

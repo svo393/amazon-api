@@ -4,7 +4,7 @@ import { CookieOptions, Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
 import R from 'ramda'
 import { promisify } from 'util'
-import { Answer, AnswerComment, Order, PasswordRequestInput, PasswordResetInput, Question, Rating, RatingComment, User, UserLoginInput, UserSafeData, UserSignupInput, UserUpdateInput } from '../types'
+import { Answer, AnswerComment, Order, PasswordRequestInput, PasswordResetInput, Question, Rating, RatingComment, User, UserLoginInput, UserSafeData, UserSignupInput, UserUpdateInput, UsersFiltersInput } from '../types'
 import env from '../utils/config'
 import { db } from '../utils/db'
 import { uploadImages } from '../utils/img'
@@ -34,7 +34,7 @@ const addUser = async (userInput: UserSignupInput, res: Response): Promise<UserS
     .first('userID')
     .where('email', email)
 
-  if (existingUser) {
+  if (typeof (existingUser) !== 'undefined') {
     throw new StatusError(409, `User with email '${email}' already exists`)
   }
 
@@ -48,7 +48,7 @@ const addUser = async (userInput: UserSignupInput, res: Response): Promise<UserS
       role: 'CUSTOMER'
     }, [ 'userID', 'email' ])
 
-  if (!addedUser) { throw new StatusError() }
+  if (typeof (addedUser) === 'undefined') { throw new StatusError() }
 
   const token = jwt.sign(
     { userID: addedUser.userID },
@@ -67,7 +67,7 @@ const loginUser = async (userInput: UserLoginInput, res: Response): Promise<User
     .first()
     .where('email', email)
 
-  if (!existingUser) {
+  if (typeof (existingUser) === 'undefined') {
     throw new StatusError(401, 'Invalid Email or Password')
   }
 
@@ -114,7 +114,20 @@ type UserListData = Omit<UserTempData,
   activitiesCount: number;
 }
 
-const getUsers = async ({ query: queryArgs }: Request): Promise<UserListData[]> => {
+const getUsers = async (userFilterInput: UsersFiltersInput): Promise<UserListData[]> => {
+  const {
+    roles,
+    createdFrom,
+    createdTo,
+    orderCountMin,
+    orderCountMax,
+    ratingCountMin,
+    ratingCountMax,
+    activitiesCountMin,
+    activitiesCountMax,
+    email
+  } = userFilterInput
+
   let rawUsers: UserTempData[] = await db('users as u')
     .select('email',
       'u.name',
@@ -149,67 +162,57 @@ const getUsers = async ({ query: queryArgs }: Request): Promise<UserListData[]> 
     activitiesCount: Number(u.ratingCommentCount) + Number(u.questionCount) + Number(u.answerCount) + Number(u.answerCommentCount)
   }))
 
-  if ('roles' in queryArgs && !R.isEmpty(queryArgs.roles)) {
-    users = users.filter((u) =>
-      queryArgs.roles.toString().split(',').includes(u.role)
-    )
+  if (typeof (roles) !== 'undefined') {
+    users = users
+      .filter((u) => roles.split(',').includes(u.role))
   }
 
-  if ('createdFrom' in queryArgs && !R.isEmpty(queryArgs.createdFrom)) {
-    users = users.filter((u) =>
-      u.createdAt >= new Date(queryArgs.createdFrom.toString())
-    )
+  if (typeof (createdFrom) !== 'undefined') {
+    users = users
+      .filter((u) => u.createdAt >= new Date(createdFrom))
   }
 
-  if ('createdTo' in queryArgs && !R.isEmpty(queryArgs.createdTo)) {
-    users = users.filter((u) =>
-      u.createdAt <= new Date(queryArgs.createdTo.toString())
-    )
+  if (typeof (createdTo) !== 'undefined') {
+    users = users
+      .filter((u) => u.createdAt <= new Date(createdTo))
   }
 
-  if ('orderCountMin' in queryArgs && !R.isEmpty(queryArgs.orderCountMin)) {
-    users = users.filter((u) =>
-      u.orderCount >= Number(queryArgs.orderCountMin)
-    )
+  if (typeof (orderCountMin) !== 'undefined') {
+    users = users
+      .filter((u) => u.orderCount >= orderCountMin)
   }
 
-  if ('orderCountMax' in queryArgs && !R.isEmpty(queryArgs.orderCountMax)) {
-    users = users.filter((u) =>
-      u.orderCount <= Number(queryArgs.orderCountMax)
-    )
+  if (typeof (orderCountMax) !== 'undefined') {
+    users = users
+      .filter((u) => u.orderCount <= orderCountMax)
   }
 
-  if ('ratingCountMin' in queryArgs && !R.isEmpty(queryArgs.ratingCountMin)) {
-    users = users.filter((u) =>
-      u.ratingCount >= Number(queryArgs.ratingCountMin)
-    )
+  if (typeof (ratingCountMin) !== 'undefined') {
+    users = users
+      .filter((u) => u.ratingCount >= ratingCountMin)
   }
 
-  if ('ratingCountMax' in queryArgs && !R.isEmpty(queryArgs.ratingCountMax)) {
-    users = users.filter((u) =>
-      u.ratingCount <= Number(queryArgs.ratingCountMax)
-    )
+  if (typeof (ratingCountMax) !== 'undefined') {
+    users = users
+      .filter((u) => u.ratingCount <= ratingCountMax)
   }
 
-  if ('activitiesCountMin' in queryArgs && !R.isEmpty(queryArgs.activitiesCountMin)) {
-    users = users.filter((u) =>
-      u.activitiesCount >= Number(queryArgs.activitiesCountMin)
-    )
+  if (typeof (activitiesCountMin) !== 'undefined') {
+    users = users
+      .filter((u) => u.activitiesCount >= activitiesCountMin)
   }
 
-  if ('activitiesCountMax' in queryArgs && !R.isEmpty(queryArgs.activitiesCountMax)) {
-    users = users.filter((u) =>
-      u.activitiesCount <= Number(queryArgs.activitiesCountMax)
-    )
+  if (typeof (activitiesCountMax) !== 'undefined') {
+    users = users
+      .filter((u) => u.activitiesCount <= activitiesCountMax)
   }
 
-  if ('email' in queryArgs && !R.isEmpty(queryArgs.email)) {
-    users = users.filter((u) =>
-      u.email.toLowerCase().includes(queryArgs.email.toString().toLowerCase())
-    )
+  if (typeof (email) !== 'undefined') {
+    users = users
+      .filter((u) => u.email?.toLowerCase().includes(email.toLowerCase()))
   }
 
-  if (!users) { throw new StatusError(404, 'Not Found') }
+  if (typeof (users) === 'undefined') { throw new StatusError(404, 'Not Found') }
   return users
 }
 
@@ -236,7 +239,7 @@ const getUserByID = async (req: Request, res: Response): Promise<UserPersonalDat
     .first()
     .where('userID', userID)
 
-  if (!user) { throw new StatusError(404, 'Not Found') }
+  if (typeof (user) === 'undefined') { throw new StatusError(404, 'Not Found') }
 
   const hasPermission = [ 'ROOT', 'ADMIN' ].includes(res.locals.userRole) ||
   res.locals.userID === userID
@@ -292,7 +295,7 @@ const updateUser = async (userInput: UserUpdateInput, res: Response, req: Reques
     .update(userInput, [ '*' ])
     .where('userID', req.params.userID)
 
-  if (!updatedUser) { throw new StatusError(404, 'Not Found') }
+  if (typeof (updatedUser) === 'undefined') { throw new StatusError(404, 'Not Found') }
 
   role !== 'ROOT' && delete updatedUser.role
   return R.omit([
@@ -321,7 +324,7 @@ const sendPasswordReset = async (userInput: PasswordRequestInput): Promise<void>
     .first()
     .where('email', email)
 
-  if (!user) throw new StatusError(401, 'Invalid Email')
+  if (typeof (user) === 'undefined') throw new StatusError(401, 'Invalid Email')
 
   const resetToken = (await promisify(randomBytes)(20)).toString('hex')
   const resetTokenCreatedAt = new Date()
@@ -351,7 +354,7 @@ const resetPassword = async ({ password, resetToken }: PasswordResetInput, res: 
     .first('userID', 'resetTokenCreatedAt')
     .where('resetToken', resetToken)
 
-  if (!user?.resetTokenCreatedAt || Number(user.resetTokenCreatedAt) + 3600000 < Date.now()) {
+  if (typeof (user?.resetTokenCreatedAt) === 'undefined' || Number(user.resetTokenCreatedAt) + 3600000 < Date.now()) {
     throw new StatusError(401, 'Reset token is invalid or expired')
   }
 
