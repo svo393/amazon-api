@@ -1101,36 +1101,12 @@ export const checkUserFilters = ({ query }: Request): UsersFiltersInput => {
     ? canBeNumber({ name: 'ratingCountMax', param: query.ratingCountMax })
     : undefined
 
-  const ratingCommentCountMin = 'ratingCommentCountMin' in query
-    ? canBeNumber({ name: 'ratingCommentCountMin', param: query.ratingCommentCountMin })
+  const activitiesCountMin = 'activitiesCountMin' in query
+    ? canBeNumber({ name: 'activitiesCountMin', param: query.activitiesCountMin })
     : undefined
 
-  const ratingCommentCountMax = 'ratingCommentCountMax' in query
-    ? canBeNumber({ name: 'ratingCommentCountMax', param: query.ratingCommentCountMax })
-    : undefined
-
-  const questionCountMin = 'questionCountMin' in query
-    ? canBeNumber({ name: 'questionCountMin', param: query.questionCountMin })
-    : undefined
-
-  const questionCountMax = 'questionCountMax' in query
-    ? canBeNumber({ name: 'questionCountMax', param: query.questionCountMax })
-    : undefined
-
-  const answerCountMin = 'answerCountMin' in query
-    ? canBeNumber({ name: 'answerCountMin', param: query.answerCountMin })
-    : undefined
-
-  const answerCountMax = 'answerCountMax' in query
-    ? canBeNumber({ name: 'answerCountMax', param: query.answerCountMax })
-    : undefined
-
-  const answerCommentCountMin = 'answerCommentCountMin' in query
-    ? canBeNumber({ name: 'answerCommentCountMin', param: query.answerCommentCountMin })
-    : undefined
-
-  const answerCommentCountMax = 'answerCommentCountMax' in query
-    ? canBeNumber({ name: 'answerCommentCountMax', param: query.answerCommentCountMax })
+  const activitiesCountMax = 'activitiesCountMax' in query
+    ? canBeNumber({ name: 'activitiesCountMax', param: query.activitiesCountMax })
     : undefined
 
   return {
@@ -1141,14 +1117,8 @@ export const checkUserFilters = ({ query }: Request): UsersFiltersInput => {
     orderCountMax: orderCountMax?.param,
     ratingCountMin: ratingCountMin?.param,
     ratingCountMax: ratingCountMax?.param,
-    ratingCommentCountMin: ratingCommentCountMin?.param,
-    ratingCommentCountMax: ratingCommentCountMax?.param,
-    questionCountMin: questionCountMin?.param,
-    questionCountMax: questionCountMax?.param,
-    answerCountMin: answerCountMin?.param,
-    answerCountMax: answerCountMax?.param,
-    answerCommentCountMin: answerCommentCountMin?.param,
-    answerCommentCountMax: answerCommentCountMax?.param
+    activitiesCountMin: activitiesCountMin?.param,
+    activitiesCountMax: activitiesCountMax?.param
   }
 }
 
@@ -1161,8 +1131,28 @@ export const checkFeedFilters = ({ query }: Request): FeedFiltersInput => {
     ? isString({ name: 'moderationStatuses', param: query.moderationStatuses })
     : undefined
 
+  const createdFrom = 'createdFrom' in query
+    ? isDate({ name: 'createdFrom', param: query.createdFrom })
+    : undefined
+
+  const createdTo = 'createdTo' in query
+    ? isDate({ name: 'createdTo', param: query.createdTo })
+    : undefined
+
+  const content = 'content' in query
+    ? isString({ name: 'content', param: query.content })
+    : undefined
+
+  const userEmail = 'userEmail' in query
+    ? isString({ name: 'userEmail', param: query.userEmail })
+    : undefined
+
   return {
     types: types?.param,
-    moderationStatuses: moderationStatuses?.param
+    moderationStatuses: moderationStatuses?.param,
+    createdFrom: createdFrom?.param,
+    createdTo: createdTo?.param,
+    content: content?.param,
+    userEmail: userEmail?.param
   }
 }

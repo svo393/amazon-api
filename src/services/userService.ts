@@ -92,7 +92,7 @@ const loginUser = async (userInput: UserLoginInput, res: Response): Promise<User
   ], existingUser)
 }
 
-type UserListData = Omit<User,
+type UserTempData = Omit<User,
   | 'password'
   | 'resetToken'
   | 'resetTokenCreatedAt'
@@ -105,8 +105,17 @@ type UserListData = Omit<User,
   answerCommentCount: number;
 }
 
+type UserListData = Omit<UserTempData,
+  | 'ratingCommentCount'
+  | 'questionCount'
+  | 'answerCount'
+  | 'answerCommentCount'
+> & {
+  activitiesCount: number;
+}
+
 const getUsers = async ({ query: queryArgs }: Request): Promise<UserListData[]> => {
-  let users: UserListData[] = await db('users as u')
+  let rawUsers: UserTempData[] = await db('users as u')
     .select('email',
       'u.name',
       'info',
@@ -117,18 +126,28 @@ const getUsers = async ({ query: queryArgs }: Request): Promise<UserListData[]> 
     )
     .count('o.orderID as orderCount')
     .count('r.ratingID as ratingCount')
-    .count('rc.ratingID as ratingCommentCount')
+    .count('rc.ratingCommentID as ratingCommentCount')
     .count('q.questionID as questionCount')
     .count('a.answerID as answerCount')
     .count('ac.answerID as answerCommentCount')
     .leftJoin('orders as o', 'u.userID', 'o.userID')
     .leftJoin('ratings as r', 'u.userID', 'r.userID')
-    .leftJoin('ratingComments as rc', 'u.userID', 'r.userID')
+    .leftJoin('ratingComments as rc', 'u.userID', 'rc.userID')
     .leftJoin('questions as q', 'u.userID', 'q.userID')
     .leftJoin('answers as a', 'u.userID', 'a.userID')
-    .leftJoin('answerComments as ac', 'u.userID', 'a.userID')
+    .leftJoin('answerComments as ac', 'u.userID', 'ac.userID')
     .where('role', '!=', 'ROOT')
     .groupBy('u.userID')
+
+  let users = rawUsers.map((u) => ({
+    ...R.omit([
+      'ratingCommentCount',
+      'questionCount',
+      'answerCount',
+      'answerCommentCount'
+    ], u),
+    activitiesCount: Number(u.ratingCommentCount) + Number(u.questionCount) + Number(u.answerCount) + Number(u.answerCommentCount)
+  }))
 
   if ('roles' in queryArgs && !R.isEmpty(queryArgs.roles)) {
     users = users.filter((u) =>
@@ -172,51 +191,15 @@ const getUsers = async ({ query: queryArgs }: Request): Promise<UserListData[]> 
     )
   }
 
-  if ('ratingCommentCountMin' in queryArgs && !R.isEmpty(queryArgs.ratingCommentCountMin)) {
+  if ('activitiesCountMin' in queryArgs && !R.isEmpty(queryArgs.activitiesCountMin)) {
     users = users.filter((u) =>
-      u.ratingCommentCount >= Number(queryArgs.ratingCommentCountMin)
+      u.activitiesCount >= Number(queryArgs.activitiesCountMin)
     )
   }
 
-  if ('ratingCommentCountMax' in queryArgs && !R.isEmpty(queryArgs.ratingCommentCountMax)) {
+  if ('activitiesCountMax' in queryArgs && !R.isEmpty(queryArgs.activitiesCountMax)) {
     users = users.filter((u) =>
-      u.ratingCommentCount <= Number(queryArgs.ratingCommentCountMax)
-    )
-  }
-
-  if ('questionCountMin' in queryArgs && !R.isEmpty(queryArgs.questionCountMin)) {
-    users = users.filter((u) =>
-      u.questionCount >= Number(queryArgs.questionCountMin)
-    )
-  }
-
-  if ('questionCountMax' in queryArgs && !R.isEmpty(queryArgs.questionCountMax)) {
-    users = users.filter((u) =>
-      u.questionCount <= Number(queryArgs.questionCountMax)
-    )
-  }
-
-  if ('answerCountMin' in queryArgs && !R.isEmpty(queryArgs.answerCountMin)) {
-    users = users.filter((u) =>
-      u.answerCount >= Number(queryArgs.answerCountMin)
-    )
-  }
-
-  if ('answerCountMax' in queryArgs && !R.isEmpty(queryArgs.answerCountMax)) {
-    users = users.filter((u) =>
-      u.answerCount <= Number(queryArgs.answerCountMax)
-    )
-  }
-
-  if ('answerCommentCountMin' in queryArgs && !R.isEmpty(queryArgs.answerCommentCountMin)) {
-    users = users.filter((u) =>
-      u.answerCommentCount >= Number(queryArgs.answerCommentCountMin)
-    )
-  }
-
-  if ('answerCommentCountMax' in queryArgs && !R.isEmpty(queryArgs.answerCommentCountMax)) {
-    users = users.filter((u) =>
-      u.answerCommentCount <= Number(queryArgs.answerCommentCountMax)
+      u.activitiesCount <= Number(queryArgs.activitiesCountMax)
     )
   }
 

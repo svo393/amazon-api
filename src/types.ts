@@ -111,6 +111,7 @@ export type Rating = {
   moderationStatus: string;
   userID: number;
   groupID: number;
+  userEmail: string;
 }
 
 export type RatingComment = {
@@ -123,6 +124,7 @@ export type RatingComment = {
   userID: number;
   ratingID: number;
   parentRatingCommentID?: number;
+  userEmail: string;
 }
 
 export type Question = {
@@ -136,6 +138,7 @@ export type Question = {
   moderationStatus: string;
   userID: number;
   groupID: number;
+  userEmail: string;
 }
 
 export type Answer = {
@@ -149,6 +152,7 @@ export type Answer = {
   moderationStatus: string;
   userID: number;
   questionID: number;
+  userEmail: string;
 }
 
 export type AnswerComment = {
@@ -161,6 +165,7 @@ export type AnswerComment = {
   userID: number;
   answerID: number;
   parentAnswerCommentID?: number;
+  userEmail: string;
 }
 
 export type GroupVariant = {
@@ -514,6 +519,10 @@ export type CategoryFiltersInput = {
 export type FeedFiltersInput = {
   types?: string;
   moderationStatuses?: string;
+  createdFrom?: string;
+  createdTo?: string;
+  content?: string;
+  userEmail?: string;
 }
 
 export type UsersFiltersInput = {
@@ -524,14 +533,8 @@ export type UsersFiltersInput = {
   orderCountMax: string;
   ratingCountMin: string;
   ratingCountMax: string;
-  ratingCommentCountMin: string;
-  ratingCommentCountMax: string;
-  questionCountMin: string;
-  questionCountMax: string;
-  answerCountMin: string;
-  answerCountMax: string;
-  answerCommentCountMin: string;
-  answerCommentCountMax: string;
+  activitiesCountMin: string;
+  activitiesCountMax: string;
 }
 
 export type OrderProductFullData = Pick<Product,
