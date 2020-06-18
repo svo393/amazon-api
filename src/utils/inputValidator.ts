@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoryCreateInput, CategoryFiltersInput, CategoryUpdateInput, FeedFiltersInput, GroupVariantCreateInput, GroupVariantUpdateInput, InvoiceCreateInput, InvoiceFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ModerationStatus, OrderCreateInput, OrderFiltersInput, OrderProductCreateInput, OrderProductUpdateInput, OrderStatus, OrderUpdateInput, ParameterCreateInput, ParameterUpdateInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductParameterInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorFiltersInput, VendorInput } from '../types'
+import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoryCreateInput, CategoryFiltersInput, CategoryUpdateInput, FeedFiltersInput, GroupVariantCreateInput, GroupVariantUpdateInput, InvoiceCreateInput, InvoiceFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ModerationStatus, OrderCreateInput, OrderFiltersInput, OrderProductCreateInput, OrderProductUpdateInput, OrderStatus, OrderUpdateInput, ParameterCreateInput, ParameterUpdateInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductParameterInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorFiltersInput, VendorInput, ProductsFiltersInput } from '../types'
 import { canBeNumber, hasDefinedProps, isArray, isBoolean, isDate, isEmail, isInputProvided, isPasswordValid, isProductParameterOrGroupVariant, isProvided, isString, isStringOrNumber } from './validatorLib'
 
 export const checkNewUser = ({ body }: Request): UserSignupInput => {
@@ -1057,19 +1057,20 @@ export const checkOrderFilters = ({ query }: Request): OrderFiltersInput => {
 }
 
 export const checkVendorFilters = ({ query }: Request): VendorFiltersInput => {
-  const q = 'q' in query
-    ? isString({ name: 'q', param: query.q })
+  const name = 'name' in query
+    ? isString({ name: 'name', param: query.name })
     : undefined
 
-  return { q: q?.param }
+  return { name: name?.param }
 }
 
 export const checkCategoryFilters = ({ query }: Request): CategoryFiltersInput => {
-  const q = 'q' in query
-    ? isString({ name: 'q', param: query.q })
+  const name = 'name' in query
+    ? isString({ name: 'name', param: query.name })
     : undefined
 
-  return { q: q?.param }
+  // TODO pass this object to service instead of req
+  return { name: name?.param }
 }
 
 export const checkUserFilters = ({ query }: Request): UsersFiltersInput => {
@@ -1154,5 +1155,75 @@ export const checkFeedFilters = ({ query }: Request): FeedFiltersInput => {
     createdTo: createdTo?.param,
     content: content?.param,
     userEmail: userEmail?.param
+  }
+}
+
+export const checkProductFilters = ({ query }: Request): ProductsFiltersInput => {
+  const groupID = 'groupID' in query
+    ? canBeNumber({ name: 'groupID', param: query.groupID })
+    : undefined
+
+  const title = 'title' in query
+    ? isString({ name: 'title', param: query.title })
+    : undefined
+
+  const priceMin = 'priceMin' in query
+    ? canBeNumber({ name: 'priceMin', param: query.priceMin })
+    : undefined
+
+  const priceMax = 'priceMax' in query
+    ? canBeNumber({ name: 'priceMax', param: query.priceMax })
+    : undefined
+
+  const categoryName = 'categoryName' in query
+    ? isString({ name: 'categoryName', param: query.categoryName })
+    : undefined
+
+  const vendorName = 'vendorName' in query
+    ? isString({ name: 'vendorName', param: query.vendorName })
+    : undefined
+
+  const stockMin = 'stockMin' in query
+    ? canBeNumber({ name: 'stockMin', param: query.stockMin })
+    : undefined
+
+  const stockMax = 'stockMax' in query
+    ? canBeNumber({ name: 'stockMax', param: query.stockMax })
+    : undefined
+
+  const isAvailable = 'isAvailable' in query
+    ? isString({ name: 'isAvailable', param: query.isAvailable })
+    : undefined
+
+  const starsMin = 'starsMin' in query
+    ? canBeNumber({ name: 'starsMin', param: query.starsMin })
+    : undefined
+
+  const starsMax = 'starsMax' in query
+    ? canBeNumber({ name: 'starsMax', param: query.starsMax })
+    : undefined
+
+  const ratingMin = 'ratingMin' in query
+    ? canBeNumber({ name: 'ratingMin', param: query.ratingMin })
+    : undefined
+
+  const ratingMax = 'ratingMax' in query
+    ? canBeNumber({ name: 'ratingMax', param: query.ratingMax })
+    : undefined
+
+  return {
+    groupID: groupID?.param,
+    title: title?.param,
+    priceMin: priceMin?.param,
+    priceMax: priceMax?.param,
+    categoryName: categoryName?.param,
+    vendorName: vendorName?.param,
+    stockMin: stockMin?.param,
+    stockMax: stockMax?.param,
+    isAvailable: isAvailable?.param,
+    starsMin: starsMin?.param,
+    starsMax: starsMax?.param,
+    ratingMin: ratingMin?.param,
+    ratingMax: ratingMax?.param
   }
 }

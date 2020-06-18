@@ -2,7 +2,7 @@ import path from 'path'
 import R from 'ramda'
 import supertest from 'supertest'
 import app from '../../src/app'
-import { Answer, AnswerComment, CartProduct, Invoice, List, Order, Product, Question, Rating, RatingComment } from '../../src/types'
+import { Answer, AnswerComment, CartProduct, Invoice, List, Order, Product, Question, Rating, RatingComment, Group } from '../../src/types'
 import { apiURLs } from '../../src/utils/constants'
 import { db } from '../../src/utils/db'
 import { createOneCategory, createOneVendor, loginAs, populateUsers, purge } from '../testHelper'
@@ -85,20 +85,34 @@ const seed = async (): Promise<void> => {
         const { addedVendor } = await createOneVendor('admin', v[0])
 
         return await Promise.all(Object.entries(v[1]).map(async (g) => {
-          let groupID: number
+          const bodies = []
 
-          return await Promise.all(g[1].map(async (p, i) => {
-            const { body }: { body: Product } = await api
-              .post(apiURLs.products)
-              .set('Cookie', `token=${token}`)
-              .send({
-                ...R.omit([ 'ratings', 'questions' ], p),
-                userID,
-                categoryID: addedCategory.categoryID,
-                vendorID: addedVendor.vendorID,
-                groupID
-              })
-            groupID = body.groupID
+          let { body }: { body: Product } = await api
+            .post(apiURLs.products)
+            .set('Cookie', `token=${token}`)
+            .send({
+              ...R.omit([ 'ratings', 'questions' ], g[1][0]),
+              userID,
+              categoryID: addedCategory.categoryID,
+              vendorID: addedVendor.vendorID
+            })
+          bodies.push(body)
+          const groupID = body.groupID
+
+          bodies.push(await Promise.all(g[1].map(async (p, i) => {
+            if (i !== 0) {
+              const result: { body: Product } = await api
+                .post(apiURLs.products)
+                .set('Cookie', `token=${token}`)
+                .send({
+                  ...R.omit([ 'ratings', 'questions' ], p),
+                  userID,
+                  categoryID: addedCategory.categoryID,
+                  vendorID: addedVendor.vendorID,
+                  groupID
+                })
+              body = result.body
+            }
 
             if (p.media) {
               const uploadAPI = api
@@ -281,7 +295,8 @@ const seed = async (): Promise<void> => {
               }))
             }
             return body
-          }))
+          })))
+          return bodies
         }))
       }))
     })))

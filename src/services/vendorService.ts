@@ -1,4 +1,5 @@
 import { Request } from 'express'
+import R from 'ramda'
 import { Vendor, VendorInput } from '../types'
 import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
@@ -22,15 +23,17 @@ const addVendor = async (vendorInput: VendorInput): Promise<Vendor> => {
 type VendorListData = Vendor & { productCount: number }
 
 const getVendors = async ({ query: queryArgs }: Request): Promise<VendorListData[]> => {
-  const query = db<Vendor>('vendors as v')
+  let vendors: VendorListData[] = await db<Vendor>('vendors as v')
     .select('v.vendorID', 'v.name')
     .count('p.productID as productCount')
     .joinRaw('JOIN products as p USING ("vendorID")')
     .groupBy('v.vendorID')
 
-  queryArgs.q && query.where('name', 'ilike', `%${queryArgs.q}%`)
-
-  return await query
+  if ('name' in queryArgs && !R.isEmpty(queryArgs.name)) {
+    vendors = vendors.filter((p) =>
+      p.name.toLowerCase().includes(queryArgs.name.toString().toLowerCase()))
+  }
+  return vendors
 }
 
 const getVendorByID = async (req: Request): Promise<VendorListData> => {

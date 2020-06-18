@@ -1,5 +1,6 @@
 import { Request } from 'express'
 import Knex from 'knex'
+import R from 'ramda'
 import { Invoice, InvoiceCreateInput, InvoiceUpdateInput } from '../types'
 import { db, dbTrans } from '../utils/db'
 import StatusError from '../utils/StatusError'
@@ -19,7 +20,7 @@ const addInvoice = async (invoiceInput: InvoiceCreateInput): Promise<Invoice> =>
 }
 
 const getInvoices = async ({ query: queryArgs }: Request): Promise<Invoice[]> => {
-  const query = db<Invoice>('invoices as i')
+  let invoices: Invoice[] = await db<Invoice>('invoices as i')
     .select(
       'i.invoiceID',
       'i.amount',
@@ -35,27 +36,49 @@ const getInvoices = async ({ query: queryArgs }: Request): Promise<Invoice[]> =>
     .join('users as u', 'i.userID', 'u.userID')
     .groupBy('i.invoiceID', 'userEmail')
 
-  queryArgs.invoiceStatuses &&
-  query.where('invoiceStatus', 'in', queryArgs.invoiceStatuses.toString().split(','))
+  if ('invoiceStatuses' in queryArgs && !R.isEmpty(queryArgs.invoiceStatuses)) {
+    invoices = invoices.filter((o) =>
+      queryArgs.invoiceStatuses.toString().split(',').includes(o.invoiceStatus)
+    )
+  }
 
-  queryArgs.paymentMethods &&
-  query.where('paymentMethod', 'in', queryArgs.paymentMethods.toString().split(','))
+  if ('paymentMethods' in queryArgs && !R.isEmpty(queryArgs.paymentMethods)) {
+    invoices = invoices.filter((o) =>
+      queryArgs.paymentMethods.toString().split(',').includes(o.paymentMethod)
+    )
+  }
 
-  queryArgs.amountMin &&
-  query.where('amount', '>=', Number(queryArgs.amountMin) * 100)
+  if ('amountMin' in queryArgs && !R.isEmpty(queryArgs.amountMin)) {
+    invoices = invoices.filter((o) =>
+      o.amount >= Number(queryArgs.amountMin)
+    )
+  }
 
-  queryArgs.amountMax &&
-  query.where('amount', '<=', Number(queryArgs.amountMax) * 100)
+  if ('amountMax' in queryArgs && !R.isEmpty(queryArgs.amountMax)) {
+    invoices = invoices.filter((o) =>
+      o.amount <= Number(queryArgs.amountMax)
+    )
+  }
 
-  queryArgs.createdFrom &&
-  query.where('i.createdAt', '>=', queryArgs.createdFrom.toString())
+  if ('createdFrom' in queryArgs && !R.isEmpty(queryArgs.createdFrom)) {
+    invoices = invoices.filter((o) =>
+      o.createdAt >= new Date(queryArgs.createdFrom.toString())
+    )
+  }
 
-  queryArgs.createdTo &&
-  query.where('i.createdAt', '<=', queryArgs.createdTo.toString())
+  if ('createdTo' in queryArgs && !R.isEmpty(queryArgs.createdTo)) {
+    invoices = invoices.filter((o) =>
+      o.createdAt <= new Date(queryArgs.createdTo.toString())
+    )
+  }
 
-  queryArgs.userEmail && query.where('u.email', 'ilike', `%${queryArgs.userEmail}%`)
+  if ('userEmail' in queryArgs && !R.isEmpty(queryArgs.userEmail)) {
+    invoices = invoices.filter((o) =>
+        o.userEmail?.toLowerCase().includes(queryArgs.userEmail.toString().toLowerCase())
+    )
+  }
 
-  return await query
+  return invoices
 }
 
 const getInvoicesByUser = async (req: Request): Promise<Invoice[]> => {

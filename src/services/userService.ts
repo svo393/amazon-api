@@ -205,7 +205,7 @@ const getUsers = async ({ query: queryArgs }: Request): Promise<UserListData[]> 
 
   if ('email' in queryArgs && !R.isEmpty(queryArgs.email)) {
     users = users.filter((u) =>
-      u.email.includes(queryArgs.email.toString())
+      u.email.toLowerCase().includes(queryArgs.email.toString().toLowerCase())
     )
   }
 

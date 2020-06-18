@@ -117,7 +117,7 @@ const getFeed = async ({ query: queryArgs }: Request): Promise<Feed> => {
   if ('content' in queryArgs && !R.isEmpty(queryArgs.content)) {
     for (const activity in feed) {
       feed[activity] = feed[activity].filter((a: Activity) =>
-        a.content.includes(queryArgs.content.toString()))
+        a.content.toLowerCase().includes(queryArgs.content.toString().toLowerCase()))
       if (R.isEmpty(feed[activity])) delete feed[activity]
     }
   }
@@ -125,7 +125,7 @@ const getFeed = async ({ query: queryArgs }: Request): Promise<Feed> => {
   if ('userEmail' in queryArgs && !R.isEmpty(queryArgs.userEmail)) {
     for (const activity in feed) {
       feed[activity] = feed[activity].filter((a: Activity) =>
-        a.userEmail.includes(queryArgs.userEmail.toString()))
+        a.userEmail.toLowerCase().includes(queryArgs.userEmail.toString().toLowerCase()))
       if (R.isEmpty(feed[activity])) delete feed[activity]
     }
   }

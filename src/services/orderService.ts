@@ -1,7 +1,7 @@
 import { Request } from 'express'
 import Knex from 'knex'
 import R from 'ramda'
-import { Invoice, Order, OrderCreateInput, OrderFullData, OrderProduct, OrderUpdateInput, OrderProductFullData } from '../types'
+import { Invoice, Order, OrderCreateInput, OrderFullData, OrderProduct, OrderProductFullData, OrderUpdateInput } from '../types'
 import { db, dbTrans } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
@@ -59,7 +59,7 @@ const addOrder = async (orderInput: OrderCreateInput): Promise<OrderFullData & I
 }
 
 const getOrders = async ({ query: queryArgs }: Request): Promise<Order[]> => {
-  const query = db<Order>('orders as o')
+  let orders: Order[] = await db<Order>('orders as o')
     .select(
       'o.orderID',
       'o.address',
@@ -76,27 +76,49 @@ const getOrders = async ({ query: queryArgs }: Request): Promise<Order[]> => {
     .join('users as u', 'o.userID', 'u.userID')
     .groupBy('o.orderID', 'i.amount', 'i.invoiceID', 'userEmail')
 
-  queryArgs.orderStatuses &&
-  query.where('orderStatus', 'in', queryArgs.orderStatuses.toString().split(','))
+  if ('orderStatuses' in queryArgs && !R.isEmpty(queryArgs.orderStatuses)) {
+    orders = orders.filter((o) =>
+      queryArgs.orderStatuses.toString().split(',').includes(o.orderStatus)
+    )
+  }
 
-  queryArgs.shippingMethods &&
-  query.where('shippingMethod', 'in', queryArgs.shippingMethods.toString().split(','))
+  if ('shippingMethods' in queryArgs && !R.isEmpty(queryArgs.shippingMethods)) {
+    orders = orders.filter((o) =>
+      queryArgs.shippingMethods.toString().split(',').includes(o.shippingMethod)
+    )
+  }
 
-  queryArgs.amountMin &&
-  query.where('amount', '>=', Number(queryArgs.amountMin) * 100)
+  if ('amountMin' in queryArgs && !R.isEmpty(queryArgs.amountMin)) {
+    orders = orders.filter((o) =>
+      o.amount >= Number(queryArgs.amountMin)
+    )
+  }
 
-  queryArgs.amountMax &&
-  query.where('amount', '<=', Number(queryArgs.amountMax) * 100)
+  if ('amountMax' in queryArgs && !R.isEmpty(queryArgs.amountMax)) {
+    orders = orders.filter((o) =>
+      o.amount <= Number(queryArgs.amountMax)
+    )
+  }
 
-  queryArgs.createdFrom &&
-  query.where('o.createdAt', '>=', queryArgs.createdFrom.toString())
+  if ('createdFrom' in queryArgs && !R.isEmpty(queryArgs.createdFrom)) {
+    orders = orders.filter((o) =>
+      o.createdAt >= new Date(queryArgs.createdFrom.toString())
+    )
+  }
 
-  queryArgs.createdTo &&
-  query.where('o.createdAt', '<=', queryArgs.createdTo.toString())
+  if ('createdTo' in queryArgs && !R.isEmpty(queryArgs.createdTo)) {
+    orders = orders.filter((o) =>
+      o.createdAt <= new Date(queryArgs.createdTo.toString())
+    )
+  }
 
-  queryArgs.userEmail && query.where('u.email', 'ilike', `%${queryArgs.userEmail}%`)
+  if ('userEmail' in queryArgs && !R.isEmpty(queryArgs.userEmail)) {
+    orders = orders.filter((o) =>
+      o.userEmail?.toLowerCase().includes(queryArgs.userEmail.toString().toLowerCase())
+    )
+  }
 
-  return await query
+  return orders
 }
 
 const getOrdersByUser = async (req: Request): Promise<Order[]> => {

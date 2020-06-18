@@ -1,4 +1,5 @@
 import { Request } from 'express'
+import R from 'ramda'
 import { Category, CategoryCreateInput, CategoryUpdateInput } from '../types'
 import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
@@ -23,15 +24,16 @@ type CategoryWithProductCount = Category & { productCount: number }
 type CategoryListData = CategoryWithProductCount & { children: number[] }
 
 const getCategories = async ({ query: queryArgs }: Request): Promise<CategoryListData[]> => {
-  const query = db<Category>('categories as c')
+  let categories: CategoryWithProductCount[] = await db('categories as c')
     .select('c.categoryID', 'c.name')
     .count('p.productID as productCount')
     .joinRaw('JOIN products as p USING ("categoryID")')
     .groupBy('c.categoryID')
 
-  queryArgs.q && query.where('name', 'ilike', `%${queryArgs.q}%`)
-
-  const categories: CategoryWithProductCount[] = await query
+  if ('name' in queryArgs && !R.isEmpty(queryArgs.name)) {
+    categories = categories.filter((p) =>
+      p.name.toLowerCase().includes(queryArgs.name.toString().toLowerCase()))
+  }
 
   return categories.map((c) => ({
     ...c,

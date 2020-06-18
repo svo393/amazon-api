@@ -509,11 +509,11 @@ export type InvoiceFiltersInput = {
 }
 
 export type VendorFiltersInput = {
-  q?: string;
+  name?: string;
 }
 
 export type CategoryFiltersInput = {
-  q?: string;
+  name?: string;
 }
 
 export type FeedFiltersInput = {
@@ -525,16 +525,32 @@ export type FeedFiltersInput = {
   userEmail?: string;
 }
 
+export type ProductsFiltersInput = {
+  groupID?: string;
+  title?: string;
+  priceMin?: string;
+  priceMax?: string;
+  categoryName?: string;
+  vendorName?: string;
+  stockMin?: string;
+  stockMax?: string;
+  isAvailable?: string;
+  starsMin?: string;
+  starsMax?: string;
+  ratingMin?: string;
+  ratingMax?: string;
+}
+
 export type UsersFiltersInput = {
-  roles: string;
-  createdFrom: string;
-  createdTo: string;
-  orderCountMin: string;
-  orderCountMax: string;
-  ratingCountMin: string;
-  ratingCountMax: string;
-  activitiesCountMin: string;
-  activitiesCountMax: string;
+  roles?: string;
+  createdFrom?: string;
+  createdTo?: string;
+  orderCountMin?: string;
+  orderCountMax?: string;
+  ratingCountMin?: string;
+  ratingCountMax?: string;
+  activitiesCountMin?: string;
+  activitiesCountMax?: string;
 }
 
 export type OrderProductFullData = Pick<Product,
