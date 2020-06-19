@@ -1,7 +1,7 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoryCreateInput, CategoryFiltersInput, CategoryUpdateInput, FeedFiltersInput, GroupVariantCreateInput, GroupVariantUpdateInput, InvoiceCreateInput, InvoiceFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ModerationStatus, OrderCreateInput, OrderFiltersInput, OrderProductCreateInput, OrderProductUpdateInput, OrderStatus, OrderUpdateInput, ParameterCreateInput, ParameterUpdateInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductParameterInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorFiltersInput, VendorInput, ProductsFiltersInput } from '../types'
-import { canBeNumber, hasDefinedProps, isArray, isBoolean, isDate, isEmail, isInputProvided, isPasswordValid, isProductParameterOrGroupVariant, isProvided, isString, isStringOrNumber } from './validatorLib'
+import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoryCreateInput, CategoryFiltersInput, CategoryUpdateInput, FeedFiltersInput, GroupVariantCreateInput, GroupVariantUpdateInput, InvoiceCreateInput, InvoiceFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ModerationStatus, OrderCreateInput, OrderFiltersInput, OrderProductCreateInput, OrderProductUpdateInput, OrderStatus, OrderUpdateInput, ParameterCreateInput, ParameterUpdateInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductParameterInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorFiltersInput, VendorInput } from '../types'
+import { canBeBoolean, canBeNumber, hasDefinedProps, isArray, isBoolean, isDate, isEmail, isInputProvided, isPasswordValid, isProductParameterOrGroupVariant, isProvided, isString, isStringOrNumber } from './validatorLib'
 
 export const checkNewUser = ({ body }: Request): UserSignupInput => {
   const email = R.pipe(
@@ -1196,7 +1196,7 @@ export const checkProductFilters = ({ query }: Request): ProductsFiltersInput =>
     : undefined
 
   const isAvailable = 'isAvailable' in query
-    ? isString({ name: 'isAvailable', param: query.isAvailable })
+    ? canBeBoolean({ name: 'isAvailable', param: query.isAvailable })
     : undefined
 
   const starsMin = 'starsMin' in query

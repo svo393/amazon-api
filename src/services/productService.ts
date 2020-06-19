@@ -133,7 +133,7 @@ export const getProducts = async (productFilterInput: ProductsFiltersInput): Pro
 
   if (typeof (isAvailable) !== 'undefined') {
     products = products
-      .filter((p) => p.isAvailable === Boolean(isAvailable))
+      .filter((p) => p.isAvailable === isAvailable)
   }
 
   if (typeof (starsMin) !== 'undefined') {

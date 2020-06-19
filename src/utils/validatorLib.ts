@@ -1,4 +1,3 @@
-import R from 'ramda'
 import checkEmail from 'validator/lib/isEmail'
 import StatusError from './StatusError'
 
@@ -94,6 +93,15 @@ export const isBoolean: CP = ({ name, param }) => {
     throw new StatusError(400, `Incorrect ${name}: ${param}`)
   }
   return { name, param }
+}
+
+export const canBeBoolean: CP = ({ name, param }) => {
+  const paramBool = JSON.parse(param)
+
+  if (typeof (paramBool) !== 'boolean') {
+    throw new StatusError(400, `Incorrect ${name}: ${param}`)
+  }
+  return { name, param: paramBool }
 }
 
 export const isEmail: CP = ({ name, param }) => {
