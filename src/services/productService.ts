@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import Knex from 'knex'
 import R from 'ramda'
-import { GroupVariant, Parameter, Product, ProductAllData, ProductCreateInput, ProductUpdateInput, ProductsFiltersInput } from '../types'
+import { GroupVariant, Parameter, Product, ProductAllData, ProductCreateInput, ProductsFiltersInput, ProductUpdateInput } from '../types'
 import { db, dbTrans } from '../utils/db'
 import { uploadImages } from '../utils/img'
 import { getProductsQuery } from '../utils/queries'
@@ -159,11 +159,33 @@ export const getProducts = async (productFilterInput: ProductsFiltersInput): Pro
   return products
 }
 
-const getProductByID = async (req: Request, res: Response): Promise<ProductListData| ProductAllData> => {
+type ProductData = ProductListData & {
+  listPrice: number;
+  media: number;
+  description: string;
+  brandSection: string;
+  userEmail: string;
+  stars: number;
+  ratingCount: number;
+  vendorName: string;
+  categoryName: string;
+}
+
+const getProductByID = async (req: Request, res: Response): Promise<ProductData| ProductAllData> => {
   const [ product ] = await getProductsQuery.clone()
-    .select('p.createdAt', 'p.updatedAt', 'p.userID')
+    .select(
+      'p.createdAt',
+      'p.updatedAt',
+      'p.userID',
+      'p.media',
+      'p.listPrice',
+      'p.description',
+      'p.brandSection',
+      'u.email as userEmail')
     .where('p.productID', req.params.productID)
     .leftJoin('groupVariants as gv', 'p.groupID', 'gv.groupID')
+    .leftJoin('users as u', 'p.userID', 'u.userID')
+    .groupBy('userEmail')
 
   if (product === undefined) throw new StatusError(404, 'Not Found')
 
