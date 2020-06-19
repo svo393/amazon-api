@@ -22,7 +22,7 @@ const addQuestion = async (questionInput: QuestionCreateInput, res: Response): P
     }) ]
   )
 
-  if (typeof (addedQuestion) === 'undefined') {
+  if (addedQuestion === undefined) {
     throw new StatusError(409, 'You\'ve already left a review for this product')
   }
   return addedQuestion
@@ -43,7 +43,7 @@ const getQuestionByID = async (req: Request): Promise<Question> => {
     .first()
     .where('questionID', req.params.questionID)
 
-  if (typeof (question) === 'undefined') throw new StatusError(404, 'Not Found')
+  if (question === undefined) throw new StatusError(404, 'Not Found')
   return question
 }
 
@@ -55,7 +55,7 @@ const updateQuestion = async (questionInput: QuestionUpdateInput, req: Request):
     }, [ '*' ])
     .where('questionID', req.params.questionID)
 
-  if (typeof (updatedQuestion) === 'undefined') throw new StatusError(404, 'Not Found')
+  if (updatedQuestion === undefined) throw new StatusError(404, 'Not Found')
   return updatedQuestion
 }
 

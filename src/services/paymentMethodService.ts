@@ -13,7 +13,7 @@ const addPaymentMethod = async (paymentMethodInput: PaymentMethod): Promise<Paym
     [ db('paymentMethods').insert(paymentMethodInput) ]
   )
 
-  if (typeof (addedPaymentMethod) === 'undefined') {
+  if (addedPaymentMethod === undefined) {
     throw new StatusError(409, `PaymentMethod with name "${paymentMethodInput.paymentMethodName}" already exists`)
   }
   return addedPaymentMethod
@@ -35,7 +35,7 @@ const updatePaymentMethod = async (paymentMethodInput: PaymentMethod, req: Reque
     .update(paymentMethodInput, [ '*' ])
     .where('paymentMethodName', req.params.paymentMethodName)
 
-  if (typeof (updatedPaymentMethod) === 'undefined') throw new StatusError(404, 'Not Found')
+  if (updatedPaymentMethod === undefined) throw new StatusError(404, 'Not Found')
   return updatedPaymentMethod
 }
 

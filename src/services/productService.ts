@@ -34,7 +34,7 @@ const addProduct = async (productInput: ProductCreateInput, res: Response): Prom
         })), [ '*' ])
     }
 
-    if (typeof (productInput.parameters) !== 'undefined' && productInput.parameters.length !== 0) {
+    if (productInput.parameters !== undefined && productInput.parameters.length !== 0) {
       const { rows: addedParameters }: { rows: Parameter[] } = await trx.raw(
         `? ON CONFLICT ("name")
            DO UPDATE SET
@@ -91,67 +91,67 @@ export const getProducts = async (productFilterInput: ProductsFiltersInput): Pro
   // TODO refactor reusable queries
   let products: ProductListData[] = await getProductsQuery.clone()
 
-  if (typeof (groupID) !== 'undefined') {
+  if (groupID !== undefined) {
     products = products
       .filter((p) => p.groupID === groupID)
   }
 
-  if (typeof (title) !== 'undefined') {
+  if (title !== undefined) {
     products = products
       .filter((p) => p.title.toLowerCase().includes(title.toLowerCase()))
   }
 
-  if (typeof (priceMin) !== 'undefined') {
+  if (priceMin !== undefined) {
     products = products
       .filter((p) => p.price >= priceMin * 10)
   }
 
-  if (typeof (priceMax) !== 'undefined') {
+  if (priceMax !== undefined) {
     products = products
       .filter((p) => p.price <= priceMax * 10)
   }
 
-  if (typeof (vendorName) !== 'undefined') {
+  if (vendorName !== undefined) {
     products = products
       .filter((p) => p.vendorName.includes(vendorName))
   }
 
-  if (typeof (categoryName) !== 'undefined') {
+  if (categoryName !== undefined) {
     products = products
       .filter((p) => p.categoryName.includes(categoryName))
   }
 
-  if (typeof (stockMin) !== 'undefined') {
+  if (stockMin !== undefined) {
     products = products
       .filter((p) => p.stock >= stockMin)
   }
 
-  if (typeof (stockMax) !== 'undefined') {
+  if (stockMax !== undefined) {
     products = products
       .filter((p) => p.stock <= stockMax)
   }
 
-  if (typeof (isAvailable) !== 'undefined') {
+  if (isAvailable !== undefined) {
     products = products
       .filter((p) => p.isAvailable === isAvailable)
   }
 
-  if (typeof (starsMin) !== 'undefined') {
+  if (starsMin !== undefined) {
     products = products
       .filter((p) => p.stars >= starsMin)
   }
 
-  if (typeof (starsMax) !== 'undefined') {
+  if (starsMax !== undefined) {
     products = products
       .filter((p) => p.stars <= starsMax)
   }
 
-  if (typeof (ratingMin) !== 'undefined') {
+  if (ratingMin !== undefined) {
     products = products
       .filter((p) => p.ratingCount >= ratingMin)
   }
 
-  if (typeof (ratingMax) !== 'undefined') {
+  if (ratingMax !== undefined) {
     products = products
       .filter((p) => p.ratingCount <= ratingMax)
   }
@@ -165,7 +165,7 @@ const getProductByID = async (req: Request, res: Response): Promise<ProductListD
     .where('p.productID', req.params.productID)
     .leftJoin('groupVariants as gv', 'p.groupID', 'gv.groupID')
 
-  if (typeof (product) === 'undefined') throw new StatusError(404, 'Not Found')
+  if (product === undefined) throw new StatusError(404, 'Not Found')
 
   const groupVariants = await db<GroupVariant>('groupVariants')
     .where('groupID', product.groupID)
@@ -191,7 +191,7 @@ const updateProduct = async (productInput: ProductUpdateInput, req: Request): Pr
     }, [ '*' ])
     .where('productID', req.params.productID)
 
-  if (typeof (updatedProduct) === 'undefined') throw new StatusError(404, 'Not Found')
+  if (updatedProduct === undefined) throw new StatusError(404, 'Not Found')
   return updatedProduct
 }
 

@@ -17,7 +17,7 @@ const addGroupVariant = async (groupVariantInput: GroupVariantCreateInput, req: 
     }) ]
   )
 
-  if (typeof (addedGroupVariant) === 'undefined') {
+  if (addedGroupVariant === undefined) {
     throw new StatusError(409, 'This product is already added to the group')
   }
   return addedGroupVariant
@@ -30,7 +30,7 @@ const updateGroupVariant = async (groupVariantInput: GroupVariantUpdateInput, re
     .andWhere('productID', req.params.productID)
     .andWhere('name', req.params.name)
 
-  if (typeof (updatedGroupVariant) === 'undefined') throw new StatusError(404, 'Not Found')
+  if (updatedGroupVariant === undefined) throw new StatusError(404, 'Not Found')
   return updatedGroupVariant
 }
 

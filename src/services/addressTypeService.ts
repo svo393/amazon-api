@@ -13,7 +13,7 @@ const addAddressType = async (atInput: ATInput): Promise<AT> => {
     [ db('addressTypes').insert(atInput) ]
   )
 
-  if (typeof (addedAT) === 'undefined') {
+  if (addedAT === undefined) {
     throw new StatusError(409, `AddressType with name "${atInput.addressTypeName}" already exists`)
   }
   return addedAT
@@ -37,7 +37,7 @@ const getAddressTypeByName = async (res: Response, req: Request): Promise<Single
     : ats.filter((at) => !at.isPrivate)
 
   const [ at ] = filteredATs.filter((shm) => shm.addressTypeName === addressTypeName)
-  if (typeof (at) === 'undefined') throw new StatusError(404, 'Not Found')
+  if (at === undefined) throw new StatusError(404, 'Not Found')
 
   const addresses = await db<Address>('addresses')
     .where('addressType', addressTypeName)
@@ -50,7 +50,7 @@ const updateAddressType = async (res: Response, atInput: ATInput, req: Request):
     .update(atInput, [ '*' ])
     .where('addressTypeName', req.params.addressTypeName)
 
-  if (typeof (updatedAT) === 'undefined') throw new StatusError(404, 'Not Found')
+  if (updatedAT === undefined) throw new StatusError(404, 'Not Found')
 
   const addresses = await db<Address>('addresses')
     .where('addressType', updatedAT.addressTypeName)

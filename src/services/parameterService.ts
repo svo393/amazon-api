@@ -22,7 +22,7 @@ const addProductParameter = async (productParameterInput: ProductParameterInput,
     })) ]
   )
 
-  if (typeof (addedProductParameter) === 'undefined') {
+  if (addedProductParameter === undefined) {
     throw new StatusError(409, 'This parameter is already added to the product')
   }
   return addedProductParameter
@@ -45,7 +45,7 @@ const updateParameter = async (parameterInput: ParameterUpdateInput, req: Reques
     .update(parameterInput, [ '*' ])
     .where('parameterID', req.params.parameterID)
 
-  if (typeof (updatedParameter) === 'undefined') throw new StatusError(404, 'Not Found')
+  if (updatedParameter === undefined) throw new StatusError(404, 'Not Found')
   return updatedParameter
 }
 

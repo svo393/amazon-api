@@ -13,7 +13,7 @@ const addInvoiceStatus = async (invoiceStatusInput: InvoiceStatus): Promise<Invo
     [ db('invoiceStatuses').insert(invoiceStatusInput) ]
   )
 
-  if (typeof (addedInvoiceStatus) === 'undefined') {
+  if (addedInvoiceStatus === undefined) {
     throw new StatusError(409, `InvoiceStatus with name "${invoiceStatusInput.invoiceStatusName}" already exists`)
   }
   return addedInvoiceStatus
@@ -28,7 +28,7 @@ const updateInvoiceStatus = async (invoiceStatusInput: InvoiceStatus, req: Reque
     .update(invoiceStatusInput, [ '*' ])
     .where('invoiceStatusName', req.params.invoiceStatusName)
 
-  if (typeof (updatedInvoiceStatus) === 'undefined') throw new StatusError(404, 'Not Found')
+  if (updatedInvoiceStatus === undefined) throw new StatusError(404, 'Not Found')
   return updatedInvoiceStatus
 }
 

@@ -21,9 +21,9 @@ const addAddress = async (addressInput: AddressCreateInput, res: Response): Prom
   if (existingAddresses.length !== 0) {
     curUA = existingAddresses.find((a) => a.userID === res.locals.userID)
 
-    if (typeof (curUA) !== 'undefined') {
+    if (curUA !== undefined) {
       if (
-        typeof (isDefault) !== 'undefined' &&
+        isDefault !== undefined &&
         curUA.isDefault !== isDefault
       ) {
         const [ updatedUserAddress ]: UserAddress[] = await db('userAddresses')
@@ -53,7 +53,7 @@ const addAddress = async (addressInput: AddressCreateInput, res: Response): Prom
         .insert(R.omit([ 'isDefault' ], addressInput), [ '*' ])
         .into('addresses')
 
-      if (typeof (addedAddress) === 'undefined') throw new StatusError()
+      if (addedAddress === undefined) throw new StatusError()
 
       const [ addedUserAddress ]: UserAddress[] = await trx
         .insert({
@@ -94,7 +94,7 @@ const getAddressByID = async (req: Request, res: Response): Promise<AddressFullD
     .joinRaw('JOIN "userAddresses" as ua USING ("addressID")')
     .leftJoin('addressTypes as at', 'a.addressType', 'at.addressTypeName')
 
-  if (typeof (address) === 'undefined') throw new StatusError(404, 'Not Found')
+  if (address === undefined) throw new StatusError(404, 'Not Found')
 
   const role: string | undefined = res.locals.userRole
 

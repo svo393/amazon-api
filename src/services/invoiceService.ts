@@ -45,37 +45,37 @@ const getInvoices = async (invoiceFilterInput: InvoiceFiltersInput): Promise<Inv
     .join('users as u', 'i.userID', 'u.userID')
     .groupBy('i.invoiceID', 'userEmail')
 
-  if (typeof (invoiceStatuses) !== 'undefined') {
+  if (invoiceStatuses !== undefined) {
     invoices = invoices
       .filter((i) => invoiceStatuses.split(',').includes(i.invoiceStatus))
   }
 
-  if (typeof (paymentMethods) !== 'undefined') {
+  if (paymentMethods !== undefined) {
     invoices = invoices
       .filter((i) => paymentMethods.split(',').includes(i.paymentMethod))
   }
 
-  if (typeof (amountMin) !== 'undefined') {
+  if (amountMin !== undefined) {
     invoices = invoices
       .filter((i) => i.amount >= amountMin)
   }
 
-  if (typeof (amountMax) !== 'undefined') {
+  if (amountMax !== undefined) {
     invoices = invoices
       .filter((i) => i.amount <= amountMax)
   }
 
-  if (typeof (createdFrom) !== 'undefined') {
+  if (createdFrom !== undefined) {
     invoices = invoices
       .filter((i) => i.createdAt >= new Date(createdFrom))
   }
 
-  if (typeof (createdTo) !== 'undefined') {
+  if (createdTo !== undefined) {
     invoices = invoices
       .filter((i) => i.createdAt <= new Date(createdTo))
   }
 
-  if (typeof (userEmail) !== 'undefined') {
+  if (userEmail !== undefined) {
     invoices = invoices
       .filter((i) => i.userEmail?.toLowerCase().includes(userEmail.toLowerCase()))
   }
@@ -105,7 +105,7 @@ const getInvoiceByID = async (req: Request): Promise<Invoice> => {
     .where('invoiceID', req.params.invoiceID)
     .joinRaw('JOIN users as u USING ("userID")')
 
-  if (typeof (invoice) === 'undefined') throw new StatusError(404, 'Not Found')
+  if (invoice === undefined) throw new StatusError(404, 'Not Found')
   return invoice
 }
 
@@ -127,7 +127,7 @@ const updateInvoice = async (invoiceInput: InvoiceUpdateInput, req: Request): Pr
       }, [ '*' ])
       .where('invoiceID', req.params.invoiceID)
 
-    if (typeof (updatedInvoice) === 'undefined') throw new StatusError(404, 'Not Found')
+    if (updatedInvoice === undefined) throw new StatusError(404, 'Not Found')
     return updatedInvoice
   })
 }

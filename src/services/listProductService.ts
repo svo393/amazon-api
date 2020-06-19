@@ -16,7 +16,7 @@ const addListProduct = async (req: Request): Promise<ListProduct> => {
     }) ]
   )
 
-  if (typeof (addedUA) === 'undefined') {
+  if (addedUA === undefined) {
     throw new StatusError(409, 'This product is already added to the list')
   }
   return addedUA

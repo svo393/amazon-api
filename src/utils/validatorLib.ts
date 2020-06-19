@@ -10,7 +10,7 @@ type CP = (params: {
 }
 
 export const isProvided: CP = ({ name, param }) => {
-  if (typeof (param) === 'undefined') {
+  if (param === undefined) {
     throw new StatusError(400, `Missing ${name}`)
   }
   return { name, param }
@@ -26,7 +26,7 @@ export const hasDefinedProps = <T>(param: T): T => {
 }
 
 export const isInputProvided = (param: object, msg = 'Missing input'): void => {
-  if (typeof (param) === 'undefined') {
+  if (param === undefined) {
     throw new StatusError(400, msg)
   }
 }
@@ -75,7 +75,7 @@ export const isNumber: CP = ({ name, param }) => {
 }
 
 export const canBeNumber: CP = ({ name, param }) => {
-  if (typeof (param) !== 'undefined' && !/^\d+(?:\.\d{2})?$/.test(param)) {
+  if (param !== undefined && !/^\d+(?:\.\d{2})?$/.test(param)) {
     throw new StatusError(400, `Incorrect ${name}: ${param}`)
   }
   return { name, param: Number(param) }

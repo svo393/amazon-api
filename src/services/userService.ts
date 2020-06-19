@@ -34,7 +34,7 @@ const addUser = async (userInput: UserSignupInput, res: Response): Promise<UserS
     .first('userID')
     .where('email', email)
 
-  if (typeof (existingUser) !== 'undefined') {
+  if (existingUser !== undefined) {
     throw new StatusError(409, `User with email '${email}' already exists`)
   }
 
@@ -48,7 +48,7 @@ const addUser = async (userInput: UserSignupInput, res: Response): Promise<UserS
       role: 'CUSTOMER'
     }, [ 'userID', 'email' ])
 
-  if (typeof (addedUser) === 'undefined') { throw new StatusError() }
+  if (addedUser === undefined) { throw new StatusError() }
 
   const token = jwt.sign(
     { userID: addedUser.userID },
@@ -67,7 +67,7 @@ const loginUser = async (userInput: UserLoginInput, res: Response): Promise<User
     .first()
     .where('email', email)
 
-  if (typeof (existingUser) === 'undefined') {
+  if (existingUser === undefined) {
     throw new StatusError(401, 'Invalid Email or Password')
   }
 
@@ -162,57 +162,57 @@ const getUsers = async (userFilterInput: UsersFiltersInput): Promise<UserListDat
     activitiesCount: Number(u.ratingCommentCount) + Number(u.questionCount) + Number(u.answerCount) + Number(u.answerCommentCount)
   }))
 
-  if (typeof (roles) !== 'undefined') {
+  if (roles !== undefined) {
     users = users
       .filter((u) => roles.split(',').includes(u.role))
   }
 
-  if (typeof (createdFrom) !== 'undefined') {
+  if (createdFrom !== undefined) {
     users = users
       .filter((u) => u.createdAt >= new Date(createdFrom))
   }
 
-  if (typeof (createdTo) !== 'undefined') {
+  if (createdTo !== undefined) {
     users = users
       .filter((u) => u.createdAt <= new Date(createdTo))
   }
 
-  if (typeof (orderCountMin) !== 'undefined') {
+  if (orderCountMin !== undefined) {
     users = users
       .filter((u) => u.orderCount >= orderCountMin)
   }
 
-  if (typeof (orderCountMax) !== 'undefined') {
+  if (orderCountMax !== undefined) {
     users = users
       .filter((u) => u.orderCount <= orderCountMax)
   }
 
-  if (typeof (ratingCountMin) !== 'undefined') {
+  if (ratingCountMin !== undefined) {
     users = users
       .filter((u) => u.ratingCount >= ratingCountMin)
   }
 
-  if (typeof (ratingCountMax) !== 'undefined') {
+  if (ratingCountMax !== undefined) {
     users = users
       .filter((u) => u.ratingCount <= ratingCountMax)
   }
 
-  if (typeof (activitiesCountMin) !== 'undefined') {
+  if (activitiesCountMin !== undefined) {
     users = users
       .filter((u) => u.activitiesCount >= activitiesCountMin)
   }
 
-  if (typeof (activitiesCountMax) !== 'undefined') {
+  if (activitiesCountMax !== undefined) {
     users = users
       .filter((u) => u.activitiesCount <= activitiesCountMax)
   }
 
-  if (typeof (email) !== 'undefined') {
+  if (email !== undefined) {
     users = users
       .filter((u) => u.email?.toLowerCase().includes(email.toLowerCase()))
   }
 
-  if (typeof (users) === 'undefined') { throw new StatusError(404, 'Not Found') }
+  if (users === undefined) { throw new StatusError(404, 'Not Found') }
   return users
 }
 
@@ -239,7 +239,7 @@ const getUserByID = async (req: Request, res: Response): Promise<UserPersonalDat
     .first()
     .where('userID', userID)
 
-  if (typeof (user) === 'undefined') { throw new StatusError(404, 'Not Found') }
+  if (user === undefined) { throw new StatusError(404, 'Not Found') }
 
   const hasPermission = [ 'ROOT', 'ADMIN' ].includes(res.locals.userRole) ||
   res.locals.userID === userID
@@ -295,7 +295,7 @@ const updateUser = async (userInput: UserUpdateInput, res: Response, req: Reques
     .update(userInput, [ '*' ])
     .where('userID', req.params.userID)
 
-  if (typeof (updatedUser) === 'undefined') { throw new StatusError(404, 'Not Found') }
+  if (updatedUser === undefined) { throw new StatusError(404, 'Not Found') }
 
   role !== 'ROOT' && delete updatedUser.role
   return R.omit([
@@ -324,7 +324,7 @@ const sendPasswordReset = async (userInput: PasswordRequestInput): Promise<void>
     .first()
     .where('email', email)
 
-  if (typeof (user) === 'undefined') throw new StatusError(401, 'Invalid Email')
+  if (user === undefined) throw new StatusError(401, 'Invalid Email')
 
   const resetToken = (await promisify(randomBytes)(20)).toString('hex')
   const resetTokenCreatedAt = new Date()
@@ -354,7 +354,7 @@ const resetPassword = async ({ password, resetToken }: PasswordResetInput, res: 
     .first('userID', 'resetTokenCreatedAt')
     .where('resetToken', resetToken)
 
-  if (typeof (user?.resetTokenCreatedAt) === 'undefined' || Number(user.resetTokenCreatedAt) + 3600000 < Date.now()) {
+  if (user?.resetTokenCreatedAt === undefined || Number(user.resetTokenCreatedAt) + 3600000 < Date.now()) {
     throw new StatusError(401, 'Reset token is invalid or expired')
   }
 

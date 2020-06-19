@@ -14,7 +14,7 @@ const addCategory = async (categoryInput: CategoryCreateInput): Promise<Category
     [ db('categories').insert(categoryInput) ]
   )
 
-  if (typeof (addedCategory) === 'undefined') {
+  if (addedCategory === undefined) {
     throw new StatusError(409, `Category with name "${categoryInput.name}" already exists`)
   }
   return addedCategory
@@ -32,7 +32,7 @@ const getCategories = async (categoryFilterInput: CategoryFiltersInput): Promise
     .joinRaw('JOIN products as p USING ("categoryID")')
     .groupBy('c.categoryID')
 
-  if (typeof (name) !== 'undefined') {
+  if (name !== undefined) {
     categories = categories
       .filter((v) => v.name.toLowerCase().includes(name.toLowerCase()))
   }
@@ -59,7 +59,7 @@ const getCategoryByID = async (req: Request): Promise<SingleCategoryData> => {
     .groupBy('c.categoryID')
 
   const [ category ] = categories.filter((c) => c.categoryID === categoryID)
-  if (typeof (category) === 'undefined') throw new StatusError(404, 'Not Found')
+  if (category === undefined) throw new StatusError(404, 'Not Found')
 
   let parentChain: Parent[] = []
   let parentCategoryID = category.parentCategoryID
@@ -67,7 +67,7 @@ const getCategoryByID = async (req: Request): Promise<SingleCategoryData> => {
   while (parentCategoryID) {
     const parent = categories.find((c) => c.categoryID === parentCategoryID)
 
-    if (typeof (parent) !== 'undefined') {
+    if (parent !== undefined) {
       parentChain.push({ name: parent.name, categoryID: parent.categoryID })
       parentCategoryID = parent.parentCategoryID
     }
@@ -91,7 +91,7 @@ const updateCategory = async (categoryInput: CategoryUpdateInput, req: Request):
     .update(categoryInput, [ 'categoryID' ])
     .where('categoryID', req.params.categoryID)
 
-  if (typeof (updatedCategory) === 'undefined') throw new StatusError(404, 'Not Found')
+  if (updatedCategory === undefined) throw new StatusError(404, 'Not Found')
   return getCategoryByID(req)
 }
 

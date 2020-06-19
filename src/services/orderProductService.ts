@@ -17,7 +17,7 @@ const addOrderProduct = async (orderProductInput: OrderProductCreateInput, req: 
     }) ]
   )
 
-  if (typeof (addedOrderProduct) === 'undefined') {
+  if (addedOrderProduct === undefined) {
     throw new StatusError(409, 'This product is already added to the order')
   }
   return addedOrderProduct
@@ -30,7 +30,7 @@ const updateOrderProduct = async (orderProductInput: OrderProductUpdateInput, re
       .where('productID', req.params.productID)
       .andWhere('orderID', req.params.orderID)
 
-    if (typeof (updatedOrderProduct) === 'undefined') throw new StatusError(404, 'Not Found')
+    if (updatedOrderProduct === undefined) throw new StatusError(404, 'Not Found')
 
     await trx('orders')
       .update({ updatedAt: new Date() })

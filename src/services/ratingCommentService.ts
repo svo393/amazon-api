@@ -29,7 +29,7 @@ const getRatingCommentByID = async (req: Request): Promise<RatingComment> => {
     .first()
     .where('ratingCommentID', req.params.ratingCommentID)
 
-  if (typeof (ratingComment) === 'undefined') throw new StatusError(404, 'Not Found')
+  if (ratingComment === undefined) throw new StatusError(404, 'Not Found')
   return ratingComment
 }
 
@@ -41,7 +41,7 @@ const updateRatingComment = async (ratingCommentInput: RatingCommentUpdateInput,
     }, [ '*' ])
     .where('ratingCommentID', req.params.ratingCommentID)
 
-  if (typeof (updatedRatingComment) === 'undefined') throw new StatusError(404, 'Not Found')
+  if (updatedRatingComment === undefined) throw new StatusError(404, 'Not Found')
   return updatedRatingComment
 }
 

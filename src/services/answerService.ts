@@ -29,7 +29,7 @@ const getAnswerByID = async (req: Request): Promise<Answer> => {
     .first()
     .where('answerID', req.params.answerID)
 
-  if (typeof (answer) === 'undefined') throw new StatusError(404, 'Not Found')
+  if (answer === undefined) throw new StatusError(404, 'Not Found')
   return answer
 }
 
@@ -41,7 +41,7 @@ const updateAnswer = async (answerInput: AnswerUpdateInput, req: Request): Promi
     }, [ '*' ])
     .where('answerID', req.params.answerID)
 
-  if (typeof (updatedAnswer) === 'undefined') throw new StatusError(404, 'Not Found')
+  if (updatedAnswer === undefined) throw new StatusError(404, 'Not Found')
   return updatedAnswer
 }
 

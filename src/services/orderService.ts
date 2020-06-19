@@ -86,37 +86,37 @@ const getOrders = async (orderFilterInput: OrderFiltersInput): Promise<Order[]> 
     .join('users as u', 'o.userID', 'u.userID')
     .groupBy('o.orderID', 'i.amount', 'i.invoiceID', 'userEmail')
 
-  if (typeof (orderStatuses) !== 'undefined') {
+  if (orderStatuses !== undefined) {
     orders = orders
       .filter((o) => orderStatuses.split(',').includes(o.orderStatus))
   }
 
-  if (typeof (shippingMethods) !== 'undefined') {
+  if (shippingMethods !== undefined) {
     orders = orders
       .filter((o) => shippingMethods.split(',').includes(o.shippingMethod))
   }
 
-  if (typeof (amountMin) !== 'undefined') {
+  if (amountMin !== undefined) {
     orders = orders
       .filter((o) => o.amount >= amountMin)
   }
 
-  if (typeof (amountMax) !== 'undefined') {
+  if (amountMax !== undefined) {
     orders = orders
       .filter((o) => o.amount <= amountMax)
   }
 
-  if (typeof (createdFrom) !== 'undefined') {
+  if (createdFrom !== undefined) {
     orders = orders
       .filter((o) => o.createdAt >= new Date(createdFrom))
   }
 
-  if (typeof (createdTo) !== 'undefined') {
+  if (createdTo !== undefined) {
     orders = orders
       .filter((o) => o.createdAt <= new Date(createdTo))
   }
 
-  if (typeof (userEmail) !== 'undefined') {
+  if (userEmail !== undefined) {
     orders = orders
       .filter((o) => o.userEmail?.toLowerCase().includes(userEmail.toLowerCase()))
   }
@@ -173,7 +173,7 @@ const getOrderByID = async (req: Request): Promise<OrderFullData> => {
     .where('orderID', req.params.orderID)
     .joinRaw('JOIN products as p USING ("productID")')
 
-  if (typeof (order) === 'undefined') throw new StatusError(404, 'Not Found')
+  if (order === undefined) throw new StatusError(404, 'Not Found')
   return {
     ...order,
     orderProducts
@@ -198,7 +198,7 @@ const updateOrder = async (orderInput: OrderUpdateInput, req: Request): Promise<
       }, [ '*' ])
       .where('orderID', req.params.orderID)
 
-    if (typeof (updatedOrder) === 'undefined') throw new StatusError(404, 'Not Found')
+    if (updatedOrder === undefined) throw new StatusError(404, 'Not Found')
     return updatedOrder
   })
 }

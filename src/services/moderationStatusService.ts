@@ -13,7 +13,7 @@ const addModerationStatus = async (moderationStatusInput: ModerationStatus): Pro
     [ db('moderationStatuses').insert(moderationStatusInput) ]
   )
 
-  if (typeof (addedModerationStatus) === 'undefined') {
+  if (addedModerationStatus === undefined) {
     throw new StatusError(409, `ModerationStatus with name "${moderationStatusInput.moderationStatusName}" already exists`)
   }
   return addedModerationStatus
@@ -28,7 +28,7 @@ const updateModerationStatus = async (moderationStatusInput: ModerationStatus, r
     .update(moderationStatusInput, [ '*' ])
     .where('moderationStatusName', req.params.moderationStatusName)
 
-  if (typeof (updatedModerationStatus) === 'undefined') throw new StatusError(404, 'Not Found')
+  if (updatedModerationStatus === undefined) throw new StatusError(404, 'Not Found')
   return updatedModerationStatus
 }
 

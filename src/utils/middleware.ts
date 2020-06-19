@@ -36,7 +36,7 @@ type Entities =
   | 'invoices'
 
 export const isLoggedIn: Middleware = (_req, res, next) => {
-  if (typeof (res.locals.userID) === 'undefined') throw new StatusError(403, 'Forbidden')
+  if (res.locals.userID === undefined) throw new StatusError(403, 'Forbidden')
   next()
 }
 
@@ -44,8 +44,8 @@ export const isAdmin: Middleware = (_req, res, next) => {
   const role: string | undefined = res.locals.userRole
 
   if (
-    typeof (res.locals.userID) === 'undefined' ||
-    typeof (role) === 'undefined' ||
+    res.locals.userID === undefined ||
+    role === undefined ||
     ![ 'ROOT', 'ADMIN' ].includes(role)
   ) {
     throw new StatusError(403, 'Forbidden')
@@ -57,8 +57,8 @@ export const isRoot: Middleware = (_req, res, next) => {
   const role: string | undefined = res.locals.userRole
 
   if (
-    typeof (res.locals.userID) === 'undefined' ||
-    typeof (role) === 'undefined' ||
+    res.locals.userID === undefined ||
+    role === undefined ||
     role !== 'ROOT'
   ) {
     throw new StatusError(403, 'Forbidden')
@@ -71,7 +71,7 @@ export const isSameUser = (target: Target): Middleware => {
     const userID: string | undefined = res.locals.userID
 
     if (
-      typeof (userID) === 'undefined' ||
+      userID === undefined ||
       (userID.toString() !== req[target].userID.toString() &&
       res.locals.userRole !== 'ROOT')
     ) {
@@ -87,7 +87,7 @@ export const isSameUserOrAdmin = (target: Target): Middleware => {
     const userID: string | undefined = res.locals.userID
 
     if (
-      typeof (userID) === 'undefined' ||
+      userID === undefined ||
       (userID.toString() !== req[target].userID.toString() &&
       ![ 'ROOT', 'ADMIN' ].includes(res.locals.userRole))
     ) {
@@ -100,14 +100,14 @@ export const isSameUserOrAdmin = (target: Target): Middleware => {
 
 export const isCreator = (entity: Entities, idName: string, target: Target): Middleware => {
   const fn: Middleware = async (req, res, next) => {
-    if (typeof (res.locals.userID) === 'undefined') throw new StatusError(403, 'Forbidden')
+    if (res.locals.userID === undefined) throw new StatusError(403, 'Forbidden')
     if (res.locals.userRole === 'ROOT') return next()
 
     const data = await db(entity)
       .first('userID')
       .where(idName, req[target][idName])
 
-    if (typeof (data) === 'undefined') throw new StatusError(404, 'Not Found')
+    if (data === undefined) throw new StatusError(404, 'Not Found')
 
     if (data.userID.toString() !== res.locals.userID.toString()) {
       throw new StatusError(403, 'Forbidden')
@@ -119,16 +119,16 @@ export const isCreator = (entity: Entities, idName: string, target: Target): Mid
 
 export const isCreatorOrAdmin = (entity: Entities, idName: string, target: Target): Middleware => {
   const fn: Middleware = async (req, res, next) => {
-    if (typeof (res.locals.userID) === 'undefined') throw new StatusError(403, 'Forbidden')
+    if (res.locals.userID === undefined) throw new StatusError(403, 'Forbidden')
 
     const role: string | undefined = res.locals.userRole
-    if (typeof (role) !== 'undefined' && [ 'ROOT', 'ADMIN' ].includes(role)) return next()
+    if (role !== undefined && [ 'ROOT', 'ADMIN' ].includes(role)) return next()
 
     const data = await db(entity)
       .first('userID')
       .where(idName, req[target][idName])
 
-    if (typeof (data) === 'undefined') throw new StatusError(404, 'Not Found')
+    if (data === undefined) throw new StatusError(404, 'Not Found')
 
     if (data.userID.toString() !== res.locals.userID.toString()) {
       throw new StatusError(403, 'Forbidden')
@@ -139,7 +139,7 @@ export const isCreatorOrAdmin = (entity: Entities, idName: string, target: Targe
 }
 
 export const getUserID: Middleware = async (req, res, next) => {
-  if (typeof (req.cookies.token) !== 'undefined') {
+  if (req.cookies.token !== undefined) {
     try {
       const decodedToken = jwt.verify(req.cookies.token, env.JWT_SECRET)
       res.locals.userID = (decodedToken as DecodedToken).userID
@@ -148,7 +148,7 @@ export const getUserID: Middleware = async (req, res, next) => {
         .first('role')
         .where('userID', res.locals.userID)
 
-      if (typeof (user) === 'undefined') {
+      if (user === undefined) {
         res.clearCookie('token')
         throw new StatusError(403, 'Forbidden')
       }

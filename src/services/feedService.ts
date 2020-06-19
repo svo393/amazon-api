@@ -93,11 +93,11 @@ const getFeed = async (feedFilterInput: FeedFiltersInput): Promise<Feed> => {
     answerComments: [ ...answerComments.map((x) => ({ ...x, type: 'answerComment' })) ]
   }
 
-  if (typeof (types) !== 'undefined') {
+  if (types !== undefined) {
     feed = R.pick(types.split(',').map((a) => a + 's'), feed)
   }
 
-  if (typeof (moderationStatuses) !== 'undefined') {
+  if (moderationStatuses !== undefined) {
     for (const activity in feed) {
       feed[activity] = feed[activity].filter((a: Activity) =>
         moderationStatuses.split(',').includes(a.moderationStatus))
@@ -105,7 +105,7 @@ const getFeed = async (feedFilterInput: FeedFiltersInput): Promise<Feed> => {
     }
   }
 
-  if (typeof (createdFrom) !== 'undefined') {
+  if (createdFrom !== undefined) {
     for (const activity in feed) {
       feed[activity] = feed[activity].filter((a: Activity) =>
         a.createdAt >= new Date(createdFrom))
@@ -114,7 +114,7 @@ const getFeed = async (feedFilterInput: FeedFiltersInput): Promise<Feed> => {
   }
 
   // TODO misses today in filter
-  if (typeof (createdTo) !== 'undefined') {
+  if (createdTo !== undefined) {
     for (const activity in feed) {
       feed[activity] = feed[activity].filter((a: Activity) =>
         a.createdAt <= new Date(createdTo))
@@ -122,7 +122,7 @@ const getFeed = async (feedFilterInput: FeedFiltersInput): Promise<Feed> => {
     }
   }
 
-  if (typeof (content) !== 'undefined') {
+  if (content !== undefined) {
     for (const activity in feed) {
       feed[activity] = feed[activity].filter((a: Activity) =>
         a.content.toLowerCase().includes(content.toLowerCase()))
@@ -130,7 +130,7 @@ const getFeed = async (feedFilterInput: FeedFiltersInput): Promise<Feed> => {
     }
   }
 
-  if (typeof (userEmail) !== 'undefined') {
+  if (userEmail !== undefined) {
     for (const activity in feed) {
       feed[activity] = feed[activity].filter((a: Activity) =>
         a.userEmail.toLowerCase().includes(userEmail.toLowerCase()))

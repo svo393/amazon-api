@@ -14,7 +14,7 @@ const addVendor = async (vendorInput: VendorInput): Promise<Vendor> => {
     [ db('vendors').insert(vendorInput) ]
   )
 
-  if (typeof (addedVendor) === 'undefined') {
+  if (addedVendor === undefined) {
     throw new StatusError(409, `Vendor with name "${vendorInput.name}" already exists`)
   }
   return addedVendor
@@ -31,7 +31,7 @@ const getVendors = async (vendorFilterInput: VendorFiltersInput): Promise<Vendor
     .joinRaw('JOIN products as p USING ("vendorID")')
     .groupBy('v.vendorID')
 
-  if (typeof (name) !== 'undefined') {
+  if (name !== undefined) {
     vendors = vendors
       .filter((v) => v.name.toLowerCase().includes(name.toLowerCase()))
   }
@@ -47,7 +47,7 @@ const getVendorByID = async (req: Request): Promise<VendorListData> => {
     .joinRaw('LEFT JOIN products as p USING ("vendorID")')
     .groupBy('v.vendorID')
 
-  if (typeof (vendor) === 'undefined') throw new StatusError(404, 'Not Found')
+  if (vendor === undefined) throw new StatusError(404, 'Not Found')
   return vendor
 }
 
@@ -56,7 +56,7 @@ const updateVendor = async (vendorInput: VendorInput, req: Request): Promise<Ven
     .update(vendorInput, [ '*' ])
     .where('vendorID', req.params.vendorID)
 
-  if (typeof (updatedVendor) === 'undefined') throw new StatusError(404, 'Not Found')
+  if (updatedVendor === undefined) throw new StatusError(404, 'Not Found')
   return updatedVendor
 }
 
