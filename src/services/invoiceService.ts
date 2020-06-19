@@ -57,12 +57,12 @@ const getInvoices = async (invoiceFilterInput: InvoiceFiltersInput): Promise<Inv
 
   if (amountMin !== undefined) {
     invoices = invoices
-      .filter((i) => i.amount >= amountMin)
+      .filter((i) => i.amount >= amountMin * 100)
   }
 
   if (amountMax !== undefined) {
     invoices = invoices
-      .filter((i) => i.amount <= amountMax)
+      .filter((i) => i.amount <= amountMax * 100)
   }
 
   if (createdFrom !== undefined) {

@@ -98,12 +98,12 @@ const getOrders = async (orderFilterInput: OrderFiltersInput): Promise<Order[]> 
 
   if (amountMin !== undefined) {
     orders = orders
-      .filter((o) => o.amount >= amountMin)
+      .filter((o) => o.amount >= amountMin * 100)
   }
 
   if (amountMax !== undefined) {
     orders = orders
-      .filter((o) => o.amount <= amountMax)
+      .filter((o) => o.amount <= amountMax * 100)
   }
 
   if (createdFrom !== undefined) {

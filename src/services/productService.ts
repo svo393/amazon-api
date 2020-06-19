@@ -103,12 +103,12 @@ export const getProducts = async (productFilterInput: ProductsFiltersInput): Pro
 
   if (priceMin !== undefined) {
     products = products
-      .filter((p) => p.price >= priceMin * 10)
+      .filter((p) => p.price >= priceMin * 100)
   }
 
   if (priceMax !== undefined) {
     products = products
-      .filter((p) => p.price <= priceMax * 10)
+      .filter((p) => p.price <= priceMax * 100)
   }
 
   if (vendorName !== undefined) {
