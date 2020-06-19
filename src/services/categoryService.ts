@@ -1,6 +1,5 @@
 import { Request } from 'express'
-import R from 'ramda'
-import { Category, CategoryCreateInput, CategoryUpdateInput, CategoryFiltersInput } from '../types'
+import { Category, CategoryCreateInput, CategoryFiltersInput, CategoryUpdateInput } from '../types'
 import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
 

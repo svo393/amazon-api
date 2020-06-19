@@ -1,6 +1,5 @@
 import { Request } from 'express'
-import R from 'ramda'
-import { Vendor, VendorInput, VendorFiltersInput } from '../types'
+import { Vendor, VendorFiltersInput, VendorInput } from '../types'
 import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
