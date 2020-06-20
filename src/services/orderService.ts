@@ -167,8 +167,7 @@ const getOrderByID = async (req: Request): Promise<OrderFullData> => {
       'op.qty',
       'op.productID',
       'op.orderID',
-      'p.title',
-      'p.primaryMedia'
+      'p.title'
     )
     .where('orderID', req.params.orderID)
     .joinRaw('JOIN products as p USING ("productID")')

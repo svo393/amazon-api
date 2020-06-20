@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import { Question, QuestionCreateInput, QuestionUpdateInput } from '../types'
+import { imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
 import { uploadImages } from '../utils/img'
 import StatusError from '../utils/StatusError'
@@ -69,7 +70,7 @@ const deleteQuestion = async (req: Request): Promise<void> => {
 
 const uploadQuestionImages = (files: Express.Multer.File[], req: Request): void => {
   const uploadConfig = {
-    imagePath: './public/media/questions',
+    imagesPath: `${imagesBasePath}/images`,
     maxWidth: 1632,
     maxHeight: 1632,
     previewWidth: 175,

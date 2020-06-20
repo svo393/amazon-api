@@ -33,7 +33,7 @@ router.put('/:productID', isCreator('products', 'productID', 'params'), async (r
 router.post('/:productID/upload', isAdmin, multerUpload.array('productMedia', 10), (req, res) => {
   req.socket.setTimeout(UPLOAD_TIMEOUT)
   const productMedia = checkMediaUpload(req)
-  productService.uploadProductImages(productMedia, req)
+  productService.uploadProductImages(productMedia, req, res)
   res.status(204).end()
 })
 

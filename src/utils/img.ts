@@ -4,7 +4,8 @@ import path from 'path'
 import sharp from 'sharp'
 
 type UploadConfig = {
-  imagePath: string;
+  filenames: number[];
+  imagesPath: string;
   maxWidth: number;
   maxHeight: number;
   previewWidth?: number;
@@ -13,9 +14,10 @@ type UploadConfig = {
   thumbHeight: number;
 }
 
-export const uploadImages = (files: Express.Multer.File[], req: Request, uploadConfig: UploadConfig, entityID: string): void => {
+export const uploadImages = (files: Express.Multer.File[], req: Request, uploadConfig: UploadConfig): void => {
   const {
-    imagePath,
+    filenames,
+    imagesPath,
     maxWidth,
     maxHeight,
     previewWidth,
@@ -27,33 +29,33 @@ export const uploadImages = (files: Express.Multer.File[], req: Request, uploadC
   files.map(async (file, index) => {
     const image = sharp(file.path)
     const info = await image.metadata()
-    const fileName = `${req.params[entityID]}_${index}`
+    const fileName = filenames[index]
 
     if ((info.width as number) > maxWidth || (info.height as number) > maxHeight) {
       await image
         .resize(maxWidth, maxHeight, { fit: 'inside' })
         .jpeg({ progressive: true })
         .toFile(
-          path.resolve(imagePath, `${fileName}_${maxWidth}.jpg`)
+          path.resolve(imagesPath, `${fileName}_${maxWidth}.jpg`)
         )
 
       await image
         .resize(maxWidth, maxHeight, { fit: 'inside' })
         .webp()
         .toFile(
-          path.resolve(imagePath, `${fileName}_${maxWidth}.webp`)
+          path.resolve(imagesPath, `${fileName}_${maxWidth}.webp`)
         )
     } else {
       await image
         .jpeg({ progressive: true })
         .toFile(
-          path.resolve(imagePath, `${fileName}_${maxWidth}.jpg`)
+          path.resolve(imagesPath, `${fileName}_${maxWidth}.jpg`)
         )
 
       await image
         .webp()
         .toFile(
-          path.resolve(imagePath, `${fileName}_${maxWidth}.webp`)
+          path.resolve(imagesPath, `${fileName}_${maxWidth}.webp`)
         )
     }
 
@@ -62,14 +64,14 @@ export const uploadImages = (files: Express.Multer.File[], req: Request, uploadC
         .resize(previewWidth, previewHeight, { fit: 'inside' })
         .jpeg({ progressive: true })
         .toFile(
-          path.resolve(imagePath, `${fileName}_${previewWidth}.jpg`)
+          path.resolve(imagesPath, `${fileName}_${previewWidth}.jpg`)
         )
 
       await image
         .resize(previewWidth, previewHeight, { fit: 'inside' })
         .webp()
         .toFile(
-          path.resolve(imagePath, `${fileName}_${previewWidth}.webp`)
+          path.resolve(imagesPath, `${fileName}_${previewWidth}.webp`)
         )
     }
 
@@ -77,14 +79,14 @@ export const uploadImages = (files: Express.Multer.File[], req: Request, uploadC
       .resize(thumbWidth, thumbHeight, { fit: 'inside' })
       .jpeg({ progressive: true })
       .toFile(
-        path.resolve(imagePath, `${fileName}_${thumbWidth}.jpg`)
+        path.resolve(imagesPath, `${fileName}_${thumbWidth}.jpg`)
       )
 
     await image
       .resize(thumbWidth, thumbHeight, { fit: 'inside' })
       .webp()
       .toFile(
-        path.resolve(imagePath, `${fileName}_${thumbWidth}.webp`)
+        path.resolve(imagesPath, `${fileName}_${thumbWidth}.webp`)
       )
 
     fs.unlinkSync(file.path)

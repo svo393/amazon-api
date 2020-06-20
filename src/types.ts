@@ -81,8 +81,6 @@ export type Product = {
   description: string;
   brandSection?: string;
   stock: number;
-  media: number;
-  primaryMedia: number;
   createdAt: Date;
   updatedAt: Date;
   isAvailable: boolean;
@@ -90,6 +88,18 @@ export type Product = {
   categoryID: number;
   vendorID: number;
   groupID: number;
+}
+
+export type Image = {
+  imageID: number;
+  index: number;
+  productID?: number;
+  ratingID?: number;
+  ratingCommentID?: number;
+  questionID?: number;
+  answerID?: number;
+  answerCommentID?: number;
+  userID: number;
 }
 
 export type ListProduct = {
@@ -103,7 +113,6 @@ export type Rating = {
   updatedAt: Date;
   title?: string;
   review?: string;
-  media?: number;
   stars: number;
   likes: number;
   dislikes: number;
@@ -119,7 +128,6 @@ export type RatingComment = {
   createdAt: Date;
   updatedAt: Date;
   content: string;
-  media?: number;
   moderationStatus: string;
   userID: number;
   ratingID: number;
@@ -132,7 +140,6 @@ export type Question = {
   createdAt: Date;
   updatedAt: Date;
   content: string;
-  media?: number;
   likes: number;
   dislikes: number;
   moderationStatus: string;
@@ -146,7 +153,6 @@ export type Answer = {
   createdAt: Date;
   updatedAt: Date;
   content: string;
-  media?: number;
   likes: number;
   dislikes: number;
   moderationStatus: string;
@@ -160,7 +166,6 @@ export type AnswerComment = {
   createdAt: Date;
   updatedAt: Date;
   content: string;
-  media?: number;
   moderationStatus: string;
   userID: number;
   answerID: number;
@@ -345,8 +350,6 @@ export type ProductUpdateInput = {
   description?: string;
   brandSection?: string;
   stock?: number;
-  media?: number;
-  primaryMedia?: number;
   isAvailable?: boolean;
   categoryID?: number;
   vendorID?: number;
@@ -369,7 +372,6 @@ export type ProductAllData = Product & {
 export type RatingCreateInput = Pick<Rating,
   | 'title'
   | 'review'
-  | 'media'
   | 'stars'
   | 'groupID'
 >
@@ -377,7 +379,6 @@ export type RatingCreateInput = Pick<Rating,
 export type RatingUpdateInput = Pick<Rating,
   | 'title'
   | 'review'
-  | 'media'
 > & {
   stars?: number;
   isVerified?: boolean;
@@ -386,54 +387,42 @@ export type RatingUpdateInput = Pick<Rating,
 
 export type RatingCommentCreateInput = Pick<RatingComment,
   | 'content'
-  | 'media'
   | 'ratingID'
   | 'parentRatingCommentID'
 >
 
-export type RatingCommentUpdateInput = Pick<RatingComment,
-  | 'media'
-> & {
+export type RatingCommentUpdateInput = {
   content?: string;
   moderationStatus?: string;
 }
 
 export type QuestionCreateInput = Pick<Question,
   | 'content'
-  | 'media'
   | 'groupID'
 >
 
-export type QuestionUpdateInput = Pick<Question,
-  | 'media'
-> & {
+export type QuestionUpdateInput = {
   content?: string;
   moderationStatus?: string;
 }
 
 export type AnswerCreateInput = Pick<Answer,
   | 'content'
-  | 'media'
   | 'questionID'
 >
 
-export type AnswerUpdateInput = Pick<Answer,
-  | 'media'
-> & {
+export type AnswerUpdateInput = {
   content?: string;
   moderationStatus?: string;
 }
 
 export type AnswerCommentCreateInput = Pick<AnswerComment,
   | 'content'
-  | 'media'
   | 'answerID'
   | 'parentAnswerCommentID'
 >
 
-export type AnswerCommentUpdateInput = Pick<AnswerComment,
-  | 'media'
-> & {
+export type AnswerCommentUpdateInput = {
   content?: string;
   moderationStatus?: string;
 }
@@ -556,7 +545,6 @@ export type UsersFiltersInput = {
 
 export type OrderProductFullData = Pick<Product,
   | 'title'
-  | 'primaryMedia'
 > & Pick<OrderProduct,
   | 'productID'
   | 'orderID'
@@ -566,4 +554,8 @@ export type OrderProductFullData = Pick<Product,
 
 export type OrderFullData = Order & {
   orderProducts: OrderProductFullData[];
+}
+
+export type ImageUpdateInput = {
+  index: number;
 }

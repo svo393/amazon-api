@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import { RatingComment, RatingCommentCreateInput, RatingCommentUpdateInput } from '../types'
+import { imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
 import { uploadImages } from '../utils/img'
 import StatusError from '../utils/StatusError'
@@ -55,7 +56,7 @@ const deleteRatingComment = async (req: Request): Promise<void> => {
 
 const uploadRatingCommentImages = (files: Express.Multer.File[], req: Request): void => {
   const uploadConfig = {
-    imagePath: './public/media/ratingComments',
+    imagesPath: `${imagesBasePath}/images`,
     maxWidth: 1632,
     maxHeight: 1632,
     previewWidth: 175,
@@ -63,7 +64,7 @@ const uploadRatingCommentImages = (files: Express.Multer.File[], req: Request): 
     thumbWidth: 117,
     thumbHeight: 117
   }
-  uploadImages(files, req, uploadConfig, 'ratingCommentID')
+  uploadImages(files, req, uploadConfig)
 }
 
 export default {

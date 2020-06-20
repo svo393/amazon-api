@@ -17,6 +17,7 @@ export const lockerAddresses = [
 export const orderStatuses = [ 'DONE', 'PROCESSING', 'NEW', 'CANCELED' ]
 export const invoiceStatuses = [ 'DONE', 'PROCESSING', 'NEW', 'CANCELED' ]
 export const baseAPI = '/api'
+export const imagesBasePath = './public/media'
 export const apiURLs = {
   categories: `${baseAPI}/categories`,
   products: `${baseAPI}/products`,

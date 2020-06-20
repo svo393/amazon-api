@@ -34,6 +34,7 @@ type Entities =
   | 'invoiceStatuses'
   | 'orders'
   | 'invoices'
+  | 'images'
 
 export const isLoggedIn: Middleware = (_req, res, next) => {
   if (res.locals.userID === undefined) throw new StatusError(403, 'Forbidden')

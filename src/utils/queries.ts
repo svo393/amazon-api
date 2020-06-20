@@ -5,7 +5,6 @@ export const getProductsQuery: any = db('products as p')
     'p.productID',
     'p.title',
     'p.price',
-    'p.primaryMedia',
     'p.stock',
     'p.groupID',
     'p.isAvailable',

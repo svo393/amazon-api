@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import { AnswerComment, AnswerCommentCreateInput, AnswerCommentUpdateInput } from '../types'
+import { imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
 import { uploadImages } from '../utils/img'
 import StatusError from '../utils/StatusError'
@@ -55,7 +56,7 @@ const deleteAnswerComment = async (req: Request): Promise<void> => {
 
 const uploadAnswerCommentImages = (files: Express.Multer.File[], req: Request): void => {
   const uploadConfig = {
-    imagePath: './public/media/answerComments',
+    imagesPath: `${imagesBasePath}/images`,
     maxWidth: 1632,
     maxHeight: 1632,
     previewWidth: 175,
@@ -63,7 +64,7 @@ const uploadAnswerCommentImages = (files: Express.Multer.File[], req: Request): 
     thumbWidth: 117,
     thumbHeight: 117
   }
-  uploadImages(files, req, uploadConfig, 'answerCommentID')
+  uploadImages(files, req, uploadConfig)
 }
 
 export default {

@@ -4,8 +4,9 @@ import { CookieOptions, Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
 import R from 'ramda'
 import { promisify } from 'util'
-import { Answer, AnswerComment, Order, PasswordRequestInput, PasswordResetInput, Question, Rating, RatingComment, User, UserLoginInput, UserSafeData, UserSignupInput, UserUpdateInput, UsersFiltersInput } from '../types'
+import { Answer, AnswerComment, Order, PasswordRequestInput, PasswordResetInput, Question, Rating, RatingComment, User, UserLoginInput, UserSafeData, UsersFiltersInput, UserSignupInput, UserUpdateInput } from '../types'
 import env from '../utils/config'
+import { imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
 import { uploadImages } from '../utils/img'
 import StatusError from '../utils/StatusError'
@@ -381,13 +382,13 @@ const resetPassword = async ({ password, resetToken }: PasswordResetInput, res: 
 
 const uploadUserAvatar = (file: Express.Multer.File, req: Request): void => {
   const uploadConfig = {
-    imagePath: './public/media/avatars',
+    imagesPath: `${imagesBasePath}/avatars`,
     maxWidth: 460,
     maxHeight: 460,
     thumbWidth: 48,
     thumbHeight: 48
   }
-  uploadImages([ file ], req, uploadConfig, 'userID')
+  uploadImages([ file ], req, uploadConfig)
 }
 
 export default {

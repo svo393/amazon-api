@@ -25,6 +25,7 @@ import vendorsRouter from './vendors'
 import ordersRouter from './orders'
 import invoicesRouter from './invoices'
 import feedRouter from './feed'
+import imagesRouter from './images'
 
 export default Router()
   .use(apiURLs.categories, categoriesRouter)
@@ -49,5 +50,6 @@ export default Router()
   .use(apiURLs.questions, questionsRouter)
   .use(apiURLs.ratingComments, ratingCommentsRouter)
   .use(apiURLs.answers, answersRouter)
+  .use(apiURLs.images, imagesRouter)
   .use(apiURLs.answerComments, answerCommentsRouter)
   .use(apiURLs.feed, feedRouter)

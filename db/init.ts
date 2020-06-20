@@ -11,6 +11,7 @@ export const init = async (): Promise<void> => {
   await db('productParameters').del()
   await db('parameters').del()
   await db('groupVariants').del()
+  await db('images').del()
   await db('answerComments').del()
   await db('answers').del()
   await db('questions').del()

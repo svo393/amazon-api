@@ -1,7 +1,7 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoryCreateInput, CategoryFiltersInput, CategoryUpdateInput, FeedFiltersInput, GroupVariantCreateInput, GroupVariantUpdateInput, InvoiceCreateInput, InvoiceFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ModerationStatus, OrderCreateInput, OrderFiltersInput, OrderProductCreateInput, OrderProductUpdateInput, OrderStatus, OrderUpdateInput, ParameterCreateInput, ParameterUpdateInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductParameterInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorFiltersInput, VendorInput } from '../types'
-import { canBeBoolean, canBeNumber, hasDefinedProps, isArray, isBoolean, isDate, isEmail, isInputProvided, isPasswordValid, isProductParameterOrGroupVariant, isProvided, isString, isStringOrNumber } from './validatorLib'
+import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoryCreateInput, CategoryFiltersInput, CategoryUpdateInput, FeedFiltersInput, GroupVariantCreateInput, GroupVariantUpdateInput, InvoiceCreateInput, InvoiceFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ModerationStatus, OrderCreateInput, OrderFiltersInput, OrderProductCreateInput, OrderProductUpdateInput, OrderStatus, OrderUpdateInput, ParameterCreateInput, ParameterUpdateInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductParameterInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorFiltersInput, VendorInput, ImageUpdateInput } from '../types'
+import { canBeBoolean, canBeNumber, hasDefinedProps, isArray, isBoolean, isDate, isEmail, isInputProvided, isPasswordValid, isProductParameterOrGroupVariant, isProvided, isString, isStringOrNumber, isNumber } from './validatorLib'
 
 export const checkNewUser = ({ body }: Request): UserSignupInput => {
   const email = R.pipe(
@@ -141,16 +141,6 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
     canBeNumber
   )({ name: 'stock', param: body.stock })
 
-  const media = R.pipe(
-    isProvided,
-    canBeNumber
-  )({ name: 'media', param: body.media })
-
-  const primaryMedia = R.pipe(
-    isProvided,
-    canBeNumber
-  )({ name: 'primaryMedia', param: body.primaryMedia })
-
   const isAvailable = 'isAvailable' in body
     ? isBoolean({ name: 'isAvailable', param: body.isAvailable })
     : undefined
@@ -189,8 +179,6 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
     brandSection: brandSection?.param,
     stock: stock.param,
     isAvailable: isAvailable?.param,
-    media: media.param,
-    primaryMedia: primaryMedia.param,
     categoryID: categoryID.param,
     vendorID: vendorID.param,
     groupID: groupID?.param,
@@ -224,14 +212,6 @@ export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
     { name: 'stock', param: body.stock }
   )
 
-  const media = body.media && canBeNumber(
-    { name: 'media', param: body.media }
-  )
-
-  const primaryMedia = body.primaryMedia && canBeNumber(
-    { name: 'primaryMedia', param: body.primaryMedia }
-  )
-
   const isAvailable = 'isAvailable' in body
     ? isBoolean({ name: 'isAvailable', param: body.isAvailable })
     : undefined
@@ -251,8 +231,6 @@ export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
     description: description?.param,
     brandSection: brandSection?.param,
     stock: stock?.param,
-    media: media?.param,
-    primaryMedia: primaryMedia?.param,
     isAvailable: isAvailable?.param,
     categoryID: categoryID?.param,
     vendorID: vendorID?.param
@@ -525,10 +503,6 @@ export const checkNewRating = ({ body }: Request): RatingCreateInput => {
     { name: 'review', param: body.review }
   )
 
-  const media = body.media && canBeNumber(
-    { name: 'media', param: body.media }
-  )
-
   const stars = R.pipe(
     isProvided,
     canBeNumber
@@ -542,7 +516,6 @@ export const checkNewRating = ({ body }: Request): RatingCreateInput => {
   return {
     title: title?.param,
     review: review?.param,
-    media: media?.param,
     stars: stars.param,
     groupID: groupID.param
   }
@@ -555,10 +528,6 @@ export const checkRatingUpdate = ({ body }: Request): RatingUpdateInput => {
 
   const review = body.review && isString(
     { name: 'review', param: body.review }
-  )
-
-  const media = body.media && canBeNumber(
-    { name: 'media', param: body.media }
   )
 
   const stars = body.review && canBeNumber(
@@ -576,7 +545,6 @@ export const checkRatingUpdate = ({ body }: Request): RatingUpdateInput => {
   return hasDefinedProps<RatingUpdateInput>({
     title: title?.param,
     review: review?.param,
-    media: media?.param,
     stars: stars?.param,
     isVerified: isVerified?.param,
     moderationStatus: moderationStatus?.param
@@ -589,10 +557,6 @@ export const checkNewRatingComment = ({ body }: Request): RatingCommentCreateInp
     isString
   )({ name: 'content', param: body.content })
 
-  const media = body.media && canBeNumber(
-    { name: 'media', param: body.media }
-  )
-
   const ratingID = R.pipe(
     isProvided,
     canBeNumber
@@ -604,7 +568,6 @@ export const checkNewRatingComment = ({ body }: Request): RatingCommentCreateInp
 
   return {
     content: content.param,
-    media: media?.param,
     ratingID: ratingID.param,
     parentRatingCommentID: parentRatingCommentID?.param
   }
@@ -615,17 +578,12 @@ export const checkRatingCommentUpdate = ({ body }: Request): RatingCommentUpdate
     { name: 'content', param: body.content }
   )
 
-  const media = body.media && canBeNumber(
-    { name: 'media', param: body.media }
-  )
-
   const moderationStatus = body.moderationStatus && isString(
     { name: 'moderationStatus', param: body.moderationStatus }
   )
 
   return hasDefinedProps<RatingCommentUpdateInput>({
     content: content?.param,
-    media: media?.param,
     moderationStatus: moderationStatus?.param
   })
 }
@@ -636,10 +594,6 @@ export const checkNewQuestion = ({ body }: Request): QuestionCreateInput => {
     isString
   )({ name: 'content', param: body.content })
 
-  const media = body.media && canBeNumber(
-    { name: 'media', param: body.media }
-  )
-
   const groupID = R.pipe(
     isProvided,
     canBeNumber
@@ -647,7 +601,6 @@ export const checkNewQuestion = ({ body }: Request): QuestionCreateInput => {
 
   return {
     content: content.param,
-    media: media?.param,
     groupID: groupID.param
   }
 }
@@ -657,17 +610,12 @@ export const checkQuestionUpdate = ({ body }: Request): QuestionUpdateInput => {
     { name: 'content', param: body.content }
   )
 
-  const media = body.media && canBeNumber(
-    { name: 'media', param: body.media }
-  )
-
   const moderationStatus = body.moderationStatus && isString(
     { name: 'moderationStatus', param: body.moderationStatus }
   )
 
   return hasDefinedProps<QuestionUpdateInput>({
     content: content?.param,
-    media: media?.param,
     moderationStatus: moderationStatus?.param
   })
 }
@@ -678,10 +626,6 @@ export const checkNewAnswer = ({ body }: Request): AnswerCreateInput => {
     isString
   )({ name: 'content', param: body.content })
 
-  const media = body.media && canBeNumber(
-    { name: 'media', param: body.media }
-  )
-
   const questionID = R.pipe(
     isProvided,
     canBeNumber
@@ -689,7 +633,6 @@ export const checkNewAnswer = ({ body }: Request): AnswerCreateInput => {
 
   return {
     content: content.param,
-    media: media?.param,
     questionID: questionID.param
   }
 }
@@ -699,17 +642,12 @@ export const checkAnswerUpdate = ({ body }: Request): AnswerUpdateInput => {
     { name: 'content', param: body.content }
   )
 
-  const media = body.media && canBeNumber(
-    { name: 'media', param: body.media }
-  )
-
   const moderationStatus = body.moderationStatus && isString(
     { name: 'moderationStatus', param: body.moderationStatus }
   )
 
   return hasDefinedProps<AnswerUpdateInput>({
     content: content?.param,
-    media: media?.param,
     moderationStatus: moderationStatus?.param
   })
 }
@@ -719,10 +657,6 @@ export const checkNewAnswerComment = ({ body }: Request): AnswerCommentCreateInp
     isProvided,
     isString
   )({ name: 'content', param: body.content })
-
-  const media = body.media && canBeNumber(
-    { name: 'media', param: body.media }
-  )
 
   const answerID = R.pipe(
     isProvided,
@@ -735,7 +669,6 @@ export const checkNewAnswerComment = ({ body }: Request): AnswerCommentCreateInp
 
   return {
     content: content.param,
-    media: media?.param,
     answerID: answerID.param,
     parentAnswerCommentID: parentAnswerCommentID?.param
   }
@@ -746,17 +679,12 @@ export const checkAnswerCommentUpdate = ({ body }: Request): AnswerCommentUpdate
     { name: 'content', param: body.content }
   )
 
-  const media = body.media && canBeNumber(
-    { name: 'media', param: body.media }
-  )
-
   const moderationStatus = body.moderationStatus && isString(
     { name: 'moderationStatus', param: body.moderationStatus }
   )
 
   return hasDefinedProps<AnswerCommentUpdateInput>({
     content: content?.param,
-    media: media?.param,
     moderationStatus: moderationStatus?.param
   })
 }
@@ -1230,4 +1158,12 @@ export const checkProductFilters = ({ query }: Request): ProductsFiltersInput =>
     ratingMin: ratingMin?.param,
     ratingMax: ratingMax?.param
   }
+}
+
+export const checkImageUpdate = ({ body }: Request): ImageUpdateInput => {
+  const index = body.index && isNumber(
+    { name: 'index', param: body.index }
+  )
+
+  return { index: index.param }
 }

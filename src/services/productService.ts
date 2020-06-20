@@ -1,13 +1,15 @@
 import { Request, Response } from 'express'
 import Knex from 'knex'
 import R from 'ramda'
-import { GroupVariant, Parameter, Product, ProductAllData, ProductCreateInput, ProductsFiltersInput, ProductUpdateInput } from '../types'
+import { GroupVariant, Image, Parameter, Product, ProductAllData, ProductCreateInput, ProductsFiltersInput, ProductUpdateInput } from '../types'
+import { imagesBasePath } from '../utils/constants'
 import { db, dbTrans } from '../utils/db'
 import { uploadImages } from '../utils/img'
 import { getProductsQuery } from '../utils/queries'
 import StatusError from '../utils/StatusError'
 
 const addProduct = async (productInput: ProductCreateInput, res: Response): Promise<Product> => {
+  const { variants, parameters } = productInput
   const now = new Date()
 
   return await dbTrans(async (trx: Knex.Transaction) => {
@@ -24,9 +26,9 @@ const addProduct = async (productInput: ProductCreateInput, res: Response): Prom
         groupID
       }, [ '*' ])
 
-    if (productInput.variants) {
+    if (variants) {
       await trx('groupVariants')
-        .insert(productInput.variants.map((gv) => ({
+        .insert(variants.map((gv) => ({
           name: gv.name,
           value: gv.value,
           groupID,
@@ -34,7 +36,7 @@ const addProduct = async (productInput: ProductCreateInput, res: Response): Prom
         })), [ '*' ])
     }
 
-    if (productInput.parameters !== undefined && productInput.parameters.length !== 0) {
+    if (parameters !== undefined && parameters.length !== 0) {
       const { rows: addedParameters }: { rows: Parameter[] } = await trx.raw(
         `? ON CONFLICT ("name")
            DO UPDATE SET
@@ -42,12 +44,12 @@ const addProduct = async (productInput: ProductCreateInput, res: Response): Prom
            RETURNING *;`,
         [
           trx('parameters')
-            .insert(productInput.parameters.map((p) => ({ name: p.name })))
+            .insert(parameters.map((p) => ({ name: p.name })))
         ]
       )
 
       await trx('productParameters')
-        .insert(productInput.parameters.map((pp) => ({
+        .insert(parameters.map((pp) => ({
           value: pp.value,
           parameterID: (addedParameters.find((p) => p.name === pp.name))?.parameterID,
           productID: addedProduct.productID
@@ -61,7 +63,6 @@ type ProductListData = Pick<Product,
   | 'productID'
   | 'title'
   | 'price'
-  | 'primaryMedia'
   | 'stock'
   | 'groupID'
   | 'isAvailable'
@@ -161,7 +162,6 @@ export const getProducts = async (productFilterInput: ProductsFiltersInput): Pro
 
 type ProductData = ProductListData & {
   listPrice: number;
-  media: number;
   description: string;
   brandSection: string;
   userEmail: string;
@@ -177,7 +177,6 @@ const getProductByID = async (req: Request, res: Response): Promise<ProductData|
       'p.createdAt',
       'p.updatedAt',
       'p.userID',
-      'p.media',
       'p.listPrice',
       'p.description',
       'p.brandSection',
@@ -217,9 +216,20 @@ const updateProduct = async (productInput: ProductUpdateInput, req: Request): Pr
   return updatedProduct
 }
 
-const uploadProductImages = (files: Express.Multer.File[], req: Request): void => {
+const uploadProductImages = async (files: Express.Multer.File[], req: Request, res: Response): Promise<void> => {
+  const images = await db<Image>('images')
+    .where('productID', req.params.productID)
+
+  const uploadedImages: Image[] = await db<Image>('images')
+    .insert(files.map((_f, index) => ({
+      productID: Number(req.params.productID),
+      userID: res.locals.userID,
+      index
+    })), [ '*' ])
+
   const uploadConfig = {
-    imagePath: './public/media/products',
+    filenames: uploadedImages.map((i) => i.imageID),
+    imagesPath: `${imagesBasePath}/images`,
     maxWidth: 1500,
     maxHeight: 1500,
     previewWidth: 425,
@@ -227,7 +237,7 @@ const uploadProductImages = (files: Express.Multer.File[], req: Request): void =
     thumbWidth: 40,
     thumbHeight: 40
   }
-  uploadImages(files, req, uploadConfig, 'productID')
+  uploadImages(files, req, uploadConfig)
 }
 
 export default {

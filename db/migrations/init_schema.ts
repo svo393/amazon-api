@@ -119,6 +119,10 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.string('name', 50).unique().notNullable()
     })
 
+    .createTable('groups', (t) => {
+      t.increments('groupID')
+    })
+
     .createTable('products', (t) => {
       t.increments('productID')
       t.string('title').notNullable()
@@ -127,8 +131,6 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.string('description', 65535).notNullable()
       t.string('brandSection', 65535)
       t.integer('stock').notNullable().unsigned()
-      t.integer('media').notNullable().unsigned()
-      t.integer('primaryMedia').notNullable().unsigned()
       t.dateTime('createdAt').notNullable()
       t.dateTime('updatedAt').notNullable()
       t.boolean('isAvailable').defaultTo(true).notNullable()
@@ -154,10 +156,6 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .notNullable()
     })
 
-    .createTable('groups', (t) => {
-      t.increments('groupID')
-    })
-
     .createTable('listProducts', (t) => {
       t
         .integer('listID')
@@ -180,7 +178,6 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.dateTime('updatedAt').notNullable()
       t.string('title')
       t.string('review', 65535)
-      t.integer('media').unsigned()
       t.integer('stars').notNullable().unsigned()
       t.integer('likes').notNullable().unsigned().defaultTo(0)
       t.integer('dislikes').notNullable().unsigned().defaultTo(0)
@@ -211,7 +208,6 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.dateTime('createdAt').notNullable()
       t.dateTime('updatedAt').notNullable()
       t.string('content', 65535).notNullable()
-      t.integer('media').unsigned()
 
       t
         .integer('userID')
@@ -241,7 +237,6 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.dateTime('createdAt').notNullable()
       t.dateTime('updatedAt').notNullable()
       t.string('content', 65535).unique().notNullable()
-      t.integer('media').unsigned()
       t.integer('likes').notNullable().unsigned().defaultTo(0)
       t.integer('dislikes').notNullable().unsigned().defaultTo(0)
 
@@ -267,7 +262,6 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.dateTime('createdAt').notNullable()
       t.dateTime('updatedAt').notNullable()
       t.string('content', 65535).unique().notNullable()
-      t.integer('media').unsigned()
       t.integer('likes').notNullable().unsigned().defaultTo(0)
       t.integer('dislikes').notNullable().unsigned().defaultTo(0)
 
@@ -294,7 +288,6 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.dateTime('createdAt').notNullable()
       t.dateTime('updatedAt').notNullable()
       t.string('content', 65535).notNullable()
-      t.integer('media').unsigned()
 
       t
         .integer('userID')
@@ -317,6 +310,58 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .string('moderationStatus')
         .references('moderationStatuses.moderationStatusName')
         .notNullable()
+    })
+
+    .createTable('images', (t) => {
+      t.increments('imageID')
+      t.integer('index').unsigned().notNullable()
+
+      t
+        .integer('userID')
+        .references('users.userID')
+        .notNullable()
+
+      t
+        .integer('productID')
+        .references('products.productID')
+
+      t
+        .integer('ratingID')
+        .references('ratings.ratingID')
+
+      t
+        .integer('ratingCommentID')
+        .references('ratingComments.ratingCommentID')
+
+      t
+        .integer('questionID')
+        .references('questions.questionID')
+
+      t
+        .integer('answerID')
+        .references('answers.answerID')
+
+      t
+        .integer('answerCommentID')
+        .references('answerComments.answerCommentID')
+    })
+    .alterTable('images', (t) => {
+      t.unique([ 'productID', 'index' ])
+    })
+    .alterTable('images', (t) => {
+      t.unique([ 'ratingID', 'index' ])
+    })
+    .alterTable('images', (t) => {
+      t.unique([ 'ratingCommentID', 'index' ])
+    })
+    .alterTable('images', (t) => {
+      t.unique([ 'questionID', 'index' ])
+    })
+    .alterTable('images', (t) => {
+      t.unique([ 'answerID', 'index' ])
+    })
+    .alterTable('images', (t) => {
+      t.unique([ 'answerCommentID', 'index' ])
     })
 
     .createTable('groupVariants', (t) => {
@@ -466,6 +511,7 @@ export const down = (knex: Knex): Knex.SchemaBuilder =>
     .dropTableIfExists('parameters')
     .dropTableIfExists('groupVariants')
     .dropTableIfExists('answerComments')
+    .dropTableIfExists('images')
     .dropTableIfExists('answers')
     .dropTableIfExists('questions')
     .dropTableIfExists('ratingComments')
