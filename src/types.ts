@@ -363,12 +363,6 @@ export type ProductPublicData = Omit<Product,
 
 export type FormattedParameters = { [parameterID: number]: Parameter & ProductParameter }
 
-export type ProductAllData = Product & {
-  stars: number;
-  ratingCount: number;
-  group: GroupVariant[];
-}
-
 export type RatingCreateInput = Pick<Rating,
   | 'title'
   | 'review'
@@ -564,12 +558,3 @@ export type ImagesUpdateInput = {
 export type ImagesDeleteInput = {
   imageID: number;
 }[]
-
-export type ImagesFiltersInput = {
-  productID: number;
-  ratingID: number;
-  ratingCommentID: number;
-  questionID: number;
-  answerID: number;
-  answerCommentID: number;
-}

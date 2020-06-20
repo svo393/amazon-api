@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import Knex from 'knex'
 import R from 'ramda'
-import { GroupVariant, Image, Parameter, Product, ProductAllData, ProductCreateInput, ProductsFiltersInput, ProductUpdateInput } from '../types'
+import { GroupVariant, Image, Parameter, Product, ProductCreateInput, ProductsFiltersInput, ProductUpdateInput } from '../types'
 import { imagesBasePath } from '../utils/constants'
 import { db, dbTrans } from '../utils/db'
 import { uploadImages } from '../utils/img'
@@ -71,6 +71,10 @@ type ProductListData = Pick<Product,
   ratingCount: number;
   vendorName: string;
   categoryName: string;
+  images: {
+    imageID: number;
+    index: number;
+  }[];
 }
 
 export const getProducts = async (productsFiltersinput: ProductsFiltersInput): Promise<ProductListData[]> => {
@@ -89,8 +93,13 @@ export const getProducts = async (productsFiltersinput: ProductsFiltersInput): P
     ratingMax,
     ratingMin
   } = productsFiltersinput
+
   // TODO refactor reusable queries
-  let products: ProductListData[] = await getProductsQuery.clone()
+  let products: (Omit<ProductListData, 'images'> & { imageID: number })[] = await getProductsQuery.clone()
+    .select('i.imageID')
+    .join('images as i', 'p.productID', 'i.productID')
+    .where('i.index', 0)
+    .groupBy('i.imageID')
 
   if (groupID !== undefined) {
     products = products
@@ -157,30 +166,43 @@ export const getProducts = async (productsFiltersinput: ProductsFiltersInput): P
       .filter((p) => p.ratingCount <= ratingMax)
   }
 
-  return products
+  return products.map((p) => {
+    const imageID = p.imageID
+    delete p.imageID
+    return {
+      ...p,
+      images: [ {
+        imageID,
+        index: 0,
+        productID: p.productID
+      } ]
+    }
+  })
 }
 
-type ProductData = ProductListData & {
+type ProductData = Omit<ProductListData, 'images'> & {
   listPrice: number;
   description: string;
   brandSection: string;
-  userEmail: string;
-  stars: number;
-  ratingCount: number;
-  vendorName: string;
-  categoryName: string;
+  group: GroupVariant[];
+  images: Image[];
 }
+
+type ProductAllData = ProductData & Pick<Product, 'createdAt' | 'updatedAt' | 'userID'> & { userEmail: string }
 
 const getProductByID = async (req: Request, res: Response): Promise<ProductData| ProductAllData> => {
   const [ product ] = await getProductsQuery.clone()
     .select(
-      'p.createdAt',
-      'p.updatedAt',
-      'p.userID',
       'p.listPrice',
       'p.description',
       'p.brandSection',
-      'u.email as userEmail')
+      'p.createdAt',
+      'p.updatedAt',
+      'p.userID',
+      'p.categoryID',
+      'p.vendorID',
+      'u.email as userEmail'
+    )
     .where('p.productID', req.params.productID)
     .leftJoin('groupVariants as gv', 'p.groupID', 'gv.groupID')
     .leftJoin('users as u', 'p.userID', 'u.userID')
@@ -191,16 +213,20 @@ const getProductByID = async (req: Request, res: Response): Promise<ProductData|
   const groupVariants = await db<GroupVariant>('groupVariants')
     .where('groupID', product.groupID)
 
-  const fullProduct = { ...product, group: groupVariants }
+  const images = await db<Image>('images')
+    .where('productID', product.productID)
+
+  const fullProduct = { ...product, group: groupVariants, images }
 
   const role: string | undefined = res.locals.userRole
 
-  return role && [ 'ROOT', 'ADMIN' ].includes(role)
+  return role !== undefined && [ 'ROOT', 'ADMIN' ].includes(role)
     ? fullProduct
     : R.omit([
       'createdAt',
       'updatedAt',
-      'userID'
+      'userID',
+      'userEmail'
     ], fullProduct)
 }
 

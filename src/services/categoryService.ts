@@ -28,7 +28,7 @@ const getCategories = async (categoriesFiltersinput: CategoriesFiltersInput): Pr
   let categories: CategoryWithProductCount[] = await db('categories as c')
     .select('c.categoryID', 'c.name')
     .count('p.productID as productCount')
-    .joinRaw('JOIN products as p USING ("categoryID")')
+    .joinRaw('LEFT JOIN products as p USING ("categoryID")')
     .groupBy('c.categoryID')
 
   if (name !== undefined) {

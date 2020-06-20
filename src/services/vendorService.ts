@@ -27,7 +27,7 @@ const getVendors = async (vendorsFiltersinput: VendorsFiltersInput): Promise<Ven
   let vendors: VendorListData[] = await db<Vendor>('vendors as v')
     .select('v.vendorID', 'v.name')
     .count('p.productID as productCount')
-    .joinRaw('JOIN products as p USING ("vendorID")')
+    .joinRaw('LEFT JOIN products as p USING ("vendorID")')
     .groupBy('v.vendorID')
 
   if (name !== undefined) {

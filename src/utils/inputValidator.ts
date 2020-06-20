@@ -1,7 +1,7 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoryCreateInput, CategoriesFiltersInput, CategoryUpdateInput, FeedFiltersInput, GroupVariantCreateInput, GroupVariantUpdateInput, InvoiceCreateInput, InvoicesFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ModerationStatus, OrderCreateInput, OrdersFiltersInput, OrderProductCreateInput, OrderProductUpdateInput, OrderStatus, OrderUpdateInput, ParameterCreateInput, ParameterUpdateInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductParameterInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorsFiltersInput, VendorInput, ImagesUpdateInput, ImagesDeleteInput, ImagesFiltersInput } from '../types'
-import { canBeBoolean, canBeNumber, hasDefinedProps, isArray, isBoolean, isDate, isEmail, isInputProvided, isPasswordValid, isProductParameterOrGroupVariant, isProvided, isString, isStringOrNumber, isNumber } from './validatorLib'
+import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoriesFiltersInput, CategoryCreateInput, CategoryUpdateInput, FeedFiltersInput, GroupVariantCreateInput, GroupVariantUpdateInput, ImagesDeleteInput, ImagesUpdateInput, InvoiceCreateInput, InvoicesFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ModerationStatus, OrderCreateInput, OrderProductCreateInput, OrderProductUpdateInput, OrdersFiltersInput, OrderStatus, OrderUpdateInput, ParameterCreateInput, ParameterUpdateInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductParameterInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorInput, VendorsFiltersInput } from '../types'
+import { canBeBoolean, canBeNumber, hasDefinedProps, isArray, isBoolean, isDate, isEmail, isInputProvided, isNumber, isPasswordValid, isProductParameterOrGroupVariant, isProvided, isString, isStringOrNumber } from './validatorLib'
 
 export const checkNewUser = ({ body }: Request): UserSignupInput => {
   const email = R.pipe(
@@ -1184,39 +1184,4 @@ export const checkImagesDelete = ({ body }: Request): ImagesDeleteInput => {
       isNumber
     )({ name: 'imageID', param: i.imageID }).param
   }))
-}
-
-export const checkImageFilters = ({ query }: Request): ImagesFiltersInput => {
-  const productID = 'productID' in query
-    ? canBeNumber({ name: 'productID', param: query.productID })
-    : undefined
-
-  const ratingID = 'ratingID' in query
-    ? canBeNumber({ name: 'ratingID', param: query.ratingID })
-    : undefined
-
-  const ratingCommentID = 'ratingCommentID' in query
-    ? canBeNumber({ name: 'ratingCommentID', param: query.ratingCommentID })
-    : undefined
-
-  const questionID = 'questionID' in query
-    ? canBeNumber({ name: 'questionID', param: query.questionID })
-    : undefined
-
-  const answerID = 'answerID' in query
-    ? canBeNumber({ name: 'answerID', param: query.answerID })
-    : undefined
-
-  const answerCommentID = 'answerCommentID' in query
-    ? canBeNumber({ name: 'answerCommentID', param: query.answerCommentID })
-    : undefined
-
-  return {
-    productID: productID?.param,
-    ratingID: ratingID?.param,
-    ratingCommentID: ratingCommentID?.param,
-    questionID: questionID?.param,
-    answerID: answerID?.param,
-    answerCommentID: answerCommentID?.param
-  }
 }

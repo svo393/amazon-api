@@ -1,11 +1,15 @@
 import fs from 'fs'
 import Knex from 'knex'
-import { Image, ImagesFiltersInput, ImagesDeleteInput, ImagesUpdateInput } from '../types'
+import { Image, ImagesDeleteInput, ImagesFiltersInput, ImagesUpdateInput } from '../types'
 import { imagesBasePath } from '../utils/constants'
-import { dbTrans, db } from '../utils/db'
+import { db, dbTrans } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
-const getImages = async (imagesFiltersinput: ImagesFiltersInput): Promise<Image[]> => {
+const getImages = async (): Promise<Image[]> => {
+  return await db<Image>('images')
+}
+
+const getImagesByEntityID = async (imagesFiltersinput: ImagesFiltersInput): Promise<Image[]> => {
   const {
     productID,
     ratingID,
@@ -85,6 +89,7 @@ const deleteImages = async (images: ImagesDeleteInput): Promise<void> => {
 
 export default {
   getImages,
+  getImagesByEntityID,
   updateImages,
   deleteImages
 }
