@@ -91,7 +91,7 @@ const seed = async (): Promise<void> => {
             .post(apiURLs.products)
             .set('Cookie', `token=${token}`)
             .send({
-              ...R.omit([ 'ratings', 'questions' ], g[1][0]),
+              ...R.omit([ 'ratings', 'questions', 'media' ], g[1][0]),
               userID,
               categoryID: addedCategory.categoryID,
               vendorID: addedVendor.vendorID
@@ -105,7 +105,7 @@ const seed = async (): Promise<void> => {
                 .post(apiURLs.products)
                 .set('Cookie', `token=${token}`)
                 .send({
-                  ...R.omit([ 'ratings', 'questions' ], p),
+                  ...R.omit([ 'ratings', 'questions', 'media' ], p),
                   userID,
                   categoryID: addedCategory.categoryID,
                   vendorID: addedVendor.vendorID,

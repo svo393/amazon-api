@@ -8,8 +8,6 @@ export const products: Omit<ProductCreateInput, 'categoryID' | 'vendorID' | 'gro
     description: '9th Generation Intel Core i5 9400T Processor (Up to 3.4GHz)\n23.8 inches Full HD (1920 x 1080) widescreen Edge to Edge LED Back lit Display\n12GB DDR4 Memory, 512GB SSD & 8x DVD Writer Double Layer Drive (DVD RW)\n802.11ac Wi Fi, Gigabit Ethernet LAN & Bluetooth 4.2LE\n2 Built in 2W Stereo Speakers| Built in 2.0MP Full HD (1080P) Webcam, Wireless Keyboard and Mouse, Windows 10 Home',
     brandSection: 'A Modern Design for...',
     stock: 21,
-    media: 7,
-    primaryMedia: 0,
     isAvailable: true,
     variants: [
       { name: 'Style', value: 'No Touch Screen' },

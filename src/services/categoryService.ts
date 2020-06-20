@@ -1,5 +1,5 @@
 import { Request } from 'express'
-import { Category, CategoryCreateInput, CategoryFiltersInput, CategoryUpdateInput } from '../types'
+import { Category, CategoryCreateInput, CategoriesFiltersInput, CategoryUpdateInput } from '../types'
 import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
@@ -22,8 +22,8 @@ const addCategory = async (categoryInput: CategoryCreateInput): Promise<Category
 type CategoryWithProductCount = Category & { productCount: number }
 type CategoryListData = CategoryWithProductCount & { children: number[] }
 
-const getCategories = async (categoryFilterInput: CategoryFiltersInput): Promise<CategoryListData[]> => {
-  const { name } = categoryFilterInput
+const getCategories = async (categoriesFiltersinput: CategoriesFiltersInput): Promise<CategoryListData[]> => {
+  const { name } = categoriesFiltersinput
 
   let categories: CategoryWithProductCount[] = await db('categories as c')
     .select('c.categoryID', 'c.name')

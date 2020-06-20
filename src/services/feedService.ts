@@ -15,7 +15,7 @@ type Activity =
   Answer & { type: string } |
   AnswerComment & { type: string }
 
-const getFeed = async (feedFilterInput: FeedFiltersInput): Promise<Feed> => {
+const getFeed = async (feedFiltersinput: FeedFiltersInput): Promise<Feed> => {
   const {
     types,
     moderationStatuses,
@@ -23,7 +23,7 @@ const getFeed = async (feedFilterInput: FeedFiltersInput): Promise<Feed> => {
     createdTo,
     content,
     userEmail
-  } = feedFilterInput
+  } = feedFiltersinput
 
   const ratingComments = await db<RatingComment>('ratingComments as rc')
     .select(

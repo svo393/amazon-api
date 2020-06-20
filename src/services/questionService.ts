@@ -70,6 +70,7 @@ const deleteQuestion = async (req: Request): Promise<void> => {
 
 const uploadQuestionImages = (files: Express.Multer.File[], req: Request): void => {
   const uploadConfig = {
+    fileNames: [],
     imagesPath: `${imagesBasePath}/images`,
     maxWidth: 1632,
     maxHeight: 1632,
@@ -78,7 +79,7 @@ const uploadQuestionImages = (files: Express.Multer.File[], req: Request): void 
     thumbWidth: 117,
     thumbHeight: 117
   }
-  uploadImages(files, req, uploadConfig, 'questionID')
+  uploadImages(files, req, uploadConfig)
 }
 
 export default {

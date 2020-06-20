@@ -12,8 +12,8 @@ router.post('/', isAdmin, async (req, res) => {
 })
 
 router.get('/', async (req, res) => {
-  const categoryFilterInput = checkCategoryFilters(req)
-  const categories = await categoryService.getCategories(categoryFilterInput)
+  const categoriesFiltersinput = checkCategoryFilters(req)
+  const categories = await categoryService.getCategories(categoriesFiltersinput)
   res.json(categories)
 })
 

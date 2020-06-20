@@ -1,5 +1,5 @@
 import { Request } from 'express'
-import { Vendor, VendorFiltersInput, VendorInput } from '../types'
+import { Vendor, VendorsFiltersInput, VendorInput } from '../types'
 import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
@@ -21,8 +21,8 @@ const addVendor = async (vendorInput: VendorInput): Promise<Vendor> => {
 
 type VendorListData = Vendor & { productCount: number }
 
-const getVendors = async (vendorFilterInput: VendorFiltersInput): Promise<VendorListData[]> => {
-  const { name } = vendorFilterInput
+const getVendors = async (vendorsFiltersinput: VendorsFiltersInput): Promise<VendorListData[]> => {
+  const { name } = vendorsFiltersinput
 
   let vendors: VendorListData[] = await db<Vendor>('vendors as v')
     .select('v.vendorID', 'v.name')

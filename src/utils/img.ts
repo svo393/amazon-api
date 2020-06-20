@@ -4,7 +4,7 @@ import path from 'path'
 import sharp from 'sharp'
 
 type UploadConfig = {
-  filenames: number[];
+  fileNames: number[];
   imagesPath: string;
   maxWidth: number;
   maxHeight: number;
@@ -16,7 +16,7 @@ type UploadConfig = {
 
 export const uploadImages = (files: Express.Multer.File[], req: Request, uploadConfig: UploadConfig): void => {
   const {
-    filenames,
+    fileNames,
     imagesPath,
     maxWidth,
     maxHeight,
@@ -29,7 +29,7 @@ export const uploadImages = (files: Express.Multer.File[], req: Request, uploadC
   files.map(async (file, index) => {
     const image = sharp(file.path)
     const info = await image.metadata()
-    const fileName = filenames[index]
+    const fileName = fileNames[index]
 
     if ((info.width as number) > maxWidth || (info.height as number) > maxHeight) {
       await image
@@ -59,7 +59,7 @@ export const uploadImages = (files: Express.Multer.File[], req: Request, uploadC
         )
     }
 
-    if (previewWidth === undefined && previewHeight === undefined) {
+    if (previewWidth !== undefined && previewHeight !== undefined) {
       await image
         .resize(previewWidth, previewHeight, { fit: 'inside' })
         .jpeg({ progressive: true })
@@ -89,6 +89,7 @@ export const uploadImages = (files: Express.Multer.File[], req: Request, uploadC
         path.resolve(imagesPath, `${fileName}_${thumbWidth}.webp`)
       )
 
+    // TODO try async rather than sync
     fs.unlinkSync(file.path)
   })
 }

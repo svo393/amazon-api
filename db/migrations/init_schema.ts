@@ -320,30 +320,37 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .integer('userID')
         .references('users.userID')
         .notNullable()
+        .onDelete('CASCADE')
 
       t
         .integer('productID')
         .references('products.productID')
+        .onDelete('CASCADE')
 
       t
         .integer('ratingID')
         .references('ratings.ratingID')
+        .onDelete('CASCADE')
 
       t
         .integer('ratingCommentID')
         .references('ratingComments.ratingCommentID')
+        .onDelete('CASCADE')
 
       t
         .integer('questionID')
         .references('questions.questionID')
+        .onDelete('CASCADE')
 
       t
         .integer('answerID')
         .references('answers.answerID')
+        .onDelete('CASCADE')
 
       t
         .integer('answerCommentID')
         .references('answerComments.answerCommentID')
+        .onDelete('CASCADE')
     })
     .alterTable('images', (t) => {
       t.unique([ 'productID', 'index' ])
@@ -510,8 +517,8 @@ export const down = (knex: Knex): Knex.SchemaBuilder =>
     .dropTableIfExists('productParameters')
     .dropTableIfExists('parameters')
     .dropTableIfExists('groupVariants')
-    .dropTableIfExists('answerComments')
     .dropTableIfExists('images')
+    .dropTableIfExists('answerComments')
     .dropTableIfExists('answers')
     .dropTableIfExists('questions')
     .dropTableIfExists('ratingComments')

@@ -37,6 +37,7 @@ export const init = async (): Promise<void> => {
     `
     ALTER SEQUENCE "invoices_invoiceID_seq" START WITH 274 INCREMENT BY 3 RESTART;
     ALTER SEQUENCE "orders_orderID_seq" START WITH 512 INCREMENT BY 3 RESTART;
+    ALTER SEQUENCE "images_imageID_seq" START WITH 1923 INCREMENT BY 3 RESTART;
     ALTER SEQUENCE "answerComments_answerCommentID_seq" START WITH 553 INCREMENT BY 3 RESTART;
     ALTER SEQUENCE "answers_answerID_seq" START WITH 480 INCREMENT BY 3 RESTART;
     ALTER SEQUENCE "questions_questionID_seq" START WITH 308 INCREMENT BY 3 RESTART;

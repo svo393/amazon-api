@@ -43,7 +43,6 @@ export const initialProducts = {
           brandSection: 'A Modern Design for...',
           stock: 21,
           media: 7,
-          primaryMedia: 0,
           isAvailable: true,
           variants: [
             { name: 'Style', value: 'No Touch Screen' },
@@ -143,7 +142,6 @@ export const initialProducts = {
           brandSection: 'A Modern Design for...',
           stock: 2,
           media: 7,
-          primaryMedia: 0,
           isAvailable: true,
           variants: [
             { name: 'Style', value: 'Touch Screen' },
@@ -177,7 +175,6 @@ export const initialProducts = {
           brandSection: 'A Modern Design for...',
           stock: 5,
           media: 7,
-          primaryMedia: 0,
           isAvailable: true,
           variants: [
             { name: 'Style', value: 'No Touch Screen' },

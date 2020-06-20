@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoryCreateInput, CategoryFiltersInput, CategoryUpdateInput, FeedFiltersInput, GroupVariantCreateInput, GroupVariantUpdateInput, InvoiceCreateInput, InvoiceFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ModerationStatus, OrderCreateInput, OrderFiltersInput, OrderProductCreateInput, OrderProductUpdateInput, OrderStatus, OrderUpdateInput, ParameterCreateInput, ParameterUpdateInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductParameterInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorFiltersInput, VendorInput, ImageUpdateInput } from '../types'
+import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoryCreateInput, CategoriesFiltersInput, CategoryUpdateInput, FeedFiltersInput, GroupVariantCreateInput, GroupVariantUpdateInput, InvoiceCreateInput, InvoicesFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ModerationStatus, OrderCreateInput, OrdersFiltersInput, OrderProductCreateInput, OrderProductUpdateInput, OrderStatus, OrderUpdateInput, ParameterCreateInput, ParameterUpdateInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductParameterInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorsFiltersInput, VendorInput, ImagesUpdateInput, ImagesDeleteInput, ImagesFiltersInput } from '../types'
 import { canBeBoolean, canBeNumber, hasDefinedProps, isArray, isBoolean, isDate, isEmail, isInputProvided, isPasswordValid, isProductParameterOrGroupVariant, isProvided, isString, isStringOrNumber, isNumber } from './validatorLib'
 
 export const checkNewUser = ({ body }: Request): UserSignupInput => {
@@ -904,7 +904,7 @@ export const checkInvoiceUpdate = ({ body }: Request): InvoiceUpdateInput => {
   })
 }
 
-export const checkInvoiceFilters = ({ query }: Request): InvoiceFiltersInput => {
+export const checkInvoiceFilters = ({ query }: Request): InvoicesFiltersInput => {
   const amountMin = 'amountMin' in query
     ? canBeNumber({ name: 'amountMin', param: query.amountMin })
     : undefined
@@ -944,7 +944,7 @@ export const checkInvoiceFilters = ({ query }: Request): InvoiceFiltersInput => 
   }
 }
 
-export const checkOrderFilters = ({ query }: Request): OrderFiltersInput => {
+export const checkOrderFilters = ({ query }: Request): OrdersFiltersInput => {
   const amountMin = 'amountMin' in query
     ? canBeNumber({ name: 'amountMin', param: query.amountMin })
     : undefined
@@ -984,7 +984,7 @@ export const checkOrderFilters = ({ query }: Request): OrderFiltersInput => {
   }
 }
 
-export const checkVendorFilters = ({ query }: Request): VendorFiltersInput => {
+export const checkVendorFilters = ({ query }: Request): VendorsFiltersInput => {
   const name = 'name' in query
     ? isString({ name: 'name', param: query.name })
     : undefined
@@ -992,7 +992,7 @@ export const checkVendorFilters = ({ query }: Request): VendorFiltersInput => {
   return { name: name?.param }
 }
 
-export const checkCategoryFilters = ({ query }: Request): CategoryFiltersInput => {
+export const checkCategoryFilters = ({ query }: Request): CategoriesFiltersInput => {
   const name = 'name' in query
     ? isString({ name: 'name', param: query.name })
     : undefined
@@ -1160,10 +1160,63 @@ export const checkProductFilters = ({ query }: Request): ProductsFiltersInput =>
   }
 }
 
-export const checkImageUpdate = ({ body }: Request): ImageUpdateInput => {
-  const index = body.index && isNumber(
-    { name: 'index', param: body.index }
-  )
+export const checkImagesUpdate = ({ body }: Request): ImagesUpdateInput => {
+  const images: any[] = isArray({ name: 'images', param: body }).param
 
-  return { index: index.param }
+  return images.map((i) => ({
+    imageID: R.pipe(
+      isProvided,
+      isNumber
+    )({ name: 'imageID', param: i.imageID }).param,
+    index: R.pipe(
+      isProvided,
+      isNumber
+    )({ name: 'index', param: i.index }).param
+  }))
+}
+
+export const checkImagesDelete = ({ body }: Request): ImagesDeleteInput => {
+  const images: any[] = isArray({ name: 'images', param: body }).param
+
+  return images.map((i) => ({
+    imageID: R.pipe(
+      isProvided,
+      isNumber
+    )({ name: 'imageID', param: i.imageID }).param
+  }))
+}
+
+export const checkImageFilters = ({ query }: Request): ImagesFiltersInput => {
+  const productID = 'productID' in query
+    ? canBeNumber({ name: 'productID', param: query.productID })
+    : undefined
+
+  const ratingID = 'ratingID' in query
+    ? canBeNumber({ name: 'ratingID', param: query.ratingID })
+    : undefined
+
+  const ratingCommentID = 'ratingCommentID' in query
+    ? canBeNumber({ name: 'ratingCommentID', param: query.ratingCommentID })
+    : undefined
+
+  const questionID = 'questionID' in query
+    ? canBeNumber({ name: 'questionID', param: query.questionID })
+    : undefined
+
+  const answerID = 'answerID' in query
+    ? canBeNumber({ name: 'answerID', param: query.answerID })
+    : undefined
+
+  const answerCommentID = 'answerCommentID' in query
+    ? canBeNumber({ name: 'answerCommentID', param: query.answerCommentID })
+    : undefined
+
+  return {
+    productID: productID?.param,
+    ratingID: ratingID?.param,
+    ratingCommentID: ratingCommentID?.param,
+    questionID: questionID?.param,
+    answerID: answerID?.param,
+    answerCommentID: answerCommentID?.param
+  }
 }

@@ -458,7 +458,7 @@ export type OrderUpdateInput = {
   shippingMethod?: string;
 }
 
-export type OrderFiltersInput = {
+export type OrdersFiltersInput = {
   amountMin?: number;
   amountMax?: number;
   createdFrom?: string;
@@ -487,7 +487,7 @@ export type InvoiceUpdateInput = {
   invoiceStatus?: string;
 }
 
-export type InvoiceFiltersInput = {
+export type InvoicesFiltersInput = {
   amountMin?: number;
   amountMax?: number;
   createdFrom?: string;
@@ -497,11 +497,11 @@ export type InvoiceFiltersInput = {
   userEmail?: string;
 }
 
-export type VendorFiltersInput = {
+export type VendorsFiltersInput = {
   name?: string;
 }
 
-export type CategoryFiltersInput = {
+export type CategoriesFiltersInput = {
   name?: string;
 }
 
@@ -556,6 +556,20 @@ export type OrderFullData = Order & {
   orderProducts: OrderProductFullData[];
 }
 
-export type ImageUpdateInput = {
+export type ImagesUpdateInput = {
+  imageID: number;
   index: number;
+}[]
+
+export type ImagesDeleteInput = {
+  imageID: number;
+}[]
+
+export type ImagesFiltersInput = {
+  productID: number;
+  ratingID: number;
+  ratingCommentID: number;
+  questionID: number;
+  answerID: number;
+  answerCommentID: number;
 }

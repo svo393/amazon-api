@@ -3,7 +3,7 @@ import parameterService from '../services/parameterService'
 import productService from '../services/productService'
 import { UPLOAD_TIMEOUT } from '../utils/config'
 import { checkMediaUpload, checkNewProduct, checkProductFilters, checkProductUpdate } from '../utils/inputValidator'
-import { isAdmin, isCreator, multerUpload } from '../utils/middleware'
+import { isAdmin, multerUpload } from '../utils/middleware'
 
 const router = Router()
 
@@ -14,8 +14,8 @@ router.post('/', isAdmin, async (req, res) => {
 })
 
 router.get('/', async (req, res) => {
-  const productFilterInput = checkProductFilters(req)
-  const products = await productService.getProducts(productFilterInput)
+  const productsFiltersInput = checkProductFilters(req)
+  const products = await productService.getProducts(productsFiltersInput)
   res.json(products)
 })
 
@@ -24,7 +24,7 @@ router.get('/:productID', async (req, res) => {
   res.json(product)
 })
 
-router.put('/:productID', isCreator('products', 'productID', 'params'), async (req, res) => {
+router.put('/:productID', isAdmin, async (req, res) => {
   const productInput = checkProductUpdate(req)
   const updatedProduct = await productService.updateProduct(productInput, req)
   res.json(updatedProduct)

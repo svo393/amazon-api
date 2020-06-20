@@ -73,7 +73,7 @@ type ProductListData = Pick<Product,
   categoryName: string;
 }
 
-export const getProducts = async (productFilterInput: ProductsFiltersInput): Promise<ProductListData[]> => {
+export const getProducts = async (productsFiltersinput: ProductsFiltersInput): Promise<ProductListData[]> => {
   const {
     groupID,
     title,
@@ -88,7 +88,7 @@ export const getProducts = async (productFilterInput: ProductsFiltersInput): Pro
     starsMin,
     ratingMax,
     ratingMin
-  } = productFilterInput
+  } = productsFiltersinput
   // TODO refactor reusable queries
   let products: ProductListData[] = await getProductsQuery.clone()
 
@@ -217,18 +217,31 @@ const updateProduct = async (productInput: ProductUpdateInput, req: Request): Pr
 }
 
 const uploadProductImages = async (files: Express.Multer.File[], req: Request, res: Response): Promise<void> => {
-  const images = await db<Image>('images')
-    .where('productID', req.params.productID)
+  // TODO resolve poll bug
+  // const images = await db<Image>('images')
+  //   .where('productID', req.params.productID)
 
-  const uploadedImages: Image[] = await db<Image>('images')
-    .insert(files.map((_f, index) => ({
-      productID: Number(req.params.productID),
+  // let indexes: number[] = []
+
+  const filesWithIndexes = files.map((f) => {
+    const match = /(?<=_)\d+(?=\.)/.exec(f.filename)
+    if (!match) throw new StatusError(400, 'Invalid image filename')
+    const index = Number(match[0])
+    // indexes.push(index)
+    return {
+      productID: req.params.productID,
       userID: res.locals.userID,
       index
-    })), [ '*' ])
+    }
+  })
+
+  // if (images.some((i) => indexes.includes(i.index))) throw new StatusError(500, 'Error uploading images')
+
+  const uploadedImages: Image[] = await db('images')
+    .insert(filesWithIndexes, [ '*' ])
 
   const uploadConfig = {
-    filenames: uploadedImages.map((i) => i.imageID),
+    fileNames: uploadedImages.map((i) => i.imageID),
     imagesPath: `${imagesBasePath}/images`,
     maxWidth: 1500,
     maxHeight: 1500,

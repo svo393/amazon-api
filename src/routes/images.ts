@@ -1,18 +1,24 @@
 import Router from 'express'
 import imageService from '../services/imageService'
-import { isCreatorOrAdmin } from '../utils/middleware'
-import { checkImageUpdate } from '../utils/inputValidator'
+import { checkImageFilters, checkImagesDelete, checkImagesUpdate } from '../utils/inputValidator'
 
 const router = Router()
 
-router.put('/:imageID', isCreatorOrAdmin('images', 'imageID', 'params'), async (req, res) => {
-  const imageUpdateInput = checkImageUpdate(req)
-  const updatedImage = await imageService.updateImage(imageUpdateInput, req)
-  res.json(updatedImage)
+router.get('/', async (req, res) => {
+  const imagesFiltersInput = checkImageFilters(req)
+  const images = await imageService.getImages(imagesFiltersInput)
+  res.json(images)
 })
 
-router.delete('/:imageID', isCreatorOrAdmin('images', 'imageID', 'params'), async (req, res) => {
-  await imageService.deleteImage(req)
+router.put('/batch', async (req, res) => {
+  const imagesUpdateInput = checkImagesUpdate(req)
+  const updatedImages = await imageService.updateImages(imagesUpdateInput)
+  res.json(updatedImages)
+})
+
+router.delete('/batch', async (req, res) => {
+  const imagesDeleteInput = checkImagesDelete(req)
+  await imageService.deleteImages(imagesDeleteInput)
   res.status(204).end()
 })
 

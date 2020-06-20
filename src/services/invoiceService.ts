@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import Knex from 'knex'
-import { Invoice, InvoiceCreateInput, InvoiceFiltersInput, InvoiceUpdateInput } from '../types'
+import { Invoice, InvoiceCreateInput, InvoicesFiltersInput, InvoiceUpdateInput } from '../types'
 import { db, dbTrans } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
@@ -18,7 +18,7 @@ const addInvoice = async (invoiceInput: InvoiceCreateInput): Promise<Invoice> =>
   return addedInvoice
 }
 
-const getInvoices = async (invoiceFilterInput: InvoiceFiltersInput): Promise<Invoice[]> => {
+const getInvoices = async (invoicesFiltersinput: InvoicesFiltersInput): Promise<Invoice[]> => {
   const {
     invoiceStatuses,
     paymentMethods,
@@ -27,7 +27,7 @@ const getInvoices = async (invoiceFilterInput: InvoiceFiltersInput): Promise<Inv
     createdFrom,
     createdTo,
     userEmail
-  } = invoiceFilterInput
+  } = invoicesFiltersinput
 
   let invoices: Invoice[] = await db('invoices as i')
     .select(

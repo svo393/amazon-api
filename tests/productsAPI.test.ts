@@ -61,8 +61,8 @@ describe('Product adding', () => {
     await api
       .post(`${apiURL}/${addedProduct.productID}/upload`)
       .set('Cookie', `token=${token}`)
-      .attach('productMedia', path.join(__dirname, 'test-image.png'))
-      .attach('productMedia', path.join(__dirname, 'test-image2.png'))
+      .attach('productMedia', path.join(__dirname, 'test-image.png'), { filename: `${addedProduct.productID}_0.png` })
+      .attach('productMedia', path.join(__dirname, 'test-image2.png'), { filename: `${addedProduct.productID}_3.png` })
       .expect(204)
   })
 

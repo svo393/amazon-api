@@ -115,7 +115,7 @@ type UserListData = Omit<UserTempData,
   activitiesCount: number;
 }
 
-const getUsers = async (userFilterInput: UsersFiltersInput): Promise<UserListData[]> => {
+const getUsers = async (usersFiltersinput: UsersFiltersInput): Promise<UserListData[]> => {
   const {
     roles,
     createdFrom,
@@ -127,7 +127,7 @@ const getUsers = async (userFilterInput: UsersFiltersInput): Promise<UserListDat
     activitiesCountMin,
     activitiesCountMax,
     email
-  } = userFilterInput
+  } = usersFiltersinput
 
   let rawUsers: UserTempData[] = await db('users as u')
     .select('email',
@@ -307,7 +307,7 @@ const updateUser = async (userInput: UserUpdateInput, res: Response, req: Reques
 }
 
 const deleteUser = async (req: Request, res: Response): Promise<void> => {
-  if (res.locals.userRole === 'ROOT') {
+  if ([ 'ROOT', 'ADMIN' ].includes(res.locals.userRole)) {
     throw new StatusError(451, 'Not gonna happen')
   }
 
@@ -382,6 +382,7 @@ const resetPassword = async ({ password, resetToken }: PasswordResetInput, res: 
 
 const uploadUserAvatar = (file: Express.Multer.File, req: Request): void => {
   const uploadConfig = {
+    fileNames: [],
     imagesPath: `${imagesBasePath}/avatars`,
     maxWidth: 460,
     maxHeight: 460,

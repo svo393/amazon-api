@@ -56,6 +56,7 @@ const deleteRatingComment = async (req: Request): Promise<void> => {
 
 const uploadRatingCommentImages = (files: Express.Multer.File[], req: Request): void => {
   const uploadConfig = {
+    fileNames: [],
     imagesPath: `${imagesBasePath}/images`,
     maxWidth: 1632,
     maxHeight: 1632,

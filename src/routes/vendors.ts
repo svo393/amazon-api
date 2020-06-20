@@ -12,8 +12,8 @@ router.post('/', isAdmin, async (req, res) => {
 })
 
 router.get('/', async (req, res) => {
-  const vendorFilterInput = checkVendorFilters(req)
-  const vendors = await vendorService.getVendors(vendorFilterInput)
+  const vendorsFiltersInput = checkVendorFilters(req)
+  const vendors = await vendorService.getVendors(vendorsFiltersInput)
   res.json(vendors)
 })
 

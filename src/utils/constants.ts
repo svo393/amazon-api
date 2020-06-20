@@ -41,6 +41,7 @@ export const apiURLs = {
   groups: `${baseAPI}/groups`,
   parameters: `${baseAPI}/parameters`,
   orders: `${baseAPI}/orders`,
+  images: `${baseAPI}/images`,
   invoices: `${baseAPI}/invoices`,
   feed: `${baseAPI}/feed`
 }

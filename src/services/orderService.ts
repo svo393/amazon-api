@@ -1,7 +1,7 @@
 import { Request } from 'express'
 import Knex from 'knex'
 import R from 'ramda'
-import { Invoice, Order, OrderCreateInput, OrderFiltersInput, OrderFullData, OrderProduct, OrderProductFullData, OrderUpdateInput } from '../types'
+import { Invoice, Order, OrderCreateInput, OrdersFiltersInput, OrderFullData, OrderProduct, OrderProductFullData, OrderUpdateInput } from '../types'
 import { db, dbTrans } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
@@ -58,7 +58,7 @@ const addOrder = async (orderInput: OrderCreateInput): Promise<OrderFullData & I
   })
 }
 
-const getOrders = async (orderFilterInput: OrderFiltersInput): Promise<Order[]> => {
+const getOrders = async (ordersFiltersinput: OrdersFiltersInput): Promise<Order[]> => {
   const {
     orderStatuses,
     shippingMethods,
@@ -67,7 +67,7 @@ const getOrders = async (orderFilterInput: OrderFiltersInput): Promise<Order[]> 
     createdFrom,
     createdTo,
     userEmail
-  } = orderFilterInput
+  } = ordersFiltersinput
 
   let orders: Order[] = await db('orders as o')
     .select(

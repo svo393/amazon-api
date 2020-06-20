@@ -13,8 +13,8 @@ router.post('/', isLoggedIn, async (req, res) => {
 })
 
 router.get('/', isAdmin, async (req, res) => {
-  const orderFilterInput = checkOrderFilters(req)
-  const orders = await orderService.getOrders(orderFilterInput)
+  const ordersFiltersinput = checkOrderFilters(req)
+  const orders = await orderService.getOrders(ordersFiltersinput)
   res.json(orders)
 })
 
