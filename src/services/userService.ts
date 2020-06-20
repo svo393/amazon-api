@@ -380,16 +380,16 @@ const resetPassword = async ({ password, resetToken }: PasswordResetInput, res: 
   return updatedUser
 }
 
-const uploadUserAvatar = (file: Express.Multer.File, req: Request): void => {
+const uploadUserAvatar = (file: Express.Multer.File, res: Response): void => {
   const uploadConfig = {
-    fileNames: [],
+    fileNames: [ res.locals.userID ],
     imagesPath: `${imagesBasePath}/avatars`,
     maxWidth: 460,
     maxHeight: 460,
     thumbWidth: 48,
     thumbHeight: 48
   }
-  uploadImages([ file ], req, uploadConfig)
+  uploadImages([ file ], uploadConfig)
 }
 
 export default {

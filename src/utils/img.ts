@@ -1,4 +1,3 @@
-import { Request } from 'express'
 import fs from 'fs'
 import path from 'path'
 import sharp from 'sharp'
@@ -14,7 +13,7 @@ type UploadConfig = {
   thumbHeight: number;
 }
 
-export const uploadImages = (files: Express.Multer.File[], req: Request, uploadConfig: UploadConfig): void => {
+export const uploadImages = (files: Express.Multer.File[], uploadConfig: UploadConfig): void => {
   const {
     fileNames,
     imagesPath,

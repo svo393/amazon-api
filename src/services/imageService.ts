@@ -1,58 +1,9 @@
 import fs from 'fs'
 import Knex from 'knex'
-import { Image, ImagesDeleteInput, ImagesFiltersInput, ImagesUpdateInput } from '../types'
+import { Image, ImagesDeleteInput, ImagesUpdateInput } from '../types'
 import { imagesBasePath } from '../utils/constants'
-import { db, dbTrans } from '../utils/db'
+import { dbTrans } from '../utils/db'
 import StatusError from '../utils/StatusError'
-
-const getImages = async (): Promise<Image[]> => {
-  return await db<Image>('images')
-}
-
-const getImagesByEntityID = async (imagesFiltersinput: ImagesFiltersInput): Promise<Image[]> => {
-  const {
-    productID,
-    ratingID,
-    ratingCommentID,
-    questionID,
-    answerID,
-    answerCommentID
-  } = imagesFiltersinput
-
-  let images = await db<Image>('images')
-
-  if (productID !== undefined) {
-    images = images
-      .filter((i) => i.productID === productID)
-  }
-
-  if (ratingID !== undefined) {
-    images = images
-      .filter((i) => i.ratingID === ratingID)
-  }
-
-  if (ratingCommentID !== undefined) {
-    images = images
-      .filter((i) => i.ratingCommentID === ratingCommentID)
-  }
-
-  if (questionID !== undefined) {
-    images = images
-      .filter((i) => i.questionID === questionID)
-  }
-
-  if (answerID !== undefined) {
-    images = images
-      .filter((i) => i.answerID === answerID)
-  }
-
-  if (answerCommentID !== undefined) {
-    images = images
-      .filter((i) => i.answerCommentID === answerCommentID)
-  }
-
-  return images
-}
 
 const updateImages = async (images: ImagesUpdateInput): Promise<Image> => {
   return dbTrans(async (trx: Knex.Transaction) => {
@@ -88,8 +39,6 @@ const deleteImages = async (images: ImagesDeleteInput): Promise<void> => {
 }
 
 export default {
-  getImages,
-  getImagesByEntityID,
   updateImages,
   deleteImages
 }

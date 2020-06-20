@@ -63,7 +63,7 @@ router.delete('/:userID', isSameUser('params'), async (req, res) => {
 router.post('/:userID/upload', isSameUser('params'), multerUpload.single('userAvatar'), (req, res) => {
   req.socket.setTimeout(UPLOAD_TIMEOUT)
   const userMedia = checkSingleMediaUpload(req)
-  userService.uploadUserAvatar(userMedia, req)
+  userService.uploadUserAvatar(userMedia, res)
   res.status(204).end()
 })
 

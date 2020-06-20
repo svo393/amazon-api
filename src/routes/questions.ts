@@ -43,7 +43,7 @@ router.get('/:questionID/answers', async (req, res) => {
 router.post('/:questionID/upload', isCreator('questions', 'questionID', 'params'), multerUpload.array('questionMedia', 4), (req, res) => {
   req.socket.setTimeout(UPLOAD_TIMEOUT)
   const questionMedia = checkMediaUpload(req)
-  questionService.uploadQuestionImages(questionMedia, req)
+  questionService.uploadQuestionImages(questionMedia, req, res)
   res.status(204).end()
 })
 

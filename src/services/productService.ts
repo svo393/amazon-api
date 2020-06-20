@@ -4,6 +4,7 @@ import R from 'ramda'
 import { GroupVariant, Image, Parameter, Product, ProductCreateInput, ProductsFiltersInput, ProductUpdateInput } from '../types'
 import { imagesBasePath } from '../utils/constants'
 import { db, dbTrans } from '../utils/db'
+import getUploadIndex from '../utils/getUploadIndex'
 import { uploadImages } from '../utils/img'
 import { getProductsQuery } from '../utils/queries'
 import StatusError from '../utils/StatusError'
@@ -250,9 +251,7 @@ const uploadProductImages = async (files: Express.Multer.File[], req: Request, r
   // let indexes: number[] = []
 
   const filesWithIndexes = files.map((f) => {
-    const match = /(?<=_)\d+(?=\.)/.exec(f.filename)
-    if (!match) throw new StatusError(400, 'Invalid image filename')
-    const index = Number(match[0])
+    const index = getUploadIndex(f.filename)
     // indexes.push(index)
     return {
       productID: req.params.productID,
@@ -276,7 +275,7 @@ const uploadProductImages = async (files: Express.Multer.File[], req: Request, r
     thumbWidth: 40,
     thumbHeight: 40
   }
-  uploadImages(files, req, uploadConfig)
+  uploadImages(files, uploadConfig)
 }
 
 export default {

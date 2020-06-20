@@ -1,7 +1,8 @@
 import { Request, Response } from 'express'
-import { AnswerComment, AnswerCommentCreateInput, AnswerCommentUpdateInput } from '../types'
+import { AnswerComment, AnswerCommentCreateInput, AnswerCommentUpdateInput, Image } from '../types'
 import { imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
+import getUploadIndex from '../utils/getUploadIndex'
 import { uploadImages } from '../utils/img'
 import StatusError from '../utils/StatusError'
 
@@ -54,9 +55,21 @@ const deleteAnswerComment = async (req: Request): Promise<void> => {
   if (deleteCount === 0) throw new StatusError(404, 'Not Found')
 }
 
-const uploadAnswerCommentImages = (files: Express.Multer.File[], req: Request): void => {
+const uploadAnswerCommentImages = async (files: Express.Multer.File[], req: Request, res: Response): Promise<void> => {
+  const filesWithIndexes = files.map((f) => {
+    const index = getUploadIndex(f.filename)
+    return {
+      answerCommentID: req.params.answerCommentID,
+      userID: res.locals.userID,
+      index
+    }
+  })
+
+  const uploadedImages: Image[] = await db('images')
+    .insert(filesWithIndexes, [ '*' ])
+
   const uploadConfig = {
-    fileNames: [],
+    fileNames: uploadedImages.map((i) => i.imageID),
     imagesPath: `${imagesBasePath}/images`,
     maxWidth: 1632,
     maxHeight: 1632,
@@ -65,7 +78,7 @@ const uploadAnswerCommentImages = (files: Express.Multer.File[], req: Request): 
     thumbWidth: 117,
     thumbHeight: 117
   }
-  uploadImages(files, req, uploadConfig)
+  uploadImages(files, uploadConfig)
 }
 
 export default {

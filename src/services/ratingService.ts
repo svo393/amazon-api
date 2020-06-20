@@ -1,7 +1,8 @@
 import { Request, Response } from 'express'
-import { Rating, RatingCreateInput, RatingUpdateInput } from '../types'
+import { Image, Rating, RatingCreateInput, RatingUpdateInput } from '../types'
 import { imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
+import getUploadIndex from '../utils/getUploadIndex'
 import { uploadImages } from '../utils/img'
 import StatusError from '../utils/StatusError'
 
@@ -68,9 +69,21 @@ const deleteRating = async (req: Request): Promise<void> => {
   if (deleteCount === 0) throw new StatusError(404, 'Not Found')
 }
 
-const uploadRatingImages = (files: Express.Multer.File[], req: Request): void => {
+const uploadRatingImages = async (files: Express.Multer.File[], req: Request, res: Response): Promise<void> => {
+  const filesWithIndexes = files.map((f) => {
+    const index = getUploadIndex(f.filename)
+    return {
+      ratingID: req.params.ratingID,
+      userID: res.locals.userID,
+      index
+    }
+  })
+
+  const uploadedImages: Image[] = await db('images')
+    .insert(filesWithIndexes, [ '*' ])
+
   const uploadConfig = {
-    fileNames: [],
+    fileNames: uploadedImages.map((i) => i.imageID),
     imagesPath: `${imagesBasePath}/images`,
     maxWidth: 1632,
     maxHeight: 1632,
@@ -79,7 +92,7 @@ const uploadRatingImages = (files: Express.Multer.File[], req: Request): void =>
     thumbWidth: 117,
     thumbHeight: 117
   }
-  uploadImages(files, req, uploadConfig)
+  uploadImages(files, uploadConfig)
 }
 
 export default {
