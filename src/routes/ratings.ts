@@ -2,7 +2,7 @@ import Router from 'express'
 import ratingCommentService from '../services/ratingCommentService'
 import ratingService from '../services/ratingService'
 import { UPLOAD_TIMEOUT } from '../utils/config'
-import { checkMediaUpload, checkNewRating, checkNewRatingComment, checkRatingUpdate } from '../utils/inputValidator'
+import { checkMediaUpload, checkNewRating, checkNewRatingComment, checkRatingFilters, checkRatingUpdate } from '../utils/inputValidator'
 import { isCreator, isCreatorOrAdmin, isLoggedIn, multerUpload } from '../utils/middleware'
 
 const router = Router()
@@ -11,6 +11,12 @@ router.post('/', isLoggedIn, async (req, res) => {
   const ratingCreateInput = checkNewRating(req)
   const addedRating = await ratingService.addRating(ratingCreateInput, res)
   res.status(201).json(addedRating)
+})
+
+router.get('/', async (req, res) => {
+  const ratingsFiltersinput = checkRatingFilters(req)
+  const ratings = await ratingService.getRatings(ratingsFiltersinput)
+  res.json(ratings)
 })
 
 router.get('/:ratingID', async (req, res) => {

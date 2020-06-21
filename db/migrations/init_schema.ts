@@ -177,7 +177,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.dateTime('createdAt').notNullable()
       t.dateTime('updatedAt').notNullable()
       t.string('title')
-      t.string('review', 65535)
+      t.string('review', 65535).notNullable()
       t.integer('stars').notNullable().unsigned()
       t.integer('likes').notNullable().unsigned().defaultTo(0)
       t.integer('dislikes').notNullable().unsigned().defaultTo(0)

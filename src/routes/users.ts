@@ -6,11 +6,10 @@ import invoiceService from '../services/invoiceService'
 import listService from '../services/listService'
 import orderService from '../services/orderService'
 import questionService from '../services/questionService'
-import ratingService from '../services/ratingService'
 import userAddressService from '../services/userAddressService'
 import userService from '../services/userService'
 import { UPLOAD_TIMEOUT } from '../utils/config'
-import { checkCartProductUpdate, checkNewCartProduct, checkNewUser, checkSingleMediaUpload, checkUserAddressesUpdate, checkUserLogin, checkUserResetRequest, checkUserResetToken, checkUserFilters, checkUserUpdate } from '../utils/inputValidator'
+import { checkCartProductUpdate, checkNewCartProduct, checkNewUser, checkSingleMediaUpload, checkUserAddressesUpdate, checkUserFilters, checkUserLogin, checkUserResetRequest, checkUserResetToken, checkUserUpdate } from '../utils/inputValidator'
 import { isAdmin, isLoggedIn, isSameUser, isSameUserOrAdmin, multerUpload } from '../utils/middleware'
 
 const router = Router()
@@ -98,11 +97,6 @@ router.delete('/:userID/addresses/:addressID/', isSameUser('params'), async (req
 router.get('/:userID/lists', isSameUserOrAdmin('params'), async (req, res) => {
   const lists = await listService.getListsByUser(req)
   res.json(lists)
-})
-
-router.get('/:userID/ratings', async (req, res) => {
-  const ratings = await ratingService.getRatingsByUser(req)
-  res.json(ratings)
 })
 
 router.get('/:userID/questions', async (req, res) => {

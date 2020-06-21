@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoriesFiltersInput, CategoryCreateInput, CategoryUpdateInput, FeedFiltersInput, GroupVariantCreateInput, GroupVariantUpdateInput, ImagesDeleteInput, ImagesUpdateInput, InvoiceCreateInput, InvoicesFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ModerationStatus, OrderCreateInput, OrderProductCreateInput, OrderProductUpdateInput, OrdersFiltersInput, OrderStatus, OrderUpdateInput, ParameterCreateInput, ParameterUpdateInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductParameterInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorInput, VendorsFiltersInput } from '../types'
+import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoriesFiltersInput, CategoryCreateInput, CategoryUpdateInput, FeedFiltersInput, GroupVariantCreateInput, GroupVariantUpdateInput, ImagesDeleteInput, ImagesUpdateInput, InvoiceCreateInput, InvoicesFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ModerationStatus, OrderCreateInput, OrderProductCreateInput, OrderProductUpdateInput, OrdersFiltersInput, OrderStatus, OrderUpdateInput, ParameterCreateInput, ParameterUpdateInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductParameterInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingsFiltersInput, RatingUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorInput, VendorsFiltersInput } from '../types'
 import { canBeBoolean, canBeNumber, hasDefinedProps, isArray, isBoolean, isDate, isEmail, isInputProvided, isNumber, isPasswordValid, isProductParameterOrGroupVariant, isProvided, isString, isStringOrNumber } from './validatorLib'
 
 export const checkNewUser = ({ body }: Request): UserSignupInput => {
@@ -499,9 +499,10 @@ export const checkNewRating = ({ body }: Request): RatingCreateInput => {
     { name: 'title', param: body.title }
   )
 
-  const review = body.review && isString(
-    { name: 'review', param: body.review }
-  )
+  const review = R.pipe(
+    isProvided,
+    isString
+  )({ name: 'review', param: body.review })
 
   const stars = R.pipe(
     isProvided,
@@ -515,7 +516,7 @@ export const checkNewRating = ({ body }: Request): RatingCreateInput => {
 
   return {
     title: title?.param,
-    review: review?.param,
+    review: review.param,
     stars: stars.param,
     groupID: groupID.param
   }
@@ -985,19 +986,19 @@ export const checkOrderFilters = ({ query }: Request): OrdersFiltersInput => {
 }
 
 export const checkVendorFilters = ({ query }: Request): VendorsFiltersInput => {
-  const name = 'name' in query
-    ? isString({ name: 'name', param: query.name })
+  const q = 'q' in query
+    ? isString({ name: 'q', param: query.q })
     : undefined
 
-  return { name: name?.param }
+  return { q: q?.param }
 }
 
 export const checkCategoryFilters = ({ query }: Request): CategoriesFiltersInput => {
-  const name = 'name' in query
-    ? isString({ name: 'name', param: query.name })
+  const q = 'q' in query
+    ? isString({ name: 'q', param: query.q })
     : undefined
 
-  return { name: name?.param }
+  return { q: q?.param }
 }
 
 export const checkUserFilters = ({ query }: Request): UsersFiltersInput => {
@@ -1184,4 +1185,19 @@ export const checkImagesDelete = ({ body }: Request): ImagesDeleteInput => {
       isNumber
     )({ name: 'imageID', param: i.imageID }).param
   }))
+}
+
+export const checkRatingFilters = ({ query }: Request): RatingsFiltersInput => {
+  const groupID = 'groupID' in query
+    ? canBeNumber({ name: 'groupID', param: query.groupID })
+    : undefined
+
+  const userEmail = 'userEmail' in query
+    ? isString({ name: 'userEmail', param: query.userEmail })
+    : undefined
+
+  return {
+    groupID: groupID?.param,
+    userEmail: userEmail?.param
+  }
 }

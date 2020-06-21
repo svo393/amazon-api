@@ -22,7 +22,7 @@ const addVendor = async (vendorInput: VendorInput): Promise<Vendor> => {
 type VendorListData = Vendor & { productCount: number }
 
 const getVendors = async (vendorsFiltersinput: VendorsFiltersInput): Promise<VendorListData[]> => {
-  const { name } = vendorsFiltersinput
+  const { q } = vendorsFiltersinput
 
   let vendors: VendorListData[] = await db<Vendor>('vendors as v')
     .select('v.vendorID', 'v.name')
@@ -30,9 +30,9 @@ const getVendors = async (vendorsFiltersinput: VendorsFiltersInput): Promise<Ven
     .joinRaw('LEFT JOIN products as p USING ("vendorID")')
     .groupBy('v.vendorID')
 
-  if (name !== undefined) {
+  if (q !== undefined) {
     vendors = vendors
-      .filter((v) => v.name.toLowerCase().includes(name.toLowerCase()))
+      .filter((v) => v.name.toLowerCase().includes(q.toLowerCase()))
   }
 
   return vendors

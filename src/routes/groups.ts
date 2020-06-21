@@ -1,16 +1,10 @@
 import Router from 'express'
 import groupService from '../services/groupService'
 import questionService from '../services/questionService'
-import ratingService from '../services/ratingService'
 import { checkGroupVariantUpdate, checkNewGroupVariant } from '../utils/inputValidator'
 import { isAdmin } from '../utils/middleware'
 
 const router = Router()
-
-router.get('/:groupID/ratings', async (req, res) => {
-  const ratings = await ratingService.getRatingsByGroup(req)
-  res.json(ratings)
-})
 
 router.get('/:groupID/questions', async (req, res) => {
   const questions = await questionService.getQuestionsByGroup(req)

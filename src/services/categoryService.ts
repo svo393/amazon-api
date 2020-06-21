@@ -23,7 +23,7 @@ type CategoryWithProductCount = Category & { productCount: number }
 type CategoryListData = CategoryWithProductCount & { children: number[] }
 
 const getCategories = async (categoriesFiltersinput: CategoriesFiltersInput): Promise<CategoryListData[]> => {
-  const { name } = categoriesFiltersinput
+  const { q } = categoriesFiltersinput
 
   let categories: CategoryWithProductCount[] = await db('categories as c')
     .select('c.categoryID', 'c.name')
@@ -31,9 +31,9 @@ const getCategories = async (categoriesFiltersinput: CategoriesFiltersInput): Pr
     .joinRaw('LEFT JOIN products as p USING ("categoryID")')
     .groupBy('c.categoryID')
 
-  if (name !== undefined) {
+  if (q !== undefined) {
     categories = categories
-      .filter((v) => v.name.toLowerCase().includes(name.toLowerCase()))
+      .filter((v) => v.name.toLowerCase().includes(q.toLowerCase()))
   }
 
   return categories.map((c) => ({

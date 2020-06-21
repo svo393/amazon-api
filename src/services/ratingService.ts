@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { Image, Rating, RatingCreateInput, RatingUpdateInput } from '../types'
+import { Image, Rating, RatingCreateInput, RatingUpdateInput, RatingsFiltersInput } from '../types'
 import { imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
 import getUploadIndex from '../utils/getUploadIndex'
@@ -30,14 +30,39 @@ const addRating = async (ratingInput: RatingCreateInput, res: Response): Promise
   return addedRating
 }
 
-const getRatingsByUser = async (req: Request): Promise<Rating[]> => {
-  return await db('ratings')
-    .where('userID', req.params.userID)
-}
+const getRatings = async (ratingsFiltersinput: RatingsFiltersInput): Promise<Rating[]> => {
+  const { groupID, userEmail } = ratingsFiltersinput
 
-const getRatingsByGroup = async (req: Request): Promise<Rating[]> => {
-  return await db('ratings')
-    .where('groupID', req.params.groupID)
+  let ratings = await db('ratings as r')
+    .select(
+      'r.ratingID',
+      'r.createdAt',
+      'r.updatedAt',
+      'r.title',
+      'r.review',
+      'r.stars',
+      'r.likes',
+      'r.dislikes',
+      'r.isVerified',
+      'r.moderationStatus',
+      'r.userID',
+      'r.groupID',
+      'u.userEmail'
+    )
+    .join('users as u', 'r.userID', 'u.userID')
+    .groupBy('r.ratingID', 'userEmail')
+
+  if (groupID !== undefined) {
+    ratings = ratings
+      .filter((r) => r.groupID === groupID)
+  }
+
+  if (userEmail !== undefined) {
+    ratings = ratings
+      .filter((r) => r.userEmail?.toLowerCase().includes(userEmail.toLowerCase()))
+  }
+
+  return ratings
 }
 
 const getRatingByID = async (req: Request): Promise<Rating> => {
@@ -97,8 +122,7 @@ const uploadRatingImages = async (files: Express.Multer.File[], req: Request, re
 
 export default {
   addRating,
-  getRatingsByUser,
-  getRatingsByGroup,
+  getRatings,
   getRatingByID,
   updateRating,
   deleteRating,

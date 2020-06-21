@@ -112,7 +112,7 @@ export type Rating = {
   createdAt: Date;
   updatedAt: Date;
   title?: string;
-  review?: string;
+  review: string;
   stars: number;
   likes: number;
   dislikes: number;
@@ -492,11 +492,11 @@ export type InvoicesFiltersInput = {
 }
 
 export type VendorsFiltersInput = {
-  name?: string;
+  q?: string;
 }
 
 export type CategoriesFiltersInput = {
-  name?: string;
+  q?: string;
 }
 
 export type FeedFiltersInput = {
@@ -506,6 +506,11 @@ export type FeedFiltersInput = {
   createdTo?: string;
   content?: string;
   userEmail?: string;
+}
+
+export type RatingsFiltersInput = {
+  userEmail?: string;
+  groupID?: number;
 }
 
 export type ProductsFiltersInput = {
