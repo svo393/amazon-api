@@ -385,6 +385,7 @@ export const createOneListProduct = async (): Promise<ListProduct & { token: str
 
 export const newRating = (groupID: number): RatingCreateInput => ({
   title: `New Rating ${(new Date().getTime()).toString()}`,
+  review: `Long Review ${(new Date().getTime()).toString()}`,
   stars: 4,
   groupID
 })

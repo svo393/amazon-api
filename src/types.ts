@@ -329,9 +329,7 @@ export type ProductCreateInput = Omit<Product,
   | 'createdAt'
   | 'updatedAt'
   | 'userID'
-  | 'isAvailable'
 > & {
-  isAvailable?: boolean;
   parameters?: {
     name: string;
     value: string;

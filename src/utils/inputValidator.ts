@@ -141,9 +141,10 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
     canBeNumber
   )({ name: 'stock', param: body.stock })
 
-  const isAvailable = 'isAvailable' in body
-    ? isBoolean({ name: 'isAvailable', param: body.isAvailable })
-    : undefined
+  const isAvailable = R.pipe(
+    isProvided,
+    isBoolean
+  )({ name: 'isAvailable', param: body.isAvailable })
 
   const categoryID = R.pipe(
     isProvided,
@@ -178,7 +179,7 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
     description: description.param,
     brandSection: brandSection?.param,
     stock: stock.param,
-    isAvailable: isAvailable?.param,
+    isAvailable: isAvailable.param,
     categoryID: categoryID.param,
     vendorID: vendorID.param,
     groupID: groupID?.param,
