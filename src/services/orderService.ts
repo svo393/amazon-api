@@ -167,10 +167,13 @@ const getOrderByID = async (req: Request): Promise<OrderFullData> => {
       'op.qty',
       'op.productID',
       'op.orderID',
-      'p.title'
+      'p.title',
+      'i.imageID'
     )
     .where('orderID', req.params.orderID)
     .joinRaw('JOIN products as p USING ("productID")')
+    .join('images as i', 'p.productID', 'i.productID')
+    .where('i.index', 0)
 
   if (order === undefined) throw new StatusError(404, 'Not Found')
   return {

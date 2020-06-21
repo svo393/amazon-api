@@ -31,7 +31,21 @@ const addRating = async (ratingInput: RatingCreateInput, res: Response): Promise
 }
 
 const getRatings = async (ratingsFiltersinput: RatingsFiltersInput): Promise<Rating[]> => {
-  const { groupID, userEmail } = ratingsFiltersinput
+  const {
+    q,
+    groupID,
+    userEmail,
+    moderationStatuses,
+    isVerified,
+    createdFrom,
+    createdTo,
+    starsMin,
+    starsMax,
+    likesMin,
+    likesMax,
+    dislikesMin,
+    dislikesMax
+  } = ratingsFiltersinput
 
   let ratings = await db('ratings as r')
     .select(
@@ -47,10 +61,16 @@ const getRatings = async (ratingsFiltersinput: RatingsFiltersInput): Promise<Rat
       'r.moderationStatus',
       'r.userID',
       'r.groupID',
-      'u.userEmail'
+      'u.email as userEmail'
     )
     .join('users as u', 'r.userID', 'u.userID')
     .groupBy('r.ratingID', 'userEmail')
+
+  if (q !== undefined) {
+    ratings = ratings
+      .filter((r) => r.title.toLowerCase().includes(q.toLowerCase()) ||
+      r.review.toLowerCase().includes(q.toLowerCase()))
+  }
 
   if (groupID !== undefined) {
     ratings = ratings
@@ -60,6 +80,56 @@ const getRatings = async (ratingsFiltersinput: RatingsFiltersInput): Promise<Rat
   if (userEmail !== undefined) {
     ratings = ratings
       .filter((r) => r.userEmail?.toLowerCase().includes(userEmail.toLowerCase()))
+  }
+
+  if (moderationStatuses !== undefined) {
+    ratings = ratings
+      .filter((r) => moderationStatuses.split(',').includes(r.moderationStatus))
+  }
+
+  if (isVerified !== undefined) {
+    ratings = ratings
+      .filter((r) => r.isVerified === isVerified)
+  }
+
+  if (createdFrom !== undefined) {
+    ratings = ratings
+      .filter((r) => r.createdAt >= new Date(createdFrom))
+  }
+
+  if (createdTo !== undefined) {
+    ratings = ratings
+      .filter((r) => r.createdAt <= new Date(createdTo))
+  }
+
+  if (starsMin !== undefined) {
+    ratings = ratings
+      .filter((r) => r.stars >= starsMin)
+  }
+
+  if (starsMax !== undefined) {
+    ratings = ratings
+      .filter((r) => r.stars <= starsMax)
+  }
+
+  if (likesMin !== undefined) {
+    ratings = ratings
+      .filter((r) => r.likes >= likesMin)
+  }
+
+  if (likesMax !== undefined) {
+    ratings = ratings
+      .filter((r) => r.likes <= likesMax)
+  }
+
+  if (dislikesMin !== undefined) {
+    ratings = ratings
+      .filter((r) => r.dislikes >= dislikesMin)
+  }
+
+  if (dislikesMax !== undefined) {
+    ratings = ratings
+      .filter((r) => r.dislikes <= dislikesMax)
   }
 
   return ratings

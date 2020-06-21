@@ -1188,6 +1188,10 @@ export const checkImagesDelete = ({ body }: Request): ImagesDeleteInput => {
 }
 
 export const checkRatingFilters = ({ query }: Request): RatingsFiltersInput => {
+  const q = 'q' in query
+    ? isString({ name: 'q', param: query.q })
+    : undefined
+
   const groupID = 'groupID' in query
     ? canBeNumber({ name: 'groupID', param: query.groupID })
     : undefined
@@ -1196,8 +1200,59 @@ export const checkRatingFilters = ({ query }: Request): RatingsFiltersInput => {
     ? isString({ name: 'userEmail', param: query.userEmail })
     : undefined
 
+  const moderationStatuses = 'moderationStatuses' in query
+    ? isString({ name: 'moderationStatuses', param: query.moderationStatuses })
+    : undefined
+
+  const isVerified = 'isVerified' in query
+    ? canBeBoolean({ name: 'isVerified', param: query.isVerified })
+    : undefined
+
+  const createdFrom = 'createdFrom' in query
+    ? isDate({ name: 'createdFrom', param: query.createdFrom })
+    : undefined
+
+  const createdTo = 'createdTo' in query
+    ? isDate({ name: 'createdTo', param: query.createdTo })
+    : undefined
+
+  const starsMin = 'starsMin' in query
+    ? canBeNumber({ name: 'starsMin', param: query.starsMin })
+    : undefined
+
+  const starsMax = 'starsMax' in query
+    ? canBeNumber({ name: 'starsMax', param: query.starsMax })
+    : undefined
+
+  const likesMin = 'likesMin' in query
+    ? canBeNumber({ name: 'likesMin', param: query.likesMin })
+    : undefined
+
+  const likesMax = 'likesMax' in query
+    ? canBeNumber({ name: 'likesMax', param: query.likesMax })
+    : undefined
+
+  const dislikesMin = 'dislikesMin' in query
+    ? canBeNumber({ name: 'dislikesMin', param: query.dislikesMin })
+    : undefined
+
+  const dislikesMax = 'dislikesMax' in query
+    ? canBeNumber({ name: 'dislikesMax', param: query.dislikesMax })
+    : undefined
+
   return {
+    q: q?.param,
     groupID: groupID?.param,
-    userEmail: userEmail?.param
+    userEmail: userEmail?.param,
+    moderationStatuses: moderationStatuses?.param,
+    isVerified: isVerified?.param,
+    createdFrom: createdFrom?.param,
+    createdTo: createdTo?.param,
+    starsMin: starsMin?.param,
+    starsMax: starsMax?.param,
+    likesMin: likesMin?.param,
+    likesMax: likesMax?.param,
+    dislikesMin: dislikesMin?.param,
+    dislikesMax: dislikesMax?.param
   }
 }

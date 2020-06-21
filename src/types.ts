@@ -509,8 +509,19 @@ export type FeedFiltersInput = {
 }
 
 export type RatingsFiltersInput = {
-  userEmail?: string;
+  q?: string;
   groupID?: number;
+  userEmail?: string;
+  moderationStatuses?: string;
+  isVerified?: boolean;
+  createdFrom?: string;
+  createdTo?: string;
+  starsMin?: number;
+  starsMax?: number;
+  likesMin?: number;
+  likesMax?: number;
+  dislikesMin?: number;
+  dislikesMax?: number;
 }
 
 export type ProductsFiltersInput = {
@@ -549,7 +560,7 @@ export type OrderProductFullData = Pick<Product,
   | 'orderID'
   | 'price'
   | 'qty'
->
+> & { imageID: number }
 
 export type OrderFullData = Order & {
   orderProducts: OrderProductFullData[];
