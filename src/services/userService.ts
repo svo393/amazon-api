@@ -93,26 +93,30 @@ const loginUser = async (userInput: UserLoginInput, res: Response): Promise<User
   ], existingUser)
 }
 
-type UserTempData = Omit<User,
+type UserListRawData = Omit<User,
   | 'password'
   | 'resetToken'
   | 'resetTokenCreatedAt'
 > & {
-  orderCount: number;
-  ratingCount: number;
-  ratingCommentCount: number;
-  questionCount: number;
-  answerCount: number;
-  answerCommentCount: number;
+  orderCount: string;
+  ratingCount: string;
+  ratingCommentCount: string;
+  questionCount: string;
+  answerCount: string;
+  answerCommentCount: string;
 }
 
-type UserListData = Omit<UserTempData,
+type UserListData = Omit<UserListRawData,
+  | 'orderCount'
+  | 'ratingCount'
   | 'ratingCommentCount'
   | 'questionCount'
   | 'answerCount'
   | 'answerCommentCount'
 > & {
   activitiesCount: number;
+  orderCount: number;
+  ratingCount: number;
 }
 
 const getUsers = async (usersFiltersinput: UsersFiltersInput): Promise<UserListData[]> => {
@@ -129,7 +133,7 @@ const getUsers = async (usersFiltersinput: UsersFiltersInput): Promise<UserListD
     email
   } = usersFiltersinput
 
-  let rawUsers: UserTempData[] = await db('users as u')
+  let rawUsers: UserListRawData[] = await db('users as u')
     .select('email',
       'u.name',
       'info',
@@ -153,15 +157,30 @@ const getUsers = async (usersFiltersinput: UsersFiltersInput): Promise<UserListD
     .where('role', '!=', 'ROOT')
     .groupBy('u.userID')
 
-  let users = rawUsers.map((u) => ({
-    ...R.omit([
-      'ratingCommentCount',
-      'questionCount',
-      'answerCount',
-      'answerCommentCount'
-    ], u),
-    activitiesCount: Number(u.ratingCommentCount) + Number(u.questionCount) + Number(u.answerCount) + Number(u.answerCommentCount)
-  }))
+  let users = rawUsers
+    .map((u) => ({
+      ...u,
+      orderCount: parseInt(u.orderCount),
+      ratingCount: parseInt(u.ratingCount),
+      ratingCommentCount: parseInt(u.ratingCommentCount),
+      questionCount: parseInt(u.questionCount),
+      answerCount: parseInt(u.answerCount),
+      answerCommentCount: parseInt(u.answerCommentCount)
+    }))
+    .map((u) => ({
+      ...R.omit([
+        'ratingCommentCount',
+        'questionCount',
+        'answerCount',
+        'answerCommentCount'
+      ], u),
+      activitiesCount: [
+        u.ratingCommentCount,
+        u.questionCount,
+        u.answerCount,
+        u.answerCommentCount
+      ].reduce((acc, cur) => acc + cur, 0)
+    }))
 
   if (roles !== undefined) {
     users = users

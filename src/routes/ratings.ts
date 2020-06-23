@@ -46,17 +46,17 @@ router.get('/:ratingID/comments', async (req, res) => {
   res.json(ratingComments)
 })
 
-router.post('/:ratingID/upload', isCreator('ratings', 'ratingID', 'params'), multerUpload.array('ratingMedia', 4), (req, res) => {
+router.post('/:ratingID/upload', isCreator('ratings', 'ratingID', 'params'), multerUpload.array('ratingImages', 4), (req, res) => {
   req.socket.setTimeout(UPLOAD_TIMEOUT)
-  const ratingMedia = checkMediaUpload(req)
-  ratingService.uploadRatingImages(ratingMedia, req, res)
+  const ratingImages = checkMediaUpload(req)
+  ratingService.uploadRatingImages(ratingImages, req, res)
   res.status(204).end()
 })
 
-router.post('/:ratingID/comments/:ratingCommentID/upload', isCreator('ratingComments', 'ratingCommentID', 'params'), multerUpload.array('ratingCommentMedia', 4), (req, res) => {
+router.post('/:ratingID/comments/:ratingCommentID/upload', isCreator('ratingComments', 'ratingCommentID', 'params'), multerUpload.array('ratingCommentImages', 4), (req, res) => {
   req.socket.setTimeout(UPLOAD_TIMEOUT)
-  const ratingMedia = checkMediaUpload(req)
-  ratingCommentService.uploadRatingCommentImages(ratingMedia, req, res)
+  const ratingCommentImages = checkMediaUpload(req)
+  ratingCommentService.uploadRatingCommentImages(ratingCommentImages, req, res)
   res.status(204).end()
 })
 

@@ -40,10 +40,10 @@ router.get('/:questionID/answers', async (req, res) => {
   res.json(answers)
 })
 
-router.post('/:questionID/upload', isCreator('questions', 'questionID', 'params'), multerUpload.array('questionMedia', 4), (req, res) => {
+router.post('/:questionID/upload', isCreator('questions', 'questionID', 'params'), multerUpload.array('questionImages', 4), (req, res) => {
   req.socket.setTimeout(UPLOAD_TIMEOUT)
-  const questionMedia = checkMediaUpload(req)
-  questionService.uploadQuestionImages(questionMedia, req, res)
+  const questionImages = checkMediaUpload(req)
+  questionService.uploadQuestionImages(questionImages, req, res)
   res.status(204).end()
 })
 

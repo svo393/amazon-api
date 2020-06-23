@@ -88,13 +88,6 @@ export const isDate: CP = ({ name, param }) => {
   return { name, param }
 }
 
-export const isBoolean: CP = ({ name, param }) => {
-  if (typeof (param) !== 'boolean') {
-    throw new StatusError(400, `Incorrect ${name}: ${param}`)
-  }
-  return { name, param }
-}
-
 export const canBeBoolean: CP = ({ name, param }) => {
   const paramBool = JSON.parse(param)
 

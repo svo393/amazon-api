@@ -10,7 +10,7 @@ import { getProductsQuery } from '../utils/queries'
 import StatusError from '../utils/StatusError'
 
 const addProduct = async (productInput: ProductCreateInput, res: Response): Promise<Product> => {
-  const { variants, parameters } = productInput
+  const { variants, parameters, listPrice, price } = productInput
   const now = new Date()
 
   return await dbTrans(async (trx: Knex.Transaction) => {
@@ -21,6 +21,8 @@ const addProduct = async (productInput: ProductCreateInput, res: Response): Prom
     const [ addedProduct ]: Product[] = await trx('products')
       .insert({
         ...R.omit([ 'parameters', 'variants' ], productInput),
+        listPrice: listPrice * 100,
+        price: price * 100,
         userID: res.locals.userID,
         createdAt: now,
         updatedAt: now,
@@ -60,7 +62,7 @@ const addProduct = async (productInput: ProductCreateInput, res: Response): Prom
   })
 }
 
-type ProductListData = Pick<Product,
+type ProductListRawData = Pick<Product,
   | 'productID'
   | 'title'
   | 'price'
@@ -68,14 +70,19 @@ type ProductListData = Pick<Product,
   | 'groupID'
   | 'isAvailable'
 > & {
-  stars: number;
-  ratingCount: number;
+  stars: string;
+  ratingCount: string;
   vendorName: string;
   categoryName: string;
   images: {
     imageID: number;
     index: number;
   }[];
+}
+
+type ProductListData = Omit<ProductListRawData, 'stars' | 'ratingCount'> & {
+  stars: number;
+  ratingCount: number;
 }
 
 export const getProducts = async (productsFiltersinput: ProductsFiltersInput): Promise<ProductListData[]> => {
@@ -96,11 +103,19 @@ export const getProducts = async (productsFiltersinput: ProductsFiltersInput): P
   } = productsFiltersinput
 
   // TODO refactor reusable queries
-  let products: (Omit<ProductListData, 'images'> & { imageID: number })[] = await getProductsQuery.clone()
+  let rawProducts: (Omit<ProductListRawData, 'images'> & { imageID: number })[] = await getProductsQuery.clone()
     .select('i.imageID')
     .join('images as i', 'p.productID', 'i.productID')
     .where('i.index', 0)
     .groupBy('i.imageID')
+
+  let products
+
+  products = rawProducts.map((p) => ({
+    ...p,
+    stars: parseFloat(p.stars),
+    ratingCount: parseInt(p.ratingCount)
+  }))
 
   if (groupID !== undefined) {
     products = products
@@ -124,12 +139,12 @@ export const getProducts = async (productsFiltersinput: ProductsFiltersInput): P
 
   if (vendorName !== undefined) {
     products = products
-      .filter((p) => p.vendorName.includes(vendorName))
+      .filter((p) => p.vendorName.toLowerCase().includes(vendorName.toLowerCase()))
   }
 
   if (categoryName !== undefined) {
     products = products
-      .filter((p) => p.categoryName.includes(categoryName))
+      .filter((p) => p.categoryName.toLowerCase().includes(categoryName.toLowerCase()))
   }
 
   if (stockMin !== undefined) {
@@ -192,7 +207,7 @@ type ProductData = Omit<ProductListData, 'images'> & {
 type ProductAllData = ProductData & Pick<Product, 'createdAt' | 'updatedAt' | 'userID'> & { userEmail: string }
 
 const getProductByID = async (req: Request, res: Response): Promise<ProductData| ProductAllData> => {
-  const [ product ] = await getProductsQuery.clone()
+  const [ rawProduct ] = await getProductsQuery.clone()
     .select(
       'p.listPrice',
       'p.description',
@@ -209,7 +224,13 @@ const getProductByID = async (req: Request, res: Response): Promise<ProductData|
     .leftJoin('users as u', 'p.userID', 'u.userID')
     .groupBy('userEmail')
 
-  if (product === undefined) throw new StatusError(404, 'Not Found')
+  if (rawProduct === undefined) throw new StatusError(404, 'Not Found')
+
+  let product = {
+    ...rawProduct,
+    stars: parseFloat(rawProduct.stars),
+    ratingCount: parseInt(rawProduct.ratingCount)
+  }
 
   const groupVariants = await db<GroupVariant>('groupVariants')
     .where('groupID', product.groupID)
@@ -244,38 +265,40 @@ const updateProduct = async (productInput: ProductUpdateInput, req: Request): Pr
 }
 
 const uploadProductImages = async (files: Express.Multer.File[], req: Request, res: Response): Promise<void> => {
+  await dbTrans(async (trx: Knex.Transaction) => {
   // TODO resolve poll bug
-  // const images = await db<Image>('images')
+  // const images = await trx<Image>('images')
   //   .where('productID', req.params.productID)
 
-  // let indexes: number[] = []
+    // let indexes: number[] = []
 
-  const filesWithIndexes = files.map((f) => {
-    const index = getUploadIndex(f.filename)
-    // indexes.push(index)
-    return {
-      productID: req.params.productID,
-      userID: res.locals.userID,
-      index
+    const filesWithIndexes = files.map((f) => {
+      const index = getUploadIndex(f.filename)
+      // indexes.push(index)
+      return {
+        productID: req.params.productID,
+        userID: res.locals.userID,
+        index
+      }
+    })
+
+    // if (images.some((i) => indexes.includes(i.index))) throw new StatusError(500, 'Error uploading images')
+
+    const uploadedImages: Image[] = await trx('images')
+      .insert(filesWithIndexes, [ '*' ])
+
+    const uploadConfig = {
+      fileNames: uploadedImages.map((i) => i.imageID),
+      imagesPath: `${imagesBasePath}/images`,
+      maxWidth: 1500,
+      maxHeight: 1500,
+      previewWidth: 425,
+      previewHeight: 425,
+      thumbWidth: 40,
+      thumbHeight: 40
     }
+    uploadImages(files, uploadConfig)
   })
-
-  // if (images.some((i) => indexes.includes(i.index))) throw new StatusError(500, 'Error uploading images')
-
-  const uploadedImages: Image[] = await db('images')
-    .insert(filesWithIndexes, [ '*' ])
-
-  const uploadConfig = {
-    fileNames: uploadedImages.map((i) => i.imageID),
-    imagesPath: `${imagesBasePath}/images`,
-    maxWidth: 1500,
-    maxHeight: 1500,
-    previewWidth: 425,
-    previewHeight: 425,
-    thumbWidth: 40,
-    thumbHeight: 40
-  }
-  uploadImages(files, uploadConfig)
 }
 
 export default {

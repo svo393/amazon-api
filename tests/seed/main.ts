@@ -121,9 +121,9 @@ const seed = async (): Promise<void> => {
 
               const mediaRange = [ ...Array(p.media).keys() ]
 
-              mediaRange.map((m) => {
+              mediaRange.forEach((m) => {
                 uploadAPI
-                  .attach('productMedia', path.join(
+                  .attach('productImages', path.join(
                     __dirname, `images/products/${i}_${m}.jpg`
                   ))
               })

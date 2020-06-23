@@ -30,10 +30,10 @@ router.put('/:productID', isAdmin, async (req, res) => {
   res.json(updatedProduct)
 })
 
-router.post('/:productID/upload', isAdmin, multerUpload.array('productMedia', 10), (req, res) => {
+router.post('/:productID/upload', isAdmin, multerUpload.array('productImages', 10), (req, res) => {
   req.socket.setTimeout(UPLOAD_TIMEOUT)
-  const productMedia = checkMediaUpload(req)
-  productService.uploadProductImages(productMedia, req, res)
+  const productImages = checkMediaUpload(req)
+  productService.uploadProductImages(productImages, req, res)
   res.status(204).end()
 })
 

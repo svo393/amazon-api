@@ -34,17 +34,17 @@ router.get('/:answerID/comments', async (req, res) => {
   res.json(answerComments)
 })
 
-router.post('/:answerID/upload', isCreator('answers', 'answerID', 'params'), multerUpload.array('answerMedia', 4), (req, res) => {
+router.post('/:answerID/upload', isCreator('answers', 'answerID', 'params'), multerUpload.array('answerImages', 4), (req, res) => {
   req.socket.setTimeout(UPLOAD_TIMEOUT)
-  const answerMedia = checkMediaUpload(req)
-  answerService.uploadAnswerImages(answerMedia, req, res)
+  const answerImages = checkMediaUpload(req)
+  answerService.uploadAnswerImages(answerImages, req, res)
   res.status(204).end()
 })
 
-router.post('/:answerID/comments/:answerCommentID/upload', isCreator('answerComments', 'answerCommentID', 'params'), multerUpload.array('answerCommentMedia', 4), (req, res) => {
+router.post('/:answerID/comments/:answerCommentID/upload', isCreator('answerComments', 'answerCommentID', 'params'), multerUpload.array('answerCommentImages', 4), (req, res) => {
   req.socket.setTimeout(UPLOAD_TIMEOUT)
-  const answerMedia = checkMediaUpload(req)
-  answerCommentService.uploadAnswerCommentImages(answerMedia, req, res)
+  const answerCommentImages = checkMediaUpload(req)
+  answerCommentService.uploadAnswerCommentImages(answerCommentImages, req, res)
   res.status(204).end()
 })
 

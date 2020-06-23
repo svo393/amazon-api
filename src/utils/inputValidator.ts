@@ -1,8 +1,9 @@
 import { Request } from 'express'
 import R from 'ramda'
 import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoriesFiltersInput, CategoryCreateInput, CategoryUpdateInput, FeedFiltersInput, GroupVariantCreateInput, GroupVariantUpdateInput, ImagesDeleteInput, ImagesUpdateInput, InvoiceCreateInput, InvoicesFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ModerationStatus, OrderCreateInput, OrderProductCreateInput, OrderProductUpdateInput, OrdersFiltersInput, OrderStatus, OrderUpdateInput, ParameterCreateInput, ParameterUpdateInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductParameterInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingsFiltersInput, RatingUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorInput, VendorsFiltersInput } from '../types'
-import { canBeBoolean, canBeNumber, hasDefinedProps, isArray, isBoolean, isDate, isEmail, isInputProvided, isNumber, isPasswordValid, isProductParameterOrGroupVariant, isProvided, isString, isStringOrNumber } from './validatorLib'
+import { canBeBoolean, canBeNumber, hasDefinedProps, isArray, isDate, isEmail, isInputProvided, isNumber, isPasswordValid, isProductParameterOrGroupVariant, isProvided, isString, isStringOrNumber } from './validatorLib'
 
+// TODO implement PARTIAL<t>
 export const checkNewUser = ({ body }: Request): UserSignupInput => {
   const email = R.pipe(
     isProvided,
@@ -36,7 +37,7 @@ export const checkUserLogin = ({ body }: Request): UserLoginInput => {
 
   const remember = R.pipe(
     isProvided,
-    isBoolean
+    canBeBoolean
   )({ name: 'remember', param: body.remember })
 
   return {
@@ -66,7 +67,7 @@ export const checkUserUpdate = ({ body }: Request): UserUpdateInput => {
   )
 
   const avatar = 'avatar' in body
-    ? isBoolean({ name: 'avatar', param: body.avatar })
+    ? canBeBoolean({ name: 'avatar', param: body.avatar })
     : undefined
 
   const role = body.role && isString(
@@ -143,7 +144,7 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
 
   const isAvailable = R.pipe(
     isProvided,
-    isBoolean
+    canBeBoolean
   )({ name: 'isAvailable', param: body.isAvailable })
 
   const categoryID = R.pipe(
@@ -214,7 +215,7 @@ export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
   )
 
   const isAvailable = 'isAvailable' in body
-    ? isBoolean({ name: 'isAvailable', param: body.isAvailable })
+    ? canBeBoolean({ name: 'isAvailable', param: body.isAvailable })
     : undefined
 
   const categoryID = body.categoryID && canBeNumber(
@@ -359,7 +360,7 @@ export const checkShippingMethod = ({ body }: Request): ShippingMethodInput => {
   )({ name: 'shippingMethodName', param: body.shippingMethodName })
 
   const isPrivate = 'isPrivate' in body
-    ? isBoolean({ name: 'isPrivate', param: body.isPrivate })
+    ? canBeBoolean({ name: 'isPrivate', param: body.isPrivate })
     : undefined
 
   return {
@@ -375,7 +376,7 @@ export const checkAddressType = ({ body }: Request): AddressTypeInput => {
   )({ name: 'addressTypeName', param: body.addressTypeName })
 
   const isPrivate = 'isPrivate' in body
-    ? isBoolean({ name: 'isPrivate', param: body.isPrivate })
+    ? canBeBoolean({ name: 'isPrivate', param: body.isPrivate })
     : undefined
 
   return {
@@ -426,7 +427,7 @@ export const checkPaymentMethod = ({ body }: Request): PaymentMethod => {
 
 export const checkNewAddress = ({ body }: Request): AddressCreateInput => {
   const isDefault = 'isDefault' in body
-    ? isBoolean({ name: 'isDefault', param: body.isDefault })
+    ? canBeBoolean({ name: 'isDefault', param: body.isDefault })
     : undefined
 
   const addr = R.pipe(
@@ -448,7 +449,7 @@ export const checkNewAddress = ({ body }: Request): AddressCreateInput => {
 
 export const checkNewUserAddress = ({ body }: Request): UserAddressCreateInput => {
   const isDefault = 'isDefault' in body
-    ? isBoolean({ name: 'isDefault', param: body.isDefault })
+    ? canBeBoolean({ name: 'isDefault', param: body.isDefault })
     : undefined
 
   const userID = R.pipe(
@@ -471,7 +472,7 @@ export const checkNewUserAddress = ({ body }: Request): UserAddressCreateInput =
 export const checkUserAddressesUpdate = ({ body }: Request): UserAddressUpdateInput => {
   const isDefault = R.pipe(
     isProvided,
-    isBoolean
+    canBeBoolean
   )({ name: 'isDefault', param: body.isDefault })
 
   return { isDefault: isDefault.param }
@@ -537,7 +538,7 @@ export const checkRatingUpdate = ({ body }: Request): RatingUpdateInput => {
   )
 
   const isVerified = 'isVerified' in body
-    ? isBoolean({ name: 'isVerified', param: body.isVerified })
+    ? canBeBoolean({ name: 'isVerified', param: body.isVerified })
     : undefined
 
   const moderationStatus = body.moderationStatus && isString(
