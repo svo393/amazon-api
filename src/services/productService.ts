@@ -103,7 +103,7 @@ export const getProducts = async (productsFiltersinput: ProductsFiltersInput): P
   } = productsFiltersinput
 
   // TODO refactor reusable queries
-  let rawProducts: (Omit<ProductListRawData, 'images'> & { imageID: number })[] = await getProductsQuery.clone()
+  const rawProducts: (Omit<ProductListRawData, 'images'> & { imageID: number })[] = await getProductsQuery.clone()
     .select('i.imageID')
     .join('images as i', 'p.productID', 'i.productID')
     .where('i.index', 0)
@@ -207,8 +207,8 @@ type ProductData = Omit<ProductListData, 'images'> & {
 type ProductAllData = ProductData & Pick<Product, 'createdAt' | 'updatedAt' | 'userID'> & { userEmail: string }
 
 const getProductByID = async (req: Request, res: Response): Promise<ProductData| ProductAllData> => {
-  const [ rawProduct ] = await getProductsQuery.clone()
-    .select(
+  const rawProduct = await getProductsQuery.clone()
+    .first(
       'p.listPrice',
       'p.description',
       'p.brandSection',
@@ -226,7 +226,7 @@ const getProductByID = async (req: Request, res: Response): Promise<ProductData|
 
   if (rawProduct === undefined) throw new StatusError(404, 'Not Found')
 
-  let product = {
+  const product = {
     ...rawProduct,
     stars: parseFloat(rawProduct.stars),
     ratingCount: parseInt(rawProduct.ratingCount)

@@ -19,16 +19,26 @@ const addVendor = async (vendorInput: VendorInput): Promise<Vendor> => {
   return addedVendor
 }
 
-type VendorListData = Vendor & { productCount: number }
+type VendorListRawData = Vendor & { productCount: string }
+type VendorListData = Omit<VendorListRawData, 'productCount'> & {
+  productCount: number;
+}
 
 const getVendors = async (vendorsFiltersinput: VendorsFiltersInput): Promise<VendorListData[]> => {
   const { q } = vendorsFiltersinput
 
-  let vendors: VendorListData[] = await db<Vendor>('vendors as v')
+  const rawVendors: VendorListRawData[] = await db<Vendor>('vendors as v')
     .select('v.vendorID', 'v.name')
     .count('p.productID as productCount')
     .joinRaw('LEFT JOIN products as p USING ("vendorID")')
     .groupBy('v.vendorID')
+
+  let vendors
+
+  vendors = rawVendors.map((v) => ({
+    ...v,
+    productCount: parseInt(v.productCount)
+  }))
 
   if (q !== undefined) {
     vendors = vendors
@@ -39,14 +49,20 @@ const getVendors = async (vendorsFiltersinput: VendorsFiltersInput): Promise<Ven
 }
 
 const getVendorByID = async (req: Request): Promise<VendorListData> => {
-  const vendor: VendorListData = await db<Vendor>('vendors as v')
+  const rawVendor: VendorListRawData = await db<Vendor>('vendors as v')
     .first('v.vendorID', 'name')
     .where('v.vendorID', req.params.vendorID)
     .count('p.productID as productCount')
     .joinRaw('LEFT JOIN products as p USING ("vendorID")')
     .groupBy('v.vendorID')
 
-  if (vendor === undefined) throw new StatusError(404, 'Not Found')
+  if (rawVendor === undefined) throw new StatusError(404, 'Not Found')
+
+  const vendor = {
+    ...rawVendor,
+    productCount: parseInt(rawVendor.productCount)
+  }
+
   return vendor
 }
 

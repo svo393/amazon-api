@@ -19,17 +19,28 @@ const addCategory = async (categoryInput: CategoryCreateInput): Promise<Category
   return addedCategory
 }
 
-type CategoryWithProductCount = Category & { productCount: number }
-type CategoryListData = CategoryWithProductCount & { children: number[] }
+type CategoryListRawData = Category & { productCount: string }
+type CategoryListData = Omit<CategoryListRawData, 'productCount'> & {
+  children: number[];
+  productCount: number;
+}
 
 const getCategories = async (categoriesFiltersinput: CategoriesFiltersInput): Promise<CategoryListData[]> => {
   const { q } = categoriesFiltersinput
 
-  let categories: CategoryWithProductCount[] = await db('categories as c')
+  let rawCategories: CategoryListRawData[] = await db('categories as c')
     .select('c.categoryID', 'c.name')
     .count('p.productID as productCount')
     .joinRaw('LEFT JOIN products as p USING ("categoryID")')
     .groupBy('c.categoryID')
+
+  let categories: CategoryListData[]
+
+  categories = rawCategories.map((v) => ({
+    ...v,
+    productCount: parseInt(v.productCount),
+    children: []
+  }))
 
   if (q !== undefined) {
     categories = categories
@@ -51,13 +62,13 @@ type SingleCategoryData = Omit<CategoryListData, 'parentCategoryID'> & { parentC
 const getCategoryByID = async (req: Request): Promise<SingleCategoryData> => {
   const categoryID = Number(req.params.categoryID)
 
-  const categories: (Category & { productCount: number })[] = await db('categories as c')
+  const categories: (Category & { productCount: string })[] = await db('categories as c')
     .select('c.categoryID', 'c.name')
     .count('p.productID as productCount')
     .joinRaw('LEFT JOIN products as p USING ("categoryID")')
     .groupBy('c.categoryID')
 
-  const [ category ] = categories.filter((c) => c.categoryID === categoryID)
+  const category = categories.find((c) => c.categoryID === categoryID)
   if (category === undefined) throw new StatusError(404, 'Not Found')
 
   let parentChain: Parent[] = []
@@ -80,6 +91,7 @@ const getCategoryByID = async (req: Request): Promise<SingleCategoryData> => {
 
   return {
     ...category,
+    productCount: parseInt(category.productCount),
     children,
     parentChain
   }

@@ -133,7 +133,7 @@ const getUsers = async (usersFiltersinput: UsersFiltersInput): Promise<UserListD
     email
   } = usersFiltersinput
 
-  let rawUsers: UserListRawData[] = await db('users as u')
+  const rawUsers: UserListRawData[] = await db('users as u')
     .select('email',
       'u.name',
       'info',
