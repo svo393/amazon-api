@@ -48,31 +48,37 @@ export const checkUserLogin = ({ body }: Request): UserLoginInput => {
 }
 
 export const checkUserUpdate = ({ body }: Request): UserUpdateInput => {
-  const password = body.password && R.pipe(
-    isString,
-    isPasswordValid
-  )({ name: 'password', param: body.password })
+  const password = 'password' in body
+    ? R.pipe(
+      isString,
+      isPasswordValid
+    )({ name: 'password', param: body.password })
+    : undefined
 
-  const email = body.email && R.pipe(
-    isString,
-    isEmail
-  )({ name: 'email', param: body.email })
+  const email = 'email' in body
+    ? R.pipe(
+      isString,
+      isEmail
+    )({ name: 'email', param: body.email })
+    : undefined
 
-  const name = body.name && isString(
-    { name: 'name', param: body.name }
-  )
+  const name = 'name' in body
+    ? isString(
+      { name: 'name', param: body.name }
+    )
+    : undefined
 
-  const info = body.info && isString(
-    { name: 'info', param: body.info }
-  )
+  const info = 'info' in body
+    ? isString({ name: 'info', param: body.info })
+    : undefined
 
   const avatar = 'avatar' in body
     ? canBeBoolean({ name: 'avatar', param: body.avatar })
     : undefined
 
-  const role = body.role && isString(
-    { name: 'role', param: body.role }
-  )
+  const role = 'role' in body
+    ? isString({ name: 'role', param: body.role })
+    : undefined
 
   return hasDefinedProps<UserUpdateInput>({
     name: name?.param,
@@ -133,9 +139,9 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
     isString
   )({ name: 'description', param: body.description })
 
-  const brandSection = body.brandSection && isString(
-    { name: 'brandSection', param: body.brandSection }
-  )
+  const brandSection = 'brandSection' in body
+    ? isString({ name: 'brandSection', param: body.brandSection })
+    : undefined
 
   const stock = R.pipe(
     isProvided,
@@ -157,19 +163,19 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
     canBeNumber
   )({ name: 'vendorID', param: body.vendorID })
 
-  const groupID = body.groupID && canBeNumber(
-    { name: 'groupID', param: body.groupID }
-  )
+  const groupID = 'groupID' in body
+    ? canBeNumber({ name: 'groupID', param: body.groupID })
+    : undefined
 
-  const variants = body.variants && isArray(
-    { name: 'variants', param: body.variants }
-  )
+  const variants = 'variants' in body
+    ? isArray({ name: 'variants', param: body.variants })
+    : undefined
 
   variants && variants.param.map((v: any) => isProductParameterOrGroupVariant({ name: 'group', param: v }))
 
-  const parameters = body.parameters && isArray(
-    { name: 'parameters', param: body.parameters }
-  )
+  const parameters = 'parameters' in body
+    ? isArray({ name: 'parameters', param: body.parameters })
+    : undefined
 
   parameters && parameters.param.map((p: any) => isProductParameterOrGroupVariant({ name: 'parameter', param: p }))
 
@@ -190,41 +196,41 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
 }
 
 export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
-  const title = body.title && isString(
-    { name: 'title', param: body.title }
-  )
+  const title = 'title' in body
+    ? isString({ name: 'title', param: body.title })
+    : undefined
 
-  const listPrice = body.listPrice && canBeNumber(
-    { name: 'listPrice', param: body.listPrice }
-  )
+  const listPrice = 'listPrice' in body
+    ? canBeNumber({ name: 'listPrice', param: body.listPrice })
+    : undefined
 
-  const price = body.price && canBeNumber(
-    { name: 'price', param: body.price }
-  )
+  const price = 'price' in body
+    ? canBeNumber({ name: 'price', param: body.price })
+    : undefined
 
-  const description = body.description && isString(
-    { name: 'description', param: body.description }
-  )
+  const description = 'description' in body
+    ? isString({ name: 'description', param: body.description })
+    : undefined
 
-  const brandSection = body.brandSection && isString(
-    { name: 'brandSection', param: body.brandSection }
-  )
+  const brandSection = 'brandSection' in body
+    ? isString({ name: 'brandSection', param: body.brandSection })
+    : undefined
 
-  const stock = body.stock && canBeNumber(
-    { name: 'stock', param: body.stock }
-  )
+  const stock = 'stock' in body
+    ? canBeNumber({ name: 'stock', param: body.stock })
+    : undefined
 
   const isAvailable = 'isAvailable' in body
     ? canBeBoolean({ name: 'isAvailable', param: body.isAvailable })
     : undefined
 
-  const categoryID = body.categoryID && canBeNumber(
-    { name: 'categoryID', param: body.categoryID }
-  )
+  const categoryID = 'categoryID' in body
+    ? canBeNumber({ name: 'categoryID', param: body.categoryID })
+    : undefined
 
-  const vendorID = body.vendorID && canBeNumber(
-    { name: 'vendorID', param: body.vendorID }
-  )
+  const vendorID = 'vendorID' in body
+    ? canBeNumber({ name: 'vendorID', param: body.vendorID })
+    : undefined
 
   return hasDefinedProps<ProductUpdateInput>({
     title: title?.param,
@@ -256,9 +262,9 @@ export const checkNewCategory = ({ body }: Request): CategoryCreateInput => {
     isString
   )({ name: 'name', param: body.name })
 
-  const parentCategoryID = body.parentCategoryID && canBeNumber(
-    { name: 'parentCategoryID', param: body.parentCategoryID }
-  )
+  const parentCategoryID = 'parentCategoryID' in body
+    ? canBeNumber({ name: 'parentCategoryID', param: body.parentCategoryID })
+    : undefined
 
   return {
     name: name.param,
@@ -267,13 +273,13 @@ export const checkNewCategory = ({ body }: Request): CategoryCreateInput => {
 }
 
 export const checkCategoryUpdate = ({ body }: Request): CategoryUpdateInput => {
-  const name = body.name && isString(
-    { name: 'name', param: body.name }
-  )
+  const name = 'name' in body
+    ? isString({ name: 'name', param: body.name })
+    : undefined
 
-  const parentCategoryID = body.parentCategoryID && canBeNumber(
-    { name: 'parentCategoryID', param: body.parentCategoryID }
-  )
+  const parentCategoryID = 'parentCategoryID' in body
+    ? canBeNumber({ name: 'parentCategoryID', param: body.parentCategoryID })
+    : undefined
 
   return hasDefinedProps<CategoryUpdateInput>({
     name: name?.param,
@@ -497,9 +503,9 @@ export const checkListUpdate = ({ body }: Request): ListCreateInput => {
 }
 
 export const checkNewRating = ({ body }: Request): RatingCreateInput => {
-  const title = body.title && isString(
-    { name: 'title', param: body.title }
-  )
+  const title = 'title' in body
+    ? isString({ name: 'title', param: body.title })
+    : undefined
 
   const review = R.pipe(
     isProvided,
@@ -525,25 +531,25 @@ export const checkNewRating = ({ body }: Request): RatingCreateInput => {
 }
 
 export const checkRatingUpdate = ({ body }: Request): RatingUpdateInput => {
-  const title = body.title && isString(
-    { name: 'title', param: body.title }
-  )
+  const title = 'title' in body
+    ? isString({ name: 'title', param: body.title })
+    : undefined
 
-  const review = body.review && isString(
-    { name: 'review', param: body.review }
-  )
+  const review = 'review' in body
+    ? isString({ name: 'review', param: body.review })
+    : undefined
 
-  const stars = body.review && canBeNumber(
-    { name: 'stars', param: body.stars }
-  )
+  const stars = 'review' in body
+    ? canBeNumber({ name: 'stars', param: body.stars })
+    : undefined
 
   const isVerified = 'isVerified' in body
     ? canBeBoolean({ name: 'isVerified', param: body.isVerified })
     : undefined
 
-  const moderationStatus = body.moderationStatus && isString(
-    { name: 'moderationStatus', param: body.moderationStatus }
-  )
+  const moderationStatus = 'moderationStatus' in body
+    ? isString({ name: 'moderationStatus', param: body.moderationStatus })
+    : undefined
 
   return hasDefinedProps<RatingUpdateInput>({
     title: title?.param,
@@ -565,9 +571,11 @@ export const checkNewRatingComment = ({ body }: Request): RatingCommentCreateInp
     canBeNumber
   )({ name: 'ratingID', param: body.ratingID })
 
-  const parentRatingCommentID = body.parentRatingCommentID && canBeNumber(
-    { name: 'parentRatingCommentID', param: body.parentRatingCommentID }
-  )
+  const parentRatingCommentID = 'parentRatingCommentID' in body
+    ? canBeNumber(
+      { name: 'parentRatingCommentID', param: body.parentRatingCommentID }
+    )
+    : undefined
 
   return {
     content: content.param,
@@ -577,13 +585,12 @@ export const checkNewRatingComment = ({ body }: Request): RatingCommentCreateInp
 }
 
 export const checkRatingCommentUpdate = ({ body }: Request): RatingCommentUpdateInput => {
-  const content = body.content && isString(
-    { name: 'content', param: body.content }
-  )
+  const content = 'content' in body
+    ? isString({ name: 'content', param: body.content })
+    : undefined
 
-  const moderationStatus = body.moderationStatus && isString(
-    { name: 'moderationStatus', param: body.moderationStatus }
-  )
+  const moderationStatus = 'moderationStatus' in body
+    ? isString({ name: 'moderationStatus', param: body.moderationStatus }) : undefined
 
   return hasDefinedProps<RatingCommentUpdateInput>({
     content: content?.param,
@@ -609,13 +616,13 @@ export const checkNewQuestion = ({ body }: Request): QuestionCreateInput => {
 }
 
 export const checkQuestionUpdate = ({ body }: Request): QuestionUpdateInput => {
-  const content = body.content && isString(
-    { name: 'content', param: body.content }
-  )
+  const content = 'content' in body
+    ? isString({ name: 'content', param: body.content })
+    : undefined
 
-  const moderationStatus = body.moderationStatus && isString(
-    { name: 'moderationStatus', param: body.moderationStatus }
-  )
+  const moderationStatus = 'moderationStatus' in body
+    ? isString({ name: 'moderationStatus', param: body.moderationStatus })
+    : undefined
 
   return hasDefinedProps<QuestionUpdateInput>({
     content: content?.param,
@@ -641,13 +648,13 @@ export const checkNewAnswer = ({ body }: Request): AnswerCreateInput => {
 }
 
 export const checkAnswerUpdate = ({ body }: Request): AnswerUpdateInput => {
-  const content = body.content && isString(
-    { name: 'content', param: body.content }
-  )
+  const content = 'content' in body
+    ? isString({ name: 'content', param: body.content })
+    : undefined
 
-  const moderationStatus = body.moderationStatus && isString(
-    { name: 'moderationStatus', param: body.moderationStatus }
-  )
+  const moderationStatus = 'moderationStatus' in body
+    ? isString({ name: 'moderationStatus', param: body.moderationStatus })
+    : undefined
 
   return hasDefinedProps<AnswerUpdateInput>({
     content: content?.param,
@@ -666,9 +673,11 @@ export const checkNewAnswerComment = ({ body }: Request): AnswerCommentCreateInp
     canBeNumber
   )({ name: 'answerID', param: body.answerID })
 
-  const parentAnswerCommentID = body.parentAnswerCommentID && canBeNumber(
-    { name: 'parentAnswerCommentID', param: body.parentAnswerCommentID }
-  )
+  const parentAnswerCommentID = 'parentAnswerCommentID' in body
+    ? canBeNumber(
+      { name: 'parentAnswerCommentID', param: body.parentAnswerCommentID }
+    )
+    : undefined
 
   return {
     content: content.param,
@@ -678,13 +687,12 @@ export const checkNewAnswerComment = ({ body }: Request): AnswerCommentCreateInp
 }
 
 export const checkAnswerCommentUpdate = ({ body }: Request): AnswerCommentUpdateInput => {
-  const content = body.content && isString(
-    { name: 'content', param: body.content }
-  )
+  const content = 'content' in body
+    ? isString({ name: 'content', param: body.content })
+    : undefined
 
-  const moderationStatus = body.moderationStatus && isString(
-    { name: 'moderationStatus', param: body.moderationStatus }
-  )
+  const moderationStatus = 'moderationStatus' in body
+    ? isString({ name: 'moderationStatus', param: body.moderationStatus }) : undefined
 
   return hasDefinedProps<AnswerCommentUpdateInput>({
     content: content?.param,
@@ -795,17 +803,17 @@ export const checkNewOrder = ({ body }: Request): OrderCreateInput => {
 }
 
 export const checkOrderUpdate = ({ body }: Request): OrderUpdateInput => {
-  const address = body.address && isString(
-    { name: 'address', param: body.address }
-  )
+  const address = 'address' in body
+    ? isString({ name: 'address', param: body.address })
+    : undefined
 
-  const orderStatus = body.orderStatus && isString(
-    { name: 'orderStatus', param: body.orderStatus }
-  )
+  const orderStatus = 'orderStatus' in body
+    ? isString({ name: 'orderStatus', param: body.orderStatus })
+    : undefined
 
-  const shippingMethod = body.shippingMethod && isString(
-    { name: 'shippingMethod', param: body.shippingMethod }
-  )
+  const shippingMethod = 'shippingMethod' in body
+    ? isString({ name: 'shippingMethod', param: body.shippingMethod })
+    : undefined
 
   return hasDefinedProps<OrderUpdateInput>({
     address: address?.param,
@@ -838,8 +846,13 @@ export const checkNewOrderProduct = ({ body }: Request): OrderProductCreateInput
 }
 
 export const checkOrderProductUpdate = ({ body }: Request): OrderProductUpdateInput => {
-  const qty = body.qty && canBeNumber({ name: 'qty', param: body.qty })
-  const price = body.price && canBeNumber({ name: 'price', param: body.price })
+  const qty = 'qty' in body
+    ? canBeNumber({ name: 'qty', param: body.qty })
+    : undefined
+
+  const price = 'price' in body
+    ? canBeNumber({ name: 'price', param: body.price })
+    : undefined
 
   return hasDefinedProps<OrderProductUpdateInput>({
     qty: qty?.param,
@@ -883,21 +896,21 @@ export const checkNewInvoice = ({ body }: Request): InvoiceCreateInput => {
 }
 
 export const checkInvoiceUpdate = ({ body }: Request): InvoiceUpdateInput => {
-  const amount = body.amount && canBeNumber(
-    { name: 'amount', param: body.amount }
-  )
+  const amount = 'amount' in body
+    ? canBeNumber({ name: 'amount', param: body.amount })
+    : undefined
 
-  const details = body.details && isString(
-    { name: 'details', param: body.details }
-  )
+  const details = 'details' in body
+    ? isString({ name: 'details', param: body.details })
+    : undefined
 
-  const invoiceStatus = body.invoiceStatus && isString(
-    { name: 'invoiceStatus', param: body.invoiceStatus }
-  )
+  const invoiceStatus = 'invoiceStatus' in body
+    ? isString({ name: 'invoiceStatus', param: body.invoiceStatus })
+    : undefined
 
-  const paymentMethod = body.paymentMethod && isString(
-    { name: 'paymentMethod', param: body.paymentMethod }
-  )
+  const paymentMethod = 'paymentMethod' in body
+    ? isString({ name: 'paymentMethod', param: body.paymentMethod })
+    : undefined
 
   return hasDefinedProps<InvoiceUpdateInput>({
     amount: amount?.param,

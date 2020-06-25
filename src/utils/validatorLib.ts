@@ -19,7 +19,7 @@ export const isProvided: CP = ({ name, param }) => {
 export const hasDefinedProps = <T>(param: T): T => {
   const strippedObject = JSON.parse(JSON.stringify(param))
 
-  if (strippedObject.length === 0) {
+  if (Object.keys(strippedObject).length === 0) {
     throw new StatusError(400, 'Invalid input')
   }
   return strippedObject
