@@ -151,6 +151,7 @@ router.delete('/:userID/cartProducts/:productID', isSameUserOrAdmin('params'), a
   res.status(204).end()
 })
 
+// TODO remove redundant routes
 router.get('/:userID/orders', isSameUserOrAdmin('params'), async (req, res) => {
   const orders = await orderService.getOrdersByUser(req)
   res.json(orders)

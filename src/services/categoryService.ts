@@ -29,29 +29,29 @@ const getCategories = async (categoriesFiltersinput: CategoriesFiltersInput): Pr
   const { q } = categoriesFiltersinput
 
   let rawCategories: CategoryListRawData[] = await db('categories as c')
-    .select('c.categoryID', 'c.name')
+    .select('c.categoryID', 'c.name', 'c.parentCategoryID')
     .count('p.productID as productCount')
     .joinRaw('LEFT JOIN products as p USING ("categoryID")')
     .groupBy('c.categoryID')
 
   let categories: CategoryListData[]
 
-  categories = rawCategories.map((v) => ({
-    ...v,
-    productCount: parseInt(v.productCount),
+  categories = rawCategories.map((c) => ({
+    ...c,
+    productCount: parseInt(c.productCount),
     children: []
   }))
 
   if (q !== undefined) {
     categories = categories
-      .filter((v) => v.name.toLowerCase().includes(q.toLowerCase()))
+      .filter((c) => c.name.toLowerCase().includes(q.toLowerCase()))
   }
 
   return categories.map((c) => ({
     ...c,
-    children: categories
-      .filter((c) => c.parentCategoryID === c.categoryID)
-      .map((c) => c.categoryID)
+    children: rawCategories
+      .filter((rc) => rc.parentCategoryID === c.categoryID)
+      .map((rc) => rc.categoryID)
   }))
 }
 
