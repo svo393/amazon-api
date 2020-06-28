@@ -38,7 +38,7 @@ router.get('/', isAdmin, async (req, res) => {
 })
 
 router.get('/me', isLoggedIn, async (req, res) => {
-  const user = await userService.getUserByID(req, res)
+  const user = await userService.getMe(res)
   res.json(user)
 })
 

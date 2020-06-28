@@ -1045,12 +1045,12 @@ export const checkUserFilters = ({ query }: Request): UsersFiltersInput => {
     ? canBeNumber({ name: 'ratingCountMax', param: query.ratingCountMax })
     : undefined
 
-  const activitiesCountMin = 'activitiesCountMin' in query
-    ? canBeNumber({ name: 'activitiesCountMin', param: query.activitiesCountMin })
+  const activityCountMin = 'activityCountMin' in query
+    ? canBeNumber({ name: 'activityCountMin', param: query.activityCountMin })
     : undefined
 
-  const activitiesCountMax = 'activitiesCountMax' in query
-    ? canBeNumber({ name: 'activitiesCountMax', param: query.activitiesCountMax })
+  const activityCountMax = 'activityCountMax' in query
+    ? canBeNumber({ name: 'activityCountMax', param: query.activityCountMax })
     : undefined
 
   const email = 'email' in query
@@ -1065,8 +1065,8 @@ export const checkUserFilters = ({ query }: Request): UsersFiltersInput => {
     orderCountMax: orderCountMax?.param,
     ratingCountMin: ratingCountMin?.param,
     ratingCountMax: ratingCountMax?.param,
-    activitiesCountMin: activitiesCountMin?.param,
-    activitiesCountMax: activitiesCountMax?.param,
+    activityCountMin: activityCountMin?.param,
+    activityCountMax: activityCountMax?.param,
     email: email?.param
   }
 }

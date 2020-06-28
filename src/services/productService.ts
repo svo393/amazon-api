@@ -6,8 +6,25 @@ import { imagesBasePath } from '../utils/constants'
 import { db, dbTrans } from '../utils/db'
 import getUploadIndex from '../utils/getUploadIndex'
 import { uploadImages } from '../utils/img'
-import { getProductsQuery } from '../utils/queries'
 import StatusError from '../utils/StatusError'
+
+const getProductsQuery: any = db('products as p')
+  .select(
+    'p.productID',
+    'p.title',
+    'p.price',
+    'p.stock',
+    'p.groupID',
+    'p.isAvailable',
+    'v.name as vendorName',
+    'c.name as categoryName'
+  )
+  .avg('stars as stars')
+  .count('r.ratingID as ratingCount')
+  .leftJoin('ratings as r', 'p.groupID', 'r.groupID')
+  .leftJoin('vendors as v', 'p.vendorID', 'v.vendorID')
+  .leftJoin('categories as c', 'p.categoryID', 'c.categoryID')
+  .groupBy('p.productID', 'vendorName', 'categoryName')
 
 const addProduct = async (productInput: ProductCreateInput, res: Response): Promise<Product> => {
   const { variants, parameters, listPrice, price } = productInput

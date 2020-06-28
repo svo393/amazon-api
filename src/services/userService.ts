@@ -4,7 +4,7 @@ import { CookieOptions, Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
 import R from 'ramda'
 import { promisify } from 'util'
-import { Answer, AnswerComment, Order, PasswordRequestInput, PasswordResetInput, Question, Rating, RatingComment, User, UserLoginInput, UserSafeData, UsersFiltersInput, UserSignupInput, UserUpdateInput } from '../types'
+import { PasswordRequestInput, PasswordResetInput, User, UserLoginInput, UserSafeData, UsersFiltersInput, UserSignupInput, UserUpdateInput } from '../types'
 import env from '../utils/config'
 import { imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
@@ -12,9 +12,31 @@ import { uploadImages } from '../utils/img'
 import StatusError from '../utils/StatusError'
 // import { makeANiceEmail, transport } from '../utils/mail'
 
-type UserBaseData = Omit<UserSafeData,
-  | 'role'
->
+const getUsersQuery: any = db('users as u')
+  .select('email',
+    'u.name',
+    'info',
+    'avatar',
+    'u.createdAt',
+    'u.userID',
+    'role'
+  )
+  .count('o.orderID as orderCount')
+  .count('r.ratingID as ratingCount')
+  .count('rc.ratingCommentID as ratingCommentCount')
+  .count('q.questionID as questionCount')
+  .count('a.answerID as answerCount')
+  .count('ac.answerID as answerCommentCount')
+  .leftJoin('orders as o', 'u.userID', 'o.userID')
+  .leftJoin('ratings as r', 'u.userID', 'r.userID')
+  .leftJoin('ratingComments as rc', 'u.userID', 'rc.userID')
+  .leftJoin('questions as q', 'u.userID', 'q.userID')
+  .leftJoin('answers as a', 'u.userID', 'a.userID')
+  .leftJoin('answerComments as ac', 'u.userID', 'ac.userID')
+  .where('role', '!=', 'ROOT')
+  .groupBy('u.userID')
+
+type UserBaseData = Omit<UserSafeData, | 'role'>
 
 const setTokenCookie = (res: Response, token: string, remember: boolean): void => {
   const config: CookieOptions = {
@@ -93,7 +115,7 @@ const loginUser = async (userInput: UserLoginInput, res: Response): Promise<User
   ], existingUser)
 }
 
-type UserListRawData = Omit<User,
+type UserRawData = Omit<User,
   | 'password'
   | 'resetToken'
   | 'resetTokenCreatedAt'
@@ -106,7 +128,7 @@ type UserListRawData = Omit<User,
   answerCommentCount: string;
 }
 
-type UserListData = Omit<UserListRawData,
+type UserData = Omit<UserRawData,
   | 'orderCount'
   | 'ratingCount'
   | 'ratingCommentCount'
@@ -114,12 +136,12 @@ type UserListData = Omit<UserListRawData,
   | 'answerCount'
   | 'answerCommentCount'
 > & {
-  activitiesCount: number;
+  activityCount: number;
   orderCount: number;
   ratingCount: number;
 }
 
-const getUsers = async (usersFiltersinput: UsersFiltersInput): Promise<UserListData[]> => {
+const getUsers = async (usersFiltersinput: UsersFiltersInput): Promise<UserData[]> => {
   const {
     roles,
     createdFrom,
@@ -128,44 +150,18 @@ const getUsers = async (usersFiltersinput: UsersFiltersInput): Promise<UserListD
     orderCountMax,
     ratingCountMin,
     ratingCountMax,
-    activitiesCountMin,
-    activitiesCountMax,
+    activityCountMin,
+    activityCountMax,
     email
   } = usersFiltersinput
 
-  const rawUsers: UserListRawData[] = await db('users as u')
-    .select('email',
-      'u.name',
-      'info',
-      'avatar',
-      'u.createdAt',
-      'u.userID',
-      'role'
-    )
-    .count('o.orderID as orderCount')
-    .count('r.ratingID as ratingCount')
-    .count('rc.ratingCommentID as ratingCommentCount')
-    .count('q.questionID as questionCount')
-    .count('a.answerID as answerCount')
-    .count('ac.answerID as answerCommentCount')
-    .leftJoin('orders as o', 'u.userID', 'o.userID')
-    .leftJoin('ratings as r', 'u.userID', 'r.userID')
-    .leftJoin('ratingComments as rc', 'u.userID', 'rc.userID')
-    .leftJoin('questions as q', 'u.userID', 'q.userID')
-    .leftJoin('answers as a', 'u.userID', 'a.userID')
-    .leftJoin('answerComments as ac', 'u.userID', 'ac.userID')
-    .where('role', '!=', 'ROOT')
-    .groupBy('u.userID')
+  const rawUsers: UserRawData[] = await getUsersQuery.clone()
 
   let users = rawUsers
     .map((u) => ({
       ...u,
       orderCount: parseInt(u.orderCount),
-      ratingCount: parseInt(u.ratingCount),
-      ratingCommentCount: parseInt(u.ratingCommentCount),
-      questionCount: parseInt(u.questionCount),
-      answerCount: parseInt(u.answerCount),
-      answerCommentCount: parseInt(u.answerCommentCount)
+      ratingCount: parseInt(u.ratingCount)
     }))
     .map((u) => ({
       ...R.omit([
@@ -174,11 +170,11 @@ const getUsers = async (usersFiltersinput: UsersFiltersInput): Promise<UserListD
         'answerCount',
         'answerCommentCount'
       ], u),
-      activitiesCount: [
-        u.ratingCommentCount,
-        u.questionCount,
-        u.answerCount,
-        u.answerCommentCount
+      activityCount: [
+        parseInt(u.ratingCommentCount),
+        parseInt(u.questionCount),
+        parseInt(u.answerCount),
+        parseInt(u.answerCommentCount)
       ].reduce((acc, cur) => acc + cur, 0)
     }))
 
@@ -217,14 +213,14 @@ const getUsers = async (usersFiltersinput: UsersFiltersInput): Promise<UserListD
       .filter((u) => u.ratingCount <= ratingCountMax)
   }
 
-  if (activitiesCountMin !== undefined) {
+  if (activityCountMin !== undefined) {
     users = users
-      .filter((u) => u.activitiesCount >= activitiesCountMin)
+      .filter((u) => u.activityCount >= activityCountMin)
   }
 
-  if (activitiesCountMax !== undefined) {
+  if (activityCountMax !== undefined) {
     users = users
-      .filter((u) => u.activitiesCount <= activitiesCountMax)
+      .filter((u) => u.activityCount <= activityCountMax)
   }
 
   if (email !== undefined) {
@@ -236,76 +232,56 @@ const getUsers = async (usersFiltersinput: UsersFiltersInput): Promise<UserListD
   return users
 }
 
-type UserPersonalData = UserSafeData & {
-  orders: Order[];
-  ratings: Rating[];
-  ratingComments: RatingComment[];
-  questions: Question[];
-  answers: Answer[];
-  answerComments: AnswerComment[];
-}
-
-type UserPublicData = Omit<UserPersonalData,
+type UserPublicData = Omit<UserData,
   | 'email'
   | 'createdAt'
   | 'orders'
   | 'role'
 >
 
-const getUserByID = async (req: Request, res: Response): Promise<UserPersonalData | UserPublicData> => {
-  const userID = req.params.userID ?? res.locals.userID
-
+const getMe = async (res: Response): Promise<{ userID: number }> => {
   const user = await db<User>('users')
-    .first()
-    .where('userID', userID)
+    .where('userID', res.locals.userID)
+    .first('userID')
 
   if (user === undefined) { throw new StatusError(404, 'Not Found') }
+  return user
+}
 
-  const hasPermission = [ 'ROOT', 'ADMIN' ].includes(res.locals.userRole) ||
-  res.locals.userID === userID
+const getUserByID = async (req: Request, res: Response): Promise<UserData | UserPublicData> => {
+  const rawUser: UserRawData = await getUsersQuery.clone()
+    .first()
+    .where('u.userID', req.params.userID)
 
-  const orders = hasPermission
-    ? await db<Order>('orders')
-      .where('userID', userID)
-    : undefined
+  if (rawUser === undefined) { throw new StatusError(404, 'Not Found') }
 
-  const ratings = await db<Rating>('ratings')
-    .where('userID', userID)
-
-  const ratingComments = await db<RatingComment>('ratingComments')
-    .where('userID', userID)
-
-  const questions = await db<Question>('questions')
-    .where('userID', userID)
-
-  const answers = await db<Answer>('answers')
-    .where('userID', userID)
-
-  const answerComments = await db<AnswerComment>('answerComments')
-    .where('userID', userID)
-
-  const userDataSplitted = hasPermission
-    ? R.omit([
-      'password',
-      'resetToken',
-      'resetTokenCreatedAt'
-    ], user)
-    : R.pick([
-      'userID',
-      'name',
-      'avatar',
-      'info'
-    ], user)
-
-  return {
-    ...userDataSplitted,
-    orders,
-    ratingComments,
-    ratings,
-    questions,
-    answers,
-    answerComments
+  const user = {
+    ...R.omit([
+      'ratingCommentCount',
+      'questionCount',
+      'answerCount',
+      'answerCommentCount'
+    ], rawUser),
+    activityCount: [
+      parseInt(rawUser.ratingCommentCount),
+      parseInt(rawUser.questionCount),
+      parseInt(rawUser.answerCount),
+      parseInt(rawUser.answerCommentCount)
+    ].reduce((acc, cur) => acc + cur, 0),
+    orderCount: parseInt(rawUser.orderCount),
+    ratingCount: parseInt(rawUser.ratingCount)
   }
+
+  const hasPermission = [ 'ROOT', 'ADMIN' ].includes(res.locals.userRole)
+
+  return hasPermission
+    ? user
+    : R.omit([
+      'email',
+      'createdAt',
+      'orders',
+      'role'
+    ], user)
 }
 
 const updateUser = async (userInput: UserUpdateInput, res: Response, req: Request): Promise<UserSafeData> => {
@@ -415,6 +391,7 @@ export default {
   addUser,
   loginUser,
   getUsers,
+  getMe,
   getUserByID,
   updateUser,
   deleteUser,

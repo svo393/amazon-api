@@ -546,8 +546,8 @@ export type UsersFiltersInput = {
   orderCountMax?: number;
   ratingCountMin?: number;
   ratingCountMax?: number;
-  activitiesCountMin?: number;
-  activitiesCountMax?: number;
+  activityCountMin?: number;
+  activityCountMax?: number;
   email?: string;
 }
 
