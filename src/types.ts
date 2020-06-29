@@ -76,7 +76,7 @@ export type Group = {
 export type Product = {
   productID: number;
   title: string;
-  listPrice: number;
+  listPrice?: number;
   price: number;
   description: string;
   brandSection?: string;
@@ -520,6 +520,16 @@ export type RatingsFiltersInput = {
   likesMax?: number;
   dislikesMin?: number;
   dislikesMax?: number;
+}
+
+export type ImagesFiltersInput = {
+  productID?: number;
+  ratingID?: number;
+  ratingCommentID?: number;
+  questionID?: number;
+  answerID?: number;
+  answerCommentID?: number;
+  userID?: number;
 }
 
 export type ProductsFiltersInput = {

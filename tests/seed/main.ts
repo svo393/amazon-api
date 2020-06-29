@@ -154,7 +154,7 @@ const seed = async (): Promise<void> => {
 
                   r.mediaFiles !== undefined && r.mediaFiles.map((m) => {
                     uploadAPI
-                      .attach('ratingMedia', path.join(
+                      .attach('ratingImages', path.join(
                         __dirname, `images/ratings/${m}.jpg`
                       ))
                   })
@@ -185,7 +185,7 @@ const seed = async (): Promise<void> => {
 
                       cm.mediaFiles !== undefined && cm.mediaFiles.map((m: number) => {
                         uploadAPI
-                          .attach('ratingCommentMedia', path.join(
+                          .attach('ratingCommentImages', path.join(
                             __dirname, `images/ratingComments/${m}.jpg`
                           ))
                       })
@@ -220,7 +220,7 @@ const seed = async (): Promise<void> => {
 
                   q.mediaFiles !== undefined && q.mediaFiles.map((m: number) => {
                     uploadAPI
-                      .attach('questionMedia', path.join(
+                      .attach('questionImages', path.join(
                         __dirname, `images/questions/${m}.jpg`
                       ))
                   })
@@ -251,7 +251,7 @@ const seed = async (): Promise<void> => {
 
                       a.mediaFiles !== undefined && a.mediaFiles.map((m: number) => {
                         uploadAPI
-                          .attach('answerMedia', path.join(
+                          .attach('answerImages', path.join(
                             __dirname, `images/answers/${m}.jpg`
                           ))
                       })
@@ -282,7 +282,7 @@ const seed = async (): Promise<void> => {
 
                           ac.mediaFiles !== undefined && ac.mediaFiles.map((m: number) => {
                             uploadAPI
-                              .attach('answerCommentMedia', path.join(
+                              .attach('answerCommentImages', path.join(
                                 __dirname, `images/answerComments/${m}.jpg`
                               ))
                           })

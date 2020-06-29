@@ -126,7 +126,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
     .createTable('products', (t) => {
       t.increments('productID')
       t.string('title').notNullable()
-      t.integer('listPrice').notNullable().unsigned()
+      t.integer('listPrice').unsigned()
       t.integer('price').notNullable().unsigned()
       t.string('description', 65535).notNullable()
       t.string('brandSection', 65535)

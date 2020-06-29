@@ -86,6 +86,8 @@ const getOrders = async (ordersFiltersinput: OrdersFiltersInput): Promise<Order[
     .join('users as u', 'o.userID', 'u.userID')
     .groupBy('o.orderID', 'i.amount', 'i.invoiceID', 'userEmail')
 
+  orders = orders.map((o) => ({ ...o, amount: o.amount / 100 }))
+
   if (orderStatuses !== undefined) {
     orders = orders
       .filter((o) => orderStatuses.split(',').includes(o.orderStatus))
@@ -98,12 +100,12 @@ const getOrders = async (ordersFiltersinput: OrdersFiltersInput): Promise<Order[
 
   if (amountMin !== undefined) {
     orders = orders
-      .filter((o) => o.amount >= amountMin * 100)
+      .filter((o) => o.amount >= amountMin)
   }
 
   if (amountMax !== undefined) {
     orders = orders
-      .filter((o) => o.amount <= amountMax * 100)
+      .filter((o) => o.amount <= amountMax)
   }
 
   if (createdFrom !== undefined) {
@@ -178,7 +180,11 @@ const getOrderByID = async (req: Request): Promise<OrderFullData> => {
   if (order === undefined) throw new StatusError(404, 'Not Found')
   return {
     ...order,
-    orderProducts
+    amount: order.amount / 100,
+    orderProducts: orderProducts.map((op) => ({
+      ...op,
+      price: op.price / 100
+    }))
   }
 }
 

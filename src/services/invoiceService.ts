@@ -10,6 +10,7 @@ const addInvoice = async (invoiceInput: InvoiceCreateInput): Promise<Invoice> =>
   const [ addedInvoice ]: Invoice[] = await db('invoices')
     .insert({
       ...invoiceInput,
+      amount: invoiceInput.amount * 100,
       invoiceStatus: 'NEW',
       createdAt: now,
       updatedAt: now
@@ -45,6 +46,8 @@ const getInvoices = async (invoicesFiltersinput: InvoicesFiltersInput): Promise<
     .join('users as u', 'i.userID', 'u.userID')
     .groupBy('i.invoiceID', 'userEmail')
 
+  invoices = invoices.map((i) => ({ ...i, amount: i.amount / 100 }))
+
   if (invoiceStatuses !== undefined) {
     invoices = invoices
       .filter((i) => invoiceStatuses.split(',').includes(i.invoiceStatus))
@@ -57,12 +60,12 @@ const getInvoices = async (invoicesFiltersinput: InvoicesFiltersInput): Promise<
 
   if (amountMin !== undefined) {
     invoices = invoices
-      .filter((i) => i.amount >= amountMin * 100)
+      .filter((i) => i.amount >= amountMin)
   }
 
   if (amountMax !== undefined) {
     invoices = invoices
-      .filter((i) => i.amount <= amountMax * 100)
+      .filter((i) => i.amount <= amountMax)
   }
 
   if (createdFrom !== undefined) {
@@ -106,7 +109,7 @@ const getInvoiceByID = async (req: Request): Promise<Invoice> => {
     .joinRaw('JOIN users as u USING ("userID")')
 
   if (invoice === undefined) throw new StatusError(404, 'Not Found')
-  return invoice
+  return { ...invoice, amount: invoice.amount / 100 }
 }
 
 const updateInvoice = async (invoiceInput: InvoiceUpdateInput, req: Request): Promise<Invoice> => {

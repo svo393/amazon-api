@@ -30,7 +30,9 @@ const addRating = async (ratingInput: RatingCreateInput, res: Response): Promise
   return addedRating
 }
 
-const getRatings = async (ratingsFiltersinput: RatingsFiltersInput): Promise<Rating[]> => {
+type RatingData = Rating & { userEmail: string }
+
+const getRatings = async (ratingsFiltersinput: RatingsFiltersInput): Promise<RatingData[]> => {
   const {
     q,
     groupID,
@@ -47,7 +49,7 @@ const getRatings = async (ratingsFiltersinput: RatingsFiltersInput): Promise<Rat
     dislikesMax
   } = ratingsFiltersinput
 
-  let ratings = await db('ratings as r')
+  let ratings: RatingData[] = await db('ratings as r')
     .select(
       'r.ratingID',
       'r.createdAt',
@@ -68,7 +70,7 @@ const getRatings = async (ratingsFiltersinput: RatingsFiltersInput): Promise<Rat
 
   if (q !== undefined) {
     ratings = ratings
-      .filter((r) => r.title.toLowerCase().includes(q.toLowerCase()) ||
+      .filter((r) => r.title?.toLowerCase().includes(q.toLowerCase()) ||
       r.review.toLowerCase().includes(q.toLowerCase()))
   }
 

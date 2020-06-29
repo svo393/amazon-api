@@ -40,7 +40,9 @@ const addProduct = async (productInput: ProductCreateInput, res: Response): Prom
     const [ addedProduct ]: Product[] = await trx('products')
       .insert({
         ...R.omit([ 'parameters', 'variants' ], productInput),
-        listPrice: listPrice * 100,
+        listPrice: listPrice !== undefined
+          ? listPrice * 100
+          : undefined,
         price: price * 100,
         userID: res.locals.userID,
         createdAt: now,
@@ -133,6 +135,7 @@ export const getProducts = async (productsFiltersinput: ProductsFiltersInput): P
 
   products = rawProducts.map((p) => ({
     ...p,
+    price: p.price / 100,
     stars: parseFloat(p.stars),
     ratingCount: parseInt(p.ratingCount)
   }))
@@ -149,12 +152,12 @@ export const getProducts = async (productsFiltersinput: ProductsFiltersInput): P
 
   if (priceMin !== undefined) {
     products = products
-      .filter((p) => p.price >= priceMin * 100)
+      .filter((p) => p.price >= priceMin)
   }
 
   if (priceMax !== undefined) {
     products = products
-      .filter((p) => p.price <= priceMax * 100)
+      .filter((p) => p.price <= priceMax)
   }
 
   if (vendorName !== undefined) {
@@ -218,17 +221,17 @@ export const getProducts = async (productsFiltersinput: ProductsFiltersInput): P
 }
 
 type ProductData = Omit<ProductListData, 'images'> & {
-  listPrice: number;
+  listPrice?: number;
   description: string;
   brandSection: string;
   group: GroupVariant[];
   images: Image[];
 }
 
-type ProductAllData = ProductData & Pick<Product, 'createdAt' | 'updatedAt' | 'userID'> & { userEmail: string }
+type ProductAllData = ProductData & Pick<Product, 'createdAt' | 'updatedAt' | 'userID' | 'listPrice'> & { userEmail: string }
 
 const getProductByID = async (req: Request, res: Response): Promise<ProductData| ProductAllData> => {
-  const rawProduct = await getProductsQuery.clone()
+  const rawProduct: Omit<ProductAllData, 'stars' | 'ratingCount'> & { stars: string; ratingCount: string } = await getProductsQuery.clone()
     .first(
       'p.listPrice',
       'p.description',
@@ -249,6 +252,10 @@ const getProductByID = async (req: Request, res: Response): Promise<ProductData|
 
   const product = {
     ...rawProduct,
+    price: rawProduct.price / 100,
+    listPrice: rawProduct.listPrice !== undefined
+      ? rawProduct.listPrice / 100
+      : undefined,
     stars: parseFloat(rawProduct.stars),
     ratingCount: parseInt(rawProduct.ratingCount)
   }
