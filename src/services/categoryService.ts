@@ -21,7 +21,7 @@ const addCategory = async (categoryInput: CategoryCreateInput): Promise<Category
 
 type CategoryListRawData = Category & { productCount: string }
 type CategoryListData = Omit<CategoryListRawData, 'productCount'> & {
-  children: number[];
+  children: { categoryID: number; name: string }[];
   productCount: number;
 }
 
@@ -51,7 +51,7 @@ const getCategories = async (categoriesFiltersinput: CategoriesFiltersInput): Pr
     ...c,
     children: rawCategories
       .filter((rc) => rc.parentCategoryID === c.categoryID)
-      .map((rc) => rc.categoryID)
+      .map((rc) => ({ categoryID: rc.categoryID, name: rc.name }))
   }))
 }
 
@@ -63,7 +63,7 @@ const getCategoryByID = async (req: Request): Promise<SingleCategoryData> => {
   const categoryID = Number(req.params.categoryID)
 
   const categories: (Category & { productCount: string })[] = await db('categories as c')
-    .select('c.categoryID', 'c.name')
+    .select('c.categoryID', 'c.name', 'c.parentCategoryID')
     .count('p.productID as productCount')
     .joinRaw('LEFT JOIN products as p USING ("categoryID")')
     .groupBy('c.categoryID')
@@ -85,7 +85,7 @@ const getCategoryByID = async (req: Request): Promise<SingleCategoryData> => {
 
   const children = categories
     .filter((c) => c.parentCategoryID === categoryID)
-    .map((c) => c.categoryID)
+    .map((c) => ({ categoryID: c.categoryID, name: c.name }))
 
   delete category.parentCategoryID
 
@@ -93,7 +93,7 @@ const getCategoryByID = async (req: Request): Promise<SingleCategoryData> => {
     ...category,
     productCount: parseInt(category.productCount),
     children,
-    parentChain
+    parentChain: parentChain.reverse()
   }
 }
 

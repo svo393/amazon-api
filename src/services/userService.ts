@@ -239,10 +239,12 @@ type UserPublicData = Omit<UserData,
   | 'role'
 >
 
-const getMe = async (res: Response): Promise<{ userID: number }> => {
+type CurrentUser = { userID: number; role: string }
+
+const getMe = async (res: Response): Promise<CurrentUser> => {
   const user = await db<User>('users')
     .where('userID', res.locals.userID)
-    .first('userID')
+    .first('userID', 'role')
 
   if (user === undefined) { throw new StatusError(404, 'Not Found') }
   return user

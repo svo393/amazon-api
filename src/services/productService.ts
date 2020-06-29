@@ -16,6 +16,8 @@ const getProductsQuery: any = db('products as p')
     'p.stock',
     'p.groupID',
     'p.isAvailable',
+    'p.vendorID',
+    'p.categoryID',
     'v.name as vendorName',
     'c.name as categoryName'
   )
@@ -86,6 +88,8 @@ type ProductListRawData = Pick<Product,
   | 'stock'
   | 'groupID'
   | 'isAvailable'
+  | 'vendorID'
+  | 'categoryID'
 > & {
   stars: string;
   ratingCount: string;
