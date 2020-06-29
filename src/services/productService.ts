@@ -95,15 +95,15 @@ type ProductListRawData = Pick<Product,
   ratingCount: string;
   vendorName: string;
   categoryName: string;
-  images: {
-    imageID: number;
-    index: number;
-  }[];
 }
 
 type ProductListData = Omit<ProductListRawData, 'stars' | 'ratingCount'> & {
   stars: number;
   ratingCount: number;
+  images: {
+    imageID: number;
+    index: number;
+  }[];
 }
 
 export const getProducts = async (productsFiltersinput: ProductsFiltersInput): Promise<ProductListData[]> => {
@@ -124,11 +124,10 @@ export const getProducts = async (productsFiltersinput: ProductsFiltersInput): P
   } = productsFiltersinput
 
   // TODO refactor reusable queries
-  const rawProducts: (Omit<ProductListRawData, 'images'> & { imageID: number })[] = await getProductsQuery.clone()
-    .select('i.imageID')
-    .join('images as i', 'p.productID', 'i.productID')
-    .where('i.index', 0)
-    .groupBy('i.imageID')
+  const rawProducts: ProductListRawData[] = await getProductsQuery.clone()
+
+  const images = await db<Image>('images')
+    .whereNotNull('productID')
 
   let products
 
@@ -204,15 +203,16 @@ export const getProducts = async (productsFiltersinput: ProductsFiltersInput): P
   }
 
   return products.map((p) => {
-    const imageID = p.imageID
-    delete p.imageID
+    const image = images.find((i) => i.productID === p.productID && i.index === 0)
     return {
       ...p,
-      images: [ {
-        imageID,
-        index: 0,
-        productID: p.productID
-      } ]
+      images: image !== undefined
+        ? [ {
+          imageID: image.imageID,
+          index: 0,
+          productID: p.productID
+        } ]
+        : []
     }
   })
 }
