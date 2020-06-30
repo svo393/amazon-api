@@ -76,7 +76,7 @@ export const isNumber: CP = ({ name, param }) => {
 }
 
 export const canBeNumber: CP = ({ name, param }) => {
-  if (param !== undefined && !/^\d+(?:\.\d{0,2})?$/.test(param)) {
+  if (param !== undefined && !/^\d+(?:\.\d{1,2})?$/.test(param)) {
     throw new StatusError(400, `Incorrect ${name}: ${param}`)
   }
   return { name, param: Number(param) }
