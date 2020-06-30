@@ -9,11 +9,12 @@ interface Feed extends ObjIndexed {
   answerComments?: (AnswerComment & { type: string })[];
 }
 
-type Activity =
-  RatingComment & { type: string } |
-  Question & { type: string } |
-  Answer & { type: string } |
-  AnswerComment & { type: string }
+type Activity = (
+  RatingComment |
+  Question |
+  Answer |
+  AnswerComment
+) & { type: string }
 
 const getFeed = async (feedFiltersinput: FeedFiltersInput): Promise<Feed> => {
   const {

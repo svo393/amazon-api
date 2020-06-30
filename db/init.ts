@@ -1,6 +1,9 @@
 import { addressTypes, invoiceStatuses, lockerAddresses, moderationStatuses, orderStatuses, paymentMethods, roles, shippingMethods } from '../src/utils/constants'
 import { db } from '../src/utils/db'
 
+const randomNumber = (min: number, max: number): number =>
+  Math.floor(Math.random() * (max - min + 1) + min)
+
 export const init = async (): Promise<void> => {
   await db('invoices').del()
   await db('invoiceStatuses').del()
@@ -35,20 +38,21 @@ export const init = async (): Promise<void> => {
 
   await db.raw(
     `
-    ALTER SEQUENCE "invoices_invoiceID_seq" START WITH 274 INCREMENT BY 3 RESTART;
-    ALTER SEQUENCE "orders_orderID_seq" START WITH 512 INCREMENT BY 3 RESTART;
-    ALTER SEQUENCE "images_imageID_seq" START WITH 1923 INCREMENT BY 3 RESTART;
-    ALTER SEQUENCE "answerComments_answerCommentID_seq" START WITH 553 INCREMENT BY 3 RESTART;
-    ALTER SEQUENCE "answers_answerID_seq" START WITH 480 INCREMENT BY 3 RESTART;
-    ALTER SEQUENCE "questions_questionID_seq" START WITH 308 INCREMENT BY 3 RESTART;
-    ALTER SEQUENCE "ratingComments_ratingCommentID_seq" START WITH 505 INCREMENT BY 3 RESTART;
-    ALTER SEQUENCE "ratings_ratingID_seq" START WITH 761 INCREMENT BY 3 RESTART;
-    ALTER SEQUENCE "products_productID_seq" START WITH 14397 INCREMENT BY 3 RESTART;
-    ALTER SEQUENCE "vendors_vendorID_seq" START WITH 527 INCREMENT BY 3 RESTART;
-    ALTER SEQUENCE "categories_categoryID_seq" START WITH 361 INCREMENT BY 3 RESTART;
-    ALTER SEQUENCE "lists_listID_seq" START WITH 735 INCREMENT BY 3 RESTART;
-    ALTER SEQUENCE "users_userID_seq" START WITH 3814 INCREMENT BY 3 RESTART;
-    ALTER SEQUENCE "addresses_addressID_seq" START WITH 307 INCREMENT BY 3 RESTART;
+    ALTER SEQUENCE "invoices_invoiceID_seq" START WITH ${randomNumber(211, 297)} INCREMENT BY 3 RESTART;
+    ALTER SEQUENCE "orders_orderID_seq" START WITH ${randomNumber(511, 597)} INCREMENT BY 3 RESTART;
+    ALTER SEQUENCE "images_imageID_seq" START WITH ${randomNumber(1011, 1997)} INCREMENT BY 3 RESTART;
+    ALTER SEQUENCE "answerComments_answerCommentID_seq" START WITH ${randomNumber(511, 597)} INCREMENT BY 3 RESTART;
+    ALTER SEQUENCE "answers_answerID_seq" START WITH ${randomNumber(411, 497)} INCREMENT BY 3 RESTART;
+    ALTER SEQUENCE "questions_questionID_seq" START WITH ${randomNumber(311, 397)}  INCREMENT BY 3 RESTART;
+    ALTER SEQUENCE "ratingComments_ratingCommentID_seq" START WITH ${randomNumber(511, 597)} INCREMENT BY 3 RESTART;
+    ALTER SEQUENCE "ratings_ratingID_seq" START WITH ${randomNumber(711, 797)} INCREMENT BY 3 RESTART;
+    ALTER SEQUENCE "products_productID_seq" START WITH ${randomNumber(11011, 13997)} INCREMENT BY 3 RESTART;
+    ALTER SEQUENCE "groups_groupID_seq" START WITH ${randomNumber(31, 79)} INCREMENT BY 3 RESTART;
+    ALTER SEQUENCE "vendors_vendorID_seq" START WITH ${randomNumber(511, 597)} INCREMENT BY 3 RESTART;
+    ALTER SEQUENCE "categories_categoryID_seq" START WITH ${randomNumber(311, 397)} INCREMENT BY 3 RESTART;
+    ALTER SEQUENCE "lists_listID_seq" START WITH ${randomNumber(711, 797)} INCREMENT BY 3 RESTART;
+    ALTER SEQUENCE "users_userID_seq" START WITH ${randomNumber(3011, 3997)} INCREMENT BY 3 RESTART;
+    ALTER SEQUENCE "addresses_addressID_seq" START WITH ${randomNumber(311, 397)} INCREMENT BY 3 RESTART;
     `
   )
 

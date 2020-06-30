@@ -58,7 +58,11 @@ const getImages = async (imagesFiltersinput: ImagesFiltersInput): Promise<Image[
 
 const updateImages = async (images: ImagesUpdateInput): Promise<Image> => {
   return dbTrans(async (trx: Knex.Transaction) => {
-    await Promise.all(images.map(async (i) => {
+    return await Promise.all(images.map(async (i) => {
+      await trx('images')
+        .update({ index: Number((`${Date.now()}${i.imageID}`).slice(8)) })
+        .where('imageID', i.imageID)
+
       const [ updatedImage ]: Image[] = await trx('images')
         .update({ index: i.index }, [ '*' ])
         .where('imageID', i.imageID)
@@ -70,22 +74,27 @@ const updateImages = async (images: ImagesUpdateInput): Promise<Image> => {
 }
 
 const deleteImages = async (images: ImagesDeleteInput): Promise<void> => {
+  const imageIDs = images.map((i) => i.imageID)
+
   await dbTrans(async (trx: Knex.Transaction) => {
-    await Promise.all(images.map(async (i) => {
-      const deleteCount = await trx('images')
-        .del()
-        .where('imageID', i.imageID)
+    const deleteCount = await trx('images')
+      .del()
+      .whereIn('imageID', imageIDs)
 
-      if (deleteCount === 0) throw new StatusError(404, 'Not Found')
+    if (deleteCount === 0) throw new StatusError(404, 'Not Found')
 
-      // TODO try async rather than sync
-      const dir = `${imagesBasePath}/images`
-      const files = fs.readdirSync(dir)
+    // TODO try async rather than sync
+    const dir = `${imagesBasePath}/images`
+    const files = fs.readdirSync(dir)
 
-      files.forEach((f) =>
-        f.includes(i.imageID.toString()) && fs.unlinkSync(`${dir}/${f}`)
-      )
-    }))
+    const filesToDelete = new Set()
+
+    files.forEach((f) =>
+      imageIDs.forEach((id) =>
+        f.includes(id.toString()) && filesToDelete.add(f)
+      ))
+
+    filesToDelete.forEach((f) => fs.unlinkSync(`${dir}/${f}`))
   })
 }
 

@@ -126,6 +126,9 @@ const updateInvoice = async (invoiceInput: InvoiceUpdateInput, req: Request): Pr
     const [ updatedInvoice ]: Invoice[] = await trx('invoices')
       .update({
         ...invoiceInput,
+        amount: invoiceInput.amount !== undefined
+          ? invoiceInput.amount * 100
+          : undefined,
         updatedAt: new Date()
       }, [ '*' ])
       .where('invoiceID', req.params.invoiceID)

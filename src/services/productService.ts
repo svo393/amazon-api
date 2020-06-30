@@ -284,6 +284,12 @@ const updateProduct = async (productInput: ProductUpdateInput, req: Request): Pr
   const [ updatedProduct ]: Product[] = await db('products')
     .update({
       ...productInput,
+      price: productInput.price !== undefined
+        ? productInput.price * 100
+        : undefined,
+      listPrice: productInput.listPrice !== undefined
+        ? productInput.listPrice * 100
+        : undefined,
       updatedAt: new Date()
     }, [ '*' ])
     .where('productID', req.params.productID)
