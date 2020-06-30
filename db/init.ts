@@ -13,7 +13,7 @@ export const init = async (): Promise<void> => {
   await db('cartProducts').del()
   await db('productParameters').del()
   await db('parameters').del()
-  await db('groupVariants').del()
+  await db('groupVariations').del()
   await db('images').del()
   await db('answerComments').del()
   await db('answers').del()

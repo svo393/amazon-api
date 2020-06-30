@@ -371,7 +371,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.unique([ 'answerCommentID', 'index' ])
     })
 
-    .createTable('groupVariants', (t) => {
+    .createTable('groupVariations', (t) => {
       t.string('name', 50).notNullable()
       t.string('value', 50).notNullable()
 
@@ -385,7 +385,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .references('products.productID')
         .notNullable()
     })
-    .alterTable('groupVariants', (t) => {
+    .alterTable('groupVariations', (t) => {
       t.primary([ 'groupID', 'productID', 'name' ])
     })
 
@@ -516,7 +516,7 @@ export const down = (knex: Knex): Knex.SchemaBuilder =>
     .dropTableIfExists('cartProducts')
     .dropTableIfExists('productParameters')
     .dropTableIfExists('parameters')
-    .dropTableIfExists('groupVariants')
+    .dropTableIfExists('groupVariations')
     .dropTableIfExists('images')
     .dropTableIfExists('answerComments')
     .dropTableIfExists('answers')

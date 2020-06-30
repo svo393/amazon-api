@@ -119,7 +119,7 @@ export const isImage: CP = ({ name, param }) => {
   return { name, param }
 }
 
-export const isProductParameterOrGroupVariant: CP = ({ name, param }) => {
+export const isProductParameterOrGroupVariation: CP = ({ name, param }) => {
   if (
     !(
       typeof (param.name) === 'string' ||

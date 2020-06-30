@@ -2,7 +2,7 @@ import supertest from 'supertest'
 import app from '../src/app'
 import { apiURLs } from '../src/utils/constants'
 import { db } from '../src/utils/db'
-import { createOneProduct, groupVariantsInDB, loginAs, newGroupVariant, populateUsers, purge } from './testHelper'
+import { createOneProduct, groupVariationsInDB, loginAs, newGroupVariation, populateUsers, purge } from './testHelper'
 
 const api = supertest(app)
 const apiURL = apiURLs.groups
@@ -13,24 +13,24 @@ beforeEach(async () => {
 })
 
 describe('Group adding', () => {
-  test('201 GroupVariant', async () => {
+  test('201 GroupVariation', async () => {
     const { addedProduct, token } = await createOneProduct('admin')
 
-    const groupsAtStart = await groupVariantsInDB()
+    const groupsAtStart = await groupVariationsInDB()
 
     await api
       .post(`${apiURL}/${addedProduct.groupID}/product/${addedProduct.productID}`)
       .set('Cookie', `token=${token}`)
-      .send(newGroupVariant())
+      .send(newGroupVariation())
       .expect(201)
       .expect('Content-Type', /application\/json/)
 
-    const groupsAtEnd = await groupVariantsInDB()
+    const groupsAtEnd = await groupVariationsInDB()
     expect(groupsAtEnd).toHaveLength(groupsAtStart.length + 1)
   })
 })
 
-describe('Group variant updating', () => {
+describe('Group variation updating', () => {
   test('200 if admin or root', async () => {
     const { addedProduct, token } = await createOneProduct('admin')
 
@@ -41,10 +41,10 @@ describe('Group variant updating', () => {
     const { body } = await api
       .put(`${apiURL}/${product.body.groupID}/product/${product.body.productID}/name/${product.body.group[0].name}`)
       .set('Cookie', `token=${token}`)
-      .send({ value: 'Updated Group Variant' })
+      .send({ value: 'Updated Group Variation' })
       .expect(200)
 
-    expect(body.value).toBe('Updated Group Variant')
+    expect(body.value).toBe('Updated Group Variation')
   })
 
   test('403 if not admin or root', async () => {
@@ -58,7 +58,7 @@ describe('Group variant updating', () => {
     await api
       .put(`${apiURL}/${product.body.groupID}/product/${product.body.productID}/name/${product.body.group[0].name}`)
       .set('Cookie', `token=${token}`)
-      .send({ value: 'Updated Group Variant' })
+      .send({ value: 'Updated Group Variation' })
       .expect(403)
   })
 })

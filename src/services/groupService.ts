@@ -1,40 +1,46 @@
 import { Request } from 'express'
-import { GroupVariant, GroupVariantCreateInput, GroupVariantUpdateInput } from '../types'
+import { GroupVariation, GroupVariationCreateInput, GroupVariationUpdateInput } from '../types'
 import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
-const addGroupVariant = async (groupVariantInput: GroupVariantCreateInput, req: Request): Promise<GroupVariant> => {
-  const { rows: [ addedGroupVariant ] }: { rows: GroupVariant[] } = await db.raw(
+const addGroupVariation = async (groupVariationInput: GroupVariationCreateInput, req: Request): Promise<GroupVariation> => {
+  const { rows: [ addedGroupVariation ] }: { rows: GroupVariation[] } = await db.raw(
     `
     ? ON CONFLICT
       DO NOTHING
       RETURNING *;
     `,
-    [ db('groupVariants').insert({
-      ...groupVariantInput,
+    [ db('groupVariations').insert({
+      ...groupVariationInput,
       productID: Number(req.params.productID),
       groupID: Number(req.params.groupID)
     }) ]
   )
 
-  if (addedGroupVariant === undefined) {
+  if (addedGroupVariation === undefined) {
     throw new StatusError(409, 'This product is already added to the group')
   }
-  return addedGroupVariant
+  return addedGroupVariation
 }
 
-const updateGroupVariant = async (groupVariantInput: GroupVariantUpdateInput, req: Request): Promise<GroupVariant> => {
-  const [ updatedGroupVariant ]: GroupVariant[] = await db('groupVariants')
-    .update(groupVariantInput, [ '*' ])
+const getGroupVariations = async (): Promise<Pick<GroupVariation, 'name'>[]> => {
+  return await db<GroupVariation>('groupVariations')
+    .select('name')
+}
+
+const updateGroupVariation = async (groupVariationInput: GroupVariationUpdateInput, req: Request): Promise<GroupVariation> => {
+  const [ updatedGroupVariation ]: GroupVariation[] = await db('groupVariations')
+    .update(groupVariationInput, [ '*' ])
     .where('groupID', req.params.groupID)
     .andWhere('productID', req.params.productID)
     .andWhere('name', req.params.name)
 
-  if (updatedGroupVariant === undefined) throw new StatusError(404, 'Not Found')
-  return updatedGroupVariant
+  if (updatedGroupVariation === undefined) throw new StatusError(404, 'Not Found')
+  return updatedGroupVariation
 }
 
 export default {
-  addGroupVariant,
-  updateGroupVariant
+  addGroupVariation,
+  getGroupVariations,
+  updateGroupVariation
 }

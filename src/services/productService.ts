@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import Knex from 'knex'
 import R from 'ramda'
-import { GroupVariant, Image, Parameter, Product, ProductCreateInput, ProductsFiltersInput, ProductUpdateInput } from '../types'
+import { GroupVariation, Image, Parameter, Product, ProductCreateInput, ProductsFiltersInput, ProductUpdateInput } from '../types'
 import { imagesBasePath } from '../utils/constants'
 import { db, dbTrans } from '../utils/db'
 import getUploadIndex from '../utils/getUploadIndex'
@@ -29,7 +29,7 @@ const getProductsQuery: any = db('products as p')
   .groupBy('p.productID', 'vendorName', 'categoryName')
 
 const addProduct = async (productInput: ProductCreateInput, res: Response): Promise<Product> => {
-  const { variants, parameters, listPrice, price } = productInput
+  const { groupVariations, parameters, listPrice, price } = productInput
   const now = new Date()
 
   return await dbTrans(async (trx: Knex.Transaction) => {
@@ -39,7 +39,7 @@ const addProduct = async (productInput: ProductCreateInput, res: Response): Prom
 
     const [ addedProduct ]: Product[] = await trx('products')
       .insert({
-        ...R.omit([ 'parameters', 'variants' ], productInput),
+        ...R.omit([ 'parameters', 'groupVariations' ], productInput),
         listPrice: listPrice !== undefined
           ? listPrice * 100
           : undefined,
@@ -50,9 +50,9 @@ const addProduct = async (productInput: ProductCreateInput, res: Response): Prom
         groupID
       }, [ '*' ])
 
-    if (variants) {
-      await trx('groupVariants')
-        .insert(variants.map((gv) => ({
+    if (groupVariations) {
+      await trx('groupVariations')
+        .insert(groupVariations.map((gv) => ({
           name: gv.name,
           value: gv.value,
           groupID,
@@ -224,7 +224,7 @@ type ProductData = Omit<ProductListData, 'images'> & {
   listPrice?: number;
   description: string;
   brandSection: string;
-  group: GroupVariant[];
+  group: GroupVariation[];
   images: Image[];
 }
 
@@ -244,7 +244,7 @@ const getProductByID = async (req: Request, res: Response): Promise<ProductData|
       'u.email as userEmail'
     )
     .where('p.productID', req.params.productID)
-    .leftJoin('groupVariants as gv', 'p.groupID', 'gv.groupID')
+    .leftJoin('groupVariations as gv', 'p.groupID', 'gv.groupID')
     .leftJoin('users as u', 'p.userID', 'u.userID')
     .groupBy('userEmail')
 
@@ -260,13 +260,13 @@ const getProductByID = async (req: Request, res: Response): Promise<ProductData|
     ratingCount: parseInt(rawProduct.ratingCount)
   }
 
-  const groupVariants = await db<GroupVariant>('groupVariants')
+  const groupVariations = await db<GroupVariation>('groupVariations')
     .where('groupID', product.groupID)
 
   const images = await db<Image>('images')
     .where('productID', product.productID)
 
-  const fullProduct = { ...product, group: groupVariants, images }
+  const fullProduct = { ...product, group: groupVariations, images }
 
   const role: string | undefined = res.locals.userRole
 

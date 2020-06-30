@@ -1,7 +1,7 @@
 import Router from 'express'
 import groupService from '../services/groupService'
 import questionService from '../services/questionService'
-import { checkGroupVariantUpdate, checkNewGroupVariant } from '../utils/inputValidator'
+import { checkGroupVariationUpdate, checkNewGroupVariation } from '../utils/inputValidator'
 import { isAdmin } from '../utils/middleware'
 
 const router = Router()
@@ -12,15 +12,15 @@ router.get('/:groupID/questions', async (req, res) => {
 })
 
 router.post('/:groupID/product/:productID', isAdmin, async (req, res) => {
-  const groupVariantCreateInput = checkNewGroupVariant(req)
-  const addedGroupVariant = await groupService.addGroupVariant(groupVariantCreateInput, req)
-  res.status(201).json(addedGroupVariant)
+  const groupVariationCreateInput = checkNewGroupVariation(req)
+  const addedGroupVariation = await groupService.addGroupVariation(groupVariationCreateInput, req)
+  res.status(201).json(addedGroupVariation)
 })
 
 router.put('/:groupID/product/:productID/name/:name', isAdmin, async (req, res) => {
-  const groupVariantUpdateInput = checkGroupVariantUpdate(req)
-  const updatedGroupVariant = await groupService.updateGroupVariant(groupVariantUpdateInput, req)
-  res.status(200).json(updatedGroupVariant)
+  const groupVariationUpdateInput = checkGroupVariationUpdate(req)
+  const updatedGroupVariation = await groupService.updateGroupVariation(groupVariationUpdateInput, req)
+  res.status(200).json(updatedGroupVariation)
 })
 
 export default router

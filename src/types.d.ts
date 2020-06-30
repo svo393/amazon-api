@@ -173,7 +173,7 @@ export type AnswerComment = {
   userEmail: string;
 }
 
-export type GroupVariant = {
+export type GroupVariation = {
   name: string;
   value: string;
   groupID: number;
@@ -335,7 +335,7 @@ export type ProductCreateInput = Omit<Product,
     value: string;
   }[];
   groupID?: number;
-  variants?: {
+  groupVariations?: {
     name: string;
     value: string;
   }[];
@@ -419,12 +419,12 @@ export type AnswerCommentUpdateInput = {
   moderationStatus?: string;
 }
 
-export type GroupVariantCreateInput = {
+export type GroupVariationCreateInput = {
   name: string;
   value: string;
 }
 
-export type GroupVariantUpdateInput = Pick<GroupVariant, | 'value'>
+export type GroupVariationUpdateInput = Pick<GroupVariation, | 'value'>
 
 export type ParameterCreateInput = Pick<Parameter, 'name'>[]
 

@@ -9,7 +9,7 @@ export const products: Omit<ProductCreateInput, 'categoryID' | 'vendorID' | 'gro
     brandSection: 'A Modern Design for...',
     stock: 21,
     isAvailable: true,
-    variants: [
+    groupVariations: [
       { name: 'Style', value: 'No Touch Screen' },
       { name: 'Size', value: '12GB / 512GB SSD' }
     ],
