@@ -5,10 +5,15 @@ import { isAdmin } from '../utils/middleware'
 
 const router = Router()
 
-router.post('/', isAdmin, async (req, res) => {
-  const parameterCreateInput = checkNewParameters(req)
-  const addedParameter = await parameterService.addParameters(parameterCreateInput)
-  res.status(201).json(addedParameter)
+router.post('/batch', isAdmin, async (req, res) => {
+  const parametersCreateInput = checkNewParameters(req)
+  const addedParameters = await parameterService.addParameters(parametersCreateInput)
+  res.status(201).json(addedParameters)
+})
+
+router.get('/', async (req, res) => {
+  const parameters = await parameterService.getParameters()
+  res.json(parameters)
 })
 
 router.post('/:parameterID/product/:productID', isAdmin, async (req, res) => {

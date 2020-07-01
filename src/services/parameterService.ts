@@ -1,12 +1,10 @@
 import { Request } from 'express'
-import { FormattedParameters, Parameter, ParameterCreateInput, ParameterUpdateInput, ProductParameter, ProductParameterInput } from '../types'
+import { FormattedParameters, Parameter, ParametersCreateInput, ParameterUpdateInput, ProductParameter, ProductParameterInput } from '../types'
 import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
-const addParameters = async (parameterInput: ParameterCreateInput): Promise<Parameter[]> => {
-  return await db('parameters')
-    .insert(parameterInput, [ '*' ])
-}
+const addParameters = async (parametersInput: ParametersCreateInput): Promise<Parameter[]> =>
+  await db('parameters').insert(parametersInput, [ '*' ])
 
 const addProductParameter = async (productParameterInput: ProductParameterInput, req: Request): Promise<ProductParameter> => {
   const { rows: [ addedProductParameter ] }: { rows: ProductParameter[] } = await db.raw(
@@ -28,8 +26,10 @@ const addProductParameter = async (productParameterInput: ProductParameterInput,
   return addedProductParameter
 }
 
+const getParameters = async (): Promise<Parameter[]> => await db('parameters')
+
 const getParametersByProduct = async (req: Request): Promise<FormattedParameters> => {
-  const parameters = await db('productParameters as pp')
+  const parameters: (ProductParameter & { parameterID: number })[] = await db('productParameters as pp')
     .leftJoin('parameters as p', 'p.parameterID', 'pp.parameterID')
     .where('pp.productID', req.params.productID)
 
@@ -37,7 +37,7 @@ const getParametersByProduct = async (req: Request): Promise<FormattedParameters
     return acc[cur.parameterID]
       ? { ...acc, [cur.parameterID]: [ ...acc[cur.parameterID], cur ] }
       : { ...acc, [cur.parameterID]: [ cur ] }
-  }, {})
+  }, {} as { [ x: number ]: any })
 }
 
 const updateParameter = async (parameterInput: ParameterUpdateInput, req: Request): Promise<Parameter> => {
@@ -52,6 +52,7 @@ const updateParameter = async (parameterInput: ParameterUpdateInput, req: Reques
 export default {
   addParameters,
   addProductParameter,
+  getParameters,
   getParametersByProduct,
   updateParameter
 }
