@@ -331,8 +331,8 @@ export type ProductCreateInput = Omit<Product,
   | 'userID'
 > & {
   parameters?: {
-    name: string;
     value: string;
+    parameterID: number;
   }[];
   groupID?: number;
   groupVariations?: {
