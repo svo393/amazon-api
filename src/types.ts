@@ -426,9 +426,7 @@ export type GroupVariationCreateInput = {
 
 export type GroupVariationUpdateInput = Pick<GroupVariation, | 'value'>
 
-export type ParametersCreateInput = Pick<Parameter, 'name'>[]
-
-export type ParameterUpdateInput = Pick<Parameter, 'name'>
+export type ParameterInput = Pick<Parameter, 'name'>
 
 export type ProductParameterInput = Pick<ProductParameter, 'value'>
 

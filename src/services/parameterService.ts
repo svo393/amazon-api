@@ -1,10 +1,23 @@
 import { Request } from 'express'
-import { FormattedParameters, Parameter, ParametersCreateInput, ParameterUpdateInput, ProductParameter, ProductParameterInput } from '../types'
+import { FormattedParameters, Parameter, ParameterInput, ProductParameter, ProductParameterInput } from '../types'
 import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
-const addParameters = async (parametersInput: ParametersCreateInput): Promise<Parameter[]> =>
-  await db('parameters').insert(parametersInput, [ '*' ])
+const addParameter = async (parameterInput: ParameterInput): Promise<Parameter> => {
+  const { rows: [ addedParameter ] }: { rows: Parameter[] } = await db.raw(
+    `
+    ? ON CONFLICT
+      DO NOTHING
+      RETURNING *;
+    `,
+    [ db('parameters').insert(parameterInput) ]
+  )
+
+  if (addedParameter === undefined) {
+    throw new StatusError(409, `Parameter with name "${parameterInput.name}" already exists`)
+  }
+  return addedParameter
+}
 
 const addProductParameter = async (productParameterInput: ProductParameterInput, req: Request): Promise<ProductParameter> => {
   const { rows: [ addedProductParameter ] }: { rows: ProductParameter[] } = await db.raw(
@@ -40,7 +53,7 @@ const getParametersByProduct = async (req: Request): Promise<FormattedParameters
   }, {} as { [ x: number ]: any })
 }
 
-const updateParameter = async (parameterInput: ParameterUpdateInput, req: Request): Promise<Parameter> => {
+const updateParameter = async (parameterInput: ParameterInput, req: Request): Promise<Parameter> => {
   const [ updatedParameter ]: Parameter[] = await db('parameters')
     .update(parameterInput, [ '*' ])
     .where('parameterID', req.params.parameterID)
@@ -50,7 +63,7 @@ const updateParameter = async (parameterInput: ParameterUpdateInput, req: Reques
 }
 
 export default {
-  addParameters,
+  addParameter,
   addProductParameter,
   getParameters,
   getParametersByProduct,
