@@ -38,8 +38,8 @@ router.post('/:productID/upload', isAdmin, multerUpload.array('productImages', 1
 })
 
 router.get('/:productID/parameters', async (req, res) => {
-  const parameters = await parameterService.getParametersByProduct(req)
-  res.json(parameters)
+  const productParameters = await parameterService.getParametersByProduct(req)
+  res.json(productParameters)
 })
 
 export default router

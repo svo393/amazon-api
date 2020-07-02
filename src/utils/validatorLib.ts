@@ -118,19 +118,3 @@ export const isImage: CP = ({ name, param }) => {
   }
   return { name, param }
 }
-
-export const isProductParameterOrGroupVariation: CP = ({ name, param }) => {
-  if (
-    !(
-      typeof (param.name) === 'string' ||
-      param.name instanceof String
-    ) ||
-    !(
-      typeof (param.value) === 'string' ||
-      param.value instanceof String ||
-      typeof (param.value) === 'number'
-    )
-  ) throw new StatusError(400, `Incorrect ${name}: ${param.name}`)
-
-  return { name, param }
-}

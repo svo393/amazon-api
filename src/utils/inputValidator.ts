@@ -1,7 +1,7 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoriesFiltersInput, CategoryCreateInput, CategoryUpdateInput, FeedFiltersInput, GroupVariationCreateInput, GroupVariationUpdateInput, ImagesDeleteInput, ImagesFiltersInput, ImagesUpdateInput, InvoiceCreateInput, InvoicesFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ModerationStatus, OrderCreateInput, OrderProductCreateInput, OrderProductUpdateInput, OrdersFiltersInput, OrderStatus, OrderUpdateInput, ParameterInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductParameterInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingsFiltersInput, RatingUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorInput, VendorsFiltersInput } from '../types'
-import { canBeBoolean, canBeNumber, hasDefinedProps, isArray, isDate, isEmail, isInputProvided, isNumber, isPasswordValid, isProductParameterOrGroupVariation, isProvided, isString } from './validatorLib'
+import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoriesFiltersInput, CategoryCreateInput, CategoryUpdateInput, FeedFiltersInput, GroupVariationCreateInput, GroupVariationUpdateInput, ImagesDeleteInput, ImagesFiltersInput, ImagesUpdateInput, InvoiceCreateInput, InvoicesFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ModerationStatus, OrderCreateInput, OrderProductCreateInput, OrderProductUpdateInput, OrdersFiltersInput, OrderStatus, OrderUpdateInput, ParameterInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductParametersInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingsFiltersInput, RatingUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorInput, VendorsFiltersInput } from '../types'
+import { canBeBoolean, canBeNumber, hasDefinedProps, isArray, isDate, isEmail, isInputProvided, isNumber, isPasswordValid, isProvided, isString, isStringOrNumber } from './validatorLib'
 
 // TODO implement PARTIAL<t>
 export const checkNewUser = ({ body }: Request): UserSignupInput => {
@@ -166,17 +166,28 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
     ? canBeNumber({ name: 'groupID', param: body.groupID })
     : undefined
 
-  const groupVariations = 'groupVariations' in body
+  let groupVariations = 'groupVariations' in body
     ? isArray({ name: 'groupVariations', param: body.groupVariations })
     : undefined
 
-  groupVariations && groupVariations.param.map((v: any) => isProductParameterOrGroupVariation({ name: 'group', param: v }))
+  // TODO groupVariatons check
+  // groupVariations?.param.forEach((v: any) =>
+  //   isProductParameterOrGroupVariation({ name: 'group', param: v }))
 
-  const parameters = 'parameters' in body
-    ? isArray({ name: 'parameters', param: body.parameters })
+  let productParameters = 'productParameters' in body
+    ? isArray({ name: 'productParameters', param: body.productParameters }).param
     : undefined
 
-  parameters && parameters.param.map((p: any) => isProductParameterOrGroupVariation({ name: 'parameter', param: p }))
+  productParameters = productParameters?.map((i: any) => ({
+    parameterID: R.pipe(
+      isProvided,
+      isNumber
+    )({ name: 'parameterID', param: i.parameterID }).param,
+    value: R.pipe(
+      isProvided,
+      isStringOrNumber
+    )({ name: 'value', param: i.value }).param
+  }))
 
   return {
     title: title.param,
@@ -190,7 +201,7 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
     vendorID: vendorID.param,
     groupID: groupID?.param,
     groupVariations: groupVariations?.param,
-    parameters: parameters?.param
+    productParameters: productParameters?.param
   }
 }
 
@@ -726,15 +737,6 @@ export const checkNewGroupVariation = ({ body }: Request): GroupVariationCreateI
 }
 
 export const checkGroupVariationUpdate = ({ body }: Request): GroupVariationUpdateInput => {
-  const value = R.pipe(
-    isProvided,
-    isString
-  )({ name: 'value', param: body.value })
-
-  return { value: value.param }
-}
-
-export const checkProductParameter = ({ body }: Request): ProductParameterInput => {
   const value = R.pipe(
     isProvided,
     isString

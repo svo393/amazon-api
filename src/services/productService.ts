@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import Knex from 'knex'
 import R from 'ramda'
-import { GroupVariation, Image, Parameter, Product, ProductCreateInput, ProductsFiltersInput, ProductUpdateInput } from '../types'
+import { GroupVariation, Image, Parameter, Product, ProductCreateInput, ProductsFiltersInput, ProductUpdateInput, ProductParametersInput } from '../types'
 import { imagesBasePath } from '../utils/constants'
 import { db, dbTrans } from '../utils/db'
 import getUploadIndex from '../utils/getUploadIndex'
@@ -28,8 +28,8 @@ const getProductsQuery: any = db('products as p')
   .leftJoin('categories as c', 'p.categoryID', 'c.categoryID')
   .groupBy('p.productID', 'vendorName', 'categoryName')
 
-const addProduct = async (productInput: ProductCreateInput, res: Response): Promise<Product> => {
-  const { groupVariations, parameters, listPrice, price } = productInput
+const addProduct = async (productInput: ProductCreateInput, res: Response): Promise<void> => {
+  const { groupVariations, productParameters, listPrice, price } = productInput
   const now = new Date()
 
   return await dbTrans(async (trx: Knex.Transaction) => {
@@ -39,7 +39,7 @@ const addProduct = async (productInput: ProductCreateInput, res: Response): Prom
 
     const [ addedProduct ]: Product[] = await trx('products')
       .insert({
-        ...R.omit([ 'parameters', 'groupVariations' ], productInput),
+        ...R.omit([ 'productParameters', 'groupVariations' ], productInput),
         listPrice: listPrice !== undefined
           ? listPrice * 100
           : undefined,
@@ -50,34 +50,21 @@ const addProduct = async (productInput: ProductCreateInput, res: Response): Prom
         groupID
       }, [ '*' ])
 
-    if (groupVariations) {
-      await trx('groupVariations')
-        .insert(groupVariations.map((gv) => ({
-          name: gv.name,
-          value: gv.value,
-          groupID,
-          productID: addedProduct.productID
-        })), [ '*' ])
-    }
+    // if (groupVariations !== undefined) {
+    //   await trx('groupVariations')
+    //     .insert(groupVariations.map((gv) => ({
+    //       name: gv.name,
+    //       value: gv.value,
+    //       groupID,
+    //       productID: addedProduct.productID
+    //     })), [ '*' ])
+    // }
 
-    if (parameters !== undefined && parameters.length !== 0) {
-      const { rows: addedParameters }: { rows: Parameter[] } = await trx.raw(
-        `? ON CONFLICT ("name")
-           DO UPDATE SET
-           "name" = EXCLUDED."name"
-           RETURNING *;`,
-        [
-          trx('parameters')
-            .insert(parameters.map((p) => ({ name: p.name })))
-        ]
-      )
-
+    if (productParameters !== undefined && productParameters.length !== 0) {
       await trx('productParameters')
-        .insert(parameters.map((pp) => ({
-          value: pp.value,
-          parameterID: (addedParameters.find((p) => p.name === pp.name))?.parameterID,
-          productID: addedProduct.productID
-        })), [ '*' ])
+        .insert(productParameters.map((pp) => (
+          { ...pp, productID: addedProduct.productID }
+        )))
     }
     return addedProduct
   })
@@ -244,7 +231,6 @@ const getProductByID = async (req: Request, res: Response): Promise<ProductData|
       'u.email as userEmail'
     )
     .where('p.productID', req.params.productID)
-    .leftJoin('groupVariations as gv', 'p.groupID', 'gv.groupID')
     .leftJoin('users as u', 'p.userID', 'u.userID')
     .groupBy('userEmail')
 

@@ -4,23 +4,13 @@ export interface ObjIndexed { [key: string]: any }
 // Types from schema in order of creation
 //
 
-export type Role = {
-  roleName: string;
-}
+export type Role = { roleName: string}
 
-export type ShippingMethod = {
-  shippingMethodName: string;
-  isPrivate: boolean;
-}
+export type ShippingMethod = { shippingMethodName: string; isPrivate: boolean}
 
-export type AddressType = {
-  addressTypeName: string;
-  isPrivate: boolean;
-}
+export type AddressType = { addressTypeName: string; isPrivate: boolean}
 
-export type PaymentMethod = {
-  paymentMethodName: string;
-}
+export type PaymentMethod = { paymentMethodName: string}
 
 export type Address = {
   addressID: number;
@@ -41,10 +31,7 @@ export type User = {
   role: string;
 }
 
-export type Follower = {
-  userID: number;
-  follows: number;
-}
+export type Follower = { userID: number; follows: number}
 
 export type UserAddress = {
   isDefault: boolean;
@@ -64,14 +51,9 @@ export type Category = {
   parentCategoryID?: number;
 }
 
-export type Vendor = {
-  vendorID: number;
-  name: string;
-}
+export type Vendor = { vendorID: number; name: string}
 
-export type Group = {
-  groupID: number;
-}
+export type Group = { groupID: number}
 
 export type Product = {
   productID: number;
@@ -102,10 +84,7 @@ export type Image = {
   userID: number;
 }
 
-export type ListProduct = {
-  listID: number;
-  productID: number;
-}
+export type ListProduct = { listID: number; productID: number}
 
 export type Rating = {
   ratingID: number;
@@ -180,10 +159,7 @@ export type GroupVariation = {
   productID: number;
 }
 
-export type Parameter = {
-  parameterID: number;
-  name: string;
-}
+export type Parameter = { parameterID: number; name: string}
 
 export type ProductParameter = {
   value: string;
@@ -197,13 +173,9 @@ export type CartProduct = {
   productID: number;
 }
 
-export type OrderStatus = {
-  orderStatusName: string;
-}
+export type OrderStatus = { orderStatusName: string}
 
-export type ModerationStatus = {
-  moderationStatusName: string;
-}
+export type ModerationStatus = { moderationStatusName: string}
 
 export type Order = {
   orderID: number;
@@ -225,9 +197,7 @@ export type OrderProduct = {
   productID: number;
 }
 
-export type InvoiceStatus = {
-  invoiceStatusName: string;
-}
+export type InvoiceStatus = { invoiceStatusName: string}
 
 export type Invoice = {
   invoiceID: number;
@@ -248,9 +218,7 @@ export type Invoice = {
 
 export type UserSignupInput = Pick<User, 'email' | 'password'>
 
-export type UserLoginInput = UserSignupInput & {
-  remember: boolean;
-}
+export type UserLoginInput = UserSignupInput & { remember: boolean}
 
 export type UserUpdateInput = {
   name?: string;
@@ -263,17 +231,11 @@ export type UserUpdateInput = {
 
 export type PasswordRequestInput = Pick<User, 'email'>
 
-export type PasswordResetInput = {
-  password: string;
-  resetToken: string;
-}
+export type PasswordResetInput = { password: string; resetToken: string}
 
 export type CategoryCreateInput = Pick<Category, 'name' | 'parentCategoryID'>
 
-export type CategoryUpdateInput = {
-  name?: string;
-  parentCategoryID?: number;
-}
+export type CategoryUpdateInput = { name?: string; parentCategoryID?: number}
 
 export type VendorInput = Pick<Vendor, 'name'>
 
@@ -287,34 +249,19 @@ export type UserSafeData = Omit<User,
   | 'resetTokenCreatedAt'
 >
 
-export type AddressTypeInput = {
-  addressTypeName: string;
-  isPrivate?: boolean;
-}
+export type AddressTypeInput = { addressTypeName: string; isPrivate?: boolean}
 
-export type ShippingMethodInput = {
-  shippingMethodName: string;
-  isPrivate?: boolean;
-}
+export type ShippingMethodInput = { shippingMethodName: string; isPrivate?: boolean}
 
 export type AddressCreateInput = Pick<Address, 'addr' | 'addressType'> & {
   isDefault?: boolean;
 }
 
-export type AddressFetchInput = {
-  userID?: number;
-  addressType?: string;
-}
+export type AddressFetchInput = { userID?: number; addressType?: string}
 
-export type AddressUpdateInput = {
-  name?: string;
-  addressType?: string;
-}
+export type AddressUpdateInput = { name?: string; addressType?: string}
 
-export type FollowerFetchInput = {
-  userID?: number;
-  follows?: number;
-}
+export type FollowerFetchInput = { userID?: number; follows?: number}
 
 export type UserAddressCreateInput =
   Pick<UserAddress, 'userID' | 'addressID'> & {
@@ -330,15 +277,9 @@ export type ProductCreateInput = Omit<Product,
   | 'updatedAt'
   | 'userID'
 > & {
-  parameters?: {
-    value: string;
-    parameterID: number;
-  }[];
+  productParameters?: { value: string; parameterID: number }[];
   groupID?: number;
-  groupVariations?: {
-    name: string;
-    value: string;
-  }[];
+  groupVariations?: { name: string; value: string }[];
 }
 
 export type ProductUpdateInput = {
@@ -358,8 +299,6 @@ export type ProductPublicData = Omit<Product,
   | 'updatedAt'
   | 'userID'
 >
-
-export type FormattedParameters = { [parameterID: number]: Parameter & ProductParameter }
 
 export type RatingCreateInput = Pick<Rating,
   | 'title'
@@ -388,25 +327,13 @@ export type RatingCommentUpdateInput = {
   moderationStatus?: string;
 }
 
-export type QuestionCreateInput = Pick<Question,
-  | 'content'
-  | 'groupID'
->
+export type QuestionCreateInput = Pick<Question, | 'content' | 'groupID'>
 
-export type QuestionUpdateInput = {
-  content?: string;
-  moderationStatus?: string;
-}
+export type QuestionUpdateInput = { content?: string; moderationStatus?: string}
 
-export type AnswerCreateInput = Pick<Answer,
-  | 'content'
-  | 'questionID'
->
+export type AnswerCreateInput = Pick<Answer, | 'content' | 'questionID'>
 
-export type AnswerUpdateInput = {
-  content?: string;
-  moderationStatus?: string;
-}
+export type AnswerUpdateInput = { content?: string; moderationStatus?: string}
 
 export type AnswerCommentCreateInput = Pick<AnswerComment,
   | 'content'
@@ -414,21 +341,15 @@ export type AnswerCommentCreateInput = Pick<AnswerComment,
   | 'parentAnswerCommentID'
 >
 
-export type AnswerCommentUpdateInput = {
-  content?: string;
-  moderationStatus?: string;
-}
+export type AnswerCommentUpdateInput = { content?: string; moderationStatus?: string}
 
-export type GroupVariationCreateInput = {
-  name: string;
-  value: string;
-}
+export type GroupVariationCreateInput = { name: string; value: string}
 
 export type GroupVariationUpdateInput = Pick<GroupVariation, | 'value'>
 
 export type ParameterInput = Pick<Parameter, 'name'>
 
-export type ProductParameterInput = Pick<ProductParameter, 'value'>
+export type ProductParametersInput = Pick<ProductParameter, 'value' | 'parameterID'>[]
 
 export type CartProductInput = Pick<CartProduct, 'qty'>
 
@@ -487,13 +408,9 @@ export type InvoicesFiltersInput = {
   userEmail?: string;
 }
 
-export type VendorsFiltersInput = {
-  q?: string;
-}
+export type VendorsFiltersInput = { q?: string}
 
-export type CategoriesFiltersInput = {
-  q?: string;
-}
+export type CategoriesFiltersInput = { q?: string}
 
 export type FeedFiltersInput = {
   types?: string;
@@ -568,15 +485,8 @@ export type OrderProductFullData = Pick<Product,
   | 'qty'
 > & { imageID: number }
 
-export type OrderFullData = Order & {
-  orderProducts: OrderProductFullData[];
-}
+export type OrderFullData = Order & { orderProducts: OrderProductFullData[]}
 
-export type ImagesUpdateInput = {
-  imageID: number;
-  index: number;
-}[]
+export type ImagesUpdateInput = { imageID: number; index: number}[]
 
-export type ImagesDeleteInput = {
-  imageID: number;
-}[]
+export type ImagesDeleteInput = { imageID: number}[]
