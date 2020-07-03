@@ -11,6 +11,11 @@ router.get('/:groupID/questions', async (req, res) => {
   res.json(questions)
 })
 
+router.get('/:groupID/variations', async (req, res) => {
+  const groupVariations = await groupService.getGroupVariationsByGroup(req)
+  res.json(groupVariations)
+})
+
 router.post('/:groupID/product/:productID', isAdmin, async (req, res) => {
   const groupVariationCreateInput = checkNewGroupVariation(req)
   const addedGroupVariation = await groupService.addGroupVariation(groupVariationCreateInput, req)

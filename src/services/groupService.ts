@@ -23,10 +23,9 @@ const addGroupVariation = async (groupVariationInput: GroupVariationCreateInput,
   return addedGroupVariation
 }
 
-const getGroupVariations = async (): Promise<Pick<GroupVariation, 'name'>[]> => {
-  return await db<GroupVariation>('groupVariations')
-    .select('name')
-}
+const getGroupVariationsByGroup = async (req: Request): Promise<GroupVariation[]> =>
+  await db<GroupVariation>('groupVariations')
+    .where('groupID', req.params.groupID)
 
 const updateGroupVariation = async (groupVariationInput: GroupVariationUpdateInput, req: Request): Promise<GroupVariation> => {
   const [ updatedGroupVariation ]: GroupVariation[] = await db('groupVariations')
@@ -41,6 +40,6 @@ const updateGroupVariation = async (groupVariationInput: GroupVariationUpdateInp
 
 export default {
   addGroupVariation,
-  getGroupVariations,
+  getGroupVariationsByGroup,
   updateGroupVariation
 }

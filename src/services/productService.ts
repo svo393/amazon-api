@@ -50,15 +50,15 @@ const addProduct = async (productInput: ProductCreateInput, res: Response): Prom
         groupID
       }, [ '*' ])
 
-    // if (groupVariations !== undefined) {
-    //   await trx('groupVariations')
-    //     .insert(groupVariations.map((gv) => ({
-    //       name: gv.name,
-    //       value: gv.value,
-    //       groupID,
-    //       productID: addedProduct.productID
-    //     })), [ '*' ])
-    // }
+    if (groupVariations !== undefined) {
+      await trx('groupVariations')
+        .insert(groupVariations.map((gv) => ({
+          name: gv.name,
+          value: gv.value,
+          groupID,
+          productID: addedProduct.productID
+        })), [ '*' ])
+    }
 
     if (productParameters !== undefined && productParameters.length !== 0) {
       await trx('productParameters')
