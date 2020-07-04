@@ -1,4 +1,4 @@
-type mappedObj = { [x: string]: string }
+type mappedObj = { [ key: string ]: string }
 
 export default (arr: string[]): mappedObj => {
   let obj: mappedObj = {}
