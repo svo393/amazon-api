@@ -2,7 +2,7 @@ import Router from 'express'
 import parameterService from '../services/parameterService'
 import productService from '../services/productService'
 import { UPLOAD_TIMEOUT } from '../utils/config'
-import { checkMediaUpload, checkNewProduct, checkProductFilters, checkProductUpdate } from '../utils/inputValidator'
+import { checkMediaUpload, checkNewProduct, checkProductMinFilters, checkProductFilters, checkProductUpdate } from '../utils/inputValidator'
 import { isAdmin, multerUpload } from '../utils/middleware'
 
 const router = Router()
@@ -16,6 +16,12 @@ router.post('/', isAdmin, async (req, res) => {
 router.get('/', async (req, res) => {
   const productsFiltersInput = checkProductFilters(req)
   const products = await productService.getProducts(productsFiltersInput)
+  res.json(products)
+})
+
+router.get('/min', async (req, res) => {
+  const productsMinFiltersInput = checkProductMinFilters(req)
+  const products = await productService.getProductsMin(productsMinFiltersInput)
   res.json(products)
 })
 

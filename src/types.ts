@@ -463,6 +463,8 @@ export type ProductsFiltersInput = {
   ratingMax?: number;
 }
 
+export type ProductsMinFiltersInput = { title?: string }
+
 export type UsersFiltersInput = {
   roles?: string;
   createdFrom?: string;

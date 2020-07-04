@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import Knex from 'knex'
 import R from 'ramda'
-import { GroupVariation, Image, Parameter, Product, ProductCreateInput, ProductsFiltersInput, ProductUpdateInput, ProductParametersInput } from '../types'
+import { GroupVariation, Image, Product, ProductCreateInput, ProductsFiltersInput, ProductsMinFiltersInput, ProductUpdateInput } from '../types'
 import { imagesBasePath } from '../utils/constants'
 import { db, dbTrans } from '../utils/db'
 import getUploadIndex from '../utils/getUploadIndex'
@@ -95,7 +95,7 @@ type ProductListData = Omit<ProductListRawData, 'stars' | 'ratingCount'> & {
   }[];
 }
 
-export const getProducts = async (productsFiltersinput: ProductsFiltersInput): Promise<ProductListData[]> => {
+const getProducts = async (productsFiltersinput: ProductsFiltersInput): Promise<ProductListData[]> => {
   const {
     groupID,
     title,
@@ -205,6 +205,41 @@ export const getProducts = async (productsFiltersinput: ProductsFiltersInput): P
         : []
     }
   })
+}
+
+type ProductMinListData = Pick<ProductListData,
+  | 'productID'
+  | 'title'
+  | 'vendorID'
+  | 'categoryID'
+  | 'groupID'
+  | 'vendorName'
+  | 'categoryName'
+>
+
+const getProductsMin = async (productsFiltersinput: ProductsMinFiltersInput): Promise<ProductMinListData[]> => {
+  const { title } = productsFiltersinput
+
+  let products = await db('products as p')
+    .select(
+      'p.productID',
+      'p.title',
+      'p.vendorID',
+      'p.groupID',
+      'p.categoryID',
+      'v.name as vendorName',
+      'c.name as categoryName'
+    )
+    .leftJoin('vendors as v', 'p.vendorID', 'v.vendorID')
+    .leftJoin('categories as c', 'p.categoryID', 'c.categoryID')
+    .groupBy('p.productID', 'vendorName', 'categoryName')
+
+  if (title !== undefined) {
+    products = products
+      .filter((p) => p.title.toLowerCase().includes(title.toLowerCase()))
+  }
+
+  return products
 }
 
 type ProductData = Omit<ProductListData, 'images'> & {
@@ -324,6 +359,7 @@ const uploadProductImages = async (files: Express.Multer.File[], req: Request, r
 export default {
   addProduct,
   getProducts,
+  getProductsMin,
   getProductByID,
   updateProduct,
   uploadProductImages

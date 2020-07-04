@@ -170,24 +170,37 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
     ? isArray({ name: 'groupVariations', param: body.groupVariations })
     : undefined
 
-  // TODO groupVariatons check
-  // groupVariations?.param.forEach((v: any) =>
-  //   isProductParameterOrGroupVariation({ name: 'group', param: v }))
+  groupVariations = {
+    ...groupVariations,
+    param: groupVariations?.param.map((gv: any) => ({
+      name: R.pipe(
+        isProvided,
+        isString
+      )({ name: 'name', param: gv.name }).param,
+      value: R.pipe(
+        isProvided,
+        isStringOrNumber
+      )({ name: 'value', param: gv.value }).param
+    }))
+  }
 
   let productParameters = 'productParameters' in body
-    ? isArray({ name: 'productParameters', param: body.productParameters }).param
+    ? isArray({ name: 'productParameters', param: body.productParameters })
     : undefined
 
-  productParameters = productParameters?.map((i: any) => ({
-    parameterID: R.pipe(
-      isProvided,
-      isNumber
-    )({ name: 'parameterID', param: i.parameterID }).param,
-    value: R.pipe(
-      isProvided,
-      isStringOrNumber
-    )({ name: 'value', param: i.value }).param
-  }))
+  productParameters = {
+    ...productParameters,
+    param: productParameters?.param.map((pp: any) => ({
+      parameterID: R.pipe(
+        isProvided,
+        isNumber
+      )({ name: 'parameterID', param: pp.parameterID }).param,
+      value: R.pipe(
+        isProvided,
+        isStringOrNumber
+      )({ name: 'value', param: pp.value }).param
+    }))
+  }
 
   return {
     title: title.param,
@@ -1164,6 +1177,14 @@ export const checkProductFilters = ({ query }: Request): ProductsFiltersInput =>
     ratingMin: ratingMin?.param,
     ratingMax: ratingMax?.param
   }
+}
+
+export const checkProductMinFilters = ({ query }: Request): ProductsFiltersInput => {
+  const title = 'title' in query
+    ? isString({ name: 'title', param: query.title })
+    : undefined
+
+  return { title: title?.param }
 }
 
 export const checkImagesUpdate = ({ body }: Request): ImagesUpdateInput => {
