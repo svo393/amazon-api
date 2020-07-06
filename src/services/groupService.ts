@@ -1,5 +1,5 @@
 import { Request } from 'express'
-import { GroupVariation, GroupVariationCreateInput, GroupVariationUpdateInput } from '../types'
+import { GroupVariation, GroupVariationCreateInput, GroupVariationDeleteInput, GroupVariationUpdateInput } from '../types'
 import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
@@ -38,8 +38,18 @@ const updateGroupVariation = async (groupVariationInput: GroupVariationUpdateInp
   return updatedGroupVariation
 }
 
+const deleteGroupVariation = async (groupVariationInput: GroupVariationDeleteInput, req: Request): Promise<void> => {
+  const deleteCount = await db('groupVariations')
+    .del()
+    .where('groupID', req.params.groupID)
+    .andWhere('name', groupVariationInput.name)
+
+  if (deleteCount === 0) throw new StatusError(404, 'Not Found')
+}
+
 export default {
   addGroupVariation,
   getGroupVariationsByGroup,
-  updateGroupVariation
+  updateGroupVariation,
+  deleteGroupVariation
 }

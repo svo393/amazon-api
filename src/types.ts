@@ -282,17 +282,8 @@ export type ProductCreateInput = Omit<Product,
   groupVariations?: { name: string; value: string }[];
 }
 
-export type ProductUpdateInput = {
-  title?: string;
-  listPrice?: number;
-  price?: number;
-  description?: string;
-  brandSection?: string;
-  stock?: number;
-  isAvailable?: boolean;
-  categoryID?: number;
-  vendorID?: number;
-}
+export type ProductUpdateInput = Partial<ProductCreateInput> &
+{ groupID: number }
 
 export type ProductPublicData = Omit<Product,
   | 'createdAt'
@@ -346,6 +337,8 @@ export type AnswerCommentUpdateInput = { content?: string; moderationStatus?: st
 export type GroupVariationCreateInput = { name: string; value: string}
 
 export type GroupVariationUpdateInput = Pick<GroupVariation, | 'value'>
+
+export type GroupVariationDeleteInput = Pick<GroupVariation, | 'name'>
 
 export type ParameterInput = Pick<Parameter, 'name'>
 

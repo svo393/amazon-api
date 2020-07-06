@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import Knex from 'knex'
 import R from 'ramda'
-import { GroupVariation, Image, Product, ProductCreateInput, ProductsFiltersInput, ProductsMinFiltersInput, ProductUpdateInput } from '../types'
+import { GroupVariation, Image, Product, ProductCreateInput, ProductsFiltersInput, ProductsMinFiltersInput, ProductUpdateInput, ProductParameter } from '../types'
 import { imagesBasePath } from '../utils/constants'
 import { db, dbTrans } from '../utils/db'
 import getUploadIndex from '../utils/getUploadIndex'
@@ -28,7 +28,7 @@ const getProductsQuery: any = db('products as p')
   .leftJoin('categories as c', 'p.categoryID', 'c.categoryID')
   .groupBy('p.productID', 'vendorName', 'categoryName')
 
-const addProduct = async (productInput: ProductCreateInput, res: Response): Promise<void> => {
+const addProduct = async (productInput: ProductCreateInput, res: Response): Promise<Product> => {
   const { groupVariations, productParameters, listPrice, price } = productInput
   const now = new Date()
 
@@ -50,8 +50,10 @@ const addProduct = async (productInput: ProductCreateInput, res: Response): Prom
         groupID
       }, [ '*' ])
 
+    let addedGroupVariations: GroupVariation[] = []
+
     if (groupVariations !== undefined) {
-      await trx('groupVariations')
+      addedGroupVariations = await trx('groupVariations')
         .insert(groupVariations.map((gv) => ({
           name: gv.name,
           value: gv.value,
@@ -66,7 +68,15 @@ const addProduct = async (productInput: ProductCreateInput, res: Response): Prom
           { ...pp, productID: addedProduct.productID }
         )))
     }
-    return addedProduct
+
+    return {
+      ...addedProduct,
+      price: addedProduct.price / 100,
+      listPrice: addedProduct.listPrice !== undefined
+        ? listPrice / 100
+        : undefined,
+      group: addedGroupVariations
+    }
   })
 }
 
@@ -301,22 +311,110 @@ const getProductByID = async (req: Request, res: Response): Promise<ProductData|
     ], fullProduct)
 }
 
-const updateProduct = async (productInput: ProductUpdateInput, req: Request): Promise<Product> => {
-  const [ updatedProduct ]: Product[] = await db('products')
-    .update({
-      ...productInput,
-      price: productInput.price !== undefined
-        ? productInput.price * 100
-        : undefined,
-      listPrice: productInput.listPrice !== undefined
-        ? productInput.listPrice * 100
-        : undefined,
-      updatedAt: new Date()
-    }, [ '*' ])
-    .where('productID', req.params.productID)
+type GroupVariationMin = Pick<GroupVariation, 'name' | 'value'>
+type ProductParameterMin = Pick<ProductParameter, 'parameterID' | 'value'>
 
-  if (updatedProduct === undefined) throw new StatusError(404, 'Not Found')
-  return updatedProduct
+const updateProduct = async (productInput: ProductUpdateInput, req: Request): Promise<Product> => {
+  const { groupID, groupVariations, productParameters, listPrice, price } = productInput
+  const productID = Number(req.params.productID)
+
+  console.info(groupVariations, productParameters)
+
+  return await dbTrans(async (trx: Knex.Transaction) => {
+    const [ updatedProduct ]: Product[] = await trx('products')
+      .update({
+        ...R.omit([ 'productParameters', 'groupVariations' ], productInput),
+        price: price !== undefined
+          ? price * 100
+          : undefined,
+        listPrice: listPrice !== undefined
+          ? listPrice * 100
+          : undefined,
+        updatedAt: new Date()
+      }, [ '*' ])
+      .where('productID', productID)
+
+    if (updatedProduct === undefined) throw new StatusError(404, 'Not Found')
+
+    let processedGroupVariations: GroupVariation[] = []
+
+    if (groupVariations !== undefined) {
+      const allGroupVariations = await trx<GroupVariation>('groupVariations')
+      let groupVariationsToInsert: GroupVariationMin[] = []
+      let groupVariationsToUpdate: GroupVariationMin[] = []
+
+      groupVariations.forEach((gv) => {
+        allGroupVariations.find((agv) =>
+          agv.groupID === groupID &&
+          agv.name === gv.name &&
+          agv.productID === productID
+            ? groupVariationsToUpdate.push(gv)
+            : groupVariationsToInsert.push(gv)
+        )
+      })
+
+      const addedGroupVariations: GroupVariation[] = await trx('groupVariations')
+        .insert(groupVariationsToInsert.map((gv) => ({
+          name: gv.name,
+          value: gv.value,
+          groupID,
+          productID
+        })), [ '*' ])
+
+      const updatedGroupVariations: GroupVariation[][] = await Promise
+        .all(groupVariationsToUpdate.map(async (gv) =>
+          await trx('groupVariations')
+            .update({ name: gv.name, value: gv.value }, [ '*' ])
+            .where('productID', productID)
+            .andWhere('groupID', groupID)
+            .andWhere('name', gv.name)
+        ))
+
+      processedGroupVariations = [
+        ...addedGroupVariations,
+        ...R.flatten(updatedGroupVariations)
+      ]
+    }
+
+    if (productParameters !== undefined) {
+      const allProductParameters = await trx<ProductParameter>('productParameters')
+      let productParametersToInsert: ProductParameterMin[] = []
+      let productParametersToUpdate: ProductParameterMin[] = []
+
+      productParameters.forEach((pp) => {
+        allProductParameters.find((app) =>
+          app.value === pp.value &&
+          app.productID === productID
+            ? productParametersToUpdate.push(pp)
+            : productParametersToInsert.push(pp)
+        )
+      })
+
+      await trx('productParameters')
+        .insert(productParametersToInsert.map((pp) => ({
+          value: pp.value,
+          parameterID: pp.parameterID,
+          productID
+        })), [ '*' ])
+
+      await Promise
+        .all(productParametersToUpdate.map(async (pp) =>
+          await trx('productParameters')
+            .update({ value: pp.value }, [ '*' ])
+            .where('productID', productID)
+            .andWhere('parameterID', pp.parameterID)
+        ))
+    }
+
+    return {
+      ...updatedProduct,
+      price: updatedProduct.price / 100,
+      listPrice: updatedProduct.listPrice !== undefined
+        ? updatedProduct.listPrice / 100
+        : undefined,
+      group: processedGroupVariations
+    }
+  })
 }
 
 const uploadProductImages = async (files: Express.Multer.File[], req: Request, res: Response): Promise<void> => {

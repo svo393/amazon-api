@@ -1,7 +1,7 @@
 import Router from 'express'
 import groupService from '../services/groupService'
 import questionService from '../services/questionService'
-import { checkGroupVariationUpdate, checkNewGroupVariation } from '../utils/inputValidator'
+import { checkGroupVariationUpdate, checkNewGroupVariation, checkGroupVariationDeletion } from '../utils/inputValidator'
 import { isAdmin } from '../utils/middleware'
 
 const router = Router()
@@ -26,6 +26,12 @@ router.put('/:groupID/product/:productID/name/:name', isAdmin, async (req, res) 
   const groupVariationUpdateInput = checkGroupVariationUpdate(req)
   const updatedGroupVariation = await groupService.updateGroupVariation(groupVariationUpdateInput, req)
   res.status(200).json(updatedGroupVariation)
+})
+
+router.delete('/:groupID/variations', isAdmin, async (req, res) => {
+  const groupVariationDeletionInput = checkGroupVariationDeletion(req)
+  await groupService.deleteGroupVariation(groupVariationDeletionInput, req)
+  res.status(204).end()
 })
 
 export default router

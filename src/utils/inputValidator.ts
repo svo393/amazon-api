@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoriesFiltersInput, CategoryCreateInput, CategoryUpdateInput, FeedFiltersInput, GroupVariationCreateInput, GroupVariationUpdateInput, ImagesDeleteInput, ImagesFiltersInput, ImagesUpdateInput, InvoiceCreateInput, InvoicesFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ModerationStatus, OrderCreateInput, OrderProductCreateInput, OrderProductUpdateInput, OrdersFiltersInput, OrderStatus, OrderUpdateInput, ParameterInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductParametersInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingsFiltersInput, RatingUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorInput, VendorsFiltersInput } from '../types'
+import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoriesFiltersInput, CategoryCreateInput, CategoryUpdateInput, FeedFiltersInput, GroupVariationCreateInput, GroupVariationUpdateInput, ImagesDeleteInput, ImagesFiltersInput, ImagesUpdateInput, InvoiceCreateInput, InvoicesFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ModerationStatus, OrderCreateInput, OrderProductCreateInput, OrderProductUpdateInput, OrdersFiltersInput, OrderStatus, OrderUpdateInput, ParameterInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductParametersInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingsFiltersInput, RatingUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorInput, VendorsFiltersInput, GroupVariationDeleteInput } from '../types'
 import { canBeBoolean, canBeNumber, hasDefinedProps, isArray, isDate, isEmail, isInputProvided, isNumber, isPasswordValid, isProvided, isString, isStringOrNumber } from './validatorLib'
 
 // TODO implement PARTIAL<t>
@@ -255,7 +255,49 @@ export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
     ? canBeNumber({ name: 'vendorID', param: body.vendorID })
     : undefined
 
+  const groupID = R.pipe(
+    isProvided,
+    canBeNumber
+  )({ name: 'groupID', param: body.groupID })
+
+  let groupVariations = 'groupVariations' in body
+    ? isArray({ name: 'groupVariations', param: body.groupVariations })
+    : undefined
+
+  groupVariations = {
+    ...groupVariations,
+    param: groupVariations?.param.map((gv: any) => ({
+      name: R.pipe(
+        isProvided,
+        isString
+      )({ name: 'name', param: gv.name }).param,
+      value: R.pipe(
+        isProvided,
+        isStringOrNumber
+      )({ name: 'value', param: gv.value }).param
+    }))
+  }
+
+  let productParameters = 'productParameters' in body
+    ? isArray({ name: 'productParameters', param: body.productParameters })
+    : undefined
+
+  productParameters = {
+    ...productParameters,
+    param: productParameters?.param.map((pp: any) => ({
+      parameterID: R.pipe(
+        isProvided,
+        isNumber
+      )({ name: 'parameterID', param: pp.parameterID }).param,
+      value: R.pipe(
+        isProvided,
+        isStringOrNumber
+      )({ name: 'value', param: pp.value }).param
+    }))
+  }
+
   return hasDefinedProps<ProductUpdateInput>({
+    groupID: groupID.param,
     title: title?.param,
     listPrice: listPrice?.param,
     price: price?.param,
@@ -264,7 +306,9 @@ export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
     stock: stock?.param,
     isAvailable: isAvailable?.param,
     categoryID: categoryID?.param,
-    vendorID: vendorID?.param
+    vendorID: vendorID?.param,
+    groupVariations: groupVariations?.param,
+    productParameters: productParameters?.param
   })
 }
 
@@ -756,6 +800,15 @@ export const checkGroupVariationUpdate = ({ body }: Request): GroupVariationUpda
   )({ name: 'value', param: body.value })
 
   return { value: value.param }
+}
+
+export const checkGroupVariationDeletion = ({ body }: Request): GroupVariationDeleteInput => {
+  const name = R.pipe(
+    isProvided,
+    isString
+  )({ name: 'name', param: body.name })
+
+  return { name: name.param }
 }
 
 export const checkNewOrder = ({ body }: Request): OrderCreateInput => {

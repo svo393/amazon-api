@@ -56,7 +56,7 @@ const getImages = async (imagesFiltersinput: ImagesFiltersInput): Promise<Image[
   return images
 }
 
-const updateImages = async (images: ImagesUpdateInput): Promise<Image> => {
+const updateImages = async (images: ImagesUpdateInput): Promise<Image[]> => {
   return dbTrans(async (trx: Knex.Transaction) => {
     return await Promise.all(images.map(async (i) => {
       await trx('images')

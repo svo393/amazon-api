@@ -26,7 +26,7 @@ const addProductParameters = async (productParameterInput: ProductParametersInpu
       DO NOTHING
       RETURNING *;
     `,
-    [ db('productParameters').insert(productParameterInput.map((pp) => ({
+    [ await db('productParameters').insert(productParameterInput.map((pp) => ({
       ...pp,
       productID: Number(req.params.productID)
     }))) ]
