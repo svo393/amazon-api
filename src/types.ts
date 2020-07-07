@@ -282,7 +282,7 @@ export type ProductCreateInput = Omit<Product,
   groupVariations?: { name: string; value: string }[];
 }
 
-export type ProductUpdateInput = Partial<ProductCreateInput> &
+export type ProductUpdateInput = ProductCreateInput &
 { groupID: number }
 
 export type ProductPublicData = Omit<Product,

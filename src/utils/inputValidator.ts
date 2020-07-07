@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoriesFiltersInput, CategoryCreateInput, CategoryUpdateInput, FeedFiltersInput, GroupVariationCreateInput, GroupVariationUpdateInput, ImagesDeleteInput, ImagesFiltersInput, ImagesUpdateInput, InvoiceCreateInput, InvoicesFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ModerationStatus, OrderCreateInput, OrderProductCreateInput, OrderProductUpdateInput, OrdersFiltersInput, OrderStatus, OrderUpdateInput, ParameterInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductParametersInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingsFiltersInput, RatingUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorInput, VendorsFiltersInput, GroupVariationDeleteInput } from '../types'
+import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoriesFiltersInput, CategoryCreateInput, CategoryUpdateInput, FeedFiltersInput, GroupVariationCreateInput, GroupVariationDeleteInput, GroupVariationUpdateInput, ImagesDeleteInput, ImagesFiltersInput, ImagesUpdateInput, InvoiceCreateInput, InvoicesFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ModerationStatus, OrderCreateInput, OrderProductCreateInput, OrderProductUpdateInput, OrdersFiltersInput, OrderStatus, OrderUpdateInput, ParameterInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductUpdateInput, ProductsFiltersInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingsFiltersInput, RatingUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorInput, VendorsFiltersInput } from '../types'
 import { canBeBoolean, canBeNumber, hasDefinedProps, isArray, isDate, isEmail, isInputProvided, isNumber, isPasswordValid, isProvided, isString, isStringOrNumber } from './validatorLib'
 
 // TODO implement PARTIAL<t>
@@ -219,41 +219,48 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
 }
 
 export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
-  const title = 'title' in body
-    ? isString({ name: 'title', param: body.title })
-    : undefined
+  const title = R.pipe(
+    isProvided,
+    isString
+  )({ name: 'title', param: body.title })
 
   const listPrice = 'listPrice' in body
     ? canBeNumber({ name: 'listPrice', param: body.listPrice })
     : undefined
 
-  const price = 'price' in body
-    ? canBeNumber({ name: 'price', param: body.price })
-    : undefined
+  const price = R.pipe(
+    isProvided,
+    canBeNumber
+  )({ name: 'price', param: body.price })
 
-  const description = 'description' in body
-    ? isString({ name: 'description', param: body.description })
-    : undefined
+  const description = R.pipe(
+    isProvided,
+    isString
+  )({ name: 'description', param: body.description })
 
   const brandSection = 'brandSection' in body
     ? isString({ name: 'brandSection', param: body.brandSection })
     : undefined
 
-  const stock = 'stock' in body
-    ? canBeNumber({ name: 'stock', param: body.stock })
-    : undefined
+  const stock = R.pipe(
+    isProvided,
+    canBeNumber
+  )({ name: 'stock', param: body.stock })
 
-  const isAvailable = 'isAvailable' in body
-    ? canBeBoolean({ name: 'isAvailable', param: body.isAvailable })
-    : undefined
+  const isAvailable = R.pipe(
+    isProvided,
+    canBeBoolean
+  )({ name: 'isAvailable', param: body.isAvailable })
 
-  const categoryID = 'categoryID' in body
-    ? canBeNumber({ name: 'categoryID', param: body.categoryID })
-    : undefined
+  const categoryID = R.pipe(
+    isProvided,
+    canBeNumber
+  )({ name: 'categoryID', param: body.categoryID })
 
-  const vendorID = 'vendorID' in body
-    ? canBeNumber({ name: 'vendorID', param: body.vendorID })
-    : undefined
+  const vendorID = R.pipe(
+    isProvided,
+    canBeNumber
+  )({ name: 'vendorID', param: body.vendorID })
 
   const groupID = R.pipe(
     isProvided,
@@ -296,20 +303,20 @@ export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
     }))
   }
 
-  return hasDefinedProps<ProductUpdateInput>({
-    groupID: groupID.param,
-    title: title?.param,
+  return {
+    title: title.param,
     listPrice: listPrice?.param,
-    price: price?.param,
-    description: description?.param,
+    price: price.param,
+    description: description.param,
     brandSection: brandSection?.param,
-    stock: stock?.param,
-    isAvailable: isAvailable?.param,
-    categoryID: categoryID?.param,
-    vendorID: vendorID?.param,
+    stock: stock.param,
+    isAvailable: isAvailable.param,
+    categoryID: categoryID.param,
+    vendorID: vendorID.param,
+    groupID: groupID.param,
     groupVariations: groupVariations?.param,
     productParameters: productParameters?.param
-  })
+  }
 }
 
 export const checkMediaUpload = ({ files }: Request): Express.Multer.File[] => {

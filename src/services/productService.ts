@@ -73,7 +73,7 @@ const addProduct = async (productInput: ProductCreateInput, res: Response): Prom
       ...addedProduct,
       price: addedProduct.price / 100,
       listPrice: addedProduct.listPrice !== undefined
-        ? listPrice / 100
+        ? addedProduct.listPrice / 100
         : undefined,
       group: addedGroupVariations
     }
@@ -318,8 +318,6 @@ const updateProduct = async (productInput: ProductUpdateInput, req: Request): Pr
   const { groupID, groupVariations, productParameters, listPrice, price } = productInput
   const productID = Number(req.params.productID)
 
-  console.info(groupVariations, productParameters)
-
   return await dbTrans(async (trx: Knex.Transaction) => {
     const [ updatedProduct ]: Product[] = await trx('products')
       .update({
@@ -340,35 +338,50 @@ const updateProduct = async (productInput: ProductUpdateInput, req: Request): Pr
 
     if (groupVariations !== undefined) {
       const allGroupVariations = await trx<GroupVariation>('groupVariations')
+        .where('groupID', groupID)
+        .andWhere('productID', productID)
+
       let groupVariationsToInsert: GroupVariationMin[] = []
       let groupVariationsToUpdate: GroupVariationMin[] = []
 
+      console.info('allGroupVariations', allGroupVariations)
+
       groupVariations.forEach((gv) => {
-        allGroupVariations.find((agv) =>
+        allGroupVariations.length !== 0 && allGroupVariations.find((agv) =>
           agv.groupID === groupID &&
           agv.name === gv.name &&
           agv.productID === productID
-            ? groupVariationsToUpdate.push(gv)
-            : groupVariationsToInsert.push(gv)
         )
+          ? groupVariationsToUpdate.push(gv)
+          : groupVariationsToInsert.push(gv)
       })
 
-      const addedGroupVariations: GroupVariation[] = await trx('groupVariations')
-        .insert(groupVariationsToInsert.map((gv) => ({
-          name: gv.name,
-          value: gv.value,
-          groupID,
-          productID
-        })), [ '*' ])
+      console.info('groupVariationsToUpdate', groupVariationsToUpdate)
+      console.info('groupVariationsToInsert', groupVariationsToInsert)
 
-      const updatedGroupVariations: GroupVariation[][] = await Promise
-        .all(groupVariationsToUpdate.map(async (gv) =>
-          await trx('groupVariations')
-            .update({ name: gv.name, value: gv.value }, [ '*' ])
-            .where('productID', productID)
-            .andWhere('groupID', groupID)
-            .andWhere('name', gv.name)
-        ))
+      let addedGroupVariations: GroupVariation[] = []
+      let updatedGroupVariations: GroupVariation[][] = []
+
+      if (groupVariationsToInsert.length !== 0) {
+        addedGroupVariations = await trx('groupVariations')
+          .insert(groupVariationsToInsert.map((gv) => ({
+            name: gv.name,
+            value: gv.value,
+            groupID,
+            productID
+          })), [ '*' ])
+      }
+
+      if (groupVariationsToUpdate.length !== 0) {
+        updatedGroupVariations = await Promise
+          .all(groupVariationsToUpdate.map(async (gv) =>
+            await trx('groupVariations')
+              .update({ name: gv.name, value: gv.value }, [ '*' ])
+              .where('productID', productID)
+              .andWhere('groupID', groupID)
+              .andWhere('name', gv.name)
+          ))
+      }
 
       processedGroupVariations = [
         ...addedGroupVariations,
@@ -378,12 +391,14 @@ const updateProduct = async (productInput: ProductUpdateInput, req: Request): Pr
 
     if (productParameters !== undefined) {
       const allProductParameters = await trx<ProductParameter>('productParameters')
+        .andWhere('productID', productID)
+
       let productParametersToInsert: ProductParameterMin[] = []
       let productParametersToUpdate: ProductParameterMin[] = []
 
       productParameters.forEach((pp) => {
         allProductParameters.find((app) =>
-          app.value === pp.value &&
+          app.parameterID === pp.parameterID &&
           app.productID === productID
             ? productParametersToUpdate.push(pp)
             : productParametersToInsert.push(pp)
