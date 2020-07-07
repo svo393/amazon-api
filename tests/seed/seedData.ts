@@ -48,7 +48,7 @@ export const initialProducts = {
             { name: 'Style', value: 'No Touch Screen' },
             { name: 'Size', value: '12GB / 512GB SSD' }
           ],
-          parameters: [
+          productParameters: [
             { name: 'Screen Size', value: '23.8' },
             { name: 'Processor', value: '3.4 GHz Intel Core i5' },
             { name: 'RAM', value: '12 GB DDR4' },
@@ -147,13 +147,13 @@ export const initialProducts = {
             { name: 'Style', value: 'Touch Screen' },
             { name: 'Size', value: '8GB / 1TB HDD' }
           ],
-          parameters: [
+          productParameters: [
             { name: 'Screen Size', value: '23.8' },
             { name: 'Processor', value: '3.4 8032' },
             { name: 'RAM', value: '8 GB DDR4_SDRAM' },
             { name: 'Hard Drive', value: 'mechanical_hard_drive' },
             { name: 'Graphics Coprocessor', value: 'Intel UHD Graphics 630' },
-            { name: 'Card Description ', value: 'Integrated' },
+            { name: 'Card Description', value: 'Integrated' },
             { name: 'Wireless Type', value: '802.11ab' },
             { name: 'Brand Name', value: 'Acer' },
             { name: 'Series', value: 'Z24-890-UR13' },
@@ -180,7 +180,7 @@ export const initialProducts = {
             { name: 'Style', value: 'No Touch Screen' },
             { name: 'Size', value: '8GB / 512GB SSD' }
           ],
-          parameters: [
+          productParameters: [
             { name: 'Screen Size', value: '23.8' },
             { name: 'Processor', value: '3.4 GHz Intel Core i5' },
             { name: 'RAM', value: '8 GB DDR4' },

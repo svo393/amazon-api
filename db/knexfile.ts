@@ -6,7 +6,8 @@ const config = {
       user: 'knex',
       password: '12345678',
       database: 'amazon-api'
-    }
+    },
+    pool: { min: 0, max: 30 } // TODO what is optimum
   },
   production: {
     client: 'pg',

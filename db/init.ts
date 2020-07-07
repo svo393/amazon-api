@@ -1,7 +1,7 @@
 import { addressTypes, invoiceStatuses, lockerAddresses, moderationStatuses, orderStatuses, paymentMethods, roles, shippingMethods } from '../src/utils/constants'
 import { db } from '../src/utils/db'
 
-const randomNumber = (min: number, max: number): number =>
+const randomNumber = (min: number, max: number) =>
   Math.floor(Math.random() * (max - min + 1) + min)
 
 export const init = async (): Promise<void> => {
@@ -21,6 +21,7 @@ export const init = async (): Promise<void> => {
   await db('ratingComments').del()
   await db('ratings').del()
   await db('listProducts').del()
+  await db('productSizes').del()
   await db('products').del()
   await db('groups').del()
   await db('vendors').del()

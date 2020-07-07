@@ -156,6 +156,19 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .notNullable()
     })
 
+    .createTable('productSizes', (t) => {
+      t.integer('name', 50).notNullable()
+      t.integer('qty').unsigned().notNullable()
+
+      t
+        .integer('productID')
+        .references('products.productID')
+        .notNullable()
+    })
+    .alterTable('productSizes', (t) => {
+      t.primary([ 'name', 'productID' ])
+    })
+
     .createTable('listProducts', (t) => {
       t
         .integer('listID')
@@ -524,6 +537,7 @@ export const down = (knex: Knex): Knex.SchemaBuilder =>
     .dropTableIfExists('ratingComments')
     .dropTableIfExists('ratings')
     .dropTableIfExists('listProducts')
+    .dropTableIfExists('productSizes')
     .dropTableIfExists('products')
     .dropTableIfExists('groups')
     .dropTableIfExists('vendors')

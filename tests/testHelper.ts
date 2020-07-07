@@ -1,6 +1,6 @@
 import supertest from 'supertest'
 import app from '../src/app'
-import { Address, AddressCreateInput, AddressType, AddressTypeInput, Answer, AnswerComment, AnswerCommentCreateInput, AnswerCreateInput, CartProduct, Category, CategoryCreateInput, Follower, Group, GroupVariation, GroupVariationCreateInput, Invoice, InvoiceCreateInput, InvoiceStatus, List, ListCreateInput, ListProduct, Order, OrderCreateInput, OrderProduct, OrderProductCreateInput, OrderStatus, Parameter, ParametersCreateInput, PaymentMethod, Product, ProductParameter, ProductPublicData, Question, QuestionCreateInput, Rating, RatingComment, RatingCommentCreateInput, RatingCreateInput, Role, ShippingMethod, ShippingMethodInput, User, UserAddress, Vendor, VendorInput, ModerationStatus } from '../src/types'
+import { Address, AddressCreateInput, AddressType, AddressTypeInput, Answer, AnswerComment, AnswerCommentCreateInput, AnswerCreateInput, CartProduct, Category, CategoryCreateInput, Follower, Group, GroupVariation, GroupVariationCreateInput, Invoice, InvoiceCreateInput, InvoiceStatus, List, ListCreateInput, ListProduct, Order, OrderCreateInput, OrderProduct, OrderProductCreateInput, OrderStatus, Parameter, ParameterInput, PaymentMethod, Product, ProductParameter, ProductPublicData, Question, QuestionCreateInput, Rating, RatingComment, RatingCommentCreateInput, RatingCreateInput, Role, ShippingMethod, ShippingMethodInput, User, UserAddress, Vendor, VendorInput, ModerationStatus } from '../src/types'
 import { apiURLs } from '../src/utils/constants'
 import { db } from '../src/utils/db'
 import { products } from './testProductData'
@@ -486,19 +486,19 @@ export const createOneGroupVariation = async (role: string, name?: string): Prom
   return { addedGroupVariation: body, token }
 }
 
-export const newParameter = (name?: string): ParametersCreateInput => ([ {
+export const newParameter = (name?: string): ParameterInput => ({
   name: name ?? `New Parameter ${(new Date().getTime()).toString()}`
-} ])
+})
 
-export const createOneParameter = async (role: string, name?: string): Promise<{ addedParameter: Parameter; token: string}> => {
-  const { token } = await loginAs(role)
+export const createOneParameter = async (role: string, name?: string, token?: string): Promise<{ addedParameter: Parameter; token: string}> => {
+  if (token === undefined) token = (await loginAs(role)).token
 
   const { body } = await api
     .post(apiURLs.parameters)
     .set('Cookie', `token=${token}`)
     .send(newParameter(name))
 
-  return { addedParameter: body[0], token }
+  return { addedParameter: body, token }
 }
 
 export const newProductParameter = (parameterID: number, productID: number, value?: string): ProductParameter => ({

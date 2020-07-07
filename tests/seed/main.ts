@@ -5,7 +5,7 @@ import app from '../../src/app'
 import { Answer, AnswerComment, CartProduct, Invoice, List, Order, Product, Question, Rating, RatingComment } from '../../src/types'
 import { apiURLs } from '../../src/utils/constants'
 import { db } from '../../src/utils/db'
-import { createOneCategory, createOneVendor, loginAs, populateUsers, purge } from '../testHelper'
+import { createOneCategory, createOneVendor, loginAs, populateUsers, purge, createOneParameter } from '../testHelper'
 import { initialProducts, initialUsers } from './seedData'
 
 const api = supertest(app)
@@ -77,6 +77,17 @@ const seed = async (): Promise<void> => {
       .set('Cookie', `token=${users[1].token}`)
       .send({ userID: users[0].userID, follows: users[3].userID })
 
+    const allProductParameterNames = new Set<string>()
+
+    Object.entries(initialProducts.Desktops.Acer[0])
+      .forEach((ip) => ip[1].productParameters
+        .forEach((pp) => allProductParameterNames.add(pp.name)))
+
+    const parameters = await Promise.all(Array.from(allProductParameterNames).map(async (pp) => {
+      const { addedParameter } = await createOneParameter('admin', pp, adminToken)
+      return [ addedParameter.name, addedParameter.parameterID ]
+    }))
+
     const products = R.flatten(await Promise.all(Object.entries(initialProducts).map(async (c) => {
       const { token, userID } = await loginAs('admin')
       const { addedCategory } = await createOneCategory('admin', c[0])
@@ -91,10 +102,19 @@ const seed = async (): Promise<void> => {
             .post(apiURLs.products)
             .set('Cookie', `token=${token}`)
             .send({
-              ...R.omit([ 'ratings', 'questions', 'media' ], g[1][0]),
+              ...R.omit([
+                'ratings',
+                'questions',
+                'media',
+                'productParameters'
+              ], g[1][0]),
               userID,
               categoryID: addedCategory.categoryID,
-              vendorID: addedVendor.vendorID
+              vendorID: addedVendor.vendorID,
+              productParameters: g[1][0].productParameters.map((pp) => {
+                const parameter: any = parameters.find((p) => p[0] === pp.name)
+                return { parameterID: parameter[1], value: pp.value }
+              })
             })
           bodies.push(body)
           const groupID = body.groupID
@@ -105,11 +125,22 @@ const seed = async (): Promise<void> => {
                 .post(apiURLs.products)
                 .set('Cookie', `token=${token}`)
                 .send({
-                  ...R.omit([ 'ratings', 'questions', 'media' ], p),
+                  ...R.omit([
+                    'ratings',
+                    'questions',
+                    'media',
+                    'productParameters'
+                  ], p),
                   userID,
                   categoryID: addedCategory.categoryID,
                   vendorID: addedVendor.vendorID,
-                  groupID
+                  groupID,
+                  productParameters: p.productParameters.map((pp) => {
+                    const parameter: any = parameters.find((par) => {
+                      return par[0] === pp.name
+                    })
+                    return { parameterID: parameter[1], value: pp.value }
+                  })
                 })
               body = result.body
             }
