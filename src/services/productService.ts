@@ -344,8 +344,6 @@ const updateProduct = async (productInput: ProductUpdateInput, req: Request): Pr
       let groupVariationsToInsert: GroupVariationMin[] = []
       let groupVariationsToUpdate: GroupVariationMin[] = []
 
-      console.info('allGroupVariations', allGroupVariations)
-
       groupVariations.forEach((gv) => {
         allGroupVariations.length !== 0 && allGroupVariations.find((agv) =>
           agv.groupID === groupID &&
@@ -355,9 +353,6 @@ const updateProduct = async (productInput: ProductUpdateInput, req: Request): Pr
           ? groupVariationsToUpdate.push(gv)
           : groupVariationsToInsert.push(gv)
       })
-
-      console.info('groupVariationsToUpdate', groupVariationsToUpdate)
-      console.info('groupVariationsToInsert', groupVariationsToInsert)
 
       let addedGroupVariations: GroupVariation[] = []
       let updatedGroupVariations: GroupVariation[][] = []
@@ -389,20 +384,35 @@ const updateProduct = async (productInput: ProductUpdateInput, req: Request): Pr
       ]
     }
 
-    if (productParameters !== undefined) {
-      const allProductParameters = await trx<ProductParameter>('productParameters')
-        .andWhere('productID', productID)
+    const allProductParameters = await trx<ProductParameter>('productParameters')
+      .andWhere('productID', productID)
+    let productParametersToDelete: number[] = []
 
+    allProductParameters.forEach((app) => {
+      !productParameters?.find((pp) => pp.parameterID === app.parameterID) &&
+          productParametersToDelete.push(app.parameterID)
+    })
+
+    console.info('productParameters', productParameters)
+    console.info('allProductParameters', allProductParameters)
+    console.info('productParametersToDelete', productParametersToDelete)
+
+    await trx('productParameters')
+      .del()
+      .whereIn('parameterID', productParametersToDelete)
+      .andWhere('productID', productID)
+
+    if (productParameters !== undefined) {
       let productParametersToInsert: ProductParameterMin[] = []
       let productParametersToUpdate: ProductParameterMin[] = []
 
       productParameters.forEach((pp) => {
-        allProductParameters.find((app) =>
+        allProductParameters.length !== 0 && allProductParameters.find((app) =>
           app.parameterID === pp.parameterID &&
           app.productID === productID
-            ? productParametersToUpdate.push(pp)
-            : productParametersToInsert.push(pp)
         )
+          ? productParametersToUpdate.push(pp)
+          : productParametersToInsert.push(pp)
       })
 
       await trx('productParameters')
