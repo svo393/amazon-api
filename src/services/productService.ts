@@ -393,10 +393,6 @@ const updateProduct = async (productInput: ProductUpdateInput, req: Request): Pr
           productParametersToDelete.push(app.parameterID)
     })
 
-    console.info('productParameters', productParameters)
-    console.info('allProductParameters', allProductParameters)
-    console.info('productParametersToDelete', productParametersToDelete)
-
     await trx('productParameters')
       .del()
       .whereIn('parameterID', productParametersToDelete)
