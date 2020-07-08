@@ -130,7 +130,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.integer('price').notNullable().unsigned()
       t.string('description', 65535).notNullable()
       t.string('brandSection', 65535)
-      t.integer('stock').notNullable().unsigned()
+      t.integer('stock').unsigned()
       t.dateTime('createdAt').notNullable()
       t.dateTime('updatedAt').notNullable()
       t.boolean('isAvailable').defaultTo(true).notNullable()
@@ -157,7 +157,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
     })
 
     .createTable('productSizes', (t) => {
-      t.integer('name', 50).notNullable()
+      t.string('name', 50).notNullable()
       t.integer('qty').unsigned().notNullable()
 
       t

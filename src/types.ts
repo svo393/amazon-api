@@ -62,7 +62,7 @@ export type Product = {
   price: number;
   description: string;
   brandSection?: string;
-  stock: number;
+  stock: number | null;
   createdAt: Date;
   updatedAt: Date;
   isAvailable: boolean;

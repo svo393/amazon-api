@@ -37,9 +37,11 @@ const addProduct = async (productInput: ProductCreateInput, res: Response): Prom
       ? productInput.groupID
       : (await trx('groups').insert({}, [ '*' ]))[0].groupID
 
+    productSizes !== undefined && delete productInput.stock
+
     const [ addedProduct ]: Product[] = await trx('products')
       .insert({
-        ...R.omit([ 'productParameters', 'groupVariations' ], productInput),
+        ...R.omit([ 'productParameters', 'groupVariations', 'productSizes' ], productInput),
         listPrice: listPrice !== undefined
           ? listPrice * 100
           : undefined,
@@ -115,6 +117,7 @@ type ProductListData = Omit<ProductListRawData, 'stars' | 'ratingCount'> & {
     imageID: number;
     index: number;
   }[];
+  productSizesSum: number | null;
 }
 
 const getProducts = async (productsFiltersinput: ProductsFiltersInput): Promise<ProductListData[]> => {
@@ -140,14 +143,24 @@ const getProducts = async (productsFiltersinput: ProductsFiltersInput): Promise<
   const images = await db<Image>('images')
     .whereNotNull('productID')
 
+  const productSizes: { productID: number; sum: string }[] = await db('productSizes')
+    .select('productID')
+    .sum('qty')
+    .groupBy('productID')
+
   let products
 
-  products = rawProducts.map((p) => ({
-    ...p,
-    price: p.price / 100,
-    stars: parseFloat(p.stars),
-    ratingCount: parseInt(p.ratingCount)
-  }))
+  products = rawProducts.map((p) => {
+    const sizes = productSizes.find((ps) => ps.productID === p.productID)
+
+    return {
+      ...p,
+      price: p.price / 100,
+      stars: parseFloat(p.stars),
+      ratingCount: parseInt(p.ratingCount),
+      productSizesSum: sizes !== undefined ? parseInt(sizes.sum) : null
+    }
+  })
 
   if (groupID !== undefined) {
     products = products
@@ -181,12 +194,20 @@ const getProducts = async (productsFiltersinput: ProductsFiltersInput): Promise<
 
   if (stockMin !== undefined) {
     products = products
-      .filter((p) => p.stock >= stockMin)
+      .filter((p) =>
+        p.stock != null
+          ? p.stock >= stockMin
+          : p.productSizesSum !== null && p.productSizesSum >= stockMin
+      )
   }
 
   if (stockMax !== undefined) {
     products = products
-      .filter((p) => p.stock <= stockMax)
+      .filter((p) =>
+        p.stock != null
+          ? p.stock <= stockMax
+          : p.productSizesSum !== null && p.productSizesSum <= stockMax
+      )
   }
 
   if (isAvailable !== undefined) {
@@ -269,6 +290,7 @@ type ProductLimitedData = Omit<ProductListData, 'images'> & {
   description: string;
   brandSection: string;
   group: GroupVariation[];
+  productSizes: ProductSize[];
   images: Image[];
 }
 
@@ -309,7 +331,15 @@ const getProductByID = async (req: Request, res: Response): Promise<ProductLimit
   const images = await db<Image>('images')
     .where('productID', product.productID)
 
-  const fullProduct = { ...product, group: groupVariations, images }
+  const productSizes = await db<ProductSize>('productSizes')
+    .where('productID', product.productID)
+
+  const fullProduct = {
+    ...product,
+    group: groupVariations,
+    images,
+    productSizes
+  }
 
   const role: string | undefined = res.locals.userRole
 
