@@ -54,17 +54,6 @@ export const isString: CP = ({ name, param }) => {
   return { name, param: param.trim() }
 }
 
-export const isStringOrNumber: CP = ({ name, param }) => {
-  if (
-    typeof (param) !== 'string' &&
-    !(param instanceof String) &&
-    typeof (param) !== 'number'
-  ) {
-    throw new StatusError(400, `Incorrect ${name}: ${param}`)
-  }
-  return { name, param: typeof (param) === 'number' ? param : param.trim() }
-}
-
 export const isArray: CP = ({ name, param }) => {
   if (!Array.isArray(param)) {
     throw new StatusError(400, `Incorrect ${name}: ${param}`)

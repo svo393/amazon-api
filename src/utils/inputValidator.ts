@@ -1,7 +1,7 @@
 import { Request } from 'express'
 import R from 'ramda'
 import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoriesFiltersInput, CategoryCreateInput, CategoryUpdateInput, FeedFiltersInput, GroupVariationCreateInput, GroupVariationDeleteInput, GroupVariationUpdateInput, ImagesDeleteInput, ImagesFiltersInput, ImagesUpdateInput, InvoiceCreateInput, InvoicesFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ModerationStatus, OrderCreateInput, OrderProductCreateInput, OrderProductUpdateInput, OrdersFiltersInput, OrderStatus, OrderUpdateInput, ParameterInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingsFiltersInput, RatingUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorInput, VendorsFiltersInput } from '../types'
-import { canBeBoolean, canBeNumber, hasDefinedProps, isArray, isDate, isEmail, isInputProvided, isNumber, isPasswordValid, isProvided, isSomeProvided, isString, isStringOrNumber } from './validatorLib'
+import { canBeBoolean, canBeNumber, hasDefinedProps, isArray, isDate, isEmail, isInputProvided, isNumber, isPasswordValid, isProvided, isSomeProvided, isString } from './validatorLib'
 
 // TODO implement PARTIAL<t>
 export const checkNewUser = ({ body }: Request): UserSignupInput => {
@@ -147,7 +147,7 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
     : undefined
 
   let productSizes = 'productSizes' in body
-    ? canBeNumber({ name: 'productSizes', param: body.productSizes })
+    ? isArray({ name: 'productSizes', param: body.productSizes })
     : undefined
 
   productSizes = {
@@ -159,7 +159,7 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
       )({ name: 'name', param: pp.name }).param,
       qty: R.pipe(
         isProvided,
-        isNumber
+        canBeNumber
       )({ name: 'qty', param: pp.qty }).param
     }))
   }
@@ -201,7 +201,7 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
       )({ name: 'name', param: gv.name }).param,
       value: R.pipe(
         isProvided,
-        isStringOrNumber
+        canBeNumber
       )({ name: 'value', param: gv.value }).param
     }))
   }
@@ -219,7 +219,7 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
       )({ name: 'parameterID', param: pp.parameterID }).param,
       value: R.pipe(
         isProvided,
-        isStringOrNumber
+        canBeNumber
       )({ name: 'value', param: pp.value }).param
     }))
   }
@@ -270,7 +270,7 @@ export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
     : undefined
 
   let productSizes = 'productSizes' in body
-    ? canBeNumber({ name: 'productSizes', param: body.productSizes })
+    ? isArray({ name: 'productSizes', param: body.productSizes })
     : undefined
 
   productSizes = {
@@ -282,7 +282,7 @@ export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
       )({ name: 'name', param: pp.name }).param,
       qty: R.pipe(
         isProvided,
-        isNumber
+        canBeNumber
       )({ name: 'qty', param: pp.qty }).param
     }))
   }
@@ -325,7 +325,7 @@ export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
       )({ name: 'name', param: gv.name }).param,
       value: R.pipe(
         isProvided,
-        isStringOrNumber
+        canBeNumber
       )({ name: 'value', param: gv.value }).param
     }))
   }
@@ -343,7 +343,7 @@ export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
       )({ name: 'parameterID', param: pp.parameterID }).param,
       value: R.pipe(
         isProvided,
-        isStringOrNumber
+        canBeNumber
       )({ name: 'value', param: pp.value }).param
     }))
   }
