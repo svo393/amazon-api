@@ -212,6 +212,8 @@ export type Invoice = {
   paymentMethod: string;
 }
 
+export type ProductSize = { name: string; qty: number; productID: number }
+
 //
 // Derivative types
 //
@@ -276,7 +278,10 @@ export type ProductCreateInput = Omit<Product,
   | 'createdAt'
   | 'updatedAt'
   | 'userID'
+  | 'stock'
 > & {
+  stock?: number;
+  productSizes?: { name: string; qty: number }[];
   productParameters?: { value: string; parameterID: number }[];
   groupID?: number;
   groupVariations?: { name: string; value: string }[];
@@ -285,7 +290,12 @@ export type ProductCreateInput = Omit<Product,
 export type ProductUpdateInput = ProductCreateInput &
 { groupID: number }
 
-export type ProductPublicData = Omit<Product,
+export type ProductData = Product & {
+  group: GroupVariation[];
+  productSize: ProductSize[];
+}
+
+export type ProductPublicData = Omit<ProductData,
   | 'createdAt'
   | 'updatedAt'
   | 'userID'

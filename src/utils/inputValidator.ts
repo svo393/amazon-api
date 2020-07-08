@@ -1,7 +1,7 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoriesFiltersInput, CategoryCreateInput, CategoryUpdateInput, FeedFiltersInput, GroupVariationCreateInput, GroupVariationDeleteInput, GroupVariationUpdateInput, ImagesDeleteInput, ImagesFiltersInput, ImagesUpdateInput, InvoiceCreateInput, InvoicesFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ModerationStatus, OrderCreateInput, OrderProductCreateInput, OrderProductUpdateInput, OrdersFiltersInput, OrderStatus, OrderUpdateInput, ParameterInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductUpdateInput, ProductsFiltersInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingsFiltersInput, RatingUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorInput, VendorsFiltersInput } from '../types'
-import { canBeBoolean, canBeNumber, hasDefinedProps, isArray, isDate, isEmail, isInputProvided, isNumber, isPasswordValid, isProvided, isString, isStringOrNumber } from './validatorLib'
+import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoriesFiltersInput, CategoryCreateInput, CategoryUpdateInput, FeedFiltersInput, GroupVariationCreateInput, GroupVariationDeleteInput, GroupVariationUpdateInput, ImagesDeleteInput, ImagesFiltersInput, ImagesUpdateInput, InvoiceCreateInput, InvoicesFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ModerationStatus, OrderCreateInput, OrderProductCreateInput, OrderProductUpdateInput, OrdersFiltersInput, OrderStatus, OrderUpdateInput, ParameterInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingsFiltersInput, RatingUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorInput, VendorsFiltersInput } from '../types'
+import { canBeBoolean, canBeNumber, hasDefinedProps, isArray, isDate, isEmail, isInputProvided, isNumber, isPasswordValid, isProvided, isSomeProvided, isString, isStringOrNumber } from './validatorLib'
 
 // TODO implement PARTIAL<t>
 export const checkNewUser = ({ body }: Request): UserSignupInput => {
@@ -142,10 +142,32 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
     ? isString({ name: 'brandSection', param: body.brandSection })
     : undefined
 
-  const stock = R.pipe(
-    isProvided,
-    canBeNumber
-  )({ name: 'stock', param: body.stock })
+  const stock = 'stock' in body
+    ? canBeNumber({ name: 'stock', param: body.stock })
+    : undefined
+
+  let productSizes = 'productSizes' in body
+    ? canBeNumber({ name: 'productSizes', param: body.productSizes })
+    : undefined
+
+  productSizes = {
+    ...productSizes,
+    param: productSizes?.param.map((pp: any) => ({
+      name: R.pipe(
+        isProvided,
+        isString
+      )({ name: 'name', param: pp.name }).param,
+      qty: R.pipe(
+        isProvided,
+        isNumber
+      )({ name: 'qty', param: pp.qty }).param
+    }))
+  }
+
+  isSomeProvided({
+    input: [ stock, productSizes ],
+    names: [ 'stock', 'productSizes' ]
+  })
 
   const isAvailable = R.pipe(
     isProvided,
@@ -208,7 +230,8 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
     price: price.param,
     description: description.param,
     brandSection: brandSection?.param,
-    stock: stock.param,
+    stock: stock?.param,
+    productSizes: productSizes?.param,
     isAvailable: isAvailable.param,
     categoryID: categoryID.param,
     vendorID: vendorID.param,
@@ -242,10 +265,32 @@ export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
     ? isString({ name: 'brandSection', param: body.brandSection })
     : undefined
 
-  const stock = R.pipe(
-    isProvided,
-    canBeNumber
-  )({ name: 'stock', param: body.stock })
+  const stock = 'stock' in body
+    ? canBeNumber({ name: 'stock', param: body.stock })
+    : undefined
+
+  let productSizes = 'productSizes' in body
+    ? canBeNumber({ name: 'productSizes', param: body.productSizes })
+    : undefined
+
+  productSizes = {
+    ...productSizes,
+    param: productSizes?.param.map((pp: any) => ({
+      name: R.pipe(
+        isProvided,
+        isString
+      )({ name: 'name', param: pp.name }).param,
+      qty: R.pipe(
+        isProvided,
+        isNumber
+      )({ name: 'qty', param: pp.qty }).param
+    }))
+  }
+
+  isSomeProvided({
+    input: [ stock, productSizes ],
+    names: [ 'stock', 'productSizes' ]
+  })
 
   const isAvailable = R.pipe(
     isProvided,
@@ -309,7 +354,8 @@ export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
     price: price.param,
     description: description.param,
     brandSection: brandSection?.param,
-    stock: stock.param,
+    stock: stock?.param,
+    productSizes: productSizes?.param,
     isAvailable: isAvailable.param,
     categoryID: categoryID.param,
     vendorID: vendorID.param,

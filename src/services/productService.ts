@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import Knex from 'knex'
 import R from 'ramda'
-import { GroupVariation, Image, Product, ProductCreateInput, ProductsFiltersInput, ProductsMinFiltersInput, ProductUpdateInput, ProductParameter } from '../types'
+import { GroupVariation, Image, Product, ProductCreateInput, ProductsFiltersInput, ProductsMinFiltersInput, ProductUpdateInput, ProductParameter, ProductData, ProductSize } from '../types'
 import { imagesBasePath } from '../utils/constants'
 import { db, dbTrans } from '../utils/db'
 import getUploadIndex from '../utils/getUploadIndex'
@@ -28,8 +28,8 @@ const getProductsQuery: any = db('products as p')
   .leftJoin('categories as c', 'p.categoryID', 'c.categoryID')
   .groupBy('p.productID', 'vendorName', 'categoryName')
 
-const addProduct = async (productInput: ProductCreateInput, res: Response): Promise<Product> => {
-  const { groupVariations, productParameters, listPrice, price } = productInput
+const addProduct = async (productInput: ProductCreateInput, res: Response): Promise<ProductData> => {
+  const { productSizes, groupVariations, productParameters, listPrice, price } = productInput
   const now = new Date()
 
   return await dbTrans(async (trx: Knex.Transaction) => {
@@ -49,6 +49,17 @@ const addProduct = async (productInput: ProductCreateInput, res: Response): Prom
         updatedAt: now,
         groupID
       }, [ '*' ])
+
+    let addedProductSizes: ProductSize[] = []
+
+    if (productSizes !== undefined) {
+      addedProductSizes = await trx('productSizes')
+        .insert(productSizes.map((ps) => ({
+          name: ps.name,
+          qty: ps.qty,
+          productID: addedProduct.productID
+        })), [ '*' ])
+    }
 
     let addedGroupVariations: GroupVariation[] = []
 
@@ -75,7 +86,8 @@ const addProduct = async (productInput: ProductCreateInput, res: Response): Prom
       listPrice: addedProduct.listPrice !== undefined
         ? addedProduct.listPrice / 100
         : undefined,
-      group: addedGroupVariations
+      group: addedGroupVariations,
+      productSizes: addedProductSizes
     }
   })
 }
@@ -252,7 +264,7 @@ const getProductsMin = async (productsFiltersinput: ProductsMinFiltersInput): Pr
   return products
 }
 
-type ProductData = Omit<ProductListData, 'images'> & {
+type ProductLimitedData = Omit<ProductListData, 'images'> & {
   listPrice?: number;
   description: string;
   brandSection: string;
@@ -260,9 +272,9 @@ type ProductData = Omit<ProductListData, 'images'> & {
   images: Image[];
 }
 
-type ProductAllData = ProductData & Pick<Product, 'createdAt' | 'updatedAt' | 'userID' | 'listPrice'> & { userEmail: string }
+type ProductAllData = ProductLimitedData & Pick<ProductData, 'createdAt' | 'updatedAt' | 'userID' | 'listPrice'> & { userEmail: string }
 
-const getProductByID = async (req: Request, res: Response): Promise<ProductData| ProductAllData> => {
+const getProductByID = async (req: Request, res: Response): Promise<ProductLimitedData| ProductAllData> => {
   const rawProduct: Omit<ProductAllData, 'stars' | 'ratingCount'> & { stars: string; ratingCount: string } = await getProductsQuery.clone()
     .first(
       'p.listPrice',
@@ -314,7 +326,7 @@ const getProductByID = async (req: Request, res: Response): Promise<ProductData|
 type GroupVariationMin = Pick<GroupVariation, 'name' | 'value'>
 type ProductParameterMin = Pick<ProductParameter, 'parameterID' | 'value'>
 
-const updateProduct = async (productInput: ProductUpdateInput, req: Request): Promise<Product> => {
+const updateProduct = async (productInput: ProductUpdateInput, req: Request): Promise<ProductData> => {
   const { groupID, groupVariations, productParameters, listPrice, price } = productInput
   const productID = Number(req.params.productID)
 

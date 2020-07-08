@@ -9,6 +9,21 @@ type CP = (params: {
   param: any;
 }
 
+type isSomeProvided = {
+  input: ({ name?: string; param: any } | undefined)[];
+  names: string[];
+}
+
+export const isSomeProvided = ({ input, names }: isSomeProvided) => {
+  const check = input.map((a) => a !== undefined)
+
+  if (check.length === 0) {
+    throw new StatusError(400,
+      `Missing one of these parameters: "${names.join('", "')}"`
+    )
+  }
+}
+
 export const isProvided: CP = ({ name, param }) => {
   if (param === undefined) {
     throw new StatusError(400, `Missing ${name}`)
