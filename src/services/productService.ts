@@ -355,15 +355,16 @@ const getProductByID = async (req: Request, res: Response): Promise<ProductLimit
 
 type GroupVariationMin = Pick<GroupVariation, 'name' | 'value'>
 type ProductParameterMin = Pick<ProductParameter, 'parameterID' | 'value'>
+type ProductSizeMin = Pick<ProductSize, 'name' | 'qty'>
 
 const updateProduct = async (productInput: ProductUpdateInput, req: Request): Promise<ProductData> => {
-  const { groupID, groupVariations, productParameters, listPrice, price } = productInput
+  const { productSizes, groupID, groupVariations, productParameters, listPrice, price } = productInput
   const productID = Number(req.params.productID)
 
   return await dbTrans(async (trx: Knex.Transaction) => {
     const [ updatedProduct ]: Product[] = await trx('products')
       .update({
-        ...R.omit([ 'productParameters', 'groupVariations' ], productInput),
+        ...R.omit([ 'productParameters', 'groupVariations', 'productSizes' ], productInput),
         price: price !== undefined
           ? price * 100
           : undefined,
@@ -375,6 +376,65 @@ const updateProduct = async (productInput: ProductUpdateInput, req: Request): Pr
       .where('productID', productID)
 
     if (updatedProduct === undefined) throw new StatusError(404, 'Not Found')
+
+    let processedProductSizes: ProductSize[] = []
+
+    if (productSizes !== undefined) {
+      const allProductSizes = await trx<ProductSize>('productSizes')
+        .where('productID', productID)
+
+      let productSizesToDelete: string[] = []
+
+      allProductSizes.forEach((app) => {
+        !productSizes?.find((pp) =>
+          pp.name === app.name && app.productID === productID
+        ) && productSizesToDelete.push(app.name)
+      })
+
+      await trx('productSizes')
+        .del()
+        .whereIn('name', productSizesToDelete)
+        .andWhere('productID', productID)
+
+      let productSizesToInsert: ProductSizeMin[] = []
+      let productSizesToUpdate: ProductSizeMin[] = []
+
+      productSizes.forEach((ps) => {
+        allProductSizes.length !== 0 && allProductSizes.find((agv) =>
+          agv.name === ps.name &&
+          agv.productID === productID
+        )
+          ? productSizesToUpdate.push(ps)
+          : productSizesToInsert.push(ps)
+      })
+
+      let addedProductSizes: ProductSize[] = []
+      let updatedProductSizes: ProductSize[][] = []
+
+      if (productSizesToInsert.length !== 0) {
+        addedProductSizes = await trx('productSizes')
+          .insert(productSizesToInsert.map((ps) => ({
+            name: ps.name,
+            qty: ps.qty,
+            productID
+          })), [ '*' ])
+      }
+
+      if (productSizesToUpdate.length !== 0) {
+        updatedProductSizes = await Promise
+          .all(productSizesToUpdate.map(async (ps) =>
+            await trx('productSizes')
+              .update({ name: ps.name, qty: ps.qty }, [ '*' ])
+              .where('productID', productID)
+              .andWhere('name', ps.name)
+          ))
+      }
+
+      processedProductSizes = [
+        ...addedProductSizes,
+        ...R.flatten(updatedProductSizes)
+      ]
+    }
 
     let processedGroupVariations: GroupVariation[] = []
 
@@ -426,21 +486,22 @@ const updateProduct = async (productInput: ProductUpdateInput, req: Request): Pr
       ]
     }
 
-    const allProductParameters = await trx<ProductParameter>('productParameters')
-      .andWhere('productID', productID)
-    let productParametersToDelete: number[] = []
-
-    allProductParameters.forEach((app) => {
-      !productParameters?.find((pp) => pp.parameterID === app.parameterID) &&
-          productParametersToDelete.push(app.parameterID)
-    })
-
-    await trx('productParameters')
-      .del()
-      .whereIn('parameterID', productParametersToDelete)
-      .andWhere('productID', productID)
-
     if (productParameters !== undefined) {
+      const allProductParameters = await trx<ProductParameter>('productParameters')
+        .andWhere('productID', productID)
+
+      let productParametersToDelete: number[] = []
+
+      allProductParameters.forEach((app) => {
+        !productParameters?.find((pp) => pp.parameterID === app.parameterID) &&
+          productParametersToDelete.push(app.parameterID)
+      })
+
+      await trx('productParameters')
+        .del()
+        .whereIn('parameterID', productParametersToDelete)
+        .andWhere('productID', productID)
+
       let productParametersToInsert: ProductParameterMin[] = []
       let productParametersToUpdate: ProductParameterMin[] = []
 
@@ -453,20 +514,24 @@ const updateProduct = async (productInput: ProductUpdateInput, req: Request): Pr
           : productParametersToInsert.push(pp)
       })
 
-      await trx('productParameters')
-        .insert(productParametersToInsert.map((pp) => ({
-          value: pp.value,
-          parameterID: pp.parameterID,
-          productID
-        })), [ '*' ])
+      if (productParametersToInsert.length !== 0) {
+        await trx('productParameters')
+          .insert(productParametersToInsert.map((pp) => ({
+            value: pp.value,
+            parameterID: pp.parameterID,
+            productID
+          })), [ '*' ])
+      }
 
-      await Promise
-        .all(productParametersToUpdate.map(async (pp) =>
-          await trx('productParameters')
-            .update({ value: pp.value }, [ '*' ])
-            .where('productID', productID)
-            .andWhere('parameterID', pp.parameterID)
-        ))
+      if (productParametersToUpdate.length !== 0) {
+        await Promise
+          .all(productParametersToUpdate.map(async (pp) =>
+            await trx('productParameters')
+              .update({ value: pp.value }, [ '*' ])
+              .where('productID', productID)
+              .andWhere('parameterID', pp.parameterID)
+          ))
+      }
     }
 
     return {
@@ -475,7 +540,8 @@ const updateProduct = async (productInput: ProductUpdateInput, req: Request): Pr
       listPrice: updatedProduct.listPrice !== undefined
         ? updatedProduct.listPrice / 100
         : undefined,
-      group: processedGroupVariations
+      group: processedGroupVariations,
+      productSizes: processedProductSizes
     }
   })
 }

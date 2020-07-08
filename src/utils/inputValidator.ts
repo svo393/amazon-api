@@ -201,7 +201,7 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
       )({ name: 'name', param: gv.name }).param,
       value: R.pipe(
         isProvided,
-        canBeNumber
+        isString
       )({ name: 'value', param: gv.value }).param
     }))
   }
@@ -219,7 +219,7 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
       )({ name: 'parameterID', param: pp.parameterID }).param,
       value: R.pipe(
         isProvided,
-        canBeNumber
+        isString
       )({ name: 'value', param: pp.value }).param
     }))
   }
@@ -325,7 +325,7 @@ export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
       )({ name: 'name', param: gv.name }).param,
       value: R.pipe(
         isProvided,
-        canBeNumber
+        isString
       )({ name: 'value', param: gv.value }).param
     }))
   }
@@ -343,7 +343,7 @@ export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
       )({ name: 'parameterID', param: pp.parameterID }).param,
       value: R.pipe(
         isProvided,
-        canBeNumber
+        isString
       )({ name: 'value', param: pp.value }).param
     }))
   }
