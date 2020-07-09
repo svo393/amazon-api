@@ -358,7 +358,7 @@ type ProductParameterMin = Pick<ProductParameter, 'parameterID' | 'value'>
 type ProductSizeMin = Pick<ProductSize, 'name' | 'qty'>
 
 const updateProduct = async (productInput: ProductUpdateInput, req: Request): Promise<ProductData> => {
-  const { productSizes, groupID, groupVariations, productParameters, listPrice, price } = productInput
+  const { productSizes, groupID, groupVariations, productParameters, listPrice, price, stock } = productInput
   const productID = Number(req.params.productID)
 
   return await dbTrans(async (trx: Knex.Transaction) => {
@@ -379,7 +379,11 @@ const updateProduct = async (productInput: ProductUpdateInput, req: Request): Pr
 
     let processedProductSizes: ProductSize[] = []
 
-    if (productSizes !== undefined) {
+    if (stock !== undefined && productSizes === undefined) {
+      await trx('productSizes')
+        .del()
+        .andWhere('productID', productID)
+    } else if (productSizes !== undefined) {
       const allProductSizes = await trx<ProductSize>('productSizes')
         .where('productID', productID)
 
