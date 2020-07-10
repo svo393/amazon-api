@@ -552,15 +552,14 @@ const updateProduct = async (productInput: ProductUpdateInput, req: Request): Pr
 
 const uploadProductImages = async (files: Express.Multer.File[], req: Request, res: Response): Promise<void> => {
   await dbTrans(async (trx: Knex.Transaction) => {
-  // TODO resolve poll bug
-  // const images = await trx<Image>('images')
-  //   .where('productID', req.params.productID)
+    const images = await trx<Image>('images')
+      .where('productID', req.params.productID)
 
-    // let indexes: number[] = []
+    let indexes: number[] = []
 
     const filesWithIndexes = files.map((f) => {
       const index = getUploadIndex(f.filename)
-      // indexes.push(index)
+      indexes.push(index)
       return {
         productID: req.params.productID,
         userID: res.locals.userID,
@@ -568,7 +567,7 @@ const uploadProductImages = async (files: Express.Multer.File[], req: Request, r
       }
     })
 
-    // if (images.some((i) => indexes.includes(i.index))) throw new StatusError(500, 'Error uploading images')
+    if (images.some((i) => indexes.includes(i.index))) throw new StatusError(500, 'Error uploading images')
 
     const uploadedImages: Image[] = await trx('images')
       .insert(filesWithIndexes, [ '*' ])
