@@ -7,9 +7,18 @@ import logger from 'morgan'
 import router from './routes'
 import env from './utils/config'
 import { errorHandler, getUserID, unknownEndpoint } from './utils/middleware'
+import csrf from 'csurf'
+
+const csrfProtection = csrf({ cookie: true })
 
 const app = express()
 app.use(helmet())
+
+// TODO consider enabling cache
+
+app.use(express.static(path.join(process.cwd(), 'public'))) // TODO migrate to nginx
+app.use(express.json())
+env.NODE_ENV === 'development' && app.use(logger('dev'))
 
 app.use(cors({
   credentials: true,
@@ -17,14 +26,9 @@ app.use(cors({
   optionsSuccessStatus: 200
 }))
 
-// TODO consider enabling cache
-
-app.use(express.static(path.join(process.cwd(), 'public'))) // TODO migrate to nginx
-
 app.use(cookieParser())
 app.use(getUserID)
-app.use(express.json())
-env.NODE_ENV === 'development' && app.use(logger('dev'))
+app.use(csrfProtection)
 
 app.use('/', router)
 app.use(unknownEndpoint)

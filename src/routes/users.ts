@@ -37,6 +37,10 @@ router.get('/', isAdmin, async (req, res) => {
   res.json(users)
 })
 
+router.get('/csrf-token', (req, res) => {
+  res.json({ csrfToken: req.csrfToken() })
+})
+
 router.get('/me', isLoggedIn, async (req, res) => {
   const user = await userService.getMe(res)
   res.json(user)
