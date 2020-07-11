@@ -11,7 +11,7 @@ router.post('/', isAdmin, async (req, res) => {
   res.status(201).json(addedShippingMethod)
 })
 
-router.get('/', async (_req, res) => {
+router.get('/', async (_, res) => {
   const shippingMethods = await shippingMethodService.getShippingMethods()
   res.json(shippingMethods)
 })

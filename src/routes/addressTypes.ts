@@ -12,7 +12,7 @@ router.post('/', isAdmin, async (req, res) => {
   res.status(201).json(addedAddressType)
 })
 
-router.get('/', async (_req, res) => {
+router.get('/', async (_, res) => {
   const addressTypes = await addressTypeService.getAddressTypes()
   res.json(addressTypes)
 })

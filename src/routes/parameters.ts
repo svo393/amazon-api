@@ -11,7 +11,7 @@ router.post('/', isAdmin, async (req, res) => {
   res.status(201).json(addedParameter)
 })
 
-router.get('/', async (_req, res) => {
+router.get('/', async (_, res) => {
   const parameters = await parameterService.getParameters()
   res.json(parameters)
 })

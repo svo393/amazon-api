@@ -11,7 +11,7 @@ router.post('/', isRoot, async (req, res) => {
   res.status(201).json(addedRole)
 })
 
-router.get('/', isRoot, async (_req, res) => {
+router.get('/', isRoot, async (_, res) => {
   const roles = await roleService.getRoles()
   res.json(roles)
 })

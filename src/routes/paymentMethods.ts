@@ -11,7 +11,7 @@ router.post('/', isAdmin, async (req, res) => {
   res.status(201).json(addedPaymentMethod)
 })
 
-router.get('/', async (_req, res) => {
+router.get('/', async (_, res) => {
   const paymentMethods = await paymentMethodService.getPaymentMethods()
   res.json(paymentMethods)
 })

@@ -36,34 +36,34 @@ type Entities =
   | 'invoices'
   | 'images'
 
-export const isLoggedIn: Middleware = (_req, res, next) => {
-  if (res.locals.userID === undefined) throw new StatusError(403, 'Forbidden')
+export const isLoggedIn: Middleware = (_, res, next) => {
+  if (res.locals.userID === undefined) throw new StatusError(401, 'Unauthorized')
   next()
 }
 
-export const isAdmin: Middleware = (_req, res, next) => {
+export const isAdmin: Middleware = (_, res, next) => {
   const role: string | undefined = res.locals.userRole
 
-  if (
-    res.locals.userID === undefined ||
-    role === undefined ||
-    ![ 'ROOT', 'ADMIN' ].includes(role)
-  ) {
+  if (res.locals.userID === undefined ||
+      role === undefined) {
+    throw new StatusError(401, 'Unauthorized')
+  }
+
+  if (![ 'ROOT', 'ADMIN' ].includes(role)) {
     throw new StatusError(403, 'Forbidden')
   }
   next()
 }
 
-export const isRoot: Middleware = (_req, res, next) => {
+export const isRoot: Middleware = (_, res, next) => {
   const role: string | undefined = res.locals.userRole
 
-  if (
-    res.locals.userID === undefined ||
-    role === undefined ||
-    role !== 'ROOT'
-  ) {
-    throw new StatusError(403, 'Forbidden')
+  if (res.locals.userID === undefined ||
+    role === undefined) {
+    throw new StatusError(401, 'Unauthorized')
   }
+
+  if (role !== 'ROOT') { throw new StatusError(403, 'Forbidden') }
   next()
 }
 
@@ -71,11 +71,10 @@ export const isSameUser = (target: Target): Middleware => {
   const fn: Middleware = (req, res, next) => {
     const userID: string | undefined = res.locals.userID
 
-    if (
-      userID === undefined ||
-      (userID.toString() !== req[target].userID.toString() &&
-      res.locals.userRole !== 'ROOT')
-    ) {
+    if (userID === undefined) throw new StatusError(401, 'Unauthorized')
+
+    if (userID.toString() !== req[target].userID.toString() &&
+      res.locals.userRole !== 'ROOT') {
       throw new StatusError(403, 'Forbidden')
     }
     next()
@@ -87,11 +86,10 @@ export const isSameUserOrAdmin = (target: Target): Middleware => {
   const fn: Middleware = (req, res, next) => {
     const userID: string | undefined = res.locals.userID
 
-    if (
-      userID === undefined ||
-      (userID.toString() !== req[target].userID.toString() &&
-      ![ 'ROOT', 'ADMIN' ].includes(res.locals.userRole))
-    ) {
+    if (userID === undefined) throw new StatusError(401, 'Unauthorized')
+
+    if (userID.toString() !== req[target].userID.toString() &&
+      ![ 'ROOT', 'ADMIN' ].includes(res.locals.userRole)) {
       throw new StatusError(403, 'Forbidden')
     }
     next()
@@ -101,7 +99,7 @@ export const isSameUserOrAdmin = (target: Target): Middleware => {
 
 export const isCreator = (entity: Entities, idName: string, target: Target): Middleware => {
   const fn: Middleware = async (req, res, next) => {
-    if (res.locals.userID === undefined) throw new StatusError(403, 'Forbidden')
+    if (res.locals.userID === undefined) throw new StatusError(401, 'Unauthorized')
     if (res.locals.userRole === 'ROOT') return next()
 
     const data = await db(entity)
@@ -120,7 +118,7 @@ export const isCreator = (entity: Entities, idName: string, target: Target): Mid
 
 export const isCreatorOrAdmin = (entity: Entities, idName: string, target: Target): Middleware => {
   const fn: Middleware = async (req, res, next) => {
-    if (res.locals.userID === undefined) throw new StatusError(403, 'Forbidden')
+    if (res.locals.userID === undefined) throw new StatusError(401, 'Unauthorized')
 
     const role: string | undefined = res.locals.userRole
     if (role !== undefined && [ 'ROOT', 'ADMIN' ].includes(role)) return next()
@@ -167,7 +165,7 @@ export const unknownEndpoint: Middleware = (req, res) => {
 }
 
 export const errorHandler = (
-  error: StatusError, _req: Request, res: Response, next: NextFunction
+  error: StatusError, _: Request, res: Response, next: NextFunction
 ): void => {
   const statusCode = error.statusCode ? error.statusCode : 500
   env.NODE_ENV === 'test' && logger.error(error)
@@ -182,13 +180,13 @@ export const errorHandler = (
 
 const storage = multer.diskStorage({
   destination: './tmp',
-  filename (_req, file, cb) { cb(null, `${Date.now()}_${file.originalname}`) }
+  filename (_, file, cb) { cb(null, `${Date.now()}_${file.originalname}`) }
 })
 
 export const multerUpload = multer({
   storage,
   limits: { fileSize: 1024 * 1024 * 10 },
-  fileFilter: (_req, file, cb) => {
+  fileFilter: (_, file, cb) => {
     if ([ 'image/png', 'image/jpg', 'image/jpeg', 'image/webp' ].includes(file.mimetype)) {
       cb(null, true)
     } else {

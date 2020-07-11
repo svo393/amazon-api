@@ -11,7 +11,7 @@ router.post('/', isAdmin, async (req, res) => {
   res.status(201).json(addedModerationStatus)
 })
 
-router.get('/', isAdmin, async (_req, res) => {
+router.get('/', isAdmin, async (_, res) => {
   const moderationStatuses = await moderationStatusService.getModerationStatuses()
   res.json(moderationStatuses)
 })

@@ -26,7 +26,13 @@ router.post('/login', async (req, res) => {
   res.json(loggedInUser)
 })
 
-router.post('/logout', (_req, res) => {
+router.post('/admin/login', async (req, res) => {
+  const userLoginInput = checkUserLogin(req)
+  const loggedInUser = await userService.loginUser(userLoginInput, res, true)
+  res.json(loggedInUser)
+})
+
+router.post('/logout', (_, res) => {
   res.clearCookie('token')
   res.status(204).end()
 })
@@ -41,7 +47,12 @@ router.get('/csrf-token', (req, res) => {
   res.json({ csrfToken: req.csrfToken() })
 })
 
-router.get('/me', isLoggedIn, async (req, res) => {
+router.get('/me', isLoggedIn, async (_, res) => {
+  const user = await userService.getMe(res)
+  res.json(user)
+})
+
+router.get('/admin/me', isAdmin, async (_, res) => {
   const user = await userService.getMe(res)
   res.json(user)
 })

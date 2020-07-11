@@ -11,7 +11,7 @@ router.post('/', isAdmin, async (req, res) => {
   res.status(201).json(addedOrderStatus)
 })
 
-router.get('/', isAdmin, async (_req, res) => {
+router.get('/', isAdmin, async (_, res) => {
   const orderStatuses = await orderStatusService.getOrderStatuses()
   res.json(orderStatuses)
 })

@@ -83,7 +83,7 @@ const addUser = async (userInput: UserSignupInput, res: Response): Promise<UserS
   return addedUser
 }
 
-const loginUser = async (userInput: UserLoginInput, res: Response): Promise<UserBaseData> => {
+const loginUser = async (userInput: UserLoginInput, res: Response, requiresAdmin = false): Promise<UserBaseData> => {
   const { email, password, remember } = userInput
 
   const existingUser = await db<User>('users')
@@ -92,6 +92,10 @@ const loginUser = async (userInput: UserLoginInput, res: Response): Promise<User
 
   if (existingUser === undefined) {
     throw new StatusError(401, 'Invalid Email or Password')
+  }
+
+  if (requiresAdmin && ![ 'ADMIN', 'ROOT' ].includes(existingUser.role)) {
+    throw new StatusError(403, 'Forbidden')
   }
 
   const isPasswordValid = await bcrypt.compare(password, existingUser.password)
