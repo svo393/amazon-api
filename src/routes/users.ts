@@ -10,7 +10,7 @@ import userAddressService from '../services/userAddressService'
 import userService from '../services/userService'
 import { UPLOAD_TIMEOUT } from '../utils/config'
 import { checkCartProductUpdate, checkNewCartProduct, checkNewUser, checkSingleMediaUpload, checkUserAddressesUpdate, checkUserFilters, checkUserLogin, checkUserResetRequest, checkUserResetToken, checkUserUpdate } from '../utils/inputValidator'
-import { isAdmin, isLoggedIn, isSameUser, isSameUserOrAdmin, multerUpload } from '../utils/middleware'
+import { isAdmin, isAuthenticated, isSameUser, isSameUserOrAdmin, multerUpload } from '../utils/middleware'
 
 const router = Router()
 
@@ -47,7 +47,7 @@ router.get('/csrf-token', (req, res) => {
   res.json({ csrfToken: req.csrfToken() })
 })
 
-router.get('/me', isLoggedIn, async (_, res) => {
+router.get('/me', isAuthenticated, async (_, res) => {
   const user = await userService.getMe(res)
   res.json(user)
 })

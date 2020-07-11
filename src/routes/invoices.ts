@@ -1,11 +1,11 @@
 import Router from 'express'
 import invoiceService from '../services/invoiceService'
 import { checkInvoiceUpdate, checkNewInvoice, checkInvoiceFilters } from '../utils/inputValidator'
-import { isAdmin, isLoggedIn, isCreatorOrAdmin } from '../utils/middleware'
+import { isAdmin, isAuthenticated, isCreatorOrAdmin } from '../utils/middleware'
 
 const router = Router()
 
-router.post('/', isLoggedIn, async (req, res) => {
+router.post('/', isAuthenticated, async (req, res) => {
   const invoiceCreateInput = checkNewInvoice(req)
   const addedInvoice = await invoiceService.addInvoice(invoiceCreateInput)
   res.status(201).json(addedInvoice)

@@ -3,7 +3,7 @@ import answerCommentService from '../services/answerCommentService'
 import answerService from '../services/answerService'
 import { UPLOAD_TIMEOUT } from '../utils/config'
 import { checkAnswerUpdate, checkMediaUpload, checkNewAnswerComment } from '../utils/inputValidator'
-import { isCreator, isCreatorOrAdmin, isLoggedIn, multerUpload } from '../utils/middleware'
+import { isCreator, isCreatorOrAdmin, isAuthenticated, multerUpload } from '../utils/middleware'
 
 const router = Router()
 
@@ -23,7 +23,7 @@ router.delete('/:answerID', isCreator('answers', 'answerID', 'params'), async (r
   res.status(204).end()
 })
 
-router.post('/comments', isLoggedIn, async (req, res) => {
+router.post('/comments', isAuthenticated, async (req, res) => {
   const answerCommentCreateInput = checkNewAnswerComment(req)
   const addedAnswerComment = await answerCommentService.addAnswerComment(answerCommentCreateInput, res)
   res.status(201).json(addedAnswerComment)

@@ -1,11 +1,11 @@
 import Router from 'express'
 import addressService from '../services/addressService'
 import { checkNewAddress } from '../utils/inputValidator'
-import { isLoggedIn } from '../utils/middleware'
+import { isAuthenticated } from '../utils/middleware'
 
 const router = Router()
 
-router.post('/', isLoggedIn, async (req, res) => {
+router.post('/', isAuthenticated, async (req, res) => {
   const addressCreateInput = checkNewAddress(req)
   const addedAddress = await addressService.addAddress(addressCreateInput, res)
   res.status(201).json(addedAddress)

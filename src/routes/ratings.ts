@@ -3,11 +3,11 @@ import ratingCommentService from '../services/ratingCommentService'
 import ratingService from '../services/ratingService'
 import { UPLOAD_TIMEOUT } from '../utils/config'
 import { checkMediaUpload, checkNewRating, checkNewRatingComment, checkRatingFilters, checkRatingUpdate } from '../utils/inputValidator'
-import { isCreator, isCreatorOrAdmin, isLoggedIn, multerUpload } from '../utils/middleware'
+import { isCreator, isCreatorOrAdmin, isAuthenticated, multerUpload } from '../utils/middleware'
 
 const router = Router()
 
-router.post('/', isLoggedIn, async (req, res) => {
+router.post('/', isAuthenticated, async (req, res) => {
   const ratingCreateInput = checkNewRating(req)
   const addedRating = await ratingService.addRating(ratingCreateInput, res)
   res.status(201).json(addedRating)
@@ -35,7 +35,7 @@ router.delete('/:ratingID', isCreator('ratings', 'ratingID', 'params'), async (r
   res.status(204).end()
 })
 
-router.post('/comments', isLoggedIn, async (req, res) => {
+router.post('/comments', isAuthenticated, async (req, res) => {
   const ratingCommentCreateInput = checkNewRatingComment(req)
   const addedRatingComment = await ratingCommentService.addRatingComment(ratingCommentCreateInput, res)
   res.status(201).json(addedRatingComment)

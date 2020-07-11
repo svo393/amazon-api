@@ -2,11 +2,11 @@ import Router from 'express'
 import listProductsService from '../services/listProductService'
 import listService from '../services/listService'
 import { checkListUpdate, checkNewList } from '../utils/inputValidator'
-import { isCreator, isLoggedIn } from '../utils/middleware'
+import { isCreator, isAuthenticated } from '../utils/middleware'
 
 const router = Router()
 
-router.post('/', isLoggedIn, async (req, res) => {
+router.post('/', isAuthenticated, async (req, res) => {
   const listCreateInput = checkNewList(req)
   const addedList = await listService.addList(listCreateInput, res)
   res.status(201).json(addedList)

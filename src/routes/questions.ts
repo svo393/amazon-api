@@ -3,11 +3,11 @@ import answerService from '../services/answerService'
 import questionService from '../services/questionService'
 import { UPLOAD_TIMEOUT } from '../utils/config'
 import { checkMediaUpload, checkNewAnswer, checkNewQuestion, checkQuestionUpdate } from '../utils/inputValidator'
-import { isCreator, isCreatorOrAdmin, isLoggedIn, multerUpload } from '../utils/middleware'
+import { isCreator, isCreatorOrAdmin, isAuthenticated, multerUpload } from '../utils/middleware'
 
 const router = Router()
 
-router.post('/', isLoggedIn, async (req, res) => {
+router.post('/', isAuthenticated, async (req, res) => {
   const questionCreateInput = checkNewQuestion(req)
   const addedQuestion = await questionService.addQuestion(questionCreateInput, res)
   res.status(201).json(addedQuestion)
@@ -29,7 +29,7 @@ router.delete('/:questionID', isCreator('questions', 'questionID', 'params'), as
   res.status(204).end()
 })
 
-router.post('/answers', isLoggedIn, async (req, res) => {
+router.post('/answers', isAuthenticated, async (req, res) => {
   const answerCreateInput = checkNewAnswer(req)
   const addedAnswer = await answerService.addAnswer(answerCreateInput, res)
   res.status(201).json(addedAnswer)

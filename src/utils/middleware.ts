@@ -36,7 +36,7 @@ type Entities =
   | 'invoices'
   | 'images'
 
-export const isLoggedIn: Middleware = (_, res, next) => {
+export const isAuthenticated: Middleware = (_, res, next) => {
   if (res.locals.userID === undefined) throw new StatusError(401, 'Unauthorized')
   next()
 }

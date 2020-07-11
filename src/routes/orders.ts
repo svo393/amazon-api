@@ -2,11 +2,11 @@ import Router from 'express'
 import orderProductService from '../services/orderProductService'
 import orderService from '../services/orderService'
 import { checkNewOrder, checkNewOrderProduct, checkOrderFilters, checkOrderProductUpdate, checkOrderUpdate } from '../utils/inputValidator'
-import { isAdmin, isCreatorOrAdmin, isLoggedIn } from '../utils/middleware'
+import { isAdmin, isCreatorOrAdmin, isAuthenticated } from '../utils/middleware'
 
 const router = Router()
 
-router.post('/', isLoggedIn, async (req, res) => {
+router.post('/', isAuthenticated, async (req, res) => {
   const orderCreateInput = checkNewOrder(req)
   const addedOrder = await orderService.addOrder(orderCreateInput)
   res.status(201).json(addedOrder)
