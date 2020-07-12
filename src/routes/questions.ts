@@ -3,13 +3,13 @@ import answerService from '../services/answerService'
 import questionService from '../services/questionService'
 import { UPLOAD_TIMEOUT } from '../utils/config'
 import { checkMediaUpload, checkNewAnswer, checkNewQuestion, checkQuestionUpdate } from '../utils/inputValidator'
-import { isCreator, isCreatorOrAdmin, isAuthenticated, multerUpload } from '../utils/middleware'
+import { requireCreator, requireCreatorOrAdmin, requireAuth, multerUpload } from '../utils/middleware'
 
 const router = Router()
 
-router.post('/', isAuthenticated, async (req, res) => {
+router.post('/', requireAuth, async (req, res) => {
   const questionCreateInput = checkNewQuestion(req)
-  const addedQuestion = await questionService.addQuestion(questionCreateInput, res)
+  const addedQuestion = await questionService.addQuestion(questionCreateInput, req)
   res.status(201).json(addedQuestion)
 })
 
@@ -18,20 +18,20 @@ router.get('/:questionID', async (req, res) => {
   res.json(question)
 })
 
-router.put('/:questionID', isCreatorOrAdmin('questions', 'questionID', 'params'), async (req, res) => {
+router.put('/:questionID', requireCreatorOrAdmin('questions', 'questionID', 'params'), async (req, res) => {
   const questionUpdateInput = checkQuestionUpdate(req)
   const updatedQuestion = await questionService.updateQuestion(questionUpdateInput, req)
   res.json(updatedQuestion)
 })
 
-router.delete('/:questionID', isCreator('questions', 'questionID', 'params'), async (req, res) => {
+router.delete('/:questionID', requireCreator('questions', 'questionID', 'params'), async (req, res) => {
   await questionService.deleteQuestion(req)
   res.status(204).end()
 })
 
-router.post('/answers', isAuthenticated, async (req, res) => {
+router.post('/answers', requireAuth, async (req, res) => {
   const answerCreateInput = checkNewAnswer(req)
-  const addedAnswer = await answerService.addAnswer(answerCreateInput, res)
+  const addedAnswer = await answerService.addAnswer(answerCreateInput, req)
   res.status(201).json(addedAnswer)
 })
 
@@ -40,10 +40,10 @@ router.get('/:questionID/answers', async (req, res) => {
   res.json(answers)
 })
 
-router.post('/:questionID/upload', isCreator('questions', 'questionID', 'params'), multerUpload.array('questionImages', 4), (req, res) => {
+router.post('/:questionID/upload', requireCreator('questions', 'questionID', 'params'), multerUpload.array('questionImages', 4), (req, res) => {
   req.socket.setTimeout(UPLOAD_TIMEOUT)
   const questionImages = checkMediaUpload(req)
-  questionService.uploadQuestionImages(questionImages, req, res)
+  questionService.uploadQuestionImages(questionImages, req)
   res.status(204).end()
 })
 

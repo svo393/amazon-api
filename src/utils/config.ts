@@ -6,6 +6,8 @@ dotenv.config()
 type Config = {
   PORT: string;
   JWT_SECRET: string;
+  SESSION_SECRET: string;
+  SESSION_MAX_AGE: string;
   NODE_ENV: string;
   MAIL_HOST: string;
   MAIL_PORT: string;
@@ -17,6 +19,8 @@ type Config = {
 const envVars: Config = R.pickAll([
   'PORT',
   'JWT_SECRET',
+  'SESSION_SECRET',
+  'SESSION_MAX_AGE',
   'NODE_ENV',
   'MAIL_HOST',
   'MAIL_PORT',

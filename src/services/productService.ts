@@ -1,7 +1,7 @@
-import { Request, Response } from 'express'
+import { Request } from 'express'
 import Knex from 'knex'
 import R from 'ramda'
-import { GroupVariation, Image, Product, ProductCreateInput, ProductsFiltersInput, ProductsMinFiltersInput, ProductUpdateInput, ProductParameter, ProductData, ProductSize } from '../types'
+import { GroupVariation, Image, Product, ProductCreateInput, ProductData, ProductParameter, ProductsFiltersInput, ProductSize, ProductsMinFiltersInput, ProductUpdateInput } from '../types'
 import { imagesBasePath } from '../utils/constants'
 import { db, dbTrans } from '../utils/db'
 import getUploadIndex from '../utils/getUploadIndex'
@@ -28,7 +28,7 @@ const getProductsQuery: any = db('products as p')
   .leftJoin('categories as c', 'p.categoryID', 'c.categoryID')
   .groupBy('p.productID', 'vendorName', 'categoryName')
 
-const addProduct = async (productInput: ProductCreateInput, res: Response): Promise<ProductData> => {
+const addProduct = async (productInput: ProductCreateInput, req: Request): Promise<ProductData> => {
   const { productSizes, groupVariations, productParameters, listPrice, price } = productInput
   const now = new Date()
 
@@ -46,7 +46,7 @@ const addProduct = async (productInput: ProductCreateInput, res: Response): Prom
           ? listPrice * 100
           : undefined,
         price: price * 100,
-        userID: res.locals.userID,
+        userID: req.session?.userID,
         createdAt: now,
         updatedAt: now,
         groupID
@@ -296,7 +296,7 @@ type ProductLimitedData = Omit<ProductListData, 'images'> & {
 
 type ProductAllData = ProductLimitedData & Pick<ProductData, 'createdAt' | 'updatedAt' | 'userID' | 'listPrice'> & { userEmail: string }
 
-const getProductByID = async (req: Request, res: Response): Promise<ProductLimitedData| ProductAllData> => {
+const getProductByID = async (req: Request): Promise<ProductLimitedData| ProductAllData> => {
   const rawProduct: Omit<ProductAllData, 'stars' | 'ratingCount'> & { stars: string; ratingCount: string } = await getProductsQuery.clone()
     .first(
       'p.listPrice',
@@ -341,7 +341,7 @@ const getProductByID = async (req: Request, res: Response): Promise<ProductLimit
     productSizes
   }
 
-  const role: string | undefined = res.locals.userRole
+  const role: string | undefined = req.session?.userRole
 
   return role !== undefined && [ 'ROOT', 'ADMIN' ].includes(role)
     ? fullProduct
@@ -550,7 +550,7 @@ const updateProduct = async (productInput: ProductUpdateInput, req: Request): Pr
   })
 }
 
-const uploadProductImages = async (files: Express.Multer.File[], req: Request, res: Response): Promise<void> => {
+const uploadProductImages = async (files: Express.Multer.File[], req: Request): Promise<void> => {
   await dbTrans(async (trx: Knex.Transaction) => {
     const images = await trx<Image>('images')
       .where('productID', req.params.productID)
@@ -562,7 +562,7 @@ const uploadProductImages = async (files: Express.Multer.File[], req: Request, r
       indexes.push(index)
       return {
         productID: req.params.productID,
-        userID: res.locals.userID,
+        userID: req.session?.userID,
         index
       }
     })

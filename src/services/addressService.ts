@@ -1,11 +1,11 @@
-import { Request, Response } from 'express'
+import { Request } from 'express'
 import Knex from 'knex'
 import R from 'ramda'
 import { Address, AddressCreateInput, UserAddress } from '../types'
 import { db, dbTrans } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
-const addAddress = async (addressInput: AddressCreateInput, res: Response): Promise<Address & UserAddress> => {
+const addAddress = async (addressInput: AddressCreateInput, req: Request): Promise<Address & UserAddress> => {
   // TODO if new address isDefault, set false to the previous
   // TODO transfer all sequence db calls to transactions
 
@@ -19,7 +19,7 @@ const addAddress = async (addressInput: AddressCreateInput, res: Response): Prom
   let curUA // aka currentUserAddress
 
   if (existingAddresses.length !== 0) {
-    curUA = existingAddresses.find((a) => a.userID === res.locals.userID)
+    curUA = existingAddresses.find((a) => a.userID === req.session?.userID)
 
     if (curUA !== undefined) {
       if (
@@ -38,7 +38,7 @@ const addAddress = async (addressInput: AddressCreateInput, res: Response): Prom
         .insert({
           isDefault,
           addressID: existingAddresses[0].addressID,
-          userID: res.locals.userID
+          userID: req.session?.userID
         }, [ '*' ])
 
       curUA = {
@@ -57,7 +57,7 @@ const addAddress = async (addressInput: AddressCreateInput, res: Response): Prom
 
       const [ addedUserAddress ]: UserAddress[] = await trx
         .insert({
-          userID: res.locals.userID,
+          userID: req.session?.userID,
           addressID: addedAddress.addressID,
           isDefault
         }, [ '*' ])
@@ -81,7 +81,7 @@ const getAddressesByType = async (req: Request): Promise<Address[]> => {
 
 type AddressFullData = Address & { userID: string; isPrivate: boolean }
 
-const getAddressByID = async (req: Request, res: Response): Promise<AddressFullData> => {
+const getAddressByID = async (req: Request): Promise<AddressFullData> => {
   const address: AddressFullData = await db('addresses as a')
     .first(
       'a.addressID',
@@ -96,12 +96,12 @@ const getAddressByID = async (req: Request, res: Response): Promise<AddressFullD
 
   if (address === undefined) throw new StatusError(404, 'Not Found')
 
-  const role: string | undefined = res.locals.userRole
+  const role: string | undefined = req.session?.userRole
 
   if (
     address.isPrivate &&
     (!role || ![ 'ROOT', 'ADMIN' ].includes(role)) &&
-    address.userID !== res.locals.userID
+    address.userID !== req.session?.userID
   ) {
     throw new StatusError(404, 'Not Found')
   }

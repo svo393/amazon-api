@@ -1,11 +1,11 @@
 import Router from 'express'
 import vendorService from '../services/vendorService'
 import { checkVendor, checkVendorFilters } from '../utils/inputValidator'
-import { isAdmin } from '../utils/middleware'
+import { requireAdmin } from '../utils/middleware'
 
 const router = Router()
 
-router.post('/', isAdmin, async (req, res) => {
+router.post('/', requireAdmin, async (req, res) => {
   const vendorCreateInput = checkVendor(req)
   const addedVendor = await vendorService.addVendor(vendorCreateInput)
   res.status(201).json(addedVendor)
@@ -22,7 +22,7 @@ router.get('/:vendorID', async (req, res) => {
   res.json(vendor)
 })
 
-router.put('/:vendorID', isAdmin, async (req, res) => {
+router.put('/:vendorID', requireAdmin, async (req, res) => {
   const vendorUpdateInput = checkVendor(req)
   const updatedItem = await vendorService.updateVendor(vendorUpdateInput, req)
   res.json(updatedItem)

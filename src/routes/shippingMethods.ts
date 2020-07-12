@@ -1,11 +1,11 @@
 import Router from 'express'
 import shippingMethodService from '../services/shippingMethodService'
 import { checkShippingMethod } from '../utils/inputValidator'
-import { isAdmin } from '../utils/middleware'
+import { requireAdmin } from '../utils/middleware'
 
 const router = Router()
 
-router.post('/', isAdmin, async (req, res) => {
+router.post('/', requireAdmin, async (req, res) => {
   const shippingMethodCreateInput = checkShippingMethod(req)
   const addedShippingMethod = await shippingMethodService.addShippingMethod(shippingMethodCreateInput)
   res.status(201).json(addedShippingMethod)
@@ -21,13 +21,13 @@ router.get('/:shippingMethodName', async (req, res) => {
   res.json(shippingMethod)
 })
 
-router.put('/:shippingMethodName', isAdmin, async (req, res) => {
+router.put('/:shippingMethodName', requireAdmin, async (req, res) => {
   const shippingMethodUpdateInput = checkShippingMethod(req)
   const updatedItem = await shippingMethodService.updateShippingMethod(shippingMethodUpdateInput, req)
   res.json(updatedItem)
 })
 
-router.delete('/:shippingMethodName', isAdmin, async (req, res) => {
+router.delete('/:shippingMethodName', requireAdmin, async (req, res) => {
   await shippingMethodService.deleteShippingMethod(req)
   res.status(204).end()
 })

@@ -1,7 +1,7 @@
 import Router from 'express'
 import answerCommentService from '../services/answerCommentService'
 import { checkAnswerCommentUpdate } from '../utils/inputValidator'
-import { isCreator, isCreatorOrAdmin } from '../utils/middleware'
+import { requireCreator, requireCreatorOrAdmin } from '../utils/middleware'
 
 const router = Router()
 
@@ -10,13 +10,13 @@ router.get('/:answerCommentID', async (req, res) => {
   res.json(answerComment)
 })
 
-router.put('/:answerCommentID', isCreatorOrAdmin('answerComments', 'answerCommentID', 'params'), async (req, res) => {
+router.put('/:answerCommentID', requireCreatorOrAdmin('answerComments', 'answerCommentID', 'params'), async (req, res) => {
   const answerCommentUpdateInput = checkAnswerCommentUpdate(req)
   const updatedAnswerComment = await answerCommentService.updateAnswerComment(answerCommentUpdateInput, req)
   res.json(updatedAnswerComment)
 })
 
-router.delete('/:answerCommentID', isCreator('answerComments', 'answerCommentID', 'params'), async (req, res) => {
+router.delete('/:answerCommentID', requireCreator('answerComments', 'answerCommentID', 'params'), async (req, res) => {
   await answerCommentService.deleteAnswerComment(req)
   res.status(204).end()
 })

@@ -1,12 +1,12 @@
 import { Request, Response } from 'express'
-import { Image, Rating, RatingCreateInput, RatingUpdateInput, RatingsFiltersInput } from '../types'
+import { Image, Rating, RatingCreateInput, RatingsFiltersInput, RatingUpdateInput } from '../types'
 import { imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
 import getUploadIndex from '../utils/getUploadIndex'
 import { uploadImages } from '../utils/img'
 import StatusError from '../utils/StatusError'
 
-const addRating = async (ratingInput: RatingCreateInput, res: Response): Promise<Rating> => {
+const addRating = async (ratingInput: RatingCreateInput, req: Request): Promise<Rating> => {
   const now = new Date()
 
   const { rows: [ addedRating ] }: { rows: Rating[] } = await db.raw(
@@ -17,7 +17,7 @@ const addRating = async (ratingInput: RatingCreateInput, res: Response): Promise
     `,
     [ db('ratings').insert({
       ...ratingInput,
-      userID: res.locals.userID,
+      userID: req.session?.userID,
       createdAt: now,
       updatedAt: now,
       moderationStatus: 'NEW'
@@ -166,12 +166,12 @@ const deleteRating = async (req: Request): Promise<void> => {
   if (deleteCount === 0) throw new StatusError(404, 'Not Found')
 }
 
-const uploadRatingImages = async (files: Express.Multer.File[], req: Request, res: Response): Promise<void> => {
+const uploadRatingImages = async (files: Express.Multer.File[], req: Request): Promise<void> => {
   const filesWithIndexes = files.map((f) => {
     const index = getUploadIndex(f.filename)
     return {
       ratingID: req.params.ratingID,
-      userID: res.locals.userID,
+      userID: req.session?.userID,
       index
     }
   })

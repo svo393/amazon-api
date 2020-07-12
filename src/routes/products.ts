@@ -2,14 +2,14 @@ import Router from 'express'
 import parameterService from '../services/parameterService'
 import productService from '../services/productService'
 import { UPLOAD_TIMEOUT } from '../utils/config'
-import { checkMediaUpload, checkNewProduct, checkProductMinFilters, checkProductFilters, checkProductUpdate } from '../utils/inputValidator'
-import { isAdmin, multerUpload } from '../utils/middleware'
+import { checkMediaUpload, checkNewProduct, checkProductFilters, checkProductMinFilters, checkProductUpdate } from '../utils/inputValidator'
+import { requireAdmin, multerUpload } from '../utils/middleware'
 
 const router = Router()
 
-router.post('/', isAdmin, async (req, res) => {
+router.post('/', requireAdmin, async (req, res) => {
   const productInput = checkNewProduct(req)
-  const addedProduct = await productService.addProduct(productInput, res)
+  const addedProduct = await productService.addProduct(productInput, req)
   res.status(201).json(addedProduct)
 })
 
@@ -26,20 +26,20 @@ router.get('/min', async (req, res) => {
 })
 
 router.get('/:productID', async (req, res) => {
-  const product = await productService.getProductByID(req, res)
+  const product = await productService.getProductByID(req)
   res.json(product)
 })
 
-router.put('/:productID', isAdmin, async (req, res) => {
+router.put('/:productID', requireAdmin, async (req, res) => {
   const productInput = checkProductUpdate(req)
   const updatedProduct = await productService.updateProduct(productInput, req)
   res.json(updatedProduct)
 })
 
-router.post('/:productID/upload', isAdmin, multerUpload.array('productImages', 10), (req, res) => {
+router.post('/:productID/upload', requireAdmin, multerUpload.array('productImages', 10), (req, res) => {
   req.socket.setTimeout(UPLOAD_TIMEOUT)
   const productImages = checkMediaUpload(req)
-  productService.uploadProductImages(productImages, req, res)
+  productService.uploadProductImages(productImages, req)
   res.status(204).end()
 })
 

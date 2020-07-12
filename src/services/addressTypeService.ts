@@ -1,5 +1,5 @@
-import { Request, Response } from 'express'
-import { Address, AddressType as AT, AddressTypeInput as ATInput, AddressType } from '../types'
+import { Request } from 'express'
+import { Address, AddressType, AddressType as AT, AddressTypeInput as ATInput } from '../types'
 import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
@@ -27,12 +27,12 @@ type SingleAddressTypeData = AddressType & {
   addresses: Address[];
 }
 
-const getAddressTypeByName = async (res: Response, req: Request): Promise<SingleAddressTypeData> => {
+const getAddressTypeByName = async (req: Request): Promise<SingleAddressTypeData> => {
   const { addressTypeName } = req.params
 
   const ats = await db<AT>('addressTypes')
 
-  const filteredATs = [ 'ROOT', 'ADMIN' ].includes(res.locals.userRole)
+  const filteredATs = [ 'ROOT', 'ADMIN' ].includes(req.session?.userRole)
     ? ats
     : ats.filter((at) => !at.isPrivate)
 
@@ -45,7 +45,7 @@ const getAddressTypeByName = async (res: Response, req: Request): Promise<Single
   return { ...at, addresses }
 }
 
-const updateAddressType = async (res: Response, atInput: ATInput, req: Request): Promise<SingleAddressTypeData> => {
+const updateAddressType = async (atInput: ATInput, req: Request): Promise<SingleAddressTypeData> => {
   const [ updatedAT ]: AT[] = await db('addressTypes')
     .update(atInput, [ '*' ])
     .where('addressTypeName', req.params.addressTypeName)

@@ -10,7 +10,8 @@ import userAddressService from '../services/userAddressService'
 import userService from '../services/userService'
 import { UPLOAD_TIMEOUT } from '../utils/config'
 import { checkCartProductUpdate, checkNewCartProduct, checkNewUser, checkSingleMediaUpload, checkUserAddressesUpdate, checkUserFilters, checkUserLogin, checkUserResetRequest, checkUserResetToken, checkUserUpdate } from '../utils/inputValidator'
-import { isAdmin, isAuthenticated, isSameUser, isSameUserOrAdmin, multerUpload } from '../utils/middleware'
+import { multerUpload, requireAdmin, requireAuth, requireSameUser, requireSameUserOrAdmin } from '../utils/middleware'
+import StatusError from '../utils/StatusError'
 
 const router = Router()
 
@@ -32,12 +33,16 @@ router.post('/admin/login', async (req, res) => {
   res.json(loggedInUser)
 })
 
-router.post('/logout', (_, res) => {
+router.post('/logout', requireAuth, (req, res) => {
+  req.session !== undefined && req.session.destroy((err) => {
+    if (err) throw new StatusError(400, 'There was a problem logging out')
+  })
   res.clearCookie('token')
+  res.clearCookie('connect.sid')
   res.status(204).end()
 })
 
-router.get('/', isAdmin, async (req, res) => {
+router.get('/', requireAdmin, async (req, res) => {
   const usersFiltersinput = checkUserFilters(req)
   const users = await userService.getUsers(usersFiltersinput)
   res.json(users)
@@ -47,37 +52,37 @@ router.get('/csrf-token', (req, res) => {
   res.json({ csrfToken: req.csrfToken() })
 })
 
-router.get('/me', isAuthenticated, async (_, res) => {
-  const user = await userService.getMe(res)
+router.get('/me', requireAuth, async (req, res) => {
+  const user = await userService.getMe(req)
   res.json(user)
 })
 
-router.get('/admin/me', isAdmin, async (_, res) => {
-  const user = await userService.getMe(res)
+router.get('/admin/me', requireAdmin, async (req, res) => {
+  const user = await userService.getMe(req)
   res.json(user)
 })
 
 router.get('/:userID', async (req, res) => {
-  const user = await userService.getUserByID(req, res)
+  const user = await userService.getUserByID(req)
   res.json(user)
 })
 
-router.put('/:userID', isSameUser('params'), async (req, res) => {
+router.put('/:userID', requireSameUser('params'), async (req, res) => {
   const userUpdateInput = checkUserUpdate(req)
   const updatedUser = await userService.updateUser(userUpdateInput, res, req)
   res.json(updatedUser)
 })
 
-router.delete('/:userID', isSameUser('params'), async (req, res) => {
-  await userService.deleteUser(req, res)
+router.delete('/:userID', requireSameUser('params'), async (req, res) => {
+  await userService.deleteUser(req)
   res.clearCookie('token')
   res.status(204).end()
 })
 
-router.post('/:userID/upload', isSameUser('params'), multerUpload.single('userAvatar'), (req, res) => {
+router.post('/:userID/upload', requireSameUser('params'), multerUpload.single('userAvatar'), (req, res) => {
   req.socket.setTimeout(UPLOAD_TIMEOUT)
   const userMedia = checkSingleMediaUpload(req)
-  userService.uploadUserAvatar(userMedia, res)
+  userService.uploadUserAvatar(userMedia, req)
   res.status(204).end()
 })
 
@@ -93,23 +98,23 @@ router.post('/reset-password', async (req, res) => {
   res.json(updatedUser)
 })
 
-router.get('/:userID/addresses', isSameUserOrAdmin('params'), async (req, res) => {
+router.get('/:userID/addresses', requireSameUserOrAdmin('params'), async (req, res) => {
   const addresses = await addressService.getAddressesByUser(req)
   res.json(addresses)
 })
 
-router.put('/:userID/addresses/:addressID/', isSameUser('params'), async (req, res) => {
+router.put('/:userID/addresses/:addressID/', requireSameUser('params'), async (req, res) => {
   const userAddressUpdateInput = checkUserAddressesUpdate(req)
   const userAddresses = await userAddressService.updateUserAddress(userAddressUpdateInput, req)
   res.json(userAddresses)
 })
 
-router.delete('/:userID/addresses/:addressID/', isSameUser('params'), async (req, res) => {
+router.delete('/:userID/addresses/:addressID/', requireSameUser('params'), async (req, res) => {
   await userAddressService.deleteUserAddress(req)
   res.status(204).end()
 })
 
-router.get('/:userID/lists', isSameUserOrAdmin('params'), async (req, res) => {
+router.get('/:userID/lists', requireSameUserOrAdmin('params'), async (req, res) => {
   const lists = await listService.getListsByUser(req)
   res.json(lists)
 })
@@ -119,7 +124,7 @@ router.get('/:userID/questions', async (req, res) => {
   res.json(questions)
 })
 
-router.post('/:userID/follows/:anotherUserID', isSameUser('params'), async (req, res) => {
+router.post('/:userID/follows/:anotherUserID', requireSameUser('params'), async (req, res) => {
   const addedFollower = await followerService.addFollower(req)
   res.status(201).json(addedFollower)
 })
@@ -134,45 +139,45 @@ router.get('/:userID/follows', async (req, res) => {
   res.json(followeres)
 })
 
-router.delete('/:userID/follows/:anotherUserID', isSameUser('params'), async (req, res) => {
+router.delete('/:userID/follows/:anotherUserID', requireSameUser('params'), async (req, res) => {
   await followerService.deleteFollower(req)
   res.status(204).end()
 })
 
-router.post('/:userID/cartProducts', isSameUserOrAdmin('params'), async (req, res) => {
+router.post('/:userID/cartProducts', requireSameUserOrAdmin('params'), async (req, res) => {
   const cartProductCreateInput = checkNewCartProduct(req)
   const addedCartProduct = await cartProductService.addCartProduct(cartProductCreateInput)
   res.status(201).json(addedCartProduct)
 })
 
-router.get('/:userID/cartProducts', isSameUserOrAdmin('params'), async (req, res) => {
+router.get('/:userID/cartProducts', requireSameUserOrAdmin('params'), async (req, res) => {
   const cartProducts = await cartProductService.getCartProductsByUser(req)
   res.json(cartProducts)
 })
 
-router.get('/:userID/cartProducts/:productID', isSameUserOrAdmin('params'), async (req, res) => {
+router.get('/:userID/cartProducts/:productID', requireSameUserOrAdmin('params'), async (req, res) => {
   const cartProduct = await cartProductService.getCartProductByID(req)
   res.json(cartProduct)
 })
 
-router.put('/:userID/cartProducts/:productID', isSameUserOrAdmin('params'), async (req, res) => {
+router.put('/:userID/cartProducts/:productID', requireSameUserOrAdmin('params'), async (req, res) => {
   const cartProductUpdateInput = checkCartProductUpdate(req)
   const updatedCartProduct = await cartProductService.updateCartProduct(cartProductUpdateInput, req)
   res.json(updatedCartProduct)
 })
 
-router.delete('/:userID/cartProducts/:productID', isSameUserOrAdmin('params'), async (req, res) => {
+router.delete('/:userID/cartProducts/:productID', requireSameUserOrAdmin('params'), async (req, res) => {
   await cartProductService.deleteCartProduct(req)
   res.status(204).end()
 })
 
 // TODO remove redundant routes
-router.get('/:userID/orders', isSameUserOrAdmin('params'), async (req, res) => {
+router.get('/:userID/orders', requireSameUserOrAdmin('params'), async (req, res) => {
   const orders = await orderService.getOrdersByUser(req)
   res.json(orders)
 })
 
-router.get('/:userID/invoices', isSameUserOrAdmin('params'), async (req, res) => {
+router.get('/:userID/invoices', requireSameUserOrAdmin('params'), async (req, res) => {
   const invoices = await invoiceService.getInvoicesByUser(req)
   res.json(invoices)
 })

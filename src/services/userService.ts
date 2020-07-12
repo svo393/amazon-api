@@ -245,16 +245,16 @@ type UserPublicData = Omit<UserData,
 
 type CurrentUser = { userID: number; role: string }
 
-const getMe = async (res: Response): Promise<CurrentUser> => {
+const getMe = async (req: Request): Promise<CurrentUser> => {
   const user = await db<User>('users')
-    .where('userID', res.locals.userID)
+    .where('userID', req.session?.userID)
     .first('userID', 'role')
 
   if (user === undefined) { throw new StatusError(404, 'Not Found') }
   return user
 }
 
-const getUserByID = async (req: Request, res: Response): Promise<UserData | UserPublicData> => {
+const getUserByID = async (req: Request): Promise<UserData | UserPublicData> => {
   const rawUser: UserRawData = await getUsersQuery.clone()
     .first()
     .where('u.userID', req.params.userID)
@@ -278,7 +278,7 @@ const getUserByID = async (req: Request, res: Response): Promise<UserData | User
     ratingCount: parseInt(rawUser.ratingCount)
   }
 
-  const hasPermission = [ 'ROOT', 'ADMIN' ].includes(res.locals.userRole)
+  const hasPermission = [ 'ROOT', 'ADMIN' ].includes(req.session?.userRole)
 
   return hasPermission
     ? user
@@ -291,7 +291,7 @@ const getUserByID = async (req: Request, res: Response): Promise<UserData | User
 }
 
 const updateUser = async (userInput: UserUpdateInput, res: Response, req: Request): Promise<UserSafeData> => {
-  const role: string | undefined = res.locals.userRole
+  const role: string | undefined = req.session?.userRole
 
   const [ updatedUser ]: User[] = await db('users')
     .update(userInput, [ '*' ])
@@ -307,8 +307,8 @@ const updateUser = async (userInput: UserUpdateInput, res: Response, req: Reques
   ], updatedUser)
 }
 
-const deleteUser = async (req: Request, res: Response): Promise<void> => {
-  if ([ 'ROOT', 'ADMIN' ].includes(res.locals.userRole)) {
+const deleteUser = async (req: Request): Promise<void> => {
+  if ([ 'ROOT', 'ADMIN' ].includes(req.session?.userRole)) {
     throw new StatusError(451, 'Not gonna happen')
   }
 
@@ -346,7 +346,7 @@ const sendPasswordReset = async (userInput: PasswordRequestInput): Promise<void>
   //           Click Here to Reset
   //         </a>`)
   //   })
-  // } catch (_err) {
+  // } catch (_) {
   //   throw new StatusError(500, 'Error requesting password reset. Please try again later.')
   // }
 }
@@ -381,9 +381,9 @@ const resetPassword = async ({ password, resetToken }: PasswordResetInput, res: 
   return updatedUser
 }
 
-const uploadUserAvatar = (file: Express.Multer.File, res: Response): void => {
+const uploadUserAvatar = (file: Express.Multer.File, req: Request): void => {
   const uploadConfig = {
-    fileNames: [ res.locals.userID ],
+    fileNames: [ req.session?.userID ],
     imagesPath: `${imagesBasePath}/avatars`,
     maxWidth: 460,
     maxHeight: 460,

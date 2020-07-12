@@ -1,4 +1,4 @@
-import { Request, Response } from 'express'
+import { Request } from 'express'
 import { AnswerComment, AnswerCommentCreateInput, AnswerCommentUpdateInput, Image } from '../types'
 import { imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
@@ -6,13 +6,13 @@ import getUploadIndex from '../utils/getUploadIndex'
 import { uploadImages } from '../utils/img'
 import StatusError from '../utils/StatusError'
 
-const addAnswerComment = async (answerCommentInput: AnswerCommentCreateInput, res: Response): Promise<AnswerComment> => {
+const addAnswerComment = async (answerCommentInput: AnswerCommentCreateInput, req: Request): Promise<AnswerComment> => {
   const now = new Date()
 
   const [ addedAnswerComment ]: AnswerComment[] = await db('answerComments')
     .insert({
       ...answerCommentInput,
-      userID: res.locals.userID,
+      userID: req.session?.userID,
       createdAt: now,
       updatedAt: now,
       moderationStatus: 'NEW'
@@ -55,12 +55,12 @@ const deleteAnswerComment = async (req: Request): Promise<void> => {
   if (deleteCount === 0) throw new StatusError(404, 'Not Found')
 }
 
-const uploadAnswerCommentImages = async (files: Express.Multer.File[], req: Request, res: Response): Promise<void> => {
+const uploadAnswerCommentImages = async (files: Express.Multer.File[], req: Request): Promise<void> => {
   const filesWithIndexes = files.map((f) => {
     const index = getUploadIndex(f.filename)
     return {
       answerCommentID: req.params.answerCommentID,
-      userID: res.locals.userID,
+      userID: req.session?.userID,
       index
     }
   })

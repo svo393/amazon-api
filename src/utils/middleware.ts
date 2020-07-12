@@ -36,16 +36,15 @@ type Entities =
   | 'invoices'
   | 'images'
 
-export const isAuthenticated: Middleware = (_, res, next) => {
-  if (res.locals.userID === undefined) throw new StatusError(401, 'Unauthorized')
+export const requireAuth: Middleware = (req, _, next) => {
+  if (req.session?.userID === undefined) throw new StatusError(401, 'Unauthorized')
   next()
 }
 
-export const isAdmin: Middleware = (_, res, next) => {
-  const role: string | undefined = res.locals.userRole
+export const requireAdmin: Middleware = (req, _, next) => {
+  const role: string | undefined = req.session?.userRole
 
-  if (res.locals.userID === undefined ||
-      role === undefined) {
+  if (req.session?.userID === undefined || role === undefined) {
     throw new StatusError(401, 'Unauthorized')
   }
 
@@ -55,10 +54,10 @@ export const isAdmin: Middleware = (_, res, next) => {
   next()
 }
 
-export const isRoot: Middleware = (_, res, next) => {
-  const role: string | undefined = res.locals.userRole
+export const requireRoot: Middleware = (req, _, next) => {
+  const role: string | undefined = req.session?.userRole
 
-  if (res.locals.userID === undefined ||
+  if (req.session?.userID === undefined ||
     role === undefined) {
     throw new StatusError(401, 'Unauthorized')
   }
@@ -67,14 +66,14 @@ export const isRoot: Middleware = (_, res, next) => {
   next()
 }
 
-export const isSameUser = (target: Target): Middleware => {
-  const fn: Middleware = (req, res, next) => {
-    const userID: string | undefined = res.locals.userID
+export const requireSameUser = (target: Target): Middleware => {
+  const fn: Middleware = (req, _, next) => {
+    const userID: string | undefined = req.session?.userID
 
     if (userID === undefined) throw new StatusError(401, 'Unauthorized')
 
     if (userID.toString() !== req[target].userID.toString() &&
-      res.locals.userRole !== 'ROOT') {
+      req.session?.userRole !== 'ROOT') {
       throw new StatusError(403, 'Forbidden')
     }
     next()
@@ -82,14 +81,14 @@ export const isSameUser = (target: Target): Middleware => {
   return fn
 }
 
-export const isSameUserOrAdmin = (target: Target): Middleware => {
-  const fn: Middleware = (req, res, next) => {
-    const userID: string | undefined = res.locals.userID
+export const requireSameUserOrAdmin = (target: Target): Middleware => {
+  const fn: Middleware = (req, _, next) => {
+    const userID: string | undefined = req.session?.userID
 
     if (userID === undefined) throw new StatusError(401, 'Unauthorized')
 
     if (userID.toString() !== req[target].userID.toString() &&
-      ![ 'ROOT', 'ADMIN' ].includes(res.locals.userRole)) {
+      ![ 'ROOT', 'ADMIN' ].includes(req.session?.userRole)) {
       throw new StatusError(403, 'Forbidden')
     }
     next()
@@ -97,10 +96,12 @@ export const isSameUserOrAdmin = (target: Target): Middleware => {
   return fn
 }
 
-export const isCreator = (entity: Entities, idName: string, target: Target): Middleware => {
-  const fn: Middleware = async (req, res, next) => {
-    if (res.locals.userID === undefined) throw new StatusError(401, 'Unauthorized')
-    if (res.locals.userRole === 'ROOT') return next()
+export const requireCreator = (entity: Entities, idName: string, target: Target): Middleware => {
+  const fn: Middleware = async (req, _, next) => {
+    if (req.session?.userID === undefined) {
+      throw new StatusError(401, 'Unauthorized')
+    }
+    if (req.session?.userRole === 'ROOT') return next()
 
     const data = await db(entity)
       .first('userID')
@@ -108,7 +109,7 @@ export const isCreator = (entity: Entities, idName: string, target: Target): Mid
 
     if (data === undefined) throw new StatusError(404, 'Not Found')
 
-    if (data.userID.toString() !== res.locals.userID.toString()) {
+    if (data.userID.toString() !== req.session?.userID.toString()) {
       throw new StatusError(403, 'Forbidden')
     }
     next()
@@ -116,11 +117,13 @@ export const isCreator = (entity: Entities, idName: string, target: Target): Mid
   return fn
 }
 
-export const isCreatorOrAdmin = (entity: Entities, idName: string, target: Target): Middleware => {
-  const fn: Middleware = async (req, res, next) => {
-    if (res.locals.userID === undefined) throw new StatusError(401, 'Unauthorized')
+export const requireCreatorOrAdmin = (entity: Entities, idName: string, target: Target): Middleware => {
+  const fn: Middleware = async (req, _, next) => {
+    if (req.session?.userID === undefined) {
+      throw new StatusError(401, 'Unauthorized')
+    }
 
-    const role: string | undefined = res.locals.userRole
+    const role: string | undefined = req.session?.userRole
     if (role !== undefined && [ 'ROOT', 'ADMIN' ].includes(role)) return next()
 
     const data = await db(entity)
@@ -129,7 +132,7 @@ export const isCreatorOrAdmin = (entity: Entities, idName: string, target: Targe
 
     if (data === undefined) throw new StatusError(404, 'Not Found')
 
-    if (data.userID.toString() !== res.locals.userID.toString()) {
+    if (data.userID.toString() !== req.session?.userID.toString()) {
       throw new StatusError(403, 'Forbidden')
     }
     next()
@@ -138,23 +141,23 @@ export const isCreatorOrAdmin = (entity: Entities, idName: string, target: Targe
 }
 
 export const getUserID: Middleware = async (req, res, next) => {
-  if (req.cookies.token !== undefined) {
+  if (req.cookies.token !== undefined && req.session !== undefined) {
     try {
       const decodedToken = jwt.verify(req.cookies.token, env.JWT_SECRET)
-      res.locals.userID = (decodedToken as DecodedToken).userID
+      req.session.userID = (decodedToken as DecodedToken).userID
 
       const user = await db<User>('users')
         .first('role')
-        .where('userID', res.locals.userID)
+        .where('userID', req.session.userID)
 
       if (user === undefined) {
         res.clearCookie('token')
-        throw new StatusError(403, 'Forbidden')
+        throw new StatusError(401, 'Unauthorized')
       }
-      res.locals.userRole = user.role
-    } catch (_err) {
+      req.session.userRole = user.role
+    } catch (_) {
       res.clearCookie('token')
-      throw new StatusError(403, 'Forbidden')
+      throw new StatusError(401, 'Unauthorized')
     }
   }
   next()
