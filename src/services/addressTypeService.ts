@@ -32,7 +32,7 @@ const getAddressTypeByName = async (req: Request): Promise<SingleAddressTypeData
 
   const ats = await db<AT>('addressTypes')
 
-  const filteredATs = [ 'ROOT', 'ADMIN' ].includes(req.session?.userRole)
+  const filteredATs = [ 'ROOT', 'ADMIN' ].includes(req.session?.role)
     ? ats
     : ats.filter((at) => !at.isPrivate)
 

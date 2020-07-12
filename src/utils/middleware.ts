@@ -1,7 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
-import jwt from 'jsonwebtoken'
 import multer from 'multer'
-import { User } from '../types'
 import env from './config'
 import { db } from './db'
 import logger from './logger'
@@ -12,12 +10,6 @@ type Middleware = (
   res: Response,
   next: NextFunction
 ) => void
-
-type DecodedToken = {
-  userID: number;
-  iat: number;
-  exp: number;
-}
 
 type Target = 'params' | 'query' | 'body'
 
@@ -42,7 +34,7 @@ export const requireAuth: Middleware = (req, _, next) => {
 }
 
 export const requireAdmin: Middleware = (req, _, next) => {
-  const role: string | undefined = req.session?.userRole
+  const role: string | undefined = req.session?.role
 
   if (req.session?.userID === undefined || role === undefined) {
     throw new StatusError(401, 'Unauthorized')
@@ -55,7 +47,7 @@ export const requireAdmin: Middleware = (req, _, next) => {
 }
 
 export const requireRoot: Middleware = (req, _, next) => {
-  const role: string | undefined = req.session?.userRole
+  const role: string | undefined = req.session?.role
 
   if (req.session?.userID === undefined ||
     role === undefined) {
@@ -73,7 +65,7 @@ export const requireSameUser = (target: Target): Middleware => {
     if (userID === undefined) throw new StatusError(401, 'Unauthorized')
 
     if (userID.toString() !== req[target].userID.toString() &&
-      req.session?.userRole !== 'ROOT') {
+      req.session?.role !== 'ROOT') {
       throw new StatusError(403, 'Forbidden')
     }
     next()
@@ -88,7 +80,7 @@ export const requireSameUserOrAdmin = (target: Target): Middleware => {
     if (userID === undefined) throw new StatusError(401, 'Unauthorized')
 
     if (userID.toString() !== req[target].userID.toString() &&
-      ![ 'ROOT', 'ADMIN' ].includes(req.session?.userRole)) {
+      ![ 'ROOT', 'ADMIN' ].includes(req.session?.role)) {
       throw new StatusError(403, 'Forbidden')
     }
     next()
@@ -101,7 +93,7 @@ export const requireCreator = (entity: Entities, idName: string, target: Target)
     if (req.session?.userID === undefined) {
       throw new StatusError(401, 'Unauthorized')
     }
-    if (req.session?.userRole === 'ROOT') return next()
+    if (req.session?.role === 'ROOT') return next()
 
     const data = await db(entity)
       .first('userID')
@@ -123,7 +115,7 @@ export const requireCreatorOrAdmin = (entity: Entities, idName: string, target: 
       throw new StatusError(401, 'Unauthorized')
     }
 
-    const role: string | undefined = req.session?.userRole
+    const role: string | undefined = req.session?.role
     if (role !== undefined && [ 'ROOT', 'ADMIN' ].includes(role)) return next()
 
     const data = await db(entity)
@@ -138,29 +130,6 @@ export const requireCreatorOrAdmin = (entity: Entities, idName: string, target: 
     next()
   }
   return fn
-}
-
-export const getUserID: Middleware = async (req, res, next) => {
-  if (req.cookies.token !== undefined && req.session !== undefined) {
-    try {
-      const decodedToken = jwt.verify(req.cookies.token, env.JWT_SECRET)
-      req.session.userID = (decodedToken as DecodedToken).userID
-
-      const user = await db<User>('users')
-        .first('role')
-        .where('userID', req.session.userID)
-
-      if (user === undefined) {
-        res.clearCookie('token')
-        throw new StatusError(401, 'Unauthorized')
-      }
-      req.session.userRole = user.role
-    } catch (_) {
-      res.clearCookie('token')
-      throw new StatusError(401, 'Unauthorized')
-    }
-  }
-  next()
 }
 
 export const unknownEndpoint: Middleware = (req, res) => {

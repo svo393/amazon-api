@@ -15,51 +15,10 @@ import StatusError from '../utils/StatusError'
 
 const router = Router()
 
-router.post('/', async (req, res) => {
-  const userSignupInput = checkNewUser(req)
-  const addedUser = await userService.addUser(userSignupInput, res)
-  res.status(201).json(addedUser)
-})
-
-router.post('/login', async (req, res) => {
-  const userLoginInput = checkUserLogin(req)
-  const loggedInUser = await userService.loginUser(userLoginInput, res)
-  res.json(loggedInUser)
-})
-
-router.post('/admin/login', async (req, res) => {
-  const userLoginInput = checkUserLogin(req)
-  const loggedInUser = await userService.loginUser(userLoginInput, res, true)
-  res.json(loggedInUser)
-})
-
-router.post('/logout', requireAuth, (req, res) => {
-  req.session !== undefined && req.session.destroy((err) => {
-    if (err) throw new StatusError(400, 'There was a problem logging out')
-  })
-  res.clearCookie('token')
-  res.clearCookie('connect.sid')
-  res.status(204).end()
-})
-
 router.get('/', requireAdmin, async (req, res) => {
   const usersFiltersinput = checkUserFilters(req)
   const users = await userService.getUsers(usersFiltersinput)
   res.json(users)
-})
-
-router.get('/csrf-token', (req, res) => {
-  res.json({ csrfToken: req.csrfToken() })
-})
-
-router.get('/me', requireAuth, async (req, res) => {
-  const user = await userService.getMe(req)
-  res.json(user)
-})
-
-router.get('/admin/me', requireAdmin, async (req, res) => {
-  const user = await userService.getMe(req)
-  res.json(user)
 })
 
 router.get('/:userID', async (req, res) => {
@@ -73,29 +32,11 @@ router.put('/:userID', requireSameUser('params'), async (req, res) => {
   res.json(updatedUser)
 })
 
-router.delete('/:userID', requireSameUser('params'), async (req, res) => {
-  await userService.deleteUser(req)
-  res.clearCookie('token')
-  res.status(204).end()
-})
-
 router.post('/:userID/upload', requireSameUser('params'), multerUpload.single('userAvatar'), (req, res) => {
   req.socket.setTimeout(UPLOAD_TIMEOUT)
   const userMedia = checkSingleMediaUpload(req)
   userService.uploadUserAvatar(userMedia, req)
   res.status(204).end()
-})
-
-router.post('/request-password-reset', async (req, res) => {
-  const userResetRequestInput = checkUserResetRequest(req)
-  await userService.sendPasswordReset(userResetRequestInput)
-  res.status(204).end()
-})
-
-router.post('/reset-password', async (req, res) => {
-  const userPasswordResetInput = checkUserResetToken(req)
-  const updatedUser = await userService.resetPassword(userPasswordResetInput, res)
-  res.json(updatedUser)
 })
 
 router.get('/:userID/addresses', requireSameUserOrAdmin('params'), async (req, res) => {

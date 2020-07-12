@@ -1,4 +1,3 @@
-import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import path from 'path'
 import express from 'express'
@@ -6,7 +5,7 @@ import helmet from 'helmet'
 import logger from 'morgan'
 import router from './routes'
 import env from './utils/config'
-import { errorHandler, getUserID, unknownEndpoint } from './utils/middleware'
+import { errorHandler, unknownEndpoint } from './utils/middleware'
 import csrf from 'csurf'
 import session from 'express-session'
 
@@ -30,6 +29,7 @@ app.use(session({
     sameSite: 'lax'
   }
 }))
+
 env.NODE_ENV === 'development' && app.use(logger('dev'))
 
 app.use(cors({
@@ -38,9 +38,7 @@ app.use(cors({
   optionsSuccessStatus: 200
 }))
 
-app.use(cookieParser())
-app.use(getUserID)
-app.use(csrfProtection)
+// app.use(csrfProtection)
 
 app.use('/', router)
 app.use(unknownEndpoint)

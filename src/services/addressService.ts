@@ -96,7 +96,7 @@ const getAddressByID = async (req: Request): Promise<AddressFullData> => {
 
   if (address === undefined) throw new StatusError(404, 'Not Found')
 
-  const role: string | undefined = req.session?.userRole
+  const role: string | undefined = req.session?.role
 
   if (
     address.isPrivate &&

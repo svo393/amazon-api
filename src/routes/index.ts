@@ -5,12 +5,17 @@ import addressesRouter from './addresses'
 import addressTypesRouter from './addressTypes'
 import answerCommentsRouter from './answerComments'
 import answersRouter from './answers'
+import authRouter from './auth'
 import categoriesRouter from './categories'
+import feedRouter from './feed'
 import groupsRouter from './groups'
+import imagesRouter from './images'
+import invoicesRouter from './invoices'
 import invoiceStatusesRouter from './invoiceStatuses'
 import listsRouter from './lists'
-import orderStatusesRouter from './orderStatuses'
 import moderationStatusesRouter from './moderationStatuses'
+import ordersRouter from './orders'
+import orderStatusesRouter from './orderStatuses'
 import parametersRouter from './parameters'
 import paymentMethodsRouter from './paymentMethods'
 import productsRouter from './products'
@@ -22,34 +27,31 @@ import shippingMethodsRouter from './shippingMethods'
 import userAddressesRouter from './userAddresses'
 import usersRouter from './users'
 import vendorsRouter from './vendors'
-import ordersRouter from './orders'
-import invoicesRouter from './invoices'
-import feedRouter from './feed'
-import imagesRouter from './images'
 
 export default Router()
-  .use(apiURLs.categories, categoriesRouter)
-  .use(apiURLs.invoices, invoicesRouter)
-  .use(apiURLs.orders, ordersRouter)
-  .use(apiURLs.products, productsRouter)
-  .use(apiURLs.users, usersRouter)
-  .use(apiURLs.vendors, vendorsRouter)
-  .use(apiURLs.groups, groupsRouter)
-  .use(apiURLs.parameters, parametersRouter)
-  .use(apiURLs.roles, rolesRouter)
-  .use(apiURLs.orderStatuses, orderStatusesRouter)
-  .use(apiURLs.moderationStatuses, moderationStatusesRouter)
-  .use(apiURLs.invoiceStatuses, invoiceStatusesRouter)
-  .use(apiURLs.shippingMethods, shippingMethodsRouter)
-  .use(apiURLs.addressTypes, addressTypesRouter)
-  .use(apiURLs.paymentMethods, paymentMethodsRouter)
   .use(apiURLs.addresses, addressesRouter)
-  .use(apiURLs.userAddresses, userAddressesRouter)
+  .use(apiURLs.addressTypes, addressTypesRouter)
+  .use(apiURLs.answerComments, answerCommentsRouter)
+  .use(apiURLs.answers, answersRouter)
+  .use(apiURLs.auth, authRouter)
+  .use(apiURLs.categories, categoriesRouter)
+  .use(apiURLs.feed, feedRouter)
+  .use(apiURLs.groups, groupsRouter)
+  .use(apiURLs.images, imagesRouter)
+  .use(apiURLs.invoices, invoicesRouter)
+  .use(apiURLs.invoiceStatuses, invoiceStatusesRouter)
   .use(apiURLs.lists, listsRouter)
-  .use(apiURLs.ratings, ratingsRouter)
+  .use(apiURLs.moderationStatuses, moderationStatusesRouter)
+  .use(apiURLs.orders, ordersRouter)
+  .use(apiURLs.orderStatuses, orderStatusesRouter)
+  .use(apiURLs.parameters, parametersRouter)
+  .use(apiURLs.paymentMethods, paymentMethodsRouter)
+  .use(apiURLs.products, productsRouter)
   .use(apiURLs.questions, questionsRouter)
   .use(apiURLs.ratingComments, ratingCommentsRouter)
-  .use(apiURLs.answers, answersRouter)
-  .use(apiURLs.images, imagesRouter)
-  .use(apiURLs.answerComments, answerCommentsRouter)
-  .use(apiURLs.feed, feedRouter)
+  .use(apiURLs.ratings, ratingsRouter)
+  .use(apiURLs.roles, rolesRouter)
+  .use(apiURLs.shippingMethods, shippingMethodsRouter)
+  .use(apiURLs.userAddresses, userAddressesRouter)
+  .use(apiURLs.users, usersRouter)
+  .use(apiURLs.vendors, vendorsRouter)

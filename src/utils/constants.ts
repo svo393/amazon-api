@@ -1,11 +1,10 @@
 export const roles = [ 'ROOT', 'ADMIN', 'CUSTOMER' ]
-export const moderationStatuses = [ 'NEW', 'APPROVED', 'REJECTED' ]
+export const paymentMethods = [ 'CARD', 'CASH' ]
 export const shippingMethods = [
   { shippingMethodName: 'INTL', isPrivate: true },
   { shippingMethodName: 'DOOR', isPrivate: true },
   { shippingMethodName: 'LOCKER' }
 ]
-export const paymentMethods = [ 'CARD', 'CASH' ]
 export const addressTypes = [
   { addressTypeName: 'SHIPPING', isPrivate: true },
   { addressTypeName: 'LOCKER' }
@@ -14,34 +13,39 @@ export const lockerAddresses = [
   'Pokrovka St, 17, Moscow, 101000 Russian Federation',
   'Altuf\'yevskoye Shosse, 70к1, Moscow, 127549 Russian Federation'
 ]
+
+export const moderationStatuses = [ 'NEW', 'APPROVED', 'REJECTED' ]
 export const orderStatuses = [ 'DONE', 'PROCESSING', 'NEW', 'CANCELED' ]
 export const invoiceStatuses = [ 'DONE', 'PROCESSING', 'NEW', 'CANCELED' ]
-export const baseAPI = '/api'
+
 export const imagesBasePath = './public/media'
+
+export const baseAPI = '/api'
 export const apiURLs = {
-  categories: `${baseAPI}/categories`,
-  products: `${baseAPI}/products`,
-  users: `${baseAPI}/users`,
-  vendors: `${baseAPI}/vendors`,
-  roles: `${baseAPI}/roles`,
-  orderStatuses: `${baseAPI}/order-statuses`,
-  moderationStatuses: `${baseAPI}/moderation-statuses`,
-  invoiceStatuses: `${baseAPI}/invoice-statuses`,
-  shippingMethods: `${baseAPI}/shipping-methods`,
-  addressTypes: `${baseAPI}/address-types`,
-  paymentMethods: `${baseAPI}/payment-methods`,
   addresses: `${baseAPI}/addresses`,
-  userAddresses: `${baseAPI}/user-addresses`,
-  lists: `${baseAPI}/lists`,
-  ratings: `${baseAPI}/ratings`,
-  ratingComments: `${baseAPI}/rating-comments`,
-  questions: `${baseAPI}/questions`,
-  answers: `${baseAPI}/answers`,
+  addressTypes: `${baseAPI}/address-types`,
   answerComments: `${baseAPI}/answer-comments`,
+  answers: `${baseAPI}/answers`,
+  auth: `${baseAPI}/auth`,
+  categories: `${baseAPI}/categories`,
+  feed: `${baseAPI}/feed`,
   groups: `${baseAPI}/groups`,
-  parameters: `${baseAPI}/parameters`,
-  orders: `${baseAPI}/orders`,
   images: `${baseAPI}/images`,
   invoices: `${baseAPI}/invoices`,
-  feed: `${baseAPI}/feed`
+  invoiceStatuses: `${baseAPI}/invoice-statuses`,
+  lists: `${baseAPI}/lists`,
+  moderationStatuses: `${baseAPI}/moderation-statuses`,
+  orders: `${baseAPI}/orders`,
+  orderStatuses: `${baseAPI}/order-statuses`,
+  parameters: `${baseAPI}/parameters`,
+  paymentMethods: `${baseAPI}/payment-methods`,
+  products: `${baseAPI}/products`,
+  questions: `${baseAPI}/questions`,
+  ratingComments: `${baseAPI}/rating-comments`,
+  ratings: `${baseAPI}/ratings`,
+  roles: `${baseAPI}/roles`,
+  shippingMethods: `${baseAPI}/shipping-methods`,
+  userAddresses: `${baseAPI}/user-addresses`,
+  users: `${baseAPI}/users`,
+  vendors: `${baseAPI}/vendors`
 }
