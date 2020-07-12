@@ -5,7 +5,7 @@ dotenv.config()
 
 type Config = {
   PORT: string;
-  JWT_SECRET: string;
+  REDIS_PASS: string;
   SESSION_SECRET: string;
   SESSION_MAX_AGE: string;
   NODE_ENV: string;
@@ -18,7 +18,7 @@ type Config = {
 
 const envVars: Config = R.pickAll([
   'PORT',
-  'JWT_SECRET',
+  'REDIS_PASS',
   'SESSION_SECRET',
   'SESSION_MAX_AGE',
   'NODE_ENV',
@@ -34,7 +34,7 @@ envVars.BASE_URL = process.env.NODE_ENV === 'production'
 
 export const UPLOAD_TIMEOUT = 20000
 
-if (R.any(R.isNil)(R.values(envVars))) {
+if (Object.values(envVars).some((v) => v === undefined)) {
   console.error('Missing environment variables. Shutting down...')
   process.exit(1)
 }
