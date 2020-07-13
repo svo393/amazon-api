@@ -1,4 +1,5 @@
 import { Request } from 'express'
+import R from 'ramda'
 import { Image, RatingComment, RatingCommentCreateInput, RatingCommentUpdateInput } from '../types'
 import { imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
@@ -26,13 +27,34 @@ const getCommentsByRating = async (req: Request): Promise<RatingComment[]> => {
     .where('ratingID', req.params.ratingID)
 }
 
-const getRatingCommentByID = async (req: Request): Promise<RatingComment> => {
-  const ratingComment = await db<RatingComment>('ratingComments')
-    .first()
-    .where('ratingCommentID', req.params.ratingCommentID)
+const getRatingCommentByID = async (req: Request): Promise<RatingComment &
+{ images: Image[] }> => {
+  const { ratingCommentID } = req.params
+
+  const ratingComment = await db<RatingComment>('ratingComments as rc')
+    .first(
+      'rc.ratingCommentID',
+      'rc.createdAt',
+      'rc.updatedAt',
+      'rc.content',
+      'rc.moderationStatus',
+      'rc.userID',
+      'rc.ratingID',
+      'rc.parentRatingCommentID',
+      'u.email as userEmail'
+    )
+    .where('ratingCommentID', ratingCommentID)
+    .join('users as u', 'rc.userID', 'u.userID')
+    .groupBy('rc.ratingCommentID', 'userEmail')
 
   if (ratingComment === undefined) throw new StatusError(404, 'Not Found')
-  return ratingComment
+
+  const images = await db<Image>('images')
+    .where('ratingCommentID', ratingCommentID)
+
+  return [ 'ROOT', 'ADMIN' ].includes(req.session?.role)
+    ? { ...ratingComment, images }
+    : { ...R.omit([ 'userEmail' ], ratingComment), images }
 }
 
 const updateRatingComment = async (ratingCommentInput: RatingCommentUpdateInput, req: Request): Promise<RatingComment> => {

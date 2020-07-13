@@ -115,8 +115,7 @@ export const requireCreatorOrAdmin = (entity: Entities, idName: string, target: 
       throw new StatusError(401, 'Unauthorized')
     }
 
-    const role: string | undefined = req.session?.role
-    if (role !== undefined && [ 'ROOT', 'ADMIN' ].includes(role)) return next()
+    if ([ 'ROOT', 'ADMIN' ].includes(req.session?.role)) return next()
 
     const data = await db(entity)
       .first('userID')

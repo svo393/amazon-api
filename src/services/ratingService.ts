@@ -1,4 +1,5 @@
-import { Request, Response } from 'express'
+import { Request } from 'express'
+import R from 'ramda'
 import { Image, Rating, RatingCreateInput, RatingsFiltersInput, RatingUpdateInput } from '../types'
 import { imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
@@ -30,9 +31,7 @@ const addRating = async (ratingInput: RatingCreateInput, req: Request): Promise<
   return addedRating
 }
 
-type RatingData = Rating & { userEmail: string }
-
-const getRatings = async (ratingsFiltersinput: RatingsFiltersInput): Promise<RatingData[]> => {
+const getRatings = async (ratingsFiltersInput: RatingsFiltersInput, req: Request): Promise<Rating[]> => {
   const {
     q,
     groupID,
@@ -47,9 +46,11 @@ const getRatings = async (ratingsFiltersinput: RatingsFiltersInput): Promise<Rat
     likesMax,
     dislikesMin,
     dislikesMax
-  } = ratingsFiltersinput
+  } = ratingsFiltersInput
 
-  let ratings: RatingData[] = await db('ratings as r')
+  const userHasPermission = [ 'ROOT', 'ADMIN' ].includes(req.session?.role)
+
+  let ratings: Rating[] = await db('ratings as r')
     .select(
       'r.ratingID',
       'r.createdAt',
@@ -79,7 +80,7 @@ const getRatings = async (ratingsFiltersinput: RatingsFiltersInput): Promise<Rat
       .filter((r) => r.groupID === groupID)
   }
 
-  if (userEmail !== undefined) {
+  if (userHasPermission && userEmail !== undefined) {
     ratings = ratings
       .filter((r) => r.userEmail?.toLowerCase().includes(userEmail.toLowerCase()))
   }
@@ -134,16 +135,43 @@ const getRatings = async (ratingsFiltersinput: RatingsFiltersInput): Promise<Rat
       .filter((r) => r.dislikes <= dislikesMax)
   }
 
-  return ratings
+  return userHasPermission
+    ? ratings
+    : ratings.map((r) => ({ ...R.omit([ 'userEmail' ], r) }))
 }
 
-const getRatingByID = async (req: Request): Promise<Rating> => {
-  const rating = await db<Rating>('ratings')
-    .first()
-    .where('ratingID', req.params.ratingID)
+const getRatingByID = async (req: Request): Promise<Rating &
+{ images: Image[] }> => {
+  const { ratingID } = req.params
+
+  const rating = await db<Rating>('ratings as r')
+    .first(
+      'r.ratingID',
+      'r.createdAt',
+      'r.updatedAt',
+      'r.title',
+      'r.review',
+      'r.stars',
+      'r.likes',
+      'r.dislikes',
+      'r.isVerified',
+      'r.moderationStatus',
+      'r.userID',
+      'r.groupID',
+      'u.email as userEmail'
+    )
+    .where('ratingID', ratingID)
+    .join('users as u', 'r.userID', 'u.userID')
+    .groupBy('r.ratingID', 'userEmail')
 
   if (rating === undefined) throw new StatusError(404, 'Not Found')
-  return rating
+
+  const images = await db<Image>('images')
+    .where('ratingID', ratingID)
+
+  return [ 'ROOT', 'ADMIN' ].includes(req.session?.role)
+    ? { ...rating, images }
+    : { ...R.omit([ 'userEmail' ], rating), images }
 }
 
 const updateRating = async (ratingInput: RatingUpdateInput, req: Request): Promise<Rating> => {

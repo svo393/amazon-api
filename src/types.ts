@@ -99,7 +99,7 @@ export type Rating = {
   moderationStatus: string;
   userID: number;
   groupID: number;
-  userEmail: string;
+  userEmail?: string;
 }
 
 export type RatingComment = {

@@ -341,9 +341,7 @@ const getProductByID = async (req: Request): Promise<ProductLimitedData| Product
     productSizes
   }
 
-  const role: string | undefined = req.session?.role
-
-  return role !== undefined && [ 'ROOT', 'ADMIN' ].includes(role)
+  return [ 'ROOT', 'ADMIN' ].includes(req.session?.role)
     ? fullProduct
     : R.omit([
       'createdAt',

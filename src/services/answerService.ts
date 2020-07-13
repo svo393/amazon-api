@@ -1,4 +1,5 @@
 import { Request } from 'express'
+import R from 'ramda'
 import { Answer, AnswerCreateInput, AnswerUpdateInput, Image } from '../types'
 import { imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
@@ -26,13 +27,35 @@ const getAnswersByQuestion = async (req: Request): Promise<Answer[]> => {
     .where('questionID', req.params.questionID)
 }
 
-const getAnswerByID = async (req: Request): Promise<Answer> => {
-  const answer = await db<Answer>('answers')
-    .first()
-    .where('answerID', req.params.answerID)
+const getAnswerByID = async (req: Request): Promise<Answer &
+{ images: Image[] }> => {
+  const { answerID } = req.params
+
+  const answer = await db<Answer>('answers as a')
+    .first(
+      'a.answerID',
+      'a.createdAt',
+      'a.updatedAt',
+      'a.content',
+      'a.likes',
+      'a.dislikes',
+      'a.moderationStatus',
+      'a.userID',
+      'a.questionID',
+      'u.email as userEmail'
+    )
+    .where('answerID', answerID)
+    .join('users as u', 'a.userID', 'u.userID')
+    .groupBy('a.answerID', 'userEmail')
 
   if (answer === undefined) throw new StatusError(404, 'Not Found')
-  return answer
+
+  const images = await db<Image>('images')
+    .where('answerID', answerID)
+
+  return [ 'ROOT', 'ADMIN' ].includes(req.session?.role)
+    ? { ...answer, images }
+    : { ...R.omit([ 'userEmail' ], answer), images }
 }
 
 const updateAnswer = async (answerInput: AnswerUpdateInput, req: Request): Promise<Answer> => {

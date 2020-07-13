@@ -15,7 +15,7 @@ router.post('/', requireAuth, async (req, res) => {
 
 router.get('/', async (req, res) => {
   const ratingsFiltersinput = checkRatingFilters(req)
-  const ratings = await ratingService.getRatings(ratingsFiltersinput)
+  const ratings = await ratingService.getRatings(ratingsFiltersinput, req)
   res.json(ratings)
 })
 
