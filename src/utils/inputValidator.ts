@@ -1181,6 +1181,10 @@ export const checkUserFilters = ({ query }: Request): UsersFiltersInput => {
 }
 
 export const checkFeedFilters = ({ query }: Request): FeedFiltersInput => {
+  const q = 'q' in query
+    ? isString({ name: 'q', param: query.q })
+    : undefined
+
   const types = 'types' in query
     ? isString({ name: 'types', param: query.types })
     : undefined
@@ -1197,20 +1201,16 @@ export const checkFeedFilters = ({ query }: Request): FeedFiltersInput => {
     ? isDate({ name: 'createdTo', param: query.createdTo })
     : undefined
 
-  const content = 'content' in query
-    ? isString({ name: 'content', param: query.content })
-    : undefined
-
   const userEmail = 'userEmail' in query
     ? isString({ name: 'userEmail', param: query.userEmail })
     : undefined
 
   return {
+    q: q?.param,
     types: types?.param,
     moderationStatuses: moderationStatuses?.param,
     createdFrom: createdFrom?.param,
     createdTo: createdTo?.param,
-    content: content?.param,
     userEmail: userEmail?.param
   }
 }

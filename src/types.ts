@@ -416,11 +416,11 @@ export type VendorsFiltersInput = { q?: string}
 export type CategoriesFiltersInput = { q?: string}
 
 export type FeedFiltersInput = {
+  q?: string;
   types?: string;
   moderationStatuses?: string;
   createdFrom?: string;
   createdTo?: string;
-  content?: string;
   userEmail?: string;
 }
 

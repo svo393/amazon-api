@@ -18,11 +18,11 @@ type Activity = (
 
 const getFeed = async (feedFiltersinput: FeedFiltersInput): Promise<Feed> => {
   const {
+    q,
     types,
     moderationStatuses,
     createdFrom,
     createdTo,
-    content,
     userEmail
   } = feedFiltersinput
 
@@ -90,6 +90,14 @@ const getFeed = async (feedFiltersinput: FeedFiltersInput): Promise<Feed> => {
     answerComments: [ ...answerComments.map((x) => ({ ...x, type: 'answerComment' })) ]
   }
 
+  if (q !== undefined) {
+    for (const activity in feed) {
+      feed[activity] = feed[activity].filter((a: Activity) =>
+        a.content.toLowerCase().includes(q.toLowerCase()))
+      if (feed[activity].length === 0) delete feed[activity]
+    }
+  }
+
   if (types !== undefined) {
     feed = R.pick(types.split(',').map((a) => a + 's'), feed)
   }
@@ -115,14 +123,6 @@ const getFeed = async (feedFiltersinput: FeedFiltersInput): Promise<Feed> => {
     for (const activity in feed) {
       feed[activity] = feed[activity].filter((a: Activity) =>
         a.createdAt <= new Date(createdTo))
-      if (feed[activity].length === 0) delete feed[activity]
-    }
-  }
-
-  if (content !== undefined) {
-    for (const activity in feed) {
-      feed[activity] = feed[activity].filter((a: Activity) =>
-        a.content.toLowerCase().includes(content.toLowerCase()))
       if (feed[activity].length === 0) delete feed[activity]
     }
   }
