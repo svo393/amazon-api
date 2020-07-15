@@ -11,20 +11,20 @@ type UploadConfig = {
   previewHeight?: number;
   thumbWidth: number;
   thumbHeight: number;
+  addWebp?: boolean;
 }
 
-export const uploadImages = (files: Express.Multer.File[], uploadConfig: UploadConfig): void => {
-  const {
-    fileNames,
-    imagesPath,
-    maxWidth,
-    maxHeight,
-    previewWidth,
-    previewHeight,
-    thumbWidth,
-    thumbHeight
-  } = uploadConfig
-
+export const uploadImages = (files: Express.Multer.File[], {
+  fileNames,
+  imagesPath,
+  maxWidth,
+  maxHeight,
+  previewWidth,
+  previewHeight,
+  thumbWidth,
+  thumbHeight,
+  addWebp = false
+}: UploadConfig): void => {
   files.map(async (file, index) => {
     const image = sharp(file.path)
     const info = await image.metadata()
@@ -38,7 +38,7 @@ export const uploadImages = (files: Express.Multer.File[], uploadConfig: UploadC
           path.resolve(imagesPath, `${fileName}_${maxWidth}.jpg`)
         )
 
-      await image
+      addWebp && await image
         .resize(maxWidth, maxHeight, { fit: 'inside' })
         .webp()
         .toFile(
@@ -51,7 +51,7 @@ export const uploadImages = (files: Express.Multer.File[], uploadConfig: UploadC
           path.resolve(imagesPath, `${fileName}_${maxWidth}.jpg`)
         )
 
-      await image
+      addWebp && await image
         .webp()
         .toFile(
           path.resolve(imagesPath, `${fileName}_${maxWidth}.webp`)
@@ -66,7 +66,7 @@ export const uploadImages = (files: Express.Multer.File[], uploadConfig: UploadC
           path.resolve(imagesPath, `${fileName}_${previewWidth}.jpg`)
         )
 
-      await image
+      addWebp && await image
         .resize(previewWidth, previewHeight, { fit: 'inside' })
         .webp()
         .toFile(
@@ -81,7 +81,7 @@ export const uploadImages = (files: Express.Multer.File[], uploadConfig: UploadC
         path.resolve(imagesPath, `${fileName}_${thumbWidth}.jpg`)
       )
 
-    await image
+    addWebp && await image
       .resize(thumbWidth, thumbHeight, { fit: 'inside' })
       .webp()
       .toFile(
