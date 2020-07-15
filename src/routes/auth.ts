@@ -31,9 +31,9 @@ router.post('/logout', requireAuth, (req, res) => {
   res.json(null)
 })
 
-router.get('/csrf-token', (req, res) => {
-  res.json({ csrfToken: req.csrfToken() })
-})
+// router.get('/csrf-token', (req, res) => {
+//   res.json({ csrfToken: req.csrfToken() })
+// })
 
 router.get('/check-in', requireAuth, async (req, res) => {
   const user = await authService.checkInUser(req)

@@ -61,7 +61,6 @@ export type Product = {
   listPrice?: number;
   price: number;
   description: string;
-  brandSection?: string;
   stock: number | null;
   createdAt: Date;
   updatedAt: Date;

@@ -288,7 +288,6 @@ const getProductsMin = async (productsFiltersinput: ProductsMinFiltersInput): Pr
 type ProductLimitedData = Omit<ProductListData, 'images'> & {
   listPrice?: number;
   description: string;
-  brandSection: string;
   group: GroupVariation[];
   productSizes: ProductSize[];
   images: Image[];
@@ -301,7 +300,6 @@ const getProductByID = async (req: Request): Promise<ProductLimitedData| Product
     .first(
       'p.listPrice',
       'p.description',
-      'p.brandSection',
       'p.createdAt',
       'p.updatedAt',
       'p.userID',

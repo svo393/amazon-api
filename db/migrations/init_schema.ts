@@ -129,7 +129,6 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.integer('listPrice').unsigned()
       t.integer('price').notNullable().unsigned()
       t.string('description', 65535).notNullable()
-      t.string('brandSection', 65535)
       t.integer('stock').unsigned()
       t.dateTime('createdAt').notNullable()
       t.dateTime('updatedAt').notNullable()

@@ -9,9 +9,8 @@ import questionService from '../services/questionService'
 import userAddressService from '../services/userAddressService'
 import userService from '../services/userService'
 import { UPLOAD_TIMEOUT } from '../utils/config'
-import { checkCartProductUpdate, checkNewCartProduct, checkNewUser, checkSingleMediaUpload, checkUserAddressesUpdate, checkUserFilters, checkUserLogin, checkUserResetRequest, checkUserResetToken, checkUserUpdate } from '../utils/inputValidator'
-import { multerUpload, requireAdmin, requireAuth, requireSameUser, requireSameUserOrAdmin } from '../utils/middleware'
-import StatusError from '../utils/StatusError'
+import { checkCartProductUpdate, checkNewCartProduct, checkSingleMediaUpload, checkUserAddressesUpdate, checkUserFilters, checkUserUpdate } from '../utils/inputValidator'
+import { multerUpload, requireAdmin, requireSameUser, requireSameUserOrAdmin } from '../utils/middleware'
 
 const router = Router()
 

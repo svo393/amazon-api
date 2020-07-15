@@ -138,10 +138,6 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
     isString
   )({ name: 'description', param: body.description })
 
-  const brandSection = 'brandSection' in body
-    ? isString({ name: 'brandSection', param: body.brandSection })
-    : undefined
-
   const stock = 'stock' in body
     ? canBeNumber({ name: 'stock', param: body.stock })
     : undefined
@@ -229,7 +225,6 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
     listPrice: listPrice?.param,
     price: price.param,
     description: description.param,
-    brandSection: brandSection?.param,
     stock: stock?.param,
     productSizes: productSizes?.param,
     isAvailable: isAvailable.param,
@@ -260,10 +255,6 @@ export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
     isProvided,
     isString
   )({ name: 'description', param: body.description })
-
-  const brandSection = 'brandSection' in body
-    ? isString({ name: 'brandSection', param: body.brandSection })
-    : undefined
 
   const stock = 'stock' in body
     ? canBeNumber({ name: 'stock', param: body.stock })
@@ -353,7 +344,6 @@ export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
     listPrice: listPrice?.param,
     price: price.param,
     description: description.param,
-    brandSection: brandSection?.param,
     stock: stock?.param,
     productSizes: productSizes?.param,
     isAvailable: isAvailable.param,
