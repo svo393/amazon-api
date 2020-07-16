@@ -4,6 +4,7 @@ import R from 'ramda'
 import { GroupVariation, Image, Product, ProductCreateInput, ProductData, ProductParameter, ProductsFiltersInput, ProductSize, ProductsMinFiltersInput, ProductUpdateInput } from '../types'
 import { imagesBasePath } from '../utils/constants'
 import { db, dbTrans } from '../utils/db'
+import fuseIndexes from '../utils/fuseIndexes'
 import getUploadIndex from '../utils/getUploadIndex'
 import { uploadImages } from '../utils/img'
 import StatusError from '../utils/StatusError'
@@ -148,7 +149,7 @@ const getProducts = async (productsFiltersinput: ProductsFiltersInput): Promise<
     .sum('qty')
     .groupBy('productID')
 
-  let products
+  let products: Omit<ProductListData, 'images'>[]
 
   products = rawProducts.map((p) => {
     const sizes = productSizes.find((ps) => ps.productID === p.productID)
@@ -169,7 +170,8 @@ const getProducts = async (productsFiltersinput: ProductsFiltersInput): Promise<
 
   if (title !== undefined) {
     products = products
-      .filter((p) => p.title.toLowerCase().includes(title.toLowerCase()))
+      .filter((_, i) =>
+        fuseIndexes(products, [ 'title' ], title).includes(i))
   }
 
   if (priceMin !== undefined) {
@@ -184,12 +186,14 @@ const getProducts = async (productsFiltersinput: ProductsFiltersInput): Promise<
 
   if (vendorName !== undefined) {
     products = products
-      .filter((p) => p.vendorName.toLowerCase().includes(vendorName.toLowerCase()))
+      .filter((_, i) =>
+        fuseIndexes(products, [ 'vendorName' ], vendorName).includes(i))
   }
 
   if (categoryName !== undefined) {
     products = products
-      .filter((p) => p.categoryName.toLowerCase().includes(categoryName.toLowerCase()))
+      .filter((_, i) =>
+        fuseIndexes(products, [ 'categoryName' ], categoryName).includes(i))
   }
 
   if (stockMin !== undefined) {

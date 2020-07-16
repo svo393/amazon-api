@@ -1,6 +1,7 @@
 import R from 'ramda'
 import { Answer, AnswerComment, FeedFiltersInput, ObjIndexed, Question, RatingComment } from '../types'
 import { db } from '../utils/db'
+import fuseIndexes from '../utils/fuseIndexes'
 
 interface Feed extends ObjIndexed {
   ratingComments?: (RatingComment & { type: string })[];
@@ -92,8 +93,10 @@ const getFeed = async (feedFiltersinput: FeedFiltersInput): Promise<Feed> => {
 
   if (q !== undefined) {
     for (const activity in feed) {
-      feed[activity] = feed[activity].filter((a: Activity) =>
-        a.content.toLowerCase().includes(q.toLowerCase()))
+      feed[activity] = feed[activity]
+        .filter((_: any, i: number) =>
+          fuseIndexes(feed[activity], [ 'content' ], q).includes(i))
+
       if (feed[activity].length === 0) delete feed[activity]
     }
   }

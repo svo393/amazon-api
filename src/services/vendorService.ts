@@ -1,6 +1,7 @@
 import { Request } from 'express'
-import { Vendor, VendorsFiltersInput, VendorInput } from '../types'
+import { Vendor, VendorInput, VendorsFiltersInput } from '../types'
 import { db } from '../utils/db'
+import fuseIndexes from '../utils/fuseIndexes'
 import StatusError from '../utils/StatusError'
 
 const addVendor = async (vendorInput: VendorInput): Promise<Vendor> => {
@@ -33,7 +34,7 @@ const getVendors = async (vendorsFiltersinput: VendorsFiltersInput): Promise<Ven
     .joinRaw('LEFT JOIN products as p USING ("vendorID")')
     .groupBy('v.vendorID')
 
-  let vendors
+  let vendors: VendorListData[]
 
   vendors = rawVendors.map((v) => ({
     ...v,
@@ -42,7 +43,8 @@ const getVendors = async (vendorsFiltersinput: VendorsFiltersInput): Promise<Ven
 
   if (q !== undefined) {
     vendors = vendors
-      .filter((v) => v.name.toLowerCase().includes(q.toLowerCase()))
+      .filter((_, i) =>
+        fuseIndexes(vendors, [ 'name' ], q).includes(i))
   }
 
   return vendors

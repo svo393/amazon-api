@@ -3,6 +3,7 @@ import R from 'ramda'
 import { Image, Rating, RatingCreateInput, RatingsFiltersInput, RatingUpdateInput } from '../types'
 import { imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
+import fuseIndexes from '../utils/fuseIndexes'
 import getUploadIndex from '../utils/getUploadIndex'
 import { uploadImages } from '../utils/img'
 import StatusError from '../utils/StatusError'
@@ -71,8 +72,8 @@ const getRatings = async (ratingsFiltersInput: RatingsFiltersInput, req: Request
 
   if (q !== undefined) {
     ratings = ratings
-      .filter((r) => r.title?.toLowerCase().includes(q.toLowerCase()) ||
-      r.review.toLowerCase().includes(q.toLowerCase()))
+      .filter((_, i) =>
+        fuseIndexes(ratings, [ 'title', 'review' ], q).includes(i))
   }
 
   if (groupID !== undefined) {

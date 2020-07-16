@@ -1,6 +1,7 @@
 import { Request } from 'express'
-import { Category, CategoryCreateInput, CategoriesFiltersInput, CategoryUpdateInput } from '../types'
+import { CategoriesFiltersInput, Category, CategoryCreateInput, CategoryUpdateInput } from '../types'
 import { db } from '../utils/db'
+import fuseIndexes from '../utils/fuseIndexes'
 import StatusError from '../utils/StatusError'
 
 const addCategory = async (categoryInput: CategoryCreateInput): Promise<Category> => {
@@ -44,7 +45,8 @@ const getCategories = async (categoriesFiltersinput: CategoriesFiltersInput): Pr
 
   if (q !== undefined) {
     categories = categories
-      .filter((c) => c.name.toLowerCase().includes(q.toLowerCase()))
+      .filter((_, i) =>
+        fuseIndexes(categories, [ 'name' ], q).includes(i))
   }
 
   return categories.map((c) => ({
