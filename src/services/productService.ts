@@ -291,6 +291,7 @@ const getProductsMin = async (productsFiltersinput: ProductsMinFiltersInput): Pr
 
 type ProductLimitedData = Omit<ProductListData, 'images'> & {
   listPrice?: number;
+  questionCount: number;
   description: string;
   group: GroupVariation[];
   productSizes: ProductSize[];
@@ -300,7 +301,7 @@ type ProductLimitedData = Omit<ProductListData, 'images'> & {
 type ProductAllData = ProductLimitedData & Pick<ProductData, 'createdAt' | 'updatedAt' | 'userID' | 'listPrice'> & { userEmail: string }
 
 const getProductByID = async (req: Request): Promise<ProductLimitedData| ProductAllData> => {
-  const rawProduct: Omit<ProductAllData, 'stars' | 'ratingCount'> & { stars: string; ratingCount: string } = await getProductsQuery.clone()
+  const rawProduct: Omit<ProductAllData, 'stars' | 'ratingCount | questionCount'> & { stars: string; ratingCount: string; questionCount: string } = await getProductsQuery.clone()
     .first(
       'p.listPrice',
       'p.description',
@@ -311,8 +312,10 @@ const getProductByID = async (req: Request): Promise<ProductLimitedData| Product
       'p.vendorID',
       'u.email as userEmail'
     )
+    .count('q.questionID as questionCount')
     .where('p.productID', req.params.productID)
     .leftJoin('users as u', 'p.userID', 'u.userID')
+    .leftJoin('questions as q', 'p.groupID', 'q.groupID')
     .groupBy('userEmail')
 
   if (rawProduct === undefined) throw new StatusError(404, 'Not Found')
@@ -324,7 +327,8 @@ const getProductByID = async (req: Request): Promise<ProductLimitedData| Product
       ? rawProduct.listPrice / 100
       : undefined,
     stars: parseFloat(rawProduct.stars),
-    ratingCount: parseInt(rawProduct.ratingCount)
+    ratingCount: parseInt(rawProduct.ratingCount),
+    questionCount: parseInt(rawProduct.questionCount)
   }
 
   const groupVariations = await db<GroupVariation>('groupVariations')

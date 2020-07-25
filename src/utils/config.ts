@@ -13,7 +13,7 @@ type Config = {
   MAIL_PORT: string;
   MAIL_USER: string;
   MAIL_PASS: string;
-  BASE_URL?: string;
+  BASE_URLS: (string | undefined)[];
 }
 
 const envVars: Config = R.pickAll([
@@ -28,9 +28,9 @@ const envVars: Config = R.pickAll([
   'MAIL_PASS'
 ], process.env)
 
-envVars.BASE_URL = process.env.NODE_ENV === 'production'
-  ? process.env.PROD_URL
-  : process.env.DEV_URL
+envVars.BASE_URLS = process.env.NODE_ENV === 'production'
+  ? [ process.env.PROD_URL1, process.env.PROD_URL2 ]
+  : [ process.env.DEV_URL1, process.env.DEV_URL2 ]
 
 export const UPLOAD_TIMEOUT = 20000
 

@@ -13,6 +13,7 @@ import router from './routes'
 import env from './utils/config'
 import { errorHandler, unknownEndpoint } from './utils/middleware'
 import fileStore from 'session-file-store'
+import StatusError from './utils/StatusError'
 
 const FileStore = fileStore(session)
 
@@ -32,7 +33,14 @@ app.use(helmet())
 
 app.use(cors({
   credentials: true,
-  origin: env.BASE_URL,
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true)
+
+    if (!env.BASE_URLS.includes(origin)) {
+      return callback(new StatusError(401, 'CORS error'), false)
+    }
+    return callback(null, true)
+  },
   optionsSuccessStatus: 200
 }))
 
