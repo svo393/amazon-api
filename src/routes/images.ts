@@ -1,8 +1,14 @@
 import Router from 'express'
 import imageService from '../services/imageService'
-import { checkImagesDelete, checkImagesUpdate } from '../utils/inputValidator'
+import { checkImageFilters, checkImagesDelete, checkImagesUpdate } from '../utils/inputValidator'
 
 const router = Router()
+
+router.get('/', async (req, res) => {
+  const imagesFiltersInput = checkImageFilters(req)
+  const images = await imageService.getImages(imagesFiltersInput)
+  res.json(images)
+})
 
 router.put('/batch', async (req, res) => {
   const imagesUpdateInput = checkImagesUpdate(req)
