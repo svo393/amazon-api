@@ -297,6 +297,7 @@ type ProductLimitedData = Omit<ProductListData, 'images'> & {
   group: GroupVariation[];
   productSizes: ProductSize[];
   images: Image[];
+  createdAt: Date;
 }
 
 type ProductAllData = ProductLimitedData & Pick<ProductData, 'createdAt' | 'updatedAt' | 'userID' | 'listPrice'> & { userEmail: string }
@@ -352,7 +353,6 @@ const getProductByID = async (req: Request): Promise<ProductLimitedData| Product
   return [ 'ROOT', 'ADMIN' ].includes(req.session?.role)
     ? fullProduct
     : R.omit([
-      'createdAt',
       'updatedAt',
       'userID',
       'userEmail'
