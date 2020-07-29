@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoriesFiltersInput, CategoryCreateInput, CategoryUpdateInput, FeedFiltersInput, GroupVariationCreateInput, GroupVariationDeleteInput, GroupVariationUpdateInput, ImagesDeleteInput, ImagesFiltersInput, ImagesUpdateInput, InvoiceCreateInput, InvoicesFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ModerationStatus, OrderCreateInput, OrderProductCreateInput, OrderProductUpdateInput, OrdersFiltersInput, OrderStatus, OrderUpdateInput, ParameterInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingsFiltersInput, RatingUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorInput, VendorsFiltersInput } from '../types'
+import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoriesFiltersInput, CategoryCreateInput, CategoryUpdateInput, FeedFiltersInput, GroupVariationCreateInput, GroupVariationDeleteInput, GroupVariationUpdateInput, ImagesDeleteInput, ImagesUpdateInput, InvoiceCreateInput, InvoicesFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ModerationStatus, OrderCreateInput, OrderProductCreateInput, OrderProductUpdateInput, OrdersFiltersInput, OrderStatus, OrderUpdateInput, ParameterInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingsFiltersInput, RatingUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorInput, VendorsFiltersInput } from '../types'
 import { canBeBoolean, canBeNumber, hasDefinedProps, isArray, isDate, isEmail, isInputProvided, isNumber, isPasswordValid, isProvided, isSomeProvided, isString } from './validatorLib'
 
 // TODO implement PARTIAL<t>
@@ -1376,45 +1376,5 @@ export const checkRatingFilters = ({ query }: Request): RatingsFiltersInput => {
     likesMax: likesMax?.param,
     dislikesMin: dislikesMin?.param,
     dislikesMax: dislikesMax?.param
-  }
-}
-
-export const checkImageFilters = ({ query }: Request): ImagesFiltersInput => {
-  const productID = 'productID' in query
-    ? canBeNumber({ name: 'productID', param: query.productID })
-    : undefined
-
-  const ratingID = 'ratingID' in query
-    ? canBeNumber({ name: 'ratingID', param: query.ratingID })
-    : undefined
-
-  const ratingCommentID = 'ratingCommentID' in query
-    ? canBeNumber({ name: 'ratingCommentID', param: query.ratingCommentID })
-    : undefined
-
-  const questionID = 'questionID' in query
-    ? canBeNumber({ name: 'questionID', param: query.questionID })
-    : undefined
-
-  const answerID = 'answerID' in query
-    ? canBeNumber({ name: 'answerID', param: query.answerID })
-    : undefined
-
-  const answerCommentID = 'answerCommentID' in query
-    ? canBeNumber({ name: 'answerCommentID', param: query.answerCommentID })
-    : undefined
-
-  const userID = 'userID' in query
-    ? canBeNumber({ name: 'userID', param: query.userID })
-    : undefined
-
-  return {
-    productID: productID?.param,
-    ratingID: ratingID?.param,
-    ratingCommentID: ratingCommentID?.param,
-    questionID: questionID?.param,
-    answerID: answerID?.param,
-    answerCommentID: answerCommentID?.param,
-    userID: userID?.param
   }
 }

@@ -3,6 +3,7 @@ import groupService from '../services/groupService'
 import questionService from '../services/questionService'
 import { checkGroupVariationUpdate, checkNewGroupVariation, checkGroupVariationDeletion } from '../utils/inputValidator'
 import { requireAdmin } from '../utils/middleware'
+import imageService from '../services/imageService'
 
 const router = Router()
 
@@ -14,6 +15,11 @@ router.get('/:groupID/questions', async (req, res) => {
 router.get('/:groupID/variations', async (req, res) => {
   const groupVariations = await groupService.getGroupVariationsByGroup(req)
   res.json(groupVariations)
+})
+
+router.get('/:groupID/images', async (req, res) => {
+  const images = await imageService.getImagesByGroup(req)
+  res.json(images)
 })
 
 router.post('/:groupID/product/:productID', requireAdmin, async (req, res) => {

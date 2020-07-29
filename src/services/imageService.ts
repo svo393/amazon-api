@@ -1,59 +1,18 @@
 import fs from 'fs'
 import Knex from 'knex'
-import { Image, ImagesDeleteInput, ImagesFiltersInput, ImagesUpdateInput } from '../types'
+import { Image, ImagesDeleteInput, ImagesUpdateInput, Product } from '../types'
 import { imagesBasePath } from '../utils/constants'
 import { db, dbTrans } from '../utils/db'
 import StatusError from '../utils/StatusError'
+import { Request } from 'express'
 
-const getImages = async (imagesFiltersinput: ImagesFiltersInput): Promise<Image[]> => {
-  const {
-    productID,
-    ratingID,
-    ratingCommentID,
-    questionID,
-    answerID,
-    answerCommentID,
-    userID
-  } = imagesFiltersinput
+const getImagesByGroup = async (req: Request): Promise<Image[]> => {
+  const products = await db<Product>('products')
+    .select('productID')
+    .where('groupID', req.params.groupID)
 
-  let images = await db<Image>('images')
-
-  if (productID !== undefined) {
-    images = images
-      .filter((i) => i.productID === productID)
-  }
-
-  if (ratingID !== undefined) {
-    images = images
-      .filter((i) => i.ratingID === ratingID)
-  }
-
-  if (ratingCommentID !== undefined) {
-    images = images
-      .filter((i) => i.ratingCommentID === ratingCommentID)
-  }
-
-  if (questionID !== undefined) {
-    images = images
-      .filter((i) => i.questionID === questionID)
-  }
-
-  if (answerID !== undefined) {
-    images = images
-      .filter((i) => i.answerID === answerID)
-  }
-
-  if (answerCommentID !== undefined) {
-    images = images
-      .filter((i) => i.answerCommentID === answerCommentID)
-  }
-
-  if (userID !== undefined) {
-    images = images
-      .filter((i) => i.userID === userID)
-  }
-
-  return images
+  return await db('images')
+    .whereIn('productID', products.map((p) => p.productID))
 }
 
 const updateImages = async (images: ImagesUpdateInput): Promise<Image[]> => {
@@ -99,7 +58,7 @@ const deleteImages = async (images: ImagesDeleteInput): Promise<void> => {
 }
 
 export default {
-  getImages,
+  getImagesByGroup,
   updateImages,
   deleteImages
 }

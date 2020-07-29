@@ -439,16 +439,6 @@ export type RatingsFiltersInput = {
   dislikesMax?: number;
 }
 
-export type ImagesFiltersInput = {
-  productID?: number;
-  ratingID?: number;
-  ratingCommentID?: number;
-  questionID?: number;
-  answerID?: number;
-  answerCommentID?: number;
-  userID?: number;
-}
-
 export type ProductsFiltersInput = {
   groupID?: number;
   title?: string;
