@@ -60,7 +60,8 @@ export type Product = {
   title: string;
   listPrice?: number;
   price: number;
-  description: string;
+  bullets: string;
+  description?: string;
   stock: number | null;
   createdAt: Date;
   updatedAt: Date;

@@ -32,8 +32,8 @@ describe('Product adding', () => {
       .expect('Content-Type', /application\/json/)
 
     const productsAtEnd = await productsInDB()
-    const descriptions = productsAtEnd.map((i) => i.description)
-    expect(descriptions).toContain(newProduct.description)
+    const bulletss = productsAtEnd.map((i) => i.bullets)
+    expect(bulletss).toContain(newProduct.bullets)
   })
 
   test('400 if no price', async () => {

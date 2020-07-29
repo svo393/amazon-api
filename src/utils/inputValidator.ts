@@ -133,10 +133,14 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
     canBeNumber
   )({ name: 'price', param: body.price })
 
-  const description = R.pipe(
+  const bullets = R.pipe(
     isProvided,
     isString
-  )({ name: 'description', param: body.description })
+  )({ name: 'bullets', param: body.bullets })
+
+  const description = 'description' in body
+    ? isString({ name: 'description', param: body.description })
+    : undefined
 
   const stock = 'stock' in body
     ? canBeNumber({ name: 'stock', param: body.stock })
@@ -224,7 +228,8 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
     title: title.param,
     listPrice: listPrice?.param,
     price: price.param,
-    description: description.param,
+    bullets: bullets.param,
+    description: description?.param,
     stock: stock?.param,
     productSizes: productSizes?.param,
     isAvailable: isAvailable.param,
@@ -250,6 +255,11 @@ export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
     isProvided,
     canBeNumber
   )({ name: 'price', param: body.price })
+
+  const bullets = R.pipe(
+    isProvided,
+    isString
+  )({ name: 'bullets', param: body.bullets })
 
   const description = R.pipe(
     isProvided,
@@ -343,6 +353,7 @@ export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
     title: title.param,
     listPrice: listPrice?.param,
     price: price.param,
+    bullets: bullets.param,
     description: description.param,
     stock: stock?.param,
     productSizes: productSizes?.param,

@@ -292,7 +292,8 @@ const getProductsMin = async (productsFiltersinput: ProductsMinFiltersInput): Pr
 type ProductLimitedData = Omit<ProductListData, 'images'> & {
   listPrice?: number;
   questionCount: number;
-  description: string;
+  bullets: string;
+  description?: string;
   group: GroupVariation[];
   productSizes: ProductSize[];
   images: Image[];
@@ -304,6 +305,7 @@ const getProductByID = async (req: Request): Promise<ProductLimitedData| Product
   const rawProduct: Omit<ProductAllData, 'stars' | 'ratingCount | questionCount'> & { stars: string; ratingCount: string; questionCount: string } = await getProductsQuery.clone()
     .first(
       'p.listPrice',
+      'p.bullets',
       'p.description',
       'p.createdAt',
       'p.updatedAt',
