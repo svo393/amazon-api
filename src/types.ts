@@ -1,4 +1,4 @@
-export interface ObjIndexed { [key: string]: any }
+export interface ObjIndexed { [ k: string ]: any }
 
 //
 // Types from schema in order of creation
@@ -473,8 +473,7 @@ export type UsersFiltersInput = {
   createdFrom?: string;
   createdTo?: string;
   page?: number;
-  sortBy?: string;
-  orderBy?: string;
+  sortBy: string;
   orderCountMin?: number;
   orderCountMax?: number;
   ratingCountMin?: number;

@@ -1131,13 +1131,10 @@ export const checkUserFilters = ({ query }: Request): UsersFiltersInput => {
     ? isString({ name: 'roles', param: query.roles })
     : undefined
 
-  const sortBy = 'sortBy' in query
-    ? isString({ name: 'sortBy', param: query.sortBy })
-    : undefined
-
-  const orderBy = 'orderBy' in query
-    ? isOrder({ name: 'orderBy', param: query.orderBy })
-    : undefined
+  const sortBy = R.pipe(
+    isProvided,
+    isString
+  )({ name: 'sortBy', param: query.sortBy })
 
   const createdFrom = 'createdFrom' in query
     ? isDate({ name: 'createdFrom', param: query.createdFrom })
@@ -1184,8 +1181,7 @@ export const checkUserFilters = ({ query }: Request): UsersFiltersInput => {
 
   return {
     roles: roles?.param,
-    sortBy: sortBy?.param,
-    orderBy: orderBy?.param,
+    sortBy: sortBy.param,
     createdFrom: createdFrom?.param,
     createdTo: createdTo?.param,
     page: page?.param,

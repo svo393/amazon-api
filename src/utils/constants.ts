@@ -50,4 +50,4 @@ export const apiURLs = {
   vendors: `${baseAPI}/vendors`
 }
 
-export const defaultOffset = 2
+export const defaultOffset = 25

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import R from 'ramda'
-import { User, UserSafeData, UsersFiltersInput, UserUpdateInput } from '../types'
+import { User, UserSafeData, UsersFiltersInput, UserUpdateInput, ObjIndexed } from '../types'
 import { defaultOffset, imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
 import { uploadImages } from '../utils/img'
@@ -59,8 +59,7 @@ type UserData = Omit<UserRawData,
 const getUsers = async (usersFiltersinput: UsersFiltersInput): Promise<UserData[]> => {
   const {
     page = 0,
-    sortBy = 'email',
-    orderBy = 'asc',
+    sortBy,
     roles,
     createdFrom,
     createdTo,
@@ -74,9 +73,6 @@ const getUsers = async (usersFiltersinput: UsersFiltersInput): Promise<UserData[
   } = usersFiltersinput
 
   const rawUsers: UserRawData[] = await getUsersQuery.clone()
-    .orderBy(sortBy, orderBy)
-    .limit(defaultOffset)
-    .offset(page * defaultOffset)
 
   let users = rawUsers
     .map((u) => ({
@@ -149,8 +145,17 @@ const getUsers = async (usersFiltersinput: UsersFiltersInput): Promise<UserData[
       .filter((u) => u.email?.toLowerCase().includes(email.toLowerCase()))
   }
 
-  if (users === undefined) { throw new StatusError(404, 'Not Found') }
-  return users
+  const orderBy = sortBy.split('_')
+
+  const usersSorted = Object.entries(users)
+    .map((u) => u[1])
+    .sort((a: ObjIndexed, b: ObjIndexed) => Number(a[orderBy[0]] > b[orderBy[0]]))
+
+  const usersArr = orderBy[0] === 'desc'
+    ? usersSorted.reverse()
+    : usersSorted
+
+  return usersArr.slice(page * defaultOffset, page * defaultOffset + defaultOffset)
 }
 
 type UserPublicData = Omit<UserData,
