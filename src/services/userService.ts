@@ -1,9 +1,10 @@
 import { Request, Response } from 'express'
 import R from 'ramda'
-import { User, UserSafeData, UsersFiltersInput, UserUpdateInput, ObjIndexed } from '../types'
-import { defaultOffset, imagesBasePath } from '../utils/constants'
+import { User, UserSafeData, UsersFiltersInput, UserUpdateInput } from '../types'
+import { defaultLimit, imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
 import { uploadImages } from '../utils/img'
+import sortElements from '../utils/sortElements'
 import StatusError from '../utils/StatusError'
 
 const getUsersQuery: any = db('users as u')
@@ -56,7 +57,7 @@ type UserData = Omit<UserRawData,
   ratingCount: number;
 }
 
-const getUsers = async (usersFiltersinput: UsersFiltersInput): Promise<UserData[]> => {
+const getUsers = async (usersFiltersinput: UsersFiltersInput): Promise<{ batch: UserData[]; totalCount: number }> => {
   const {
     page = 0,
     sortBy,
@@ -145,17 +146,12 @@ const getUsers = async (usersFiltersinput: UsersFiltersInput): Promise<UserData[
       .filter((u) => u.email?.toLowerCase().includes(email.toLowerCase()))
   }
 
-  const orderBy = sortBy.split('_')
+  const usersSorted = sortElements(users, sortBy)
 
-  const usersSorted = Object.entries(users)
-    .map((u) => u[1])
-    .sort((a: ObjIndexed, b: ObjIndexed) => Number(a[orderBy[0]] > b[orderBy[0]]))
-
-  const usersArr = orderBy[0] === 'desc'
-    ? usersSorted.reverse()
-    : usersSorted
-
-  return usersArr.slice(page * defaultOffset, page * defaultOffset + defaultOffset)
+  return {
+    batch: usersSorted.slice(page * defaultLimit, page * defaultLimit + defaultLimit),
+    totalCount: usersSorted.length
+  }
 }
 
 type UserPublicData = Omit<UserData,
