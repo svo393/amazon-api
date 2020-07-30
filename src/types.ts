@@ -472,6 +472,9 @@ export type UsersFiltersInput = {
   roles?: string;
   createdFrom?: string;
   createdTo?: string;
+  page?: number;
+  sortBy?: string;
+  orderBy?: string;
   orderCountMin?: number;
   orderCountMax?: number;
   ratingCountMin?: number;

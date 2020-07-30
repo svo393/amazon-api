@@ -49,3 +49,5 @@ export const apiURLs = {
   users: `${baseAPI}/users`,
   vendors: `${baseAPI}/vendors`
 }
+
+export const defaultOffset = 2

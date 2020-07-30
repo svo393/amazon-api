@@ -1,7 +1,7 @@
 import { Request } from 'express'
 import R from 'ramda'
 import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoriesFiltersInput, CategoryCreateInput, CategoryUpdateInput, FeedFiltersInput, GroupVariationCreateInput, GroupVariationDeleteInput, GroupVariationUpdateInput, ImagesDeleteInput, ImagesFiltersInput, ImagesUpdateInput, InvoiceCreateInput, InvoicesFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ModerationStatus, OrderCreateInput, OrderProductCreateInput, OrderProductUpdateInput, OrdersFiltersInput, OrderStatus, OrderUpdateInput, ParameterInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingsFiltersInput, RatingUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorInput, VendorsFiltersInput } from '../types'
-import { canBeBoolean, canBeNumber, hasDefinedProps, isArray, isDate, isEmail, isInputProvided, isNumber, isPasswordValid, isProvided, isSomeProvided, isString } from './validatorLib'
+import { canBeBoolean, canBeNumber, hasDefinedProps, isArray, isDate, isEmail, isInputProvided, isNumber, isPasswordValid, isPositiveNumber, isProvided, isSomeProvided, isString, isOrder } from './validatorLib'
 
 // TODO implement PARTIAL<t>
 export const checkNewUser = ({ body }: Request): UserSignupInput => {
@@ -1131,12 +1131,27 @@ export const checkUserFilters = ({ query }: Request): UsersFiltersInput => {
     ? isString({ name: 'roles', param: query.roles })
     : undefined
 
+  const sortBy = 'sortBy' in query
+    ? isString({ name: 'sortBy', param: query.sortBy })
+    : undefined
+
+  const orderBy = 'orderBy' in query
+    ? isOrder({ name: 'orderBy', param: query.orderBy })
+    : undefined
+
   const createdFrom = 'createdFrom' in query
     ? isDate({ name: 'createdFrom', param: query.createdFrom })
     : undefined
 
   const createdTo = 'createdTo' in query
     ? isDate({ name: 'createdTo', param: query.createdTo })
+    : undefined
+
+  const page = 'page' in query
+    ? R.pipe(
+      canBeNumber,
+      isPositiveNumber
+    )({ name: 'page', param: query.page })
     : undefined
 
   const orderCountMin = 'orderCountMin' in query
@@ -1169,8 +1184,11 @@ export const checkUserFilters = ({ query }: Request): UsersFiltersInput => {
 
   return {
     roles: roles?.param,
+    sortBy: sortBy?.param,
+    orderBy: orderBy?.param,
     createdFrom: createdFrom?.param,
     createdTo: createdTo?.param,
+    page: page?.param,
     orderCountMin: orderCountMin?.param,
     orderCountMax: orderCountMax?.param,
     ratingCountMin: ratingCountMin?.param,

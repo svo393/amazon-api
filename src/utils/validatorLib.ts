@@ -86,8 +86,22 @@ export const canBeNumber: CP = ({ name, param }) => {
   return { name, param: Number(param) }
 }
 
+export const isPositiveNumber: CP = ({ name, param }) => {
+  if (param < 0) {
+    throw new StatusError(400, `${name} must be positive number`)
+  }
+  return { name, param }
+}
+
 export const isDate: CP = ({ name, param }) => {
   if (!/^\d{4}\/[0|1]\d\/[0-3]\d$/.test(param)) {
+    throw new StatusError(400, `Incorrect ${name}: ${param}`)
+  }
+  return { name, param }
+}
+
+export const isOrder: CP = ({ name, param }) => {
+  if (![ 'asc', 'desc' ].includes(param)) {
     throw new StatusError(400, `Incorrect ${name}: ${param}`)
   }
   return { name, param }

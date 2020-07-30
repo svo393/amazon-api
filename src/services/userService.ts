@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import R from 'ramda'
 import { User, UserSafeData, UsersFiltersInput, UserUpdateInput } from '../types'
-import { imagesBasePath } from '../utils/constants'
+import { defaultOffset, imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
 import { uploadImages } from '../utils/img'
 import StatusError from '../utils/StatusError'
@@ -58,6 +58,9 @@ type UserData = Omit<UserRawData,
 
 const getUsers = async (usersFiltersinput: UsersFiltersInput): Promise<UserData[]> => {
   const {
+    page = 0,
+    sortBy = 'email',
+    orderBy = 'asc',
     roles,
     createdFrom,
     createdTo,
@@ -71,6 +74,9 @@ const getUsers = async (usersFiltersinput: UsersFiltersInput): Promise<UserData[
   } = usersFiltersinput
 
   const rawUsers: UserRawData[] = await getUsersQuery.clone()
+    .orderBy(sortBy, orderBy)
+    .limit(defaultOffset)
+    .offset(page * defaultOffset)
 
   let users = rawUsers
     .map((u) => ({
