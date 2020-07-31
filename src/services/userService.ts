@@ -4,7 +4,7 @@ import { User, UserSafeData, UsersFiltersInput, UserUpdateInput } from '../types
 import { defaultLimit, imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
 import { uploadImages } from '../utils/img'
-import sortElements from '../utils/sortElements'
+import sortItems from '../utils/sortItems'
 import StatusError from '../utils/StatusError'
 
 const getUsersQuery: any = db('users as u')
@@ -59,7 +59,7 @@ type UserData = Omit<UserRawData,
 
 const getUsers = async (usersFiltersinput: UsersFiltersInput): Promise<{ batch: UserData[]; totalCount: number }> => {
   const {
-    page = 0,
+    page = 1,
     sortBy,
     roles,
     createdFrom,
@@ -146,10 +146,10 @@ const getUsers = async (usersFiltersinput: UsersFiltersInput): Promise<{ batch: 
       .filter((u) => u.email?.toLowerCase().includes(email.toLowerCase()))
   }
 
-  const usersSorted = sortElements(users, sortBy)
+  const usersSorted = sortItems(users, sortBy)
 
   return {
-    batch: usersSorted.slice(page * defaultLimit, page * defaultLimit + defaultLimit),
+    batch: usersSorted.slice((page - 1) * defaultLimit, (page - 1) * defaultLimit + defaultLimit),
     totalCount: usersSorted.length
   }
 }

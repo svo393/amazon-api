@@ -50,4 +50,4 @@ export const apiURLs = {
   vendors: `${baseAPI}/vendors`
 }
 
-export const defaultLimit = 25
+export const defaultLimit = 2
