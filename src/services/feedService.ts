@@ -1,16 +1,8 @@
-import R from 'ramda'
-import { Answer, AnswerComment, FeedFiltersInput, ObjIndexed, Question, RatingComment } from '../types'
+import { Answer, AnswerComment, FeedFiltersInput, Question, RatingComment } from '../types'
+import { defaultLimit } from '../utils/constants'
 import { db } from '../utils/db'
 import fuseIndexes from '../utils/fuseIndexes'
 import sortItems from '../utils/sortItems'
-import { defaultLimit } from '../utils/constants'
-
-interface Feed extends ObjIndexed {
-  ratingComments?: (RatingComment & { type: string })[];
-  questions?: (Question & { type: string })[];
-  answers?: (Answer & { type: string })[];
-  answerComments?: (AnswerComment & { type: string })[];
-}
 
 type Activity = (
   RatingComment |
@@ -18,6 +10,8 @@ type Activity = (
   Answer |
   AnswerComment
 ) & { type: string }
+
+type Feed = Activity[]
 
 const getFeed = async (feedFiltersinput: FeedFiltersInput): Promise<{ batch: Feed; totalCount: number }> => {
   const {
@@ -88,71 +82,55 @@ const getFeed = async (feedFiltersinput: FeedFiltersInput): Promise<{ batch: Fee
     .join('users as u', 'ac.userID', 'u.userID')
     .groupBy('ac.answerCommentID', 'userEmail')
 
-  let feed: Feed = {
-    ratingComments: [ ...ratingComments.map((x) => ({ ...x, type: 'ratingComment' })) ],
-    questions: [ ...questions.map((x) => ({ ...x, type: 'question' })) ],
-    answers: [ ...answers.map((x) => ({ ...x, type: 'answer' })) ],
-    answerComments: [ ...answerComments.map((x) => ({ ...x, type: 'answerComment' })) ]
-  }
+  let feed: Feed = [
+    ...ratingComments.map((rc) => ({ ...rc, type: 'ratingComment' })),
+    ...questions.map((q) => ({ ...q, type: 'question' })),
+    ...answers.map((a) => ({ ...a, type: 'answer' })),
+    ...answerComments.map((ac) => ({ ...ac, type: 'answerComment' }))
+  ]
 
   if (q !== undefined) {
-    for (const activity in feed) {
-      feed[activity] = feed[activity]
-        .filter((_: any, i: number) =>
-          fuseIndexes(feed[activity], [ 'content' ], q).includes(i))
-
-      if (feed[activity].length === 0) delete feed[activity]
-    }
+    feed = feed
+      .filter((_, i) =>
+        fuseIndexes(feed, [ 'content' ], q).includes(i))
   }
 
   if (types !== undefined) {
-    feed = R.pick(types.split(',').map((a) => a + 's'), feed)
+    feed = feed
+      .filter((a) => types.split(',').includes(a.type))
   }
 
   if (moderationStatuses !== undefined) {
-    for (const activity in feed) {
-      feed[activity] = feed[activity].filter((a: Activity) =>
+    feed = feed
+      .filter((a) =>
         moderationStatuses.split(',').includes(a.moderationStatus))
-      if (feed[activity].length === 0) delete feed[activity]
-    }
   }
 
   if (createdFrom !== undefined) {
-    for (const activity in feed) {
-      feed[activity] = feed[activity].filter((a: Activity) =>
+    feed = feed
+      .filter((a) =>
         a.createdAt >= new Date(createdFrom))
-      if (feed[activity].length === 0) delete feed[activity]
-    }
   }
 
   // TODO misses today in filter
   if (createdTo !== undefined) {
-    for (const activity in feed) {
-      feed[activity] = feed[activity].filter((a: Activity) =>
+    feed = feed
+      .filter((a) =>
         a.createdAt <= new Date(createdTo))
-      if (feed[activity].length === 0) delete feed[activity]
-    }
   }
 
   if (userEmail !== undefined) {
-    for (const activity in feed) {
-      feed[activity] = feed[activity].filter((a: Activity) =>
+    feed = feed
+      .filter((a) =>
         a.userEmail.toLowerCase().includes(userEmail.toLowerCase()))
-      if (feed[activity].length === 0) delete feed[activity]
-    }
   }
 
-  console.info('feed', feed)
+  const feedSorted = sortItems(feed, sortBy)
 
-  // const feedSorted = sortItems(feed, sortBy)
-
-  // return {
-  //   batch: feedSorted.slice((page - 1) * defaultLimit, (page - 1) * defaultLimit + defaultLimit),
-  //   totalCount: feed.length
-  // }
-  return feed as any
+  return {
+    batch: feedSorted.slice((page - 1) * defaultLimit, (page - 1) * defaultLimit + defaultLimit),
+    totalCount: feed.length
+  }
 }
 
-export default {
-  getFeed
-}
+export default { getFeed }
