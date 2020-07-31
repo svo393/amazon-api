@@ -1,7 +1,9 @@
 import { Request } from 'express'
 import { CategoriesFiltersInput, Category, CategoryCreateInput, CategoryUpdateInput } from '../types'
+import { defaultLimit } from '../utils/constants'
 import { db } from '../utils/db'
 import fuseIndexes from '../utils/fuseIndexes'
+import sortItems from '../utils/sortItems'
 import StatusError from '../utils/StatusError'
 
 const addCategory = async (categoryInput: CategoryCreateInput): Promise<Category> => {
@@ -26,8 +28,12 @@ type CategoryListData = Omit<CategoryListRawData, 'productCount'> & {
   productCount: number;
 }
 
-const getCategories = async (categoriesFiltersinput: CategoriesFiltersInput): Promise<CategoryListData[]> => {
-  const { q } = categoriesFiltersinput
+const getCategories = async (categoriesFiltersinput: CategoriesFiltersInput): Promise<{ batch: CategoryListData[]; totalCount: number }> => {
+  const {
+    page = 1,
+    sortBy = 'groupID',
+    q
+  } = categoriesFiltersinput
 
   let rawCategories: CategoryListRawData[] = await db('categories as c')
     .select('c.categoryID', 'c.name', 'c.parentCategoryID')
@@ -49,12 +55,19 @@ const getCategories = async (categoriesFiltersinput: CategoriesFiltersInput): Pr
         fuseIndexes(categories, [ 'name' ], q).includes(i))
   }
 
-  return categories.map((c) => ({
+  const categoriesSorted = sortItems(categories, sortBy)
+
+  const _categoriesSorted = categoriesSorted.map((c) => ({
     ...c,
     children: rawCategories
       .filter((rc) => rc.parentCategoryID === c.categoryID)
       .map((rc) => ({ categoryID: rc.categoryID, name: rc.name }))
   }))
+
+  return {
+    batch: _categoriesSorted.slice((page - 1) * defaultLimit, (page - 1) * defaultLimit + defaultLimit),
+    totalCount: categories.length
+  }
 }
 
 type Parent = { name: string; categoryID: number };

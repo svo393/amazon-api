@@ -1,7 +1,9 @@
 import { Request } from 'express'
 import { Vendor, VendorInput, VendorsFiltersInput } from '../types'
+import { defaultLimit } from '../utils/constants'
 import { db } from '../utils/db'
 import fuseIndexes from '../utils/fuseIndexes'
+import sortItems from '../utils/sortItems'
 import StatusError from '../utils/StatusError'
 
 const addVendor = async (vendorInput: VendorInput): Promise<Vendor> => {
@@ -25,8 +27,12 @@ type VendorListData = Omit<VendorListRawData, 'productCount'> & {
   productCount: number;
 }
 
-const getVendors = async (vendorsFiltersinput: VendorsFiltersInput): Promise<VendorListData[]> => {
-  const { q } = vendorsFiltersinput
+const getVendors = async (vendorsFiltersinput: VendorsFiltersInput): Promise<{ batch: VendorListData[]; totalCount: number }> => {
+  const {
+    page = 1,
+    sortBy = 'groupID',
+    q
+  } = vendorsFiltersinput
 
   const rawVendors: VendorListRawData[] = await db<Vendor>('vendors as v')
     .select('v.vendorID', 'v.name')
@@ -47,7 +53,12 @@ const getVendors = async (vendorsFiltersinput: VendorsFiltersInput): Promise<Ven
         fuseIndexes(vendors, [ 'name' ], q).includes(i))
   }
 
-  return vendors
+  const vendorsSorted = sortItems(vendors, sortBy)
+
+  return {
+    batch: vendorsSorted.slice((page - 1) * defaultLimit, (page - 1) * defaultLimit + defaultLimit),
+    totalCount: vendors.length
+  }
 }
 
 const getVendorByID = async (req: Request): Promise<VendorListData> => {

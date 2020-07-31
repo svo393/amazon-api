@@ -60,7 +60,7 @@ type UserData = Omit<UserRawData,
 const getUsers = async (usersFiltersinput: UsersFiltersInput): Promise<{ batch: UserData[]; totalCount: number }> => {
   const {
     page = 1,
-    sortBy,
+    sortBy = 'email',
     roles,
     createdFrom,
     createdTo,
@@ -150,7 +150,7 @@ const getUsers = async (usersFiltersinput: UsersFiltersInput): Promise<{ batch: 
 
   return {
     batch: usersSorted.slice((page - 1) * defaultLimit, (page - 1) * defaultLimit + defaultLimit),
-    totalCount: usersSorted.length
+    totalCount: users.length
   }
 }
 

@@ -2,6 +2,8 @@ import R from 'ramda'
 import { Answer, AnswerComment, FeedFiltersInput, ObjIndexed, Question, RatingComment } from '../types'
 import { db } from '../utils/db'
 import fuseIndexes from '../utils/fuseIndexes'
+import sortItems from '../utils/sortItems'
+import { defaultLimit } from '../utils/constants'
 
 interface Feed extends ObjIndexed {
   ratingComments?: (RatingComment & { type: string })[];
@@ -17,8 +19,10 @@ type Activity = (
   AnswerComment
 ) & { type: string }
 
-const getFeed = async (feedFiltersinput: FeedFiltersInput): Promise<Feed> => {
+const getFeed = async (feedFiltersinput: FeedFiltersInput): Promise<{ batch: Feed; totalCount: number }> => {
   const {
+    page = 1,
+    sortBy = 'createdAt_desc',
     q,
     types,
     moderationStatuses,
@@ -138,7 +142,15 @@ const getFeed = async (feedFiltersinput: FeedFiltersInput): Promise<Feed> => {
     }
   }
 
-  return feed
+  console.info('feed', feed)
+
+  // const feedSorted = sortItems(feed, sortBy)
+
+  // return {
+  //   batch: feedSorted.slice((page - 1) * defaultLimit, (page - 1) * defaultLimit + defaultLimit),
+  //   totalCount: feed.length
+  // }
+  return feed as any
 }
 
 export default {

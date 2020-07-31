@@ -1,7 +1,9 @@
 import { Request } from 'express'
 import Knex from 'knex'
 import { Invoice, InvoiceCreateInput, InvoicesFiltersInput, InvoiceUpdateInput } from '../types'
+import { defaultLimit } from '../utils/constants'
 import { db, dbTrans } from '../utils/db'
+import sortItems from '../utils/sortItems'
 import StatusError from '../utils/StatusError'
 
 const addInvoice = async (invoiceInput: InvoiceCreateInput): Promise<Invoice> => {
@@ -19,8 +21,10 @@ const addInvoice = async (invoiceInput: InvoiceCreateInput): Promise<Invoice> =>
   return addedInvoice
 }
 
-const getInvoices = async (invoicesFiltersinput: InvoicesFiltersInput): Promise<Invoice[]> => {
+const getInvoices = async (invoicesFiltersinput: InvoicesFiltersInput): Promise<{ batch: Invoice[]; totalCount: number }> => {
   const {
+    page = 1,
+    sortBy = 'createdAt_desc',
     invoiceStatuses,
     paymentMethods,
     amountMin,
@@ -83,7 +87,12 @@ const getInvoices = async (invoicesFiltersinput: InvoicesFiltersInput): Promise<
       .filter((i) => i.userEmail?.toLowerCase().includes(userEmail.toLowerCase()))
   }
 
-  return invoices
+  const invoicesSorted = sortItems(invoices, sortBy)
+
+  return {
+    batch: invoicesSorted.slice((page - 1) * defaultLimit, (page - 1) * defaultLimit + defaultLimit),
+    totalCount: invoices.length
+  }
 }
 
 const getInvoicesByUser = async (req: Request): Promise<Invoice[]> => {

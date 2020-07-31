@@ -1,8 +1,10 @@
 import { Request } from 'express'
 import Knex from 'knex'
 import R from 'ramda'
-import { Invoice, Order, OrderCreateInput, OrdersFiltersInput, OrderFullData, OrderProduct, OrderProductFullData, OrderUpdateInput } from '../types'
+import { Invoice, Order, OrderCreateInput, OrderFullData, OrderProduct, OrderProductFullData, OrdersFiltersInput, OrderUpdateInput } from '../types'
+import { defaultLimit } from '../utils/constants'
 import { db, dbTrans } from '../utils/db'
+import sortItems from '../utils/sortItems'
 import StatusError from '../utils/StatusError'
 
 const addOrder = async (orderInput: OrderCreateInput): Promise<OrderFullData & Invoice> => {
@@ -58,8 +60,10 @@ const addOrder = async (orderInput: OrderCreateInput): Promise<OrderFullData & I
   })
 }
 
-const getOrders = async (ordersFiltersinput: OrdersFiltersInput): Promise<Order[]> => {
+const getOrders = async (ordersFiltersinput: OrdersFiltersInput): Promise<{ batch: Order[]; totalCount: number }> => {
   const {
+    page = 1,
+    sortBy = 'createdAt_desc',
     orderStatuses,
     shippingMethods,
     amountMin,
@@ -123,7 +127,12 @@ const getOrders = async (ordersFiltersinput: OrdersFiltersInput): Promise<Order[
       .filter((o) => o.userEmail?.toLowerCase().includes(userEmail.toLowerCase()))
   }
 
-  return orders
+  const ordersSorted = sortItems(orders, sortBy)
+
+  return {
+    batch: ordersSorted.slice((page - 1) * defaultLimit, (page - 1) * defaultLimit + defaultLimit),
+    totalCount: orders.length
+  }
 }
 
 const getOrdersByUser = async (req: Request): Promise<Order[]> => {

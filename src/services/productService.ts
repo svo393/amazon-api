@@ -2,12 +2,13 @@ import { Request } from 'express'
 import Knex from 'knex'
 import R from 'ramda'
 import { GroupVariation, Image, Product, ProductCreateInput, ProductData, ProductParameter, ProductsFiltersInput, ProductSize, ProductsMinFiltersInput, ProductUpdateInput } from '../types'
-import { imagesBasePath } from '../utils/constants'
+import { imagesBasePath, defaultLimit } from '../utils/constants'
 import { db, dbTrans } from '../utils/db'
 import fuseIndexes from '../utils/fuseIndexes'
 import getUploadIndex from '../utils/getUploadIndex'
 import { uploadImages } from '../utils/img'
 import StatusError from '../utils/StatusError'
+import sortItems from '../utils/sortItems'
 
 const getProductsQuery: any = db('products as p')
   .select(
@@ -121,8 +122,10 @@ type ProductListData = Omit<ProductListRawData, 'stars' | 'ratingCount'> & {
   productSizesSum: number | null;
 }
 
-const getProducts = async (productsFiltersinput: ProductsFiltersInput): Promise<ProductListData[]> => {
+const getProducts = async (productsFiltersInput: ProductsFiltersInput): Promise<{ batch: ProductListData[]; totalCount: number }> => {
   const {
+    page = 1,
+    sortBy = 'groupID',
     groupID,
     title,
     priceMin,
@@ -136,7 +139,10 @@ const getProducts = async (productsFiltersinput: ProductsFiltersInput): Promise<
     starsMin,
     ratingMax,
     ratingMin
-  } = productsFiltersinput
+  } = productsFiltersInput
+
+  console.info('productsFiltersInput', productsFiltersInput)
+  console.info('page', page)
 
   // TODO refactor reusable queries
   const rawProducts: ProductListRawData[] = await getProductsQuery.clone()
@@ -239,7 +245,10 @@ const getProducts = async (productsFiltersinput: ProductsFiltersInput): Promise<
       .filter((p) => p.ratingCount <= ratingMax)
   }
 
-  return products.map((p) => {
+  const productsSorted = sortItems(products, sortBy)
+    .slice((page - 1) * defaultLimit, (page - 1) * defaultLimit + defaultLimit)
+
+  const batch = productsSorted.map((p) => {
     const image = images.find((i) => i.productID === p.productID && i.index === 0)
     return {
       ...p,
@@ -252,6 +261,8 @@ const getProducts = async (productsFiltersinput: ProductsFiltersInput): Promise<
         : []
     }
   })
+
+  return { batch, totalCount: products.length }
 }
 
 type ProductMinListData = Pick<ProductListData,

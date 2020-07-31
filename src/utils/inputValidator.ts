@@ -1,7 +1,7 @@
 import { Request } from 'express'
 import R from 'ramda'
 import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoriesFiltersInput, CategoryCreateInput, CategoryUpdateInput, FeedFiltersInput, GroupVariationCreateInput, GroupVariationDeleteInput, GroupVariationUpdateInput, ImagesDeleteInput, ImagesFiltersInput, ImagesUpdateInput, InvoiceCreateInput, InvoicesFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ModerationStatus, OrderCreateInput, OrderProductCreateInput, OrderProductUpdateInput, OrdersFiltersInput, OrderStatus, OrderUpdateInput, ParameterInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingsFiltersInput, RatingUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorInput, VendorsFiltersInput } from '../types'
-import { canBeBoolean, canBeNumber, hasDefinedProps, isArray, isDate, isEmail, isInputProvided, isNumber, isPasswordValid, isPositiveNumber, isProvided, isSomeProvided, isString, isOrder } from './validatorLib'
+import { canBeBoolean, canBeNumber, hasDefinedProps, isArray, isDate, isEmail, isInputProvided, isNumber, isPasswordValid, isPositiveNumber, isProvided, isSomeProvided, isString } from './validatorLib'
 
 // TODO implement PARTIAL<t>
 export const checkNewUser = ({ body }: Request): UserSignupInput => {
@@ -1035,6 +1035,17 @@ export const checkInvoiceFilters = ({ query }: Request): InvoicesFiltersInput =>
     ? canBeNumber({ name: 'amountMin', param: query.amountMin })
     : undefined
 
+  const sortBy = 'sortBy' in query
+    ? isString({ name: 'sortBy', param: query.sortBy })
+    : undefined
+
+  const page = 'page' in query
+    ? R.pipe(
+      canBeNumber,
+      isPositiveNumber
+    )({ name: 'page', param: query.page })
+    : undefined
+
   const amountMax = 'amountMax' in query
     ? canBeNumber({ name: 'amountMax', param: query.amountMax })
     : undefined
@@ -1060,6 +1071,8 @@ export const checkInvoiceFilters = ({ query }: Request): InvoicesFiltersInput =>
     : undefined
 
   return {
+    sortBy: sortBy?.param,
+    page: page?.param,
     amountMin: amountMin?.param,
     amountMax: amountMax?.param,
     createdFrom: createdFrom?.param,
@@ -1073,6 +1086,17 @@ export const checkInvoiceFilters = ({ query }: Request): InvoicesFiltersInput =>
 export const checkOrderFilters = ({ query }: Request): OrdersFiltersInput => {
   const amountMin = 'amountMin' in query
     ? canBeNumber({ name: 'amountMin', param: query.amountMin })
+    : undefined
+
+  const sortBy = 'sortBy' in query
+    ? isString({ name: 'sortBy', param: query.sortBy })
+    : undefined
+
+  const page = 'page' in query
+    ? R.pipe(
+      canBeNumber,
+      isPositiveNumber
+    )({ name: 'page', param: query.page })
     : undefined
 
   const amountMax = 'amountMax' in query
@@ -1100,6 +1124,8 @@ export const checkOrderFilters = ({ query }: Request): OrdersFiltersInput => {
     : undefined
 
   return {
+    sortBy: sortBy?.param,
+    page: page?.param,
     amountMin: amountMin?.param,
     amountMax: amountMax?.param,
     createdFrom: createdFrom?.param,
@@ -1115,7 +1141,22 @@ export const checkVendorFilters = ({ query }: Request): VendorsFiltersInput => {
     ? isString({ name: 'q', param: query.q })
     : undefined
 
-  return { q: q?.param }
+  const sortBy = 'sortBy' in query
+    ? isString({ name: 'sortBy', param: query.sortBy })
+    : undefined
+
+  const page = 'page' in query
+    ? R.pipe(
+      canBeNumber,
+      isPositiveNumber
+    )({ name: 'page', param: query.page })
+    : undefined
+
+  return {
+    sortBy: sortBy?.param,
+    page: page?.param,
+    q: q?.param
+  }
 }
 
 export const checkCategoryFilters = ({ query }: Request): CategoriesFiltersInput => {
@@ -1123,7 +1164,22 @@ export const checkCategoryFilters = ({ query }: Request): CategoriesFiltersInput
     ? isString({ name: 'q', param: query.q })
     : undefined
 
-  return { q: q?.param }
+  const sortBy = 'sortBy' in query
+    ? isString({ name: 'sortBy', param: query.sortBy })
+    : undefined
+
+  const page = 'page' in query
+    ? R.pipe(
+      canBeNumber,
+      isPositiveNumber
+    )({ name: 'page', param: query.page })
+    : undefined
+
+  return {
+    q: q?.param,
+    sortBy: sortBy?.param,
+    page: page?.param
+  }
 }
 
 export const checkUserFilters = ({ query }: Request): UsersFiltersInput => {
@@ -1131,17 +1187,16 @@ export const checkUserFilters = ({ query }: Request): UsersFiltersInput => {
     ? isString({ name: 'roles', param: query.roles })
     : undefined
 
-  const sortBy = R.pipe(
-    isProvided,
-    isString
-  )({ name: 'sortBy', param: query.sortBy })
-
   const createdFrom = 'createdFrom' in query
     ? isDate({ name: 'createdFrom', param: query.createdFrom })
     : undefined
 
   const createdTo = 'createdTo' in query
     ? isDate({ name: 'createdTo', param: query.createdTo })
+    : undefined
+
+  const sortBy = 'sortBy' in query
+    ? isString({ name: 'sortBy', param: query.sortBy })
     : undefined
 
   const page = 'page' in query
@@ -1181,10 +1236,10 @@ export const checkUserFilters = ({ query }: Request): UsersFiltersInput => {
 
   return {
     roles: roles?.param,
-    sortBy: sortBy.param,
+    sortBy: sortBy?.param,
+    page: page?.param,
     createdFrom: createdFrom?.param,
     createdTo: createdTo?.param,
-    page: page?.param,
     orderCountMin: orderCountMin?.param,
     orderCountMax: orderCountMax?.param,
     ratingCountMin: ratingCountMin?.param,
@@ -1198,6 +1253,17 @@ export const checkUserFilters = ({ query }: Request): UsersFiltersInput => {
 export const checkFeedFilters = ({ query }: Request): FeedFiltersInput => {
   const q = 'q' in query
     ? isString({ name: 'q', param: query.q })
+    : undefined
+
+  const sortBy = 'sortBy' in query
+    ? isString({ name: 'sortBy', param: query.sortBy })
+    : undefined
+
+  const page = 'page' in query
+    ? R.pipe(
+      canBeNumber,
+      isPositiveNumber
+    )({ name: 'page', param: query.page })
     : undefined
 
   const types = 'types' in query
@@ -1221,6 +1287,8 @@ export const checkFeedFilters = ({ query }: Request): FeedFiltersInput => {
     : undefined
 
   return {
+    sortBy: sortBy?.param,
+    page: page?.param,
     q: q?.param,
     types: types?.param,
     moderationStatuses: moderationStatuses?.param,
@@ -1233,6 +1301,17 @@ export const checkFeedFilters = ({ query }: Request): FeedFiltersInput => {
 export const checkProductFilters = ({ query }: Request): ProductsFiltersInput => {
   const groupID = 'groupID' in query
     ? canBeNumber({ name: 'groupID', param: query.groupID })
+    : undefined
+
+  const sortBy = 'sortBy' in query
+    ? isString({ name: 'sortBy', param: query.sortBy })
+    : undefined
+
+  const page = 'page' in query
+    ? R.pipe(
+      canBeNumber,
+      isPositiveNumber
+    )({ name: 'page', param: query.page })
     : undefined
 
   const title = 'title' in query
@@ -1285,6 +1364,8 @@ export const checkProductFilters = ({ query }: Request): ProductsFiltersInput =>
 
   return {
     groupID: groupID?.param,
+    sortBy: sortBy?.param,
+    page: page?.param,
     title: title?.param,
     priceMin: priceMin?.param,
     priceMax: priceMax?.param,
@@ -1343,6 +1424,17 @@ export const checkRatingFilters = ({ query }: Request): RatingsFiltersInput => {
     ? canBeNumber({ name: 'groupID', param: query.groupID })
     : undefined
 
+  const sortBy = 'sortBy' in query
+    ? isString({ name: 'sortBy', param: query.sortBy })
+    : undefined
+
+  const page = 'page' in query
+    ? R.pipe(
+      canBeNumber,
+      isPositiveNumber
+    )({ name: 'page', param: query.page })
+    : undefined
+
   const userEmail = 'userEmail' in query
     ? isString({ name: 'userEmail', param: query.userEmail })
     : undefined
@@ -1388,6 +1480,8 @@ export const checkRatingFilters = ({ query }: Request): RatingsFiltersInput => {
     : undefined
 
   return {
+    sortBy: sortBy?.param,
+    page: page?.param,
     q: q?.param,
     groupID: groupID?.param,
     userEmail: userEmail?.param,

@@ -1,11 +1,12 @@
 import { Request } from 'express'
 import R from 'ramda'
 import { Image, Rating, RatingCreateInput, RatingsFiltersInput, RatingUpdateInput } from '../types'
-import { imagesBasePath } from '../utils/constants'
+import { defaultLimit, imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
 import fuseIndexes from '../utils/fuseIndexes'
 import getUploadIndex from '../utils/getUploadIndex'
 import { uploadImages } from '../utils/img'
+import sortItems from '../utils/sortItems'
 import StatusError from '../utils/StatusError'
 
 const addRating = async (ratingInput: RatingCreateInput, req: Request): Promise<Rating> => {
@@ -32,8 +33,10 @@ const addRating = async (ratingInput: RatingCreateInput, req: Request): Promise<
   return addedRating
 }
 
-const getRatings = async (ratingsFiltersInput: RatingsFiltersInput, req: Request): Promise<Rating[]> => {
+const getRatings = async (ratingsFiltersInput: RatingsFiltersInput, req: Request): Promise<{ batch: Rating[]; totalCount: number }> => {
   const {
+    page = 1,
+    sortBy = 'createdAt_desc',
     q,
     groupID,
     userEmail,
@@ -136,9 +139,16 @@ const getRatings = async (ratingsFiltersInput: RatingsFiltersInput, req: Request
       .filter((r) => r.dislikes <= dislikesMax)
   }
 
-  return userHasPermission
+  const _ratings = userHasPermission
     ? ratings
     : ratings.map((r) => ({ ...R.omit([ 'userEmail' ], r) }))
+
+  const ratingsSorted = sortItems(_ratings, sortBy)
+
+  return {
+    batch: ratingsSorted.slice((page - 1) * defaultLimit, (page - 1) * defaultLimit + defaultLimit),
+    totalCount: _ratings.length
+  }
 }
 
 const getRatingByID = async (req: Request): Promise<Rating &

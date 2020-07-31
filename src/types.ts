@@ -375,6 +375,8 @@ export type OrderUpdateInput = {
 export type OrdersFiltersInput = {
   amountMin?: number;
   amountMax?: number;
+  page?: number;
+  sortBy?: string;
   createdFrom?: string;
   createdTo?: string;
   orderStatuses?: string;
@@ -404,6 +406,8 @@ export type InvoiceUpdateInput = {
 export type InvoicesFiltersInput = {
   amountMin?: number;
   amountMax?: number;
+  page?: number;
+  sortBy?: string;
   createdFrom?: string;
   createdTo?: string;
   invoiceStatuses?: string;
@@ -411,13 +415,23 @@ export type InvoicesFiltersInput = {
   userEmail?: string;
 }
 
-export type VendorsFiltersInput = { q?: string}
+export type VendorsFiltersInput = {
+  q?: string;
+  page?: number;
+  sortBy?: string;
+}
 
-export type CategoriesFiltersInput = { q?: string}
+export type CategoriesFiltersInput = {
+  q?: string;
+  page?: number;
+  sortBy?: string;
+}
 
 export type FeedFiltersInput = {
   q?: string;
   types?: string;
+  page?: number;
+  sortBy?: string;
   moderationStatuses?: string;
   createdFrom?: string;
   createdTo?: string;
@@ -428,6 +442,8 @@ export type RatingsFiltersInput = {
   q?: string;
   groupID?: number;
   userEmail?: string;
+  page?: number;
+  sortBy?: string;
   moderationStatuses?: string;
   isVerified?: boolean;
   createdFrom?: string;
@@ -464,6 +480,8 @@ export type ProductsFiltersInput = {
   starsMax?: number;
   ratingMin?: number;
   ratingMax?: number;
+  page?: number;
+  sortBy?: string;
 }
 
 export type ProductsMinFiltersInput = { title?: string }
@@ -473,7 +491,7 @@ export type UsersFiltersInput = {
   createdFrom?: string;
   createdTo?: string;
   page?: number;
-  sortBy: string;
+  sortBy?: string;
   orderCountMin?: number;
   orderCountMax?: number;
   ratingCountMin?: number;
