@@ -23,7 +23,7 @@ router.delete('/:answerID', requireCreator('answers', 'answerID', 'params'), asy
   res.status(204).end()
 })
 
-router.post('/comments', requireAuth, async (req, res) => {
+router.post('/:answerID/comments', requireAuth, async (req, res) => {
   const answerCommentCreateInput = checkNewAnswerComment(req)
   const addedAnswerComment = await answerCommentService.addAnswerComment(answerCommentCreateInput, req)
   res.status(201).json(addedAnswerComment)

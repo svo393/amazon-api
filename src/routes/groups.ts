@@ -1,9 +1,10 @@
 import Router from 'express'
 import groupService from '../services/groupService'
-import questionService from '../services/questionService'
-import { checkGroupVariationUpdate, checkNewGroupVariation, checkGroupVariationDeletion } from '../utils/inputValidator'
-import { requireAdmin } from '../utils/middleware'
 import imageService from '../services/imageService'
+import questionService from '../services/questionService'
+import ratingService from '../services/ratingService'
+import { checkGroupVariationDeletion, checkGroupVariationUpdate, checkNewGroupVariation, checkNewQuestion, checkNewRating } from '../utils/inputValidator'
+import { requireAdmin, requireAuth } from '../utils/middleware'
 
 const router = Router()
 
@@ -38,6 +39,18 @@ router.delete('/:groupID/variations', requireAdmin, async (req, res) => {
   const groupVariationDeletionInput = checkGroupVariationDeletion(req)
   await groupService.deleteGroupVariation(groupVariationDeletionInput, req)
   res.status(204).end()
+})
+
+router.post('/:groupID/ratings', requireAuth, async (req, res) => {
+  const ratingCreateInput = checkNewRating(req)
+  const addedRating = await ratingService.addRating(ratingCreateInput, req)
+  res.status(201).json(addedRating)
+})
+
+router.post('/:groupID/questions', requireAuth, async (req, res) => {
+  const questionCreateInput = checkNewQuestion(req)
+  const addedQuestion = await questionService.addQuestion(questionCreateInput, req)
+  res.status(201).json(addedQuestion)
 })
 
 export default router

@@ -84,6 +84,15 @@ export type Image = {
   userID: number;
 }
 
+export type Vote = {
+  voteID: number;
+  vote: boolean;
+  ratingID?: number;
+  questionID?: number;
+  answerID?: number;
+  userID: number;
+}
+
 export type ListProduct = { listID: number; productID: number}
 
 export type Rating = {
@@ -265,10 +274,7 @@ export type AddressUpdateInput = { name?: string; addressType?: string}
 
 export type FollowerFetchInput = { userID?: number; follows?: number}
 
-export type UserAddressCreateInput =
-  Pick<UserAddress, 'userID' | 'addressID'> & {
-  isDefault?: boolean;
-}
+export type UserAddressCreateInput = { isDefault?: boolean }
 export type UserAddressUpdateInput = Pick<UserAddress, 'isDefault'>
 
 export type UserAddressFetchInput = Pick<UserAddress, 'userID'>
@@ -305,7 +311,6 @@ export type RatingCreateInput = Pick<Rating,
   | 'title'
   | 'review'
   | 'stars'
-  | 'groupID'
 >
 
 export type RatingUpdateInput = Pick<Rating,
@@ -319,7 +324,6 @@ export type RatingUpdateInput = Pick<Rating,
 
 export type RatingCommentCreateInput = Pick<RatingComment,
   | 'content'
-  | 'ratingID'
   | 'parentRatingCommentID'
 >
 
@@ -328,17 +332,16 @@ export type RatingCommentUpdateInput = {
   moderationStatus?: string;
 }
 
-export type QuestionCreateInput = Pick<Question, | 'content' | 'groupID'>
+export type QuestionCreateInput = Pick<Question, | 'content'>
 
 export type QuestionUpdateInput = { content?: string; moderationStatus?: string}
 
-export type AnswerCreateInput = Pick<Answer, | 'content' | 'questionID'>
+export type AnswerCreateInput = Pick<Answer, 'content'>
 
 export type AnswerUpdateInput = { content?: string; moderationStatus?: string}
 
 export type AnswerCommentCreateInput = Pick<AnswerComment,
   | 'content'
-  | 'answerID'
   | 'parentAnswerCommentID'
 >
 
@@ -358,7 +361,6 @@ export type CartProductInput = Pick<CartProduct, 'qty'>
 
 export type OrderCreateInput = Pick<Order,
   | 'address'
-  | 'userID'
   | 'shippingMethod'
 > & {
   details: string;
@@ -384,16 +386,13 @@ export type OrdersFiltersInput = {
   userEmail?: string;
 }
 
-export type OrderProductCreateInput = Omit<OrderProduct, | 'orderID'>
-
-export type OrderProductUpdateInput = Omit<OrderProductCreateInput, | 'productID'>
+export type OrderProductInput = Omit<OrderProduct, | 'orderID' | 'productID'>
 
 export type InvoiceCreateInput = Pick<Invoice,
   | 'amount'
   | 'details'
   | 'orderID'
   | 'paymentMethod'
-  | 'userID'
 >
 
 export type InvoiceUpdateInput = {
@@ -463,6 +462,18 @@ export type ImagesFiltersInput = {
   questionID?: number;
   answerID?: number;
   answerCommentID?: number;
+  userID?: number;
+}
+
+export type VotesCreateInput = {
+  vote: boolean;
+  userID: number;
+}
+
+export type VotesFiltersInput = {
+  ratingID?: number;
+  questionID?: number;
+  answerID?: number;
   userID?: number;
 }
 

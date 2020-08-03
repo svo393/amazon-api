@@ -11,8 +11,8 @@ const addListProduct = async (req: Request): Promise<ListProduct> => {
       RETURNING *;
     `,
     [ db('listProducts').insert({
-      listID: Number(req.params.listID),
-      productID: Number(req.params.productID)
+      listID: req.params.listID,
+      productID: req.params.productID
     }) ]
   )
 

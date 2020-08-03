@@ -192,8 +192,6 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.string('title')
       t.string('review', 65535).notNullable()
       t.integer('stars').notNullable().unsigned()
-      t.integer('likes').notNullable().unsigned().defaultTo(0)
-      t.integer('dislikes').notNullable().unsigned().defaultTo(0)
       t.boolean('isVerified').defaultTo(false).notNullable()
 
       t
@@ -250,8 +248,6 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.dateTime('createdAt').notNullable()
       t.dateTime('updatedAt').notNullable()
       t.string('content', 65535).unique().notNullable()
-      t.integer('likes').notNullable().unsigned().defaultTo(0)
-      t.integer('dislikes').notNullable().unsigned().defaultTo(0)
 
       t
         .integer('userID')
@@ -275,8 +271,6 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.dateTime('createdAt').notNullable()
       t.dateTime('updatedAt').notNullable()
       t.string('content', 65535).unique().notNullable()
-      t.integer('likes').notNullable().unsigned().defaultTo(0)
-      t.integer('dislikes').notNullable().unsigned().defaultTo(0)
 
       t
         .integer('userID')
@@ -323,6 +317,41 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .string('moderationStatus')
         .references('moderationStatuses.moderationStatusName')
         .notNullable()
+    })
+
+    .createTable('votes', (t) => {
+      t.increments('voteID')
+      t.boolean('vote').notNullable()
+
+      t
+        .integer('userID')
+        .references('users.userID')
+        .notNullable()
+        .onDelete('CASCADE')
+
+      t
+        .integer('ratingID')
+        .references('ratings.ratingID')
+        .onDelete('CASCADE')
+
+      t
+        .integer('questionID')
+        .references('questions.questionID')
+        .onDelete('CASCADE')
+
+      t
+        .integer('answerID')
+        .references('answers.answerID')
+        .onDelete('CASCADE')
+    })
+    .alterTable('votes', (t) => {
+      t.unique([ 'ratingID', 'userID' ])
+    })
+    .alterTable('votes', (t) => {
+      t.unique([ 'questionID', 'userID' ])
+    })
+    .alterTable('votes', (t) => {
+      t.unique([ 'answerID', 'userID' ])
     })
 
     .createTable('images', (t) => {
@@ -531,6 +560,7 @@ export const down = (knex: Knex): Knex.SchemaBuilder =>
     .dropTableIfExists('parameters')
     .dropTableIfExists('groupVariations')
     .dropTableIfExists('images')
+    .dropTableIfExists('votes')
     .dropTableIfExists('answerComments')
     .dropTableIfExists('answers')
     .dropTableIfExists('questions')

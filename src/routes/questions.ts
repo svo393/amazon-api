@@ -7,12 +7,6 @@ import { requireCreator, requireCreatorOrAdmin, requireAuth, multerUpload } from
 
 const router = Router()
 
-router.post('/', requireAuth, async (req, res) => {
-  const questionCreateInput = checkNewQuestion(req)
-  const addedQuestion = await questionService.addQuestion(questionCreateInput, req)
-  res.status(201).json(addedQuestion)
-})
-
 router.get('/:questionID', async (req, res) => {
   const question = await questionService.getQuestionByID(req)
   res.json(question)
@@ -29,7 +23,7 @@ router.delete('/:questionID', requireCreator('questions', 'questionID', 'params'
   res.status(204).end()
 })
 
-router.post('/answers', requireAuth, async (req, res) => {
+router.post('/:questionID/answers', requireAuth, async (req, res) => {
   const answerCreateInput = checkNewAnswer(req)
   const addedAnswer = await answerService.addAnswer(answerCreateInput, req)
   res.status(201).json(addedAnswer)

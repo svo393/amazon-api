@@ -12,8 +12,8 @@ const addGroupVariation = async (groupVariationInput: GroupVariationCreateInput,
     `,
     [ db('groupVariations').insert({
       ...groupVariationInput,
-      productID: Number(req.params.productID),
-      groupID: Number(req.params.groupID)
+      productID: req.params.productID,
+      groupID: req.params.groupID
     }) ]
   )
 

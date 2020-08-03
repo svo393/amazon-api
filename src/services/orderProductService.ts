@@ -1,10 +1,10 @@
 import { Request } from 'express'
-import { OrderProduct, OrderProductCreateInput, OrderProductUpdateInput } from '../types'
+import { OrderProduct, OrderProductInput } from '../types'
 import { db, dbTrans } from '../utils/db'
 import StatusError from '../utils/StatusError'
 import Knex from 'knex'
 
-const addOrderProduct = async (orderProductInput: OrderProductCreateInput, req: Request): Promise<OrderProduct> => {
+const addOrderProduct = async (orderProductInput: OrderProductInput, req: Request): Promise<OrderProduct> => {
   const { rows: [ addedOrderProduct ] }: { rows: OrderProduct[] } = await db.raw(
     `
     ? ON CONFLICT
@@ -13,7 +13,8 @@ const addOrderProduct = async (orderProductInput: OrderProductCreateInput, req: 
     `,
     [ db('orderProducts').insert({
       ...orderProductInput,
-      orderID: Number(req.params.orderID)
+      orderID: req.params.orderID,
+      productID: req.params.productID
     }) ]
   )
 
@@ -23,7 +24,7 @@ const addOrderProduct = async (orderProductInput: OrderProductCreateInput, req: 
   return addedOrderProduct
 }
 
-const updateOrderProduct = async (orderProductInput: OrderProductUpdateInput, req: Request): Promise<OrderProduct> => {
+const updateOrderProduct = async (orderProductInput: OrderProductInput, req: Request): Promise<OrderProduct> => {
   return await dbTrans(async (trx: Knex.Transaction) => {
     const [ updatedOrderProduct ]: OrderProduct[] = await trx('orderProducts')
       .update(orderProductInput, [ '*' ])

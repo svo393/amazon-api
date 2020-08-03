@@ -9,7 +9,7 @@ import questionService from '../services/questionService'
 import userAddressService from '../services/userAddressService'
 import userService from '../services/userService'
 import { UPLOAD_TIMEOUT } from '../utils/config'
-import { checkCartProductUpdate, checkNewCartProduct, checkSingleMediaUpload, checkUserAddressesUpdate, checkUserFilters, checkUserUpdate } from '../utils/inputValidator'
+import { checkCartProductUpdate, checkNewCartProduct, checkNewOrder, checkSingleMediaUpload, checkUserAddressesUpdate, checkUserFilters, checkUserUpdate, checkNewInvoice } from '../utils/inputValidator'
 import { multerUpload, requireAdmin, requireSameUser, requireSameUserOrAdmin } from '../utils/middleware'
 
 const router = Router()
@@ -120,6 +120,18 @@ router.get('/:userID/orders', requireSameUserOrAdmin('params'), async (req, res)
 router.get('/:userID/invoices', requireSameUserOrAdmin('params'), async (req, res) => {
   const invoices = await invoiceService.getInvoicesByUser(req)
   res.json(invoices)
+})
+
+router.post('/:userID/orders', requireSameUser('params'), async (req, res) => {
+  const orderCreateInput = checkNewOrder(req)
+  const addedOrder = await orderService.addOrder(orderCreateInput, req)
+  res.status(201).json(addedOrder)
+})
+
+router.post('/:userID/orders', requireSameUser('params'), async (req, res) => {
+  const invoiceCreateInput = checkNewInvoice(req)
+  const addedInvoice = await invoiceService.addInvoice(invoiceCreateInput)
+  res.status(201).json(addedInvoice)
 })
 
 export default router

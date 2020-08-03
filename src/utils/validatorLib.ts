@@ -15,7 +15,7 @@ type isSomeProvided = {
 }
 
 export const isSomeProvided = ({ input, names }: isSomeProvided) => {
-  const check = input.map((a) => a !== undefined)
+  const check = input.map((i) => i !== undefined)
 
   if (check.length === 0) {
     throw new StatusError(400,

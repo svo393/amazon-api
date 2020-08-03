@@ -21,7 +21,8 @@ const addQuestion = async (questionInput: QuestionCreateInput, req: Request): Pr
       userID: req.session?.userID,
       createdAt: now,
       updatedAt: now,
-      moderationStatus: 'NEW'
+      moderationStatus: 'NEW',
+      groupID: req.params.groupID
     }) ]
   )
 

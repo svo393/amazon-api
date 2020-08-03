@@ -1,7 +1,7 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoriesFiltersInput, CategoryCreateInput, CategoryUpdateInput, FeedFiltersInput, GroupVariationCreateInput, GroupVariationDeleteInput, GroupVariationUpdateInput, ImagesDeleteInput, ImagesFiltersInput, ImagesUpdateInput, InvoiceCreateInput, InvoicesFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ModerationStatus, OrderCreateInput, OrderProductCreateInput, OrderProductUpdateInput, OrdersFiltersInput, OrderStatus, OrderUpdateInput, ParameterInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingsFiltersInput, RatingUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorInput, VendorsFiltersInput } from '../types'
-import { canBeBoolean, canBeNumber, hasDefinedProps, isArray, isDate, isEmail, isInputProvided, isNumber, isPasswordValid, isPositiveNumber, isProvided, isSomeProvided, isString } from './validatorLib'
+import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoriesFiltersInput, CategoryCreateInput, CategoryUpdateInput, FeedFiltersInput, GroupVariationCreateInput, GroupVariationDeleteInput, GroupVariationUpdateInput, ImagesDeleteInput, ImagesFiltersInput, ImagesUpdateInput, InvoiceCreateInput, InvoicesFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ModerationStatus, OrderCreateInput, OrderProductInput, OrdersFiltersInput, OrderStatus, OrderUpdateInput, ParameterInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingsFiltersInput, RatingUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorInput, VendorsFiltersInput, VotesCreateInput, VotesFiltersInput } from '../types'
+import { canBeBoolean, canBeNumber, hasDefinedProps, isArray, isDate, isEmail, isInputProvided, isPasswordValid, isPositiveNumber, isProvided, isSomeProvided, isString } from './validatorLib'
 
 // TODO implement PARTIAL<t>
 export const checkNewUser = ({ body }: Request): UserSignupInput => {
@@ -215,7 +215,7 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
     param: productParameters?.param.map((pp: any) => ({
       parameterID: R.pipe(
         isProvided,
-        isNumber
+        canBeNumber
       )({ name: 'parameterID', param: pp.parameterID }).param,
       value: R.pipe(
         isProvided,
@@ -340,7 +340,7 @@ export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
     param: productParameters?.param.map((pp: any) => ({
       parameterID: R.pipe(
         isProvided,
-        isNumber
+        canBeNumber
       )({ name: 'parameterID', param: pp.parameterID }).param,
       value: R.pipe(
         isProvided,
@@ -579,21 +579,7 @@ export const checkNewUserAddress = ({ body }: Request): UserAddressCreateInput =
     ? canBeBoolean({ name: 'isDefault', param: body.isDefault })
     : undefined
 
-  const userID = R.pipe(
-    isProvided,
-    canBeNumber
-  )({ name: 'userID', param: body.userID })
-
-  const addressID = R.pipe(
-    isProvided,
-    canBeNumber
-  )({ name: 'addressID', param: body.addressID })
-
-  return {
-    isDefault: isDefault?.param,
-    userID: userID.param,
-    addressID: addressID.param
-  }
+  return { isDefault: isDefault?.param }
 }
 
 export const checkUserAddressesUpdate = ({ body }: Request): UserAddressUpdateInput => {
@@ -638,16 +624,10 @@ export const checkNewRating = ({ body }: Request): RatingCreateInput => {
     canBeNumber
   )({ name: 'stars', param: body.stars })
 
-  const groupID = R.pipe(
-    isProvided,
-    canBeNumber
-  )({ name: 'groupID', param: body.groupID })
-
   return {
     title: title?.param,
     review: review.param,
-    stars: stars.param,
-    groupID: groupID.param
+    stars: stars.param
   }
 }
 
@@ -687,11 +667,6 @@ export const checkNewRatingComment = ({ body }: Request): RatingCommentCreateInp
     isString
   )({ name: 'content', param: body.content })
 
-  const ratingID = R.pipe(
-    isProvided,
-    canBeNumber
-  )({ name: 'ratingID', param: body.ratingID })
-
   const parentRatingCommentID = 'parentRatingCommentID' in body
     ? canBeNumber(
       { name: 'parentRatingCommentID', param: body.parentRatingCommentID }
@@ -700,7 +675,6 @@ export const checkNewRatingComment = ({ body }: Request): RatingCommentCreateInp
 
   return {
     content: content.param,
-    ratingID: ratingID.param,
     parentRatingCommentID: parentRatingCommentID?.param
   }
 }
@@ -725,15 +699,7 @@ export const checkNewQuestion = ({ body }: Request): QuestionCreateInput => {
     isString
   )({ name: 'content', param: body.content })
 
-  const groupID = R.pipe(
-    isProvided,
-    canBeNumber
-  )({ name: 'groupID', param: body.groupID })
-
-  return {
-    content: content.param,
-    groupID: groupID.param
-  }
+  return { content: content.param }
 }
 
 export const checkQuestionUpdate = ({ body }: Request): QuestionUpdateInput => {
@@ -757,15 +723,7 @@ export const checkNewAnswer = ({ body }: Request): AnswerCreateInput => {
     isString
   )({ name: 'content', param: body.content })
 
-  const questionID = R.pipe(
-    isProvided,
-    canBeNumber
-  )({ name: 'questionID', param: body.questionID })
-
-  return {
-    content: content.param,
-    questionID: questionID.param
-  }
+  return { content: content.param }
 }
 
 export const checkAnswerUpdate = ({ body }: Request): AnswerUpdateInput => {
@@ -789,11 +747,6 @@ export const checkNewAnswerComment = ({ body }: Request): AnswerCommentCreateInp
     isString
   )({ name: 'content', param: body.content })
 
-  const answerID = R.pipe(
-    isProvided,
-    canBeNumber
-  )({ name: 'answerID', param: body.answerID })
-
   const parentAnswerCommentID = 'parentAnswerCommentID' in body
     ? canBeNumber(
       { name: 'parentAnswerCommentID', param: body.parentAnswerCommentID }
@@ -802,7 +755,6 @@ export const checkNewAnswerComment = ({ body }: Request): AnswerCommentCreateInp
 
   return {
     content: content.param,
-    answerID: answerID.param,
     parentAnswerCommentID: parentAnswerCommentID?.param
   }
 }
@@ -876,11 +828,6 @@ export const checkNewOrder = ({ body }: Request): OrderCreateInput => {
     isString
   )({ name: 'shippingMethod', param: body.shippingMethod })
 
-  const userID = R.pipe(
-    isProvided,
-    canBeNumber
-  )({ name: 'userID', param: body.userID })
-
   const details = R.pipe(
     isProvided,
     isString
@@ -904,7 +851,6 @@ export const checkNewOrder = ({ body }: Request): OrderCreateInput => {
 
   return {
     address: address.param,
-    userID: userID.param,
     shippingMethod: shippingMethod.param,
     details: details.param,
     paymentMethod: paymentMethod.param,
@@ -932,7 +878,7 @@ export const checkOrderUpdate = ({ body }: Request): OrderUpdateInput => {
   })
 }
 
-export const checkNewOrderProduct = ({ body }: Request): OrderProductCreateInput => {
+export const checkNewOrderProduct = ({ body }: Request): OrderProductInput => {
   const qty = R.pipe(
     isProvided,
     canBeNumber
@@ -943,19 +889,10 @@ export const checkNewOrderProduct = ({ body }: Request): OrderProductCreateInput
     canBeNumber
   )({ name: 'price', param: body.price })
 
-  const productID = R.pipe(
-    isProvided,
-    canBeNumber
-  )({ name: 'productID', param: body.productID })
-
-  return {
-    qty: qty.param,
-    price: price.param,
-    productID: productID.param
-  }
+  return { qty: qty.param, price: price.param }
 }
 
-export const checkOrderProductUpdate = ({ body }: Request): OrderProductUpdateInput => {
+export const checkOrderProductUpdate = ({ body }: Request): OrderProductInput => {
   const qty = 'qty' in body
     ? canBeNumber({ name: 'qty', param: body.qty })
     : undefined
@@ -964,7 +901,7 @@ export const checkOrderProductUpdate = ({ body }: Request): OrderProductUpdateIn
     ? canBeNumber({ name: 'price', param: body.price })
     : undefined
 
-  return hasDefinedProps<OrderProductUpdateInput>({
+  return hasDefinedProps<OrderProductInput>({
     qty: qty?.param,
     price: price?.param
   })
@@ -1395,11 +1332,11 @@ export const checkImagesUpdate = ({ body }: Request): ImagesUpdateInput => {
   return images.map((i) => ({
     imageID: R.pipe(
       isProvided,
-      isNumber
+      canBeNumber
     )({ name: 'imageID', param: i.imageID }).param,
     index: R.pipe(
       isProvided,
-      isNumber
+      canBeNumber
     )({ name: 'index', param: i.index }).param
   }))
 }
@@ -1410,7 +1347,7 @@ export const checkImagesDelete = ({ body }: Request): ImagesDeleteInput => {
   return images.map((i) => ({
     imageID: R.pipe(
       isProvided,
-      isNumber
+      canBeNumber
     )({ name: 'imageID', param: i.imageID }).param
   }))
 }
@@ -1534,6 +1471,45 @@ export const checkImageFilters = ({ query }: Request): ImagesFiltersInput => {
     questionID: questionID?.param,
     answerID: answerID?.param,
     answerCommentID: answerCommentID?.param,
+    userID: userID?.param
+  }
+}
+
+export const checkNewVote = ({ body }: Request): VotesCreateInput => {
+  const vote = R.pipe(
+    isProvided,
+    canBeBoolean
+  )({ name: 'vote', param: body.vote })
+
+  const userID = R.pipe(
+    isProvided,
+    isString
+  )({ name: 'userID', param: body.userID })
+
+  return { vote: vote.param, userID: userID.param }
+}
+
+export const checkVoteFilters = ({ query }: Request): VotesFiltersInput => {
+  const ratingID = 'ratingID' in query
+    ? canBeNumber({ name: 'ratingID', param: query.ratingID })
+    : undefined
+
+  const questionID = 'questionID' in query
+    ? canBeNumber({ name: 'questionID', param: query.questionID })
+    : undefined
+
+  const answerID = 'answerID' in query
+    ? canBeNumber({ name: 'answerID', param: query.answerID })
+    : undefined
+
+  const userID = 'userID' in query
+    ? canBeNumber({ name: 'userID', param: query.userID })
+    : undefined
+
+  return {
+    ratingID: ratingID?.param,
+    questionID: questionID?.param,
+    answerID: answerID?.param,
     userID: userID?.param
   }
 }

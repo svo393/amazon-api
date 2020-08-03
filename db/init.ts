@@ -20,6 +20,7 @@ export const init = async (): Promise<void> => {
   await db('questions').del()
   await db('ratingComments').del()
   await db('ratings').del()
+  await db('votes').del()
   await db('listProducts').del()
   await db('productSizes').del()
   await db('products').del()

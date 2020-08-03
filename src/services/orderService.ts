@@ -7,17 +7,20 @@ import { db, dbTrans } from '../utils/db'
 import sortItems from '../utils/sortItems'
 import StatusError from '../utils/StatusError'
 
-const addOrder = async (orderInput: OrderCreateInput): Promise<OrderFullData & Invoice> => {
+const addOrder = async (orderInput: OrderCreateInput, req: Request): Promise<OrderFullData & Invoice> => {
   const { cart } = orderInput
   const now = new Date()
 
   return await dbTrans(async (trx: Knex.Transaction) => {
+    const userID = req.session?.userID
+
     const [ addedOrder ]: Order[] = await trx('orders')
       .insert({
         ...R.omit([ 'cart', 'details', 'paymentMethod' ], orderInput),
         orderStatus: 'NEW',
         createdAt: now,
-        updatedAt: now
+        updatedAt: now,
+        userID
       }, [ '*' ])
 
     const cartProducts: {
@@ -45,7 +48,7 @@ const addOrder = async (orderInput: OrderCreateInput): Promise<OrderFullData & I
         amount: R.sum(addedOrderProducts.map((op) => op.qty * op.price)),
         details: orderInput.details,
         orderID: addedOrder.orderID,
-        userID: orderInput.userID,
+        userID,
         paymentMethod: orderInput.paymentMethod,
         invoiceStatus: 'NEW',
         createdAt: now,

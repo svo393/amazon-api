@@ -75,7 +75,7 @@ type Parent = { name: string; categoryID: number };
 type SingleCategoryData = Omit<CategoryListData, 'parentCategoryID'> & { parentChain: Parent[] }
 
 const getCategoryByID = async (req: Request): Promise<SingleCategoryData> => {
-  const categoryID = Number(req.params.categoryID)
+  const categoryID = req.params.categoryID
 
   const categories: (Category & { productCount: string })[] = await db('categories as c')
     .select('c.categoryID', 'c.name', 'c.parentCategoryID')

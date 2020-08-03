@@ -6,12 +6,6 @@ import { requireAdmin, requireCreatorOrAdmin, requireAuth } from '../utils/middl
 
 const router = Router()
 
-router.post('/', requireAuth, async (req, res) => {
-  const orderCreateInput = checkNewOrder(req)
-  const addedOrder = await orderService.addOrder(orderCreateInput)
-  res.status(201).json(addedOrder)
-})
-
 router.get('/', requireAdmin, async (req, res) => {
   const ordersFiltersinput = checkOrderFilters(req)
   const orders = await orderService.getOrders(ordersFiltersinput)
@@ -29,7 +23,7 @@ router.put('/:orderID', requireAdmin, async (req, res) => {
   res.json(updatedItem)
 })
 
-router.post('/:orderID/products', requireAdmin, async (req, res) => {
+router.post('/:orderID/products/:productID', requireAdmin, async (req, res) => {
   const orderProductCreateInput = checkNewOrderProduct(req)
   const addedOrderProduct = await orderProductService.addOrderProduct(orderProductCreateInput, req)
   res.status(201).json(addedOrderProduct)

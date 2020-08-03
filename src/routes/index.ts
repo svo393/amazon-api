@@ -24,7 +24,6 @@ import ratingCommentsRouter from './ratingComments'
 import ratingsRouter from './ratings'
 import rolesRouter from './roles'
 import shippingMethodsRouter from './shippingMethods'
-import userAddressesRouter from './userAddresses'
 import usersRouter from './users'
 import vendorsRouter from './vendors'
 
@@ -52,6 +51,5 @@ export default Router()
   .use(apiURLs.ratings, ratingsRouter)
   .use(apiURLs.roles, rolesRouter)
   .use(apiURLs.shippingMethods, shippingMethodsRouter)
-  .use(apiURLs.userAddresses, userAddressesRouter)
   .use(apiURLs.users, usersRouter)
   .use(apiURLs.vendors, vendorsRouter)

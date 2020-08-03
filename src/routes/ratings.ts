@@ -1,17 +1,12 @@
 import Router from 'express'
 import ratingCommentService from '../services/ratingCommentService'
 import ratingService from '../services/ratingService'
+import voteService from '../services/voteService'
 import { UPLOAD_TIMEOUT } from '../utils/config'
-import { checkMediaUpload, checkNewRating, checkNewRatingComment, checkRatingFilters, checkRatingUpdate } from '../utils/inputValidator'
-import { requireCreator, requireCreatorOrAdmin, requireAuth, multerUpload } from '../utils/middleware'
+import { checkMediaUpload, checkNewRating, checkNewRatingComment, checkNewVote, checkRatingFilters, checkRatingUpdate } from '../utils/inputValidator'
+import { multerUpload, requireAuth, requireCreator, requireCreatorOrAdmin } from '../utils/middleware'
 
 const router = Router()
-
-router.post('/', requireAuth, async (req, res) => {
-  const ratingCreateInput = checkNewRating(req)
-  const addedRating = await ratingService.addRating(ratingCreateInput, req)
-  res.status(201).json(addedRating)
-})
 
 router.get('/', async (req, res) => {
   const ratingsFiltersinput = checkRatingFilters(req)
@@ -35,7 +30,7 @@ router.delete('/:ratingID', requireCreator('ratings', 'ratingID', 'params'), asy
   res.status(204).end()
 })
 
-router.post('/comments', requireAuth, async (req, res) => {
+router.post('/:ratingID/comments', requireAuth, async (req, res) => {
   const ratingCommentCreateInput = checkNewRatingComment(req)
   const addedRatingComment = await ratingCommentService.addRatingComment(ratingCommentCreateInput, req)
   res.status(201).json(addedRatingComment)
@@ -58,6 +53,12 @@ router.post('/:ratingID/comments/:ratingCommentID/upload', requireCreator('ratin
   const ratingCommentImages = checkMediaUpload(req)
   ratingCommentService.uploadRatingCommentImages(ratingCommentImages, req)
   res.status(204).end()
+})
+
+router.post('/:ratingID/votes', requireAuth, async (req, res) => {
+  const voteCreateInput = checkNewVote(req)
+  const addedVote = await voteService.addVote(voteCreateInput, req)
+  res.status(201).json(addedVote)
 })
 
 export default router

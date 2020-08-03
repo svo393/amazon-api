@@ -45,7 +45,6 @@ export const apiURLs = {
   ratings: `${baseAPI}/ratings`,
   roles: `${baseAPI}/roles`,
   shippingMethods: `${baseAPI}/shipping-methods`,
-  userAddresses: `${baseAPI}/user-addresses`,
   users: `${baseAPI}/users`,
   vendors: `${baseAPI}/vendors`
 }
