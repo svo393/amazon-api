@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { Image, Question, QuestionCreateInput, QuestionUpdateInput } from '../types'
+import { Image, Question, QuestionCreateInput, QuestionUpdateInput, Vote } from '../types'
 import { imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
 import getUploadIndex from '../utils/getUploadIndex'
@@ -52,8 +52,6 @@ const getQuestionByID = async (req: Request): Promise<Question &
       'q.createdAt',
       'q.updatedAt',
       'q.content',
-      'q.likes',
-      'q.dislikes',
       'q.moderationStatus',
       'q.userID',
       'q.groupID',
@@ -68,9 +66,23 @@ const getQuestionByID = async (req: Request): Promise<Question &
   const images = await db<Image>('images')
     .where('questionID', questionID)
 
+  const votes = await db<Vote>('votes')
+    .where('questionID', questionID)
+
+  const voteSum = votes.reduce((acc, cur) => (
+    acc += cur.vote ? 1 : -1
+  ), 0)
+
+  const _question = {
+    ...question,
+    images,
+    votes: voteSum,
+    type: 'question'
+  }
+
   return [ 'ROOT', 'ADMIN' ].includes(req.session?.role)
-    ? { ...question, images }
-    : { ...R.omit([ 'userEmail' ], question), images }
+    ? _question
+    : R.omit([ 'userEmail' ], _question)
 }
 
 const updateQuestion = async (questionInput: QuestionUpdateInput, req: Request): Promise<Question> => {

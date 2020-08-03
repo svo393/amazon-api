@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { Answer, AnswerCreateInput, AnswerUpdateInput, Image } from '../types'
+import { Answer, AnswerCreateInput, AnswerUpdateInput, Image, Vote } from '../types'
 import { imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
 import getUploadIndex from '../utils/getUploadIndex'
@@ -38,8 +38,6 @@ const getAnswerByID = async (req: Request): Promise<Answer &
       'a.createdAt',
       'a.updatedAt',
       'a.content',
-      'a.likes',
-      'a.dislikes',
       'a.moderationStatus',
       'a.userID',
       'a.questionID',
@@ -54,9 +52,23 @@ const getAnswerByID = async (req: Request): Promise<Answer &
   const images = await db<Image>('images')
     .where('answerID', answerID)
 
+  const votes = await db<Vote>('votes')
+    .where('answerID', answerID)
+
+  const voteSum = votes.reduce((acc, cur) => (
+    acc += cur.vote ? 1 : -1
+  ), 0)
+
+  const _answer = {
+    ...answer,
+    images,
+    votes: voteSum,
+    type: 'answer'
+  }
+
   return [ 'ROOT', 'ADMIN' ].includes(req.session?.role)
-    ? { ...answer, images }
-    : { ...R.omit([ 'userEmail' ], answer), images }
+    ? _answer
+    : R.omit([ 'userEmail' ], _answer)
 }
 
 const updateAnswer = async (answerInput: AnswerUpdateInput, req: Request): Promise<Answer> => {

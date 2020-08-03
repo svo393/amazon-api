@@ -54,8 +54,8 @@ const getAnswerCommentByID = async (req: Request): Promise<AnswerComment &
     .where('answerCommentID', answerCommentID)
 
   return [ 'ROOT', 'ADMIN' ].includes(req.session?.role)
-    ? { ...answerComment, images }
-    : { ...R.omit([ 'userEmail' ], answerComment), images }
+    ? { ...answerComment, images, type: 'answerComment' }
+    : { ...R.omit([ 'userEmail' ], answerComment), images, type: 'answerComment' }
 }
 
 const updateAnswerComment = async (answerCommentInput: AnswerCommentUpdateInput, req: Request): Promise<AnswerComment> => {

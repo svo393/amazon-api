@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { Image, Rating, RatingCreateInput, RatingsFiltersInput, RatingUpdateInput } from '../types'
+import { Image, Rating, RatingCreateInput, RatingsFiltersInput, RatingUpdateInput, Vote } from '../types'
 import { defaultLimit, imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
 import fuseIndexes from '../utils/fuseIndexes'
@@ -47,15 +47,13 @@ const getRatings = async (ratingsFiltersInput: RatingsFiltersInput, req: Request
     createdTo,
     starsMin,
     starsMax,
-    likesMin,
-    likesMax,
-    dislikesMin,
-    dislikesMax
+    votesMin,
+    votesMax
   } = ratingsFiltersInput
 
   const userHasPermission = [ 'ROOT', 'ADMIN' ].includes(req.session?.role)
 
-  let ratings: Rating[] = await db('ratings as r')
+  let ratings: (Rating & { votes: number })[] = await db('ratings as r')
     .select(
       'r.ratingID',
       'r.createdAt',
@@ -63,8 +61,6 @@ const getRatings = async (ratingsFiltersInput: RatingsFiltersInput, req: Request
       'r.title',
       'r.review',
       'r.stars',
-      'r.likes',
-      'r.dislikes',
       'r.isVerified',
       'r.moderationStatus',
       'r.userID',
@@ -73,6 +69,19 @@ const getRatings = async (ratingsFiltersInput: RatingsFiltersInput, req: Request
     )
     .join('users as u', 'r.userID', 'u.userID')
     .groupBy('r.ratingID', 'userEmail')
+
+  const votes = await db<Vote>('votes')
+    .whereNotNull('ratingID')
+
+  ratings = ratings
+    .map((r) => {
+      const voteSum = votes
+        .filter((v) => v.ratingID === r.ratingID)
+        .reduce((acc, cur) => (
+          acc += cur.vote ? 1 : -1
+        ), 0)
+      return { ...r, votes: voteSum }
+    })
 
   if (q !== undefined) {
     ratings = ratings
@@ -120,24 +129,14 @@ const getRatings = async (ratingsFiltersInput: RatingsFiltersInput, req: Request
       .filter((r) => r.stars <= starsMax)
   }
 
-  if (likesMin !== undefined) {
+  if (votesMin !== undefined) {
     ratings = ratings
-      .filter((r) => r.likes >= likesMin)
+      .filter((r) => r.votes >= votesMin)
   }
 
-  if (likesMax !== undefined) {
+  if (votesMax !== undefined) {
     ratings = ratings
-      .filter((r) => r.likes <= likesMax)
-  }
-
-  if (dislikesMin !== undefined) {
-    ratings = ratings
-      .filter((r) => r.dislikes >= dislikesMin)
-  }
-
-  if (dislikesMax !== undefined) {
-    ratings = ratings
-      .filter((r) => r.dislikes <= dislikesMax)
+      .filter((r) => r.votes <= votesMax)
   }
 
   const _ratings = userHasPermission
@@ -153,7 +152,7 @@ const getRatings = async (ratingsFiltersInput: RatingsFiltersInput, req: Request
 }
 
 const getRatingByID = async (req: Request): Promise<Rating &
-{ images: Image[] }> => {
+{ images: Image[]; votes: number }> => {
   const { ratingID } = req.params
 
   const rating = await db<Rating>('ratings as r')
@@ -164,8 +163,6 @@ const getRatingByID = async (req: Request): Promise<Rating &
       'r.title',
       'r.review',
       'r.stars',
-      'r.likes',
-      'r.dislikes',
       'r.isVerified',
       'r.moderationStatus',
       'r.userID',
@@ -181,9 +178,23 @@ const getRatingByID = async (req: Request): Promise<Rating &
   const images = await db<Image>('images')
     .where('ratingID', ratingID)
 
+  const votes = await db<Vote>('votes')
+    .where('ratingID', ratingID)
+
+  const voteSum = votes.reduce((acc, cur) => (
+    acc += cur.vote ? 1 : -1
+  ), 0)
+
+  const _rating = {
+    ...rating,
+    images,
+    votes: voteSum,
+    type: 'rating'
+  }
+
   return [ 'ROOT', 'ADMIN' ].includes(req.session?.role)
-    ? { ...rating, images }
-    : { ...R.omit([ 'userEmail' ], rating), images }
+    ? _rating
+    : R.omit([ 'userEmail' ], _rating)
 }
 
 const updateRating = async (ratingInput: RatingUpdateInput, req: Request): Promise<Rating> => {

@@ -1400,20 +1400,12 @@ export const checkRatingFilters = ({ query }: Request): RatingsFiltersInput => {
     ? canBeNumber({ name: 'starsMax', param: query.starsMax })
     : undefined
 
-  const likesMin = 'likesMin' in query
-    ? canBeNumber({ name: 'likesMin', param: query.likesMin })
+  const votesMin = 'votesMin' in query
+    ? canBeNumber({ name: 'votesMin', param: query.votesMin })
     : undefined
 
-  const likesMax = 'likesMax' in query
-    ? canBeNumber({ name: 'likesMax', param: query.likesMax })
-    : undefined
-
-  const dislikesMin = 'dislikesMin' in query
-    ? canBeNumber({ name: 'dislikesMin', param: query.dislikesMin })
-    : undefined
-
-  const dislikesMax = 'dislikesMax' in query
-    ? canBeNumber({ name: 'dislikesMax', param: query.dislikesMax })
+  const votesMax = 'votesMax' in query
+    ? canBeNumber({ name: 'votesMax', param: query.votesMax })
     : undefined
 
   return {
@@ -1428,10 +1420,8 @@ export const checkRatingFilters = ({ query }: Request): RatingsFiltersInput => {
     createdTo: createdTo?.param,
     starsMin: starsMin?.param,
     starsMax: starsMax?.param,
-    likesMin: likesMin?.param,
-    likesMax: likesMax?.param,
-    dislikesMin: dislikesMin?.param,
-    dislikesMax: dislikesMax?.param
+    votesMin: votesMin?.param,
+    votesMax: votesMax?.param
   }
 }
 

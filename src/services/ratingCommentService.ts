@@ -54,8 +54,8 @@ const getRatingCommentByID = async (req: Request): Promise<RatingComment &
     .where('ratingCommentID', ratingCommentID)
 
   return [ 'ROOT', 'ADMIN' ].includes(req.session?.role)
-    ? { ...ratingComment, images }
-    : { ...R.omit([ 'userEmail' ], ratingComment), images }
+    ? { ...ratingComment, images, type: 'ratingComment' }
+    : { ...R.omit([ 'userEmail' ], ratingComment), images, type: 'ratingComment' }
 }
 
 const updateRatingComment = async (ratingCommentInput: RatingCommentUpdateInput, req: Request): Promise<RatingComment> => {

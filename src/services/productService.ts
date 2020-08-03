@@ -141,9 +141,6 @@ const getProducts = async (productsFiltersInput: ProductsFiltersInput): Promise<
     ratingMin
   } = productsFiltersInput
 
-  console.info('productsFiltersInput', productsFiltersInput)
-  console.info('page', page)
-
   // TODO refactor reusable queries
   const rawProducts: ProductListRawData[] = await getProductsQuery.clone()
 

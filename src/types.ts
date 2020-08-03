@@ -102,8 +102,6 @@ export type Rating = {
   title?: string;
   review: string;
   stars: number;
-  likes: number;
-  dislikes: number;
   isVerified: boolean;
   moderationStatus: string;
   userID: number;
@@ -128,8 +126,6 @@ export type Question = {
   createdAt: Date;
   updatedAt: Date;
   content: string;
-  likes: number;
-  dislikes: number;
   moderationStatus: string;
   userID: number;
   groupID: number;
@@ -141,8 +137,6 @@ export type Answer = {
   createdAt: Date;
   updatedAt: Date;
   content: string;
-  likes: number;
-  dislikes: number;
   moderationStatus: string;
   userID: number;
   questionID: number;
@@ -450,10 +444,8 @@ export type RatingsFiltersInput = {
   createdTo?: string;
   starsMin?: number;
   starsMax?: number;
-  likesMin?: number;
-  likesMax?: number;
-  dislikesMin?: number;
-  dislikesMax?: number;
+  votesMin?: number;
+  votesMax?: number;
 }
 
 export type ImagesFiltersInput = {
