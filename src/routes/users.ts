@@ -128,10 +128,4 @@ router.post('/:userID/orders', requireSameUser('params'), async (req, res) => {
   res.status(201).json(addedOrder)
 })
 
-router.post('/:userID/orders', requireSameUser('params'), async (req, res) => {
-  const invoiceCreateInput = checkNewInvoice(req)
-  const addedInvoice = await invoiceService.addInvoice(invoiceCreateInput)
-  res.status(201).json(addedInvoice)
-})
-
 export default router

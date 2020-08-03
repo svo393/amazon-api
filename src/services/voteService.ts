@@ -4,6 +4,8 @@ import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
 const addVote = async (voteInput: VotesCreateInput, req: Request): Promise<Vote> => {
+  const { ratingID, questionID, answerID } = req.params
+
   const { rows: [ addedVote ] }: { rows: Vote[] } = await db.raw(
     `
     ? ON CONFLICT
@@ -12,7 +14,10 @@ const addVote = async (voteInput: VotesCreateInput, req: Request): Promise<Vote>
     `,
     [ db('votes').insert({
       ...voteInput,
-      userID: req.session?.userID
+      userID: req.session?.userID,
+      ratingID,
+      questionID,
+      answerID
     }) ]
   )
 

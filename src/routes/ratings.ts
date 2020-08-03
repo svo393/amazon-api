@@ -3,7 +3,7 @@ import ratingCommentService from '../services/ratingCommentService'
 import ratingService from '../services/ratingService'
 import voteService from '../services/voteService'
 import { UPLOAD_TIMEOUT } from '../utils/config'
-import { checkMediaUpload, checkNewRating, checkNewRatingComment, checkNewVote, checkRatingFilters, checkRatingUpdate } from '../utils/inputValidator'
+import { checkMediaUpload, checkNewRatingComment, checkNewVote, checkRatingFilters, checkRatingUpdate } from '../utils/inputValidator'
 import { multerUpload, requireAuth, requireCreator, requireCreatorOrAdmin } from '../utils/middleware'
 
 const router = Router()

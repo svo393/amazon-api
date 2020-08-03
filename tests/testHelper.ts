@@ -1,6 +1,6 @@
 import supertest from 'supertest'
 import app from '../src/app'
-import { Address, AddressCreateInput, AddressType, AddressTypeInput, Answer, AnswerComment, AnswerCommentCreateInput, AnswerCreateInput, CartProduct, Category, CategoryCreateInput, Follower, Group, GroupVariation, GroupVariationCreateInput, Invoice, InvoiceCreateInput, InvoiceStatus, List, ListCreateInput, ListProduct, Order, OrderCreateInput, OrderProduct, OrderProductCreateInput, OrderStatus, Parameter, ParameterInput, PaymentMethod, Product, ProductParameter, ProductPublicData, Question, QuestionCreateInput, Rating, RatingComment, RatingCommentCreateInput, RatingCreateInput, Role, ShippingMethod, ShippingMethodInput, User, UserAddress, Vendor, VendorInput, ModerationStatus } from '../src/types'
+import { Address, AddressCreateInput, AddressType, AddressTypeInput, Answer, AnswerComment, AnswerCommentCreateInput, AnswerCreateInput, CartProduct, Category, CategoryCreateInput, Follower, Group, GroupVariation, GroupVariationCreateInput, Invoice, InvoiceCreateInput, InvoiceStatus, List, ListCreateInput, ListProduct, Order, OrderCreateInput, OrderProduct, OrderProductInput, OrderStatus, Parameter, ParameterInput, PaymentMethod, Product, ProductParameter, ProductPublicData, Question, QuestionCreateInput, Rating, RatingComment, RatingCommentCreateInput, RatingCreateInput, Role, ShippingMethod, ShippingMethodInput, User, UserAddress, Vendor, VendorInput, ModerationStatus } from '../src/types'
 import { apiURLs } from '../src/utils/constants'
 import { db } from '../src/utils/db'
 import { products } from './testProductData'
@@ -296,12 +296,11 @@ export const createOneAddress = async (role: string): Promise<{ addedAddress: Ad
 
 export const createOneUserAddress = async (): Promise<UserAddress & { sessionID: string}> => {
   const { addedAddress } = await createOneAddress('admin')
-  const { userID, sessionID } = await loginAs('customer')
+  const { sessionID } = await loginAs('customer')
 
   const { body }: { body: UserAddress } = await api
-    .post(apiURLs.userAddresses)
+    .post(`${apiURLs.addresses}/${addedAddress.addressID}/userAddresses`)
     .set('Cookie', `sessionID=${sessionID}`)
-    .send({ userID, addressID: addedAddress.addressID })
 
   return { ...body, sessionID }
 }
@@ -383,11 +382,10 @@ export const createOneListProduct = async (): Promise<ListProduct & { sessionID:
   return { ...body, sessionID, userID }
 }
 
-export const newRating = (groupID: number): RatingCreateInput => ({
+export const newRating = (): RatingCreateInput => ({
   title: `New Rating ${(new Date().getTime()).toString()}`,
   review: `Long Review ${(new Date().getTime()).toString()}`,
-  stars: 4,
-  groupID
+  stars: 4
 })
 
 export const createOneRating = async (): Promise<Rating & { sessionID: string }> => {
@@ -395,16 +393,15 @@ export const createOneRating = async (): Promise<Rating & { sessionID: string }>
   const { addedProduct } = await createOneProduct('admin')
 
   const { body }: { body: Rating } = await api
-    .post(apiURLs.ratings)
+    .post(`${apiURLs.groups}/${addedProduct.groupID}/ratings`)
     .set('Cookie', `sessionID=${sessionID}`)
-    .send(newRating(addedProduct.groupID))
+    .send(newRating())
 
   return { ...body, sessionID }
 }
 
-export const newRatingComment = (ratingID: number): RatingCommentCreateInput => ({
-  content: `New RatingComment ${(new Date().getTime()).toString()}`,
-  ratingID
+export const newRatingComment = (): RatingCommentCreateInput => ({
+  content: `New RatingComment ${(new Date().getTime()).toString()}`
 })
 
 export const createOneRatingComment = async (): Promise<RatingComment & { sessionID: string }> => {
@@ -412,16 +409,15 @@ export const createOneRatingComment = async (): Promise<RatingComment & { sessio
   const { ratingID } = await createOneRating()
 
   const { body }: { body: RatingComment } = await api
-    .post(`${apiURLs.ratings}/comments`)
+    .post(`${apiURLs.ratings}/${ratingID}/comments`)
     .set('Cookie', `sessionID=${sessionID}`)
-    .send(newRatingComment(ratingID))
+    .send(newRatingComment())
 
   return { ...body, sessionID }
 }
 
-export const newQuestion = (groupID: number): QuestionCreateInput => ({
-  content: `New Question ${(new Date().getTime()).toString()}`,
-  groupID
+export const newQuestion = (): QuestionCreateInput => ({
+  content: `New Question ${(new Date().getTime()).toString()}`
 })
 
 export const createOneQuestion = async (): Promise<Question & { sessionID: string }> => {
@@ -429,16 +425,15 @@ export const createOneQuestion = async (): Promise<Question & { sessionID: strin
   const { addedProduct } = await createOneProduct('admin')
 
   const { body }: { body: Question } = await api
-    .post(apiURLs.questions)
+    .post(`${apiURLs.groups}/${addedProduct.groupID}/questions`)
     .set('Cookie', `sessionID=${sessionID}`)
-    .send(newQuestion(addedProduct.groupID))
+    .send(newQuestion())
 
   return { ...body, sessionID }
 }
 
-export const newAnswer = (questionID: number): AnswerCreateInput => ({
-  content: `New Answer ${(new Date().getTime()).toString()}`,
-  questionID
+export const newAnswer = (): AnswerCreateInput => ({
+  content: `New Answer ${(new Date().getTime()).toString()}`
 })
 
 export const createOneAnswer = async (): Promise<Answer & { sessionID: string }> => {
@@ -446,16 +441,15 @@ export const createOneAnswer = async (): Promise<Answer & { sessionID: string }>
   const { questionID } = await createOneQuestion()
 
   const { body }: { body: Answer } = await api
-    .post(`${apiURLs.questions}/answers`)
+    .post(`${apiURLs.questions}/${questionID}/answers`)
     .set('Cookie', `sessionID=${sessionID}`)
-    .send(newAnswer(questionID))
+    .send(newAnswer())
 
   return { ...body, sessionID }
 }
 
-export const newAnswerComment = (answerID: number): AnswerCommentCreateInput => ({
-  content: `New AnswerComment ${(new Date().getTime()).toString()}`,
-  answerID
+export const newAnswerComment = (): AnswerCommentCreateInput => ({
+  content: `New AnswerComment ${(new Date().getTime()).toString()}`
 })
 
 export const createOneAnswerComment = async (): Promise<AnswerComment & { sessionID: string }> => {
@@ -463,9 +457,9 @@ export const createOneAnswerComment = async (): Promise<AnswerComment & { sessio
   const { answerID } = await createOneAnswer()
 
   const { body }: { body: AnswerComment } = await api
-    .post(`${apiURLs.answers}/comments`)
+    .post(`${apiURLs.answers}/${answerID}/comments`)
     .set('Cookie', `sessionID=${sessionID}`)
-    .send(newAnswerComment(answerID))
+    .send(newAnswerComment())
 
   return { ...body, sessionID }
 }
@@ -582,12 +576,11 @@ export const createOneInvoiceStatus = async (invoiceStatus: string): Promise<{ a
   return { addedInvoiceStatus: body, sessionID }
 }
 
-export const newOrder = (address: string, shippingMethod: string, userID: number, cart: CartProduct[], paymentMethod: string): OrderCreateInput => ({
+export const newOrder = (address: string, shippingMethod: string, cart: CartProduct[], paymentMethod: string): OrderCreateInput => ({
   address,
   details: 'Card 4242 4242 4242 4242',
   paymentMethod,
   shippingMethod,
-  userID,
   cart
 })
 
@@ -599,30 +592,25 @@ export const createOneOrder = async (role: string): Promise<{ addedOrder: Order;
   const { addedCartProduct: addedCartProduct2 } = await createOneCartProduct(role)
 
   const { body }: { body: Order } = await api
-    .post(apiURLs.orders)
+    .post(`${apiURLs.users}/${userID}/orders`)
     .set('Cookie', `sessionID=${sessionID}`)
     .send(newOrder(
       addedAddress.addr,
       addedShippingMethod.shippingMethodName,
-      userID,
       [ addedCartProduct1, addedCartProduct2 ],
       addedPaymentMethod.paymentMethodName
     ))
   return { addedOrder: body, sessionID }
 }
 
-export const newOrderProduct = (product: Product | ProductPublicData): OrderProductCreateInput => ({
-  qty: 3,
-  price: product.price,
-  productID: product.productID
-})
+export const newOrderProduct = (product: Product | ProductPublicData): OrderProductInput => ({ qty: 3, price: product.price })
 
 export const createOneOrderProduct = async (role: string): Promise<{ addedOrderProduct: OrderProduct; sessionID: string }> => {
   const { addedProduct } = await createOneProduct('admin')
   const { addedOrder, sessionID } = await createOneOrder(role)
 
   const { body }: { body: OrderProduct } = await api
-    .post(`${apiURLs.orders}/${addedOrder.orderID}/products`)
+    .post(`${apiURLs.orders}/${addedOrder.orderID}/products/${addedProduct.productID}`)
     .set('Cookie', `sessionID=${sessionID}`)
     .send(newOrderProduct(addedProduct))
   return { addedOrderProduct: body, sessionID }

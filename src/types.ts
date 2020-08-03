@@ -392,6 +392,7 @@ export type InvoiceCreateInput = Pick<Invoice,
   | 'amount'
   | 'details'
   | 'orderID'
+  | 'userID'
   | 'paymentMethod'
 >
 

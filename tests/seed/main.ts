@@ -166,12 +166,9 @@ const seed = async (): Promise<void> => {
                 const sessionID = users[r.author].sessionID
 
                 const { body }: { body: Rating } = await api
-                  .post(apiURLs.ratings)
+                  .post(`${apiURLs.groups}/${groupID}/ratings`)
                   .set('Cookie', `sessionID=${sessionID}`)
-                  .send({
-                    ...R.omit([ 'author', 'comments', 'mediaFiles' ], r),
-                    groupID
-                  })
+                  .send(R.omit([ 'author', 'comments', 'mediaFiles' ], r))
 
                 await api
                   .put(`${apiURLs.ratings}/${body.ratingID}`)
@@ -197,12 +194,9 @@ const seed = async (): Promise<void> => {
                     const sessionID = users[cm.author].sessionID
 
                     const ratingComment: { body: RatingComment } = await api
-                      .post(`${apiURLs.ratings}/comments`)
+                      .post(`${apiURLs.ratings}/${body.ratingID}/comments`)
                       .set('Cookie', `sessionID=${sessionID}`)
-                      .send({
-                        ...R.omit([ 'author', 'mediaFiles' ], cm),
-                        ratingID: body.ratingID
-                      })
+                      .send(R.omit([ 'author', 'mediaFiles' ], cm))
 
                     await api
                       .put(`${apiURLs.ratingComments}/${ratingComment.body.ratingCommentID}`)
@@ -232,12 +226,9 @@ const seed = async (): Promise<void> => {
                 const sessionID = users[q.author].sessionID
 
                 const { body }: { body: Question } = await api
-                  .post(apiURLs.questions)
+                  .post(`${apiURLs.groups}/${groupID}/questions`)
                   .set('Cookie', `sessionID=${sessionID}`)
-                  .send({
-                    ...R.omit([ 'author', 'answers', 'mediaFiles' ], q),
-                    groupID
-                  })
+                  .send(R.omit([ 'author', 'answers', 'mediaFiles' ], q))
 
                 // await api
                 //   .put(`${apiURLs.questions}/${body.questionID}`)
@@ -263,12 +254,9 @@ const seed = async (): Promise<void> => {
                     const sessionID = users[a.author].sessionID
 
                     const answer: { body: Answer } = await api
-                      .post(`${apiURLs.questions}/answers`)
+                      .post(`${apiURLs.questions}/${body.questionID}/answers`)
                       .set('Cookie', `sessionID=${sessionID}`)
-                      .send({
-                        ...R.omit([ 'author', 'mediaFiles' ], a),
-                        questionID: body.questionID
-                      })
+                      .send(R.omit([ 'author', 'mediaFiles' ], a))
 
                     // await api
                     //   .put(`${apiURLs.answers}/${answer.body.answerID}`)
@@ -294,12 +282,9 @@ const seed = async (): Promise<void> => {
                         const sessionID = users[ac.author].sessionID
 
                         const answerComment: { body: AnswerComment } = await api
-                          .post(`${apiURLs.answers}/comments`)
+                          .post(`${apiURLs.answers}/${answer.body.answerID}/comments`)
                           .set('Cookie', `sessionID=${sessionID}`)
-                          .send({
-                            ...R.omit([ 'author', 'mediaFiles' ], ac),
-                            answerID: answer.body.answerID
-                          })
+                          .send(R.omit([ 'author', 'mediaFiles' ], ac))
 
                         // await api
                         //   .put(`${apiURLs.answerComments}/${answerComment.body.answerCommentID}`)
@@ -370,14 +355,13 @@ const seed = async (): Promise<void> => {
       })
 
     const order1: { body: Order & Invoice } = await api
-      .post(apiURLs.orders)
+      .post(`${apiURLs.users}/${users[0].userID}/orders`)
       .set('Cookie', `sessionID=${users[0].sessionID}`)
       .send({
         address: users[0].address,
         details: 'Card 4242 4242 4242 4242',
         shippingMethod: 'DOOR',
         paymentMethod: 'CARD',
-        userID: users[0].userID,
         cart: [ cartProduct1.body ]
       })
 
@@ -401,14 +385,13 @@ const seed = async (): Promise<void> => {
       })
 
     const order2: { body: Order & Invoice } = await api
-      .post(apiURLs.orders)
+      .post(`${apiURLs.users}/${users[2].userID}/orders`)
       .set('Cookie', `sessionID=${users[2].sessionID}`)
       .send({
         address: users[2].address,
         details: 'Take my money',
         shippingMethod: 'LOCKER',
         paymentMethod: 'CASH',
-        userID: users[2].userID,
         cart: [ cartProduct2.body ]
       })
 

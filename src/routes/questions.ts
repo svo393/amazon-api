@@ -1,9 +1,10 @@
 import Router from 'express'
 import answerService from '../services/answerService'
 import questionService from '../services/questionService'
+import voteService from '../services/voteService'
 import { UPLOAD_TIMEOUT } from '../utils/config'
-import { checkMediaUpload, checkNewAnswer, checkNewQuestion, checkQuestionUpdate } from '../utils/inputValidator'
-import { requireCreator, requireCreatorOrAdmin, requireAuth, multerUpload } from '../utils/middleware'
+import { checkMediaUpload, checkNewAnswer, checkNewVote, checkQuestionUpdate } from '../utils/inputValidator'
+import { multerUpload, requireAuth, requireCreator, requireCreatorOrAdmin } from '../utils/middleware'
 
 const router = Router()
 
@@ -39,6 +40,12 @@ router.post('/:questionID/upload', requireCreator('questions', 'questionID', 'pa
   const questionImages = checkMediaUpload(req)
   questionService.uploadQuestionImages(questionImages, req)
   res.status(204).end()
+})
+
+router.post('/:questionID/votes', requireAuth, async (req, res) => {
+  const voteCreateInput = checkNewVote(req)
+  const addedVote = await voteService.addVote(voteCreateInput, req)
+  res.status(201).json(addedVote)
 })
 
 export default router

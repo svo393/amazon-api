@@ -17,7 +17,7 @@ const addAnswer = async (answerInput: AnswerCreateInput, req: Request): Promise<
       createdAt: now,
       updatedAt: now,
       moderationStatus: 'NEW',
-      question: req.params.questionID
+      questionID: req.params.questionID
     }, [ '*' ])
 
   return addedAnswer

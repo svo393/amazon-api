@@ -1,8 +1,9 @@
 import Router from 'express'
+import invoiceService from '../services/invoiceService'
 import orderProductService from '../services/orderProductService'
 import orderService from '../services/orderService'
-import { checkNewOrder, checkNewOrderProduct, checkOrderFilters, checkOrderProductUpdate, checkOrderUpdate } from '../utils/inputValidator'
-import { requireAdmin, requireCreatorOrAdmin, requireAuth } from '../utils/middleware'
+import { checkNewInvoice, checkNewOrderProduct, checkOrderFilters, checkOrderProductUpdate, checkOrderUpdate } from '../utils/inputValidator'
+import { requireAdmin, requireCreatorOrAdmin } from '../utils/middleware'
 
 const router = Router()
 

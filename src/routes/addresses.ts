@@ -17,7 +17,7 @@ router.get('/:addressID', async (req, res) => {
   res.json(address)
 })
 
-router.post('/:addressID/userAddresses', requireCreator('answers', 'answerID', 'params'), async (req, res) => {
+router.post('/:addressID/userAddresses', requireAuth, async (req, res) => {
   const userAddressCreateInput = checkNewUserAddress(req)
   const addedUserAddress = await userAddressService.addUserAddress(userAddressCreateInput, req)
   res.status(201).json(addedUserAddress)
