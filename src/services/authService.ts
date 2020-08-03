@@ -84,7 +84,7 @@ const checkInUser = async (req: Request): Promise<UserInfo> => {
     .where('userID', req.session?.userID)
     .first('userID', 'role', 'avatar')
 
-  if (user === undefined) { throw new StatusError(404, 'Not Found') }
+  if (user === undefined) { throw new StatusError(401, 'Unauthorized') }
   return user
 }
 
