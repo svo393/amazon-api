@@ -1196,6 +1196,10 @@ export const checkFeedFilters = ({ query }: Request): FeedFiltersInput => {
     ? isString({ name: 'sortBy', param: query.sortBy })
     : undefined
 
+  const groupID = 'groupID' in query
+    ? canBeNumber({ name: 'groupID', param: query.groupID })
+    : undefined
+
   const page = 'page' in query
     ? R.pipe(
       canBeNumber,
@@ -1227,6 +1231,7 @@ export const checkFeedFilters = ({ query }: Request): FeedFiltersInput => {
     sortBy: sortBy?.param,
     page: page?.param,
     q: q?.param,
+    groupID: groupID?.param,
     types: types?.param,
     moderationStatuses: moderationStatuses?.param,
     createdFrom: createdFrom?.param,

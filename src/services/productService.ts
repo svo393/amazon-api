@@ -171,12 +171,6 @@ const getProducts = async (productsFiltersInput: ProductsFiltersInput): Promise<
       .filter((p) => p.groupID === groupID)
   }
 
-  if (title !== undefined) {
-    products = products
-      .filter((_, i) =>
-        fuseIndexes(products, [ 'title' ], title).includes(i))
-  }
-
   if (priceMin !== undefined) {
     products = products
       .filter((p) => p.price >= priceMin)
@@ -185,18 +179,6 @@ const getProducts = async (productsFiltersInput: ProductsFiltersInput): Promise<
   if (priceMax !== undefined) {
     products = products
       .filter((p) => p.price <= priceMax)
-  }
-
-  if (vendorName !== undefined) {
-    products = products
-      .filter((_, i) =>
-        fuseIndexes(products, [ 'vendorName' ], vendorName).includes(i))
-  }
-
-  if (categoryName !== undefined) {
-    products = products
-      .filter((_, i) =>
-        fuseIndexes(products, [ 'categoryName' ], categoryName).includes(i))
   }
 
   if (stockMin !== undefined) {
@@ -240,6 +222,24 @@ const getProducts = async (productsFiltersInput: ProductsFiltersInput): Promise<
   if (ratingMax !== undefined) {
     products = products
       .filter((p) => p.ratingCount <= ratingMax)
+  }
+
+  if (title !== undefined) {
+    products = products
+      .filter((_, i) =>
+        fuseIndexes(products, [ 'title' ], title).includes(i))
+  }
+
+  if (vendorName !== undefined) {
+    products = products
+      .filter((_, i) =>
+        fuseIndexes(products, [ 'vendorName' ], vendorName).includes(i))
+  }
+
+  if (categoryName !== undefined) {
+    products = products
+      .filter((_, i) =>
+        fuseIndexes(products, [ 'categoryName' ], categoryName).includes(i))
   }
 
   const productsSorted = sortItems(products, sortBy)

@@ -1,4 +1,4 @@
-import { Answer, AnswerComment, FeedFiltersInput, Question, RatingComment } from '../types'
+import { Answer, AnswerComment, FeedFiltersInput, Question, RatingComment, Vote } from '../types'
 import { defaultLimit } from '../utils/constants'
 import { db } from '../utils/db'
 import fuseIndexes from '../utils/fuseIndexes'
@@ -9,7 +9,7 @@ type Activity = (
   Question |
   Answer |
   AnswerComment
-) & { type: string }
+) & { type: string; groupID: number }
 
 type Feed = Activity[]
 
@@ -22,10 +22,11 @@ const getFeed = async (feedFiltersinput: FeedFiltersInput): Promise<{ batch: Fee
     moderationStatuses,
     createdFrom,
     createdTo,
-    userEmail
+    userEmail,
+    groupID
   } = feedFiltersinput
 
-  const ratingComments = await db<RatingComment>('ratingComments as rc')
+  const ratingComments: (RatingComment & { groupID: number })[] = await db('ratingComments as rc')
     .select(
       'rc.ratingCommentID',
       'rc.createdAt',
@@ -35,12 +36,14 @@ const getFeed = async (feedFiltersinput: FeedFiltersInput): Promise<{ batch: Fee
       'rc.userID',
       'rc.ratingID',
       'rc.parentRatingCommentID',
-      'u.email as userEmail'
+      'u.email as userEmail',
+      'r.groupID'
     )
     .join('users as u', 'rc.userID', 'u.userID')
-    .groupBy('rc.ratingCommentID', 'userEmail')
+    .join('ratings as r', 'rc.ratingID', 'r.ratingID')
+    .groupBy('rc.ratingCommentID', 'userEmail', 'r.groupID')
 
-  const questions = await db<Question>('questions as q')
+  const questions: Question[] = await db('questions as q')
     .select(
       'q.questionID',
       'q.createdAt',
@@ -54,7 +57,7 @@ const getFeed = async (feedFiltersinput: FeedFiltersInput): Promise<{ batch: Fee
     .join('users as u', 'q.userID', 'u.userID')
     .groupBy('q.questionID', 'userEmail')
 
-  const answers = await db<Answer>('answers as a')
+  const answers: (Answer & { groupID: number })[] = await db('answers as a')
     .select(
       'a.answerID',
       'a.createdAt',
@@ -63,12 +66,14 @@ const getFeed = async (feedFiltersinput: FeedFiltersInput): Promise<{ batch: Fee
       'a.moderationStatus',
       'a.userID',
       'a.questionID',
-      'u.email as userEmail'
+      'u.email as userEmail',
+      'q.groupID'
     )
     .join('users as u', 'a.userID', 'u.userID')
-    .groupBy('a.answerID', 'userEmail')
+    .join('questions as q', 'a.questionID', 'q.questionID')
+    .groupBy('a.answerID', 'userEmail', 'q.groupID')
 
-  const answerComments = await db<AnswerComment>('answerComments as ac')
+  const answerComments: (AnswerComment & { groupID: number })[] = await db('answerComments as ac')
     .select(
       'ac.answerCommentID',
       'ac.createdAt',
@@ -77,27 +82,49 @@ const getFeed = async (feedFiltersinput: FeedFiltersInput): Promise<{ batch: Fee
       'ac.moderationStatus',
       'ac.userID',
       'ac.parentAnswerCommentID',
-      'u.email as userEmail'
+      'u.email as userEmail',
+      'q.groupID'
     )
     .join('users as u', 'ac.userID', 'u.userID')
-    .groupBy('ac.answerCommentID', 'userEmail')
+    .join('answers as a', 'ac.answerID', 'a.answerID')
+    .join('questions as q', 'a.questionID', 'q.questionID')
+    .groupBy('ac.answerCommentID', 'userEmail', 'q.groupID')
+
+  const votes = await db<Vote>('votes')
+    .orWhereNotNull('questionID')
+    .orWhereNotNull('answerID')
 
   let feed: Feed = [
     ...ratingComments.map((rc) => ({ ...rc, type: 'ratingComment' })),
-    ...questions.map((q) => ({ ...q, type: 'question' })),
-    ...answers.map((a) => ({ ...a, type: 'answer' })),
-    ...answerComments.map((ac) => ({ ...ac, type: 'answerComment' }))
-  ]
+    ...answerComments.map((ac) => ({ ...ac, type: 'answerComment' })),
 
-  if (q !== undefined) {
-    feed = feed
-      .filter((_, i) =>
-        fuseIndexes(feed, [ 'content' ], q).includes(i))
-  }
+    ...questions.map((q) => {
+      const voteSum = votes
+        .filter((v) => v.questionID === q.questionID)
+        .reduce((acc, cur) => (
+          acc += cur.vote ? 1 : -1
+        ), 0)
+      return { ...q, type: 'question', votes: voteSum }
+    }),
+
+    ...answers.map((a) => {
+      const voteSum = votes
+        .filter((v) => v.answerID === a.answerID)
+        .reduce((acc, cur) => (
+          acc += cur.vote ? 1 : -1
+        ), 0)
+      return { ...a, type: 'answer', votes: voteSum }
+    })
+  ]
 
   if (types !== undefined) {
     feed = feed
       .filter((a) => types.split(',').includes(a.type))
+  }
+
+  if (groupID !== undefined) {
+    feed = feed
+      .filter((a) => a.groupID === groupID)
   }
 
   if (moderationStatuses !== undefined) {
@@ -123,6 +150,12 @@ const getFeed = async (feedFiltersinput: FeedFiltersInput): Promise<{ batch: Fee
     feed = feed
       .filter((a) =>
         a.userEmail.toLowerCase().includes(userEmail.toLowerCase()))
+  }
+
+  if (q !== undefined) {
+    feed = feed
+      .filter((_, i) =>
+        fuseIndexes(feed, [ 'content' ], q).includes(i))
   }
 
   const feedSorted = sortItems(feed, sortBy)

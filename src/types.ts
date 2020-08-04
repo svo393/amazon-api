@@ -424,6 +424,7 @@ export type CategoriesFiltersInput = {
 export type FeedFiltersInput = {
   q?: string;
   types?: string;
+  groupID?: number;
   page?: number;
   sortBy?: string;
   moderationStatuses?: string;

@@ -83,12 +83,6 @@ const getRatings = async (ratingsFiltersInput: RatingsFiltersInput, req: Request
       return { ...r, votes: voteSum }
     })
 
-  if (q !== undefined) {
-    ratings = ratings
-      .filter((_, i) =>
-        fuseIndexes(ratings, [ 'title', 'review' ], q).includes(i))
-  }
-
   if (groupID !== undefined) {
     ratings = ratings
       .filter((r) => r.groupID === groupID)
@@ -137,6 +131,12 @@ const getRatings = async (ratingsFiltersInput: RatingsFiltersInput, req: Request
   if (votesMax !== undefined) {
     ratings = ratings
       .filter((r) => r.votes <= votesMax)
+  }
+
+  if (q !== undefined) {
+    ratings = ratings
+      .filter((_, i) =>
+        fuseIndexes(ratings, [ 'title', 'review' ], q).includes(i))
   }
 
   const _ratings = userHasPermission
