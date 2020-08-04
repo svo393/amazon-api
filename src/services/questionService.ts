@@ -38,8 +38,21 @@ const getQuestionsByUser = async (req: Request): Promise<Question[]> => {
 }
 
 const getQuestionsByGroup = async (req: Request): Promise<Question[]> => {
-  return await db('questions')
+  const questions = await db('questions')
     .where('groupID', req.params.groupID)
+
+  const votes = await db<Vote>('votes')
+    .whereNotNull('questionID')
+
+  return questions
+    .map((q) => {
+      const voteSum = votes
+        .filter((v) => v.questionID === q.questionID)
+        .reduce((acc, cur) => (
+          acc += cur.vote ? 1 : -1
+        ), 0)
+      return { ...q, votes: voteSum }
+    })
 }
 
 const getQuestionByID = async (req: Request): Promise<Question &

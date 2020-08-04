@@ -24,8 +24,21 @@ const addAnswer = async (answerInput: AnswerCreateInput, req: Request): Promise<
 }
 
 const getAnswersByQuestion = async (req: Request): Promise<Answer[]> => {
-  return await db('questions')
+  const answers = await db('questions')
     .where('questionID', req.params.questionID)
+
+  const votes = await db<Vote>('votes')
+    .whereNotNull('answerID')
+
+  return answers
+    .map((a) => {
+      const voteSum = votes
+        .filter((v) => v.answerID === a.answerID)
+        .reduce((acc, cur) => (
+          acc += cur.vote ? 1 : -1
+        ), 0)
+      return { ...a, votes: voteSum }
+    })
 }
 
 const getAnswerByID = async (req: Request): Promise<Answer &

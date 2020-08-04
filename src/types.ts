@@ -155,6 +155,15 @@ export type AnswerComment = {
   userEmail: string;
 }
 
+type Activity = (
+  RatingComment |
+  Question |
+  Answer |
+  AnswerComment
+) & { type: string }
+
+export type Feed = Activity[]
+
 export type GroupVariation = {
   name: string;
   value: string;
