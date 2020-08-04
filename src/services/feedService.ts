@@ -29,7 +29,7 @@ const getFeed = async (feedFiltersinput: FeedFiltersInput): Promise<{ batch: Fee
       'u.email as userEmail'
     )
     .join('users as u', 'rc.userID', 'u.userID')
-    .groupBy('rc.ratingCommentID', 'userEmail', 'r.groupID')
+    .groupBy('rc.ratingCommentID', 'userEmail')
 
   const questions: Question[] = await db('questions as q')
     .select(
@@ -57,7 +57,7 @@ const getFeed = async (feedFiltersinput: FeedFiltersInput): Promise<{ batch: Fee
       'u.email as userEmail'
     )
     .join('users as u', 'a.userID', 'u.userID')
-    .groupBy('a.answerID', 'userEmail', 'q.groupID')
+    .groupBy('a.answerID', 'userEmail')
 
   const answerComments: AnswerComment[] = await db('answerComments as ac')
     .select(
@@ -71,7 +71,7 @@ const getFeed = async (feedFiltersinput: FeedFiltersInput): Promise<{ batch: Fee
       'u.email as userEmail'
     )
     .join('users as u', 'ac.userID', 'u.userID')
-    .groupBy('ac.answerCommentID', 'userEmail', 'q.groupID')
+    .groupBy('ac.answerCommentID', 'userEmail')
 
   let feed: Feed = [
     ...ratingComments.map((rc) => ({ ...rc, type: 'ratingComment' })),

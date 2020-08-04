@@ -6,6 +6,7 @@ import { db } from '../utils/db'
 import getUploadIndex from '../utils/getUploadIndex'
 import { uploadImages } from '../utils/img'
 import StatusError from '../utils/StatusError'
+import getCursor from '../utils/getCursor'
 
 const addAnswer = async (answerInput: AnswerCreateInput, req: Request): Promise<Answer> => {
   const now = new Date()
@@ -24,13 +25,13 @@ const addAnswer = async (answerInput: AnswerCreateInput, req: Request): Promise<
 }
 
 const getAnswersByQuestion = async (req: Request): Promise<Answer[]> => {
-  const answers = await db('questions')
+  let answers = await db('questions')
     .where('questionID', req.params.questionID)
 
   const votes = await db<Vote>('votes')
     .whereNotNull('answerID')
 
-  return answers
+  answers = answers
     .map((a) => {
       const voteSum = votes
         .filter((v) => v.answerID === a.answerID)
@@ -39,6 +40,8 @@ const getAnswersByQuestion = async (req: Request): Promise<Answer[]> => {
         ), 0)
       return { ...a, votes: voteSum }
     })
+
+  return getCursor()
 }
 
 const getAnswerByID = async (req: Request): Promise<Answer &
