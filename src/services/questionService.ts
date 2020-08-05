@@ -1,8 +1,9 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { Image, Question, QuestionCreateInput, QuestionUpdateInput, Vote } from '../types'
+import { BatchWithCursor, CursorInput, Image, Question, QuestionCreateInput, QuestionUpdateInput, Vote } from '../types'
 import { imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
+import getCursor from '../utils/getCursor'
 import getUploadIndex from '../utils/getUploadIndex'
 import { uploadImages } from '../utils/img'
 import StatusError from '../utils/StatusError'
@@ -21,7 +22,6 @@ const addQuestion = async (questionInput: QuestionCreateInput, req: Request): Pr
       userID: req.session?.userID,
       createdAt: now,
       updatedAt: now,
-      moderationStatus: 'NEW',
       groupID: req.params.groupID
     }) ]
   )
@@ -37,22 +37,36 @@ const getQuestionsByUser = async (req: Request): Promise<Question[]> => {
     .where('userID', req.params.userID)
 }
 
-const getQuestionsByGroup = async (req: Request): Promise<Question[]> => {
-  const questions = await db('questions')
-    .where('groupID', req.params.groupID)
+const getQuestionsByGroup = async (questionsInput: CursorInput, req: Request): Promise<BatchWithCursor<Question> & { groupID: number }> => {
+  const { startCursor, limit, firstLimit } = questionsInput
+  const { groupID } = req.params
+
+  let questions = await db('questions')
+    .where('groupID', groupID)
 
   const votes = await db<Vote>('votes')
     .whereNotNull('questionID')
 
-  return questions
+  questions = questions
     .map((q) => {
       const voteSum = votes
         .filter((v) => v.questionID === q.questionID)
         .reduce((acc, cur) => (
           acc += cur.vote ? 1 : -1
         ), 0)
-      return { ...q, votes: voteSum }
+      return { ...q, votes: voteSum, type: 'question' }
     })
+
+  return {
+    ...getCursor({
+      startCursor,
+      limit,
+      firstLimit,
+      idProp: 'questionID',
+      data: questions
+    }),
+    groupID: Number(groupID)
+  }
 }
 
 const getQuestionByID = async (req: Request): Promise<Question &

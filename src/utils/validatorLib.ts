@@ -31,6 +31,13 @@ export const isProvided: CP = ({ name, param }) => {
   return { name, param }
 }
 
+export const isObject: CP = ({ name, param }) => {
+  if (Object.prototype.toString.call(param) !== '[object Object]') {
+    throw new StatusError(400, `Incorrect ${name}: ${param}`)
+  }
+  return { name, param }
+}
+
 export const hasDefinedProps = <T>(param: T): T => {
   const strippedObject = JSON.parse(JSON.stringify(param))
 

@@ -77,6 +77,10 @@ export const initialProducts = {
             {
               author: 0,
               stars: 1,
+              variation: {
+                Style: 'No Touch Screen',
+                Size: '12GB / 512GB SSD'
+              },
               title: 'Brand New ACER AIO has dead pixel.',
               review: 'PC is ok, less than thrilled that this brand new machine has a dead pixel and it is required that it have 2 dead pixels to be covered under warranty. Acer customer service was not helpful. They suggested troubleshooting solutions that I completed but were pointless. Their customer service staff also clearly did not communicate well with one another. On a subsequent call it appeared that the notes provided by the previous CSR were inadequate to communicate the steps we already took. They are unwilling to provide a positive outcome.. Will never buy another Acer product. Very unhappy.',
               comments: [
@@ -91,6 +95,10 @@ export const initialProducts = {
             {
               author: 2,
               stars: 5,
+              variation: {
+                Style: 'Touch Screen',
+                Size: '8GB / 1TB HDD'
+              },
               title: 'We Would Give More Stars If We Could',
               review: `Wow. This is a great computer. Any complaints made about the C24-865 have been resoundingly addressed here.
 

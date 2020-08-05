@@ -189,6 +189,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.increments('ratingID')
       t.dateTime('createdAt').notNullable()
       t.dateTime('updatedAt').notNullable()
+      t.jsonb('variation')
       t.string('title')
       t.string('review', 65535).notNullable()
       t.integer('stars').notNullable().unsigned()
@@ -208,7 +209,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t
         .string('moderationStatus')
         .references('moderationStatuses.moderationStatusName')
-        .notNullable()
+        .defaultTo('NEW')
     })
     .alterTable('ratings', (t) => {
       t.unique([ 'userID', 'groupID' ])
@@ -240,7 +241,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t
         .string('moderationStatus')
         .references('moderationStatuses.moderationStatusName')
-        .notNullable()
+        .defaultTo('NEW')
     })
 
     .createTable('questions', (t) => {
@@ -263,7 +264,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t
         .string('moderationStatus')
         .references('moderationStatuses.moderationStatusName')
-        .notNullable()
+        .defaultTo('NEW')
     })
 
     .createTable('answers', (t) => {
@@ -287,7 +288,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t
         .string('moderationStatus')
         .references('moderationStatuses.moderationStatusName')
-        .notNullable()
+        .defaultTo('NEW')
     })
 
     .createTable('answerComments', (t) => {
@@ -316,7 +317,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t
         .string('moderationStatus')
         .references('moderationStatuses.moderationStatusName')
-        .notNullable()
+        .defaultTo('NEW')
     })
 
     .createTable('votes', (t) => {
@@ -490,7 +491,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t
         .string('orderStatus')
         .references('orderStatuses.orderStatusName')
-        .notNullable()
+        .defaultTo('NEW')
 
       t
         .string('shippingMethod')
@@ -540,7 +541,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t
         .string('invoiceStatus')
         .references('invoiceStatuses.invoiceStatusName')
-        .notNullable()
+        .defaultTo('NEW')
 
       t
         .string('paymentMethod')

@@ -3,11 +3,18 @@ import StatusError from './StatusError'
 type Props = {
   startCursor?: number;
   limit?: number;
+  firstLimit?: number;
   idProp: string;
-  data: { [ k: string ]: any }[];
+  data: any[];
 }
 
-export default ({ startCursor, limit = 0, idProp, data }: Props) => {
+export default ({
+  startCursor,
+  limit = 4,
+  firstLimit = limit,
+  idProp,
+  data
+}: Props) => {
   const totalCount = data.length
   let start = 0
 
@@ -17,7 +24,12 @@ export default ({ startCursor, limit = 0, idProp, data }: Props) => {
     start = index + 1
   }
 
-  const batch = data.slice(start, start + limit)
+  const batch = start === 0
+    ? data.slice(start, start + firstLimit)
+    : data.slice(start, start + limit)
+
+  console.info('limit', limit)
+
   const endItem = batch[batch.length - 1]
 
   const endCursor = endItem !== undefined

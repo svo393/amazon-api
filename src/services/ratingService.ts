@@ -23,7 +23,6 @@ const addRating = async (ratingInput: RatingCreateInput, req: Request): Promise<
       userID: req.session?.userID,
       createdAt: now,
       updatedAt: now,
-      moderationStatus: 'NEW',
       groupID: req.params.groupID
     }) ]
   )

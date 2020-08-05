@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { Answer, AnswerCreateInput, AnswerUpdateInput, Image, Vote } from '../types'
+import { Answer, AnswerCreateInput, AnswerUpdateInput, CursorInput, Image, Vote, BatchWithCursor } from '../types'
 import { imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
 import getUploadIndex from '../utils/getUploadIndex'
@@ -17,16 +17,18 @@ const addAnswer = async (answerInput: AnswerCreateInput, req: Request): Promise<
       userID: req.session?.userID,
       createdAt: now,
       updatedAt: now,
-      moderationStatus: 'NEW',
       questionID: req.params.questionID
     }, [ '*' ])
 
   return addedAnswer
 }
 
-const getAnswersByQuestion = async (req: Request): Promise<Answer[]> => {
-  let answers = await db('questions')
-    .where('questionID', req.params.questionID)
+const getAnswersByQuestion = async (CursorInput: CursorInput, req: Request): Promise<BatchWithCursor<Answer> & { questionID: number }> => {
+  const { startCursor, limit, firstLimit } = CursorInput
+  const { questionID } = req.params
+
+  let answers = await db<Answer>('answers')
+    .where('questionID', questionID)
 
   const votes = await db<Vote>('votes')
     .whereNotNull('answerID')
@@ -38,10 +40,19 @@ const getAnswersByQuestion = async (req: Request): Promise<Answer[]> => {
         .reduce((acc, cur) => (
           acc += cur.vote ? 1 : -1
         ), 0)
-      return { ...a, votes: voteSum }
+      return { ...a, votes: voteSum, type: 'answer' }
     })
 
-  return getCursor()
+  return {
+    ...getCursor({
+      startCursor,
+      limit,
+      firstLimit,
+      idProp: 'answerID',
+      data: answers
+    }),
+    questionID: Number(questionID)
+  }
 }
 
 const getAnswerByID = async (req: Request): Promise<Answer &

@@ -16,7 +16,6 @@ const addRatingComment = async (ratingCommentInput: RatingCommentCreateInput, re
       userID: req.session?.userID,
       createdAt: now,
       updatedAt: now,
-      moderationStatus: 'NEW',
       ratingID: req.params.ratingID
     }, [ '*' ])
 

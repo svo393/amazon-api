@@ -4,13 +4,13 @@ export interface ObjIndexed { [ k: string ]: any }
 // Types from schema in order of creation
 //
 
-export type Role = { roleName: string}
+export type Role = { roleName: string }
 
-export type ShippingMethod = { shippingMethodName: string; isPrivate: boolean}
+export type ShippingMethod = { shippingMethodName: string; isPrivate: boolean }
 
-export type AddressType = { addressTypeName: string; isPrivate: boolean}
+export type AddressType = { addressTypeName: string; isPrivate: boolean }
 
-export type PaymentMethod = { paymentMethodName: string}
+export type PaymentMethod = { paymentMethodName: string }
 
 export type Address = {
   addressID: number;
@@ -31,7 +31,7 @@ export type User = {
   role: string;
 }
 
-export type Follower = { userID: number; follows: number}
+export type Follower = { userID: number; follows: number }
 
 export type UserAddress = {
   isDefault: boolean;
@@ -51,9 +51,9 @@ export type Category = {
   parentCategoryID?: number;
 }
 
-export type Vendor = { vendorID: number; name: string}
+export type Vendor = { vendorID: number; name: string }
 
-export type Group = { groupID: number}
+export type Group = { groupID: number }
 
 export type Product = {
   productID: number;
@@ -93,12 +93,13 @@ export type Vote = {
   userID: number;
 }
 
-export type ListProduct = { listID: number; productID: number}
+export type ListProduct = { listID: number; productID: number }
 
 export type Rating = {
   ratingID: number;
   createdAt: Date;
   updatedAt: Date;
+  variation: { [ k: string ]: string };
   title?: string;
   review: string;
   stars: number;
@@ -171,7 +172,7 @@ export type GroupVariation = {
   productID: number;
 }
 
-export type Parameter = { parameterID: number; name: string}
+export type Parameter = { parameterID: number; name: string }
 
 export type ProductParameter = {
   value: string;
@@ -185,9 +186,9 @@ export type CartProduct = {
   productID: number;
 }
 
-export type OrderStatus = { orderStatusName: string}
+export type OrderStatus = { orderStatusName: string }
 
-export type ModerationStatus = { moderationStatusName: string}
+export type ModerationStatus = { moderationStatusName: string }
 
 export type Order = {
   orderID: number;
@@ -209,7 +210,7 @@ export type OrderProduct = {
   productID: number;
 }
 
-export type InvoiceStatus = { invoiceStatusName: string}
+export type InvoiceStatus = { invoiceStatusName: string }
 
 export type Invoice = {
   invoiceID: number;
@@ -232,24 +233,24 @@ export type ProductSize = { name: string; qty: number; productID: number }
 
 export type UserSignupInput = Pick<User, 'email' | 'password'>
 
-export type UserLoginInput = UserSignupInput & { remember: boolean}
+export type UserLoginInput = UserSignupInput & { remember: boolean } // TODO remember option
 
-export type UserUpdateInput = {
-  name?: string;
-  info?: string;
-  email?: string;
-  password?: string;
-  avatar?: boolean;
-  role?: string;
-}
+export type UserUpdateInput = Partial<Pick<User,
+  | 'name'
+  | 'info'
+  | 'email'
+  | 'password'
+  | 'avatar'
+  | 'role'
+>>
 
 export type PasswordRequestInput = Pick<User, 'email'>
 
-export type PasswordResetInput = { password: string; resetToken: string}
+export type PasswordResetInput = { password: string; resetToken: string }
 
 export type CategoryCreateInput = Pick<Category, 'name' | 'parentCategoryID'>
 
-export type CategoryUpdateInput = { name?: string; parentCategoryID?: number}
+export type CategoryUpdateInput = Partial<CategoryCreateInput>
 
 export type VendorInput = Pick<Vendor, 'name'>
 
@@ -263,21 +264,21 @@ export type UserSafeData = Omit<User,
   | 'resetTokenCreatedAt'
 >
 
-export type AddressTypeInput = { addressTypeName: string; isPrivate?: boolean}
+export type AddressTypeInput = { addressTypeName: string; isPrivate?: boolean }
 
-export type ShippingMethodInput = { shippingMethodName: string; isPrivate?: boolean}
+export type ShippingMethodInput = { shippingMethodName: string; isPrivate?: boolean }
 
 export type AddressCreateInput = Pick<Address, 'addr' | 'addressType'> & {
   isDefault?: boolean;
 }
 
-export type AddressFetchInput = { userID?: number; addressType?: string}
+export type AddressFetchInput = { userID?: number; addressType?: string }
 
-export type AddressUpdateInput = { name?: string; addressType?: string}
+export type AddressUpdateInput = { name?: string; addressType?: string }
 
-export type FollowerFetchInput = { userID?: number; follows?: number}
+export type FollowerFetchInput = { userID?: number; follows?: number }
 
-export type UserAddressCreateInput = { isDefault?: boolean }
+export type UserAddressCreateInput = Partial<Pick<UserAddress, 'isDefault'>>
 export type UserAddressUpdateInput = Pick<UserAddress, 'isDefault'>
 
 export type UserAddressFetchInput = Pick<UserAddress, 'userID'>
@@ -296,8 +297,7 @@ export type ProductCreateInput = Omit<Product,
   groupVariations?: { name: string; value: string }[];
 }
 
-export type ProductUpdateInput = ProductCreateInput &
-{ groupID: number }
+export type ProductUpdateInput = ProductCreateInput & { groupID: number }
 
 export type ProductData = Product & {
   group: GroupVariation[];
@@ -313,44 +313,67 @@ export type ProductPublicData = Omit<ProductData,
 export type RatingCreateInput = Pick<Rating,
   | 'title'
   | 'review'
+  | 'variation'
   | 'stars'
 >
 
-export type RatingUpdateInput = Pick<Rating,
+export type RatingUpdateInput = Partial<Pick<Rating,
   | 'title'
   | 'review'
-> & {
-  stars?: number;
-  isVerified?: boolean;
-  moderationStatus?: string;
-}
+  | 'stars'
+  | 'variation'
+  | 'isVerified'
+  | 'moderationStatus'
+>>
 
 export type RatingCommentCreateInput = Pick<RatingComment,
   | 'content'
   | 'parentRatingCommentID'
 >
 
-export type RatingCommentUpdateInput = {
-  content?: string;
-  moderationStatus?: string;
-}
+export type RatingCommentUpdateInput = Partial<Pick<RatingComment,
+  | 'content'
+  | 'moderationStatus'
+>>
 
 export type QuestionCreateInput = Pick<Question, | 'content'>
 
-export type QuestionUpdateInput = { content?: string; moderationStatus?: string}
+export type QuestionUpdateInput = Partial<Pick<Question,
+  | 'content'
+  | 'moderationStatus'
+>>
 
 export type AnswerCreateInput = Pick<Answer, 'content'>
 
-export type AnswerUpdateInput = { content?: string; moderationStatus?: string}
+export type AnswerUpdateInput = Partial<Pick<Answer,
+  | 'content'
+  | 'moderationStatus'
+>>
+
+export type CursorInput = {
+  startCursor?: number;
+  limit?: number;
+  firstLimit?: number;
+}
 
 export type AnswerCommentCreateInput = Pick<AnswerComment,
   | 'content'
   | 'parentAnswerCommentID'
 >
 
-export type AnswerCommentUpdateInput = { content?: string; moderationStatus?: string}
+export type AnswerCommentUpdateInput = Partial<Pick<AnswerComment,
+  | 'content'
+  | 'moderationStatus'
+>>
 
-export type GroupVariationCreateInput = { name: string; value: string}
+export type BatchWithCursor<T> = {
+  totalCount: number;
+  endCursor: number;
+  hasNextPage: boolean;
+  batch: T[];
+}
+
+export type GroupVariationCreateInput = { name: string; value: string }
 
 export type GroupVariationUpdateInput = Pick<GroupVariation, | 'value'>
 
@@ -371,11 +394,11 @@ export type OrderCreateInput = Pick<Order,
   cart: CartProduct[];
 }
 
-export type OrderUpdateInput = {
-  address?: string;
-  orderStatus?: string;
-  shippingMethod?: string;
-}
+export type OrderUpdateInput = Partial<Pick<Order,
+| 'address'
+| 'orderStatus'
+| 'shippingMethod'
+>>
 
 export type OrdersFiltersInput = {
   amountMin?: number;
@@ -399,12 +422,12 @@ export type InvoiceCreateInput = Pick<Invoice,
   | 'paymentMethod'
 >
 
-export type InvoiceUpdateInput = {
-  amount?: number;
-  details?: string;
-  paymentMethod?: string;
-  invoiceStatus?: string;
-}
+export type InvoiceUpdateInput = Partial<Pick<Invoice,
+| 'amount'
+| 'details'
+| 'invoiceStatus'
+| 'paymentMethod'
+>>
 
 export type InvoicesFiltersInput = {
   amountMin?: number;
@@ -526,6 +549,6 @@ export type OrderProductFullData = Pick<Product,
 
 export type OrderFullData = Order & { orderProducts: OrderProductFullData[]}
 
-export type ImagesUpdateInput = { imageID: number; index: number}[]
+export type ImagesUpdateInput = { imageID: number; index: number }[]
 
-export type ImagesDeleteInput = { imageID: number}[]
+export type ImagesDeleteInput = { imageID: number }[]

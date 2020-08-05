@@ -16,7 +16,6 @@ const addAnswerComment = async (answerCommentInput: AnswerCommentCreateInput, re
       userID: req.session?.userID,
       createdAt: now,
       updatedAt: now,
-      moderationStatus: 'NEW',
       answerID: req.params.answerID
     }, [ '*' ])
 

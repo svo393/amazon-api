@@ -1,7 +1,7 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoriesFiltersInput, CategoryCreateInput, CategoryUpdateInput, FeedFiltersInput, GroupVariationCreateInput, GroupVariationDeleteInput, GroupVariationUpdateInput, ImagesDeleteInput, ImagesFiltersInput, ImagesUpdateInput, InvoiceCreateInput, InvoicesFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ModerationStatus, OrderCreateInput, OrderProductInput, OrdersFiltersInput, OrderStatus, OrderUpdateInput, ParameterInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingsFiltersInput, RatingUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorInput, VendorsFiltersInput, VotesCreateInput, VotesFiltersInput } from '../types'
-import { canBeBoolean, canBeNumber, hasDefinedProps, isArray, isDate, isEmail, isInputProvided, isPasswordValid, isPositiveNumber, isProvided, isSomeProvided, isString } from './validatorLib'
+import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoriesFiltersInput, CategoryCreateInput, CategoryUpdateInput, FeedFiltersInput, GroupVariationCreateInput, GroupVariationDeleteInput, GroupVariationUpdateInput, ImagesDeleteInput, ImagesFiltersInput, ImagesUpdateInput, InvoiceCreateInput, InvoicesFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ModerationStatus, OrderCreateInput, OrderProductInput, OrdersFiltersInput, OrderStatus, OrderUpdateInput, ParameterInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingsFiltersInput, RatingUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorInput, VendorsFiltersInput, VotesCreateInput, VotesFiltersInput, CursorInput } from '../types'
+import { canBeBoolean, canBeNumber, hasDefinedProps, isArray, isDate, isEmail, isInputProvided, isPasswordValid, isPositiveNumber, isProvided, isSomeProvided, isString, isObject } from './validatorLib'
 
 // TODO implement PARTIAL<t>
 export const checkNewUser = ({ body }: Request): UserSignupInput => {
@@ -619,6 +619,11 @@ export const checkNewRating = ({ body }: Request): RatingCreateInput => {
     isString
   )({ name: 'review', param: body.review })
 
+  const variation = R.pipe(
+    isProvided,
+    isObject
+  )({ name: 'variation', param: body.variation })
+
   const stars = R.pipe(
     isProvided,
     canBeNumber
@@ -627,6 +632,7 @@ export const checkNewRating = ({ body }: Request): RatingCreateInput => {
   return {
     title: title?.param,
     review: review.param,
+    variation: variation.param,
     stars: stars.param
   }
 }
@@ -638,6 +644,10 @@ export const checkRatingUpdate = ({ body }: Request): RatingUpdateInput => {
 
   const review = 'review' in body
     ? isString({ name: 'review', param: body.review })
+    : undefined
+
+  const variation = 'variation' in body
+    ? isObject({ name: 'variation', param: body.variation })
     : undefined
 
   const stars = 'review' in body
@@ -655,6 +665,7 @@ export const checkRatingUpdate = ({ body }: Request): RatingUpdateInput => {
   return hasDefinedProps<RatingUpdateInput>({
     title: title?.param,
     review: review?.param,
+    variation: variation?.param,
     stars: stars?.param,
     isVerified: isVerified?.param,
     moderationStatus: moderationStatus?.param
@@ -693,6 +704,26 @@ export const checkRatingCommentUpdate = ({ body }: Request): RatingCommentUpdate
   })
 }
 
+export const checkQuestions = ({ query }: Request): CursorInput => {
+  const startCursor = 'startCursor' in query
+    ? canBeNumber({ name: 'startCursor', param: query.startCursor })
+    : undefined
+
+  const limit = 'limit' in query
+    ? canBeNumber({ name: 'limit', param: query.limit })
+    : undefined
+
+  const firstLimit = 'firstLimit' in query
+    ? canBeNumber({ name: 'firstLimit', param: query.firstLimit })
+    : undefined
+
+  return {
+    startCursor: startCursor?.param,
+    limit: limit?.param,
+    firstLimit: firstLimit?.param
+  }
+}
+
 export const checkNewQuestion = ({ body }: Request): QuestionCreateInput => {
   const content = R.pipe(
     isProvided,
@@ -715,6 +746,26 @@ export const checkQuestionUpdate = ({ body }: Request): QuestionUpdateInput => {
     content: content?.param,
     moderationStatus: moderationStatus?.param
   })
+}
+
+export const checkAnswers = ({ query }: Request): CursorInput => {
+  const startCursor = 'startCursor' in query
+    ? canBeNumber({ name: 'startCursor', param: query.startCursor })
+    : undefined
+
+  const limit = 'limit' in query
+    ? canBeNumber({ name: 'limit', param: query.limit })
+    : undefined
+
+  const firstLimit = 'firstLimit' in query
+    ? canBeNumber({ name: 'firstLimit', param: query.firstLimit })
+    : undefined
+
+  return {
+    startCursor: startCursor?.param,
+    limit: limit?.param,
+    firstLimit: firstLimit?.param
+  }
 }
 
 export const checkNewAnswer = ({ body }: Request): AnswerCreateInput => {

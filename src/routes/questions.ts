@@ -3,7 +3,7 @@ import answerService from '../services/answerService'
 import questionService from '../services/questionService'
 import voteService from '../services/voteService'
 import { UPLOAD_TIMEOUT } from '../utils/config'
-import { checkMediaUpload, checkNewAnswer, checkNewVote, checkQuestionUpdate } from '../utils/inputValidator'
+import { checkMediaUpload, checkNewAnswer, checkNewVote, checkQuestionUpdate, checkAnswers } from '../utils/inputValidator'
 import { multerUpload, requireAuth, requireCreator, requireCreatorOrAdmin } from '../utils/middleware'
 
 const router = Router()
@@ -31,7 +31,8 @@ router.post('/:questionID/answers', requireAuth, async (req, res) => {
 })
 
 router.get('/:questionID/answers', async (req, res) => {
-  const answers = await answerService.getAnswersByQuestion(req)
+  const answersInput = checkAnswers(req)
+  const answers = await answerService.getAnswersByQuestion(answersInput, req)
   res.json(answers)
 })
 

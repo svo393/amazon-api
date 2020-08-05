@@ -3,13 +3,14 @@ import groupService from '../services/groupService'
 import imageService from '../services/imageService'
 import questionService from '../services/questionService'
 import ratingService from '../services/ratingService'
-import { checkGroupVariationDeletion, checkGroupVariationUpdate, checkNewGroupVariation, checkNewQuestion, checkNewRating } from '../utils/inputValidator'
+import { checkGroupVariationDeletion, checkGroupVariationUpdate, checkNewGroupVariation, checkNewQuestion, checkNewRating, checkQuestions } from '../utils/inputValidator'
 import { requireAdmin, requireAuth } from '../utils/middleware'
 
 const router = Router()
 
 router.get('/:groupID/questions', async (req, res) => {
-  const questions = await questionService.getQuestionsByGroup(req)
+  const questionsInput = checkQuestions(req)
+  const questions = await questionService.getQuestionsByGroup(questionsInput, req)
   res.json(questions)
 })
 

@@ -327,7 +327,7 @@ const getProductByID = async (req: Request): Promise<ProductLimitedData| Product
     .where('p.productID', req.params.productID)
     .leftJoin('users as u', 'p.userID', 'u.userID')
     .leftJoin('questions as q', 'p.groupID', 'q.groupID')
-    .groupBy('userEmail')
+    .groupBy('userEmail', 'q.questionID')
 
   if (rawProduct === undefined) throw new StatusError(404, 'Not Found')
 
