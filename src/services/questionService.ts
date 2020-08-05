@@ -1,11 +1,13 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { BatchWithCursor, CursorInput, Image, Question, QuestionCreateInput, QuestionUpdateInput, Vote } from '../types'
+import { Answer, BatchWithCursor, Image, Question, QuestionCreateInput, QuestionCursorInput, QuestionUpdateInput, Vote } from '../types'
 import { imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
+import fuseIndexes from '../utils/fuseIndexes'
 import getCursor from '../utils/getCursor'
 import getUploadIndex from '../utils/getUploadIndex'
 import { uploadImages } from '../utils/img'
+import sortItems from '../utils/sortItems'
 import StatusError from '../utils/StatusError'
 
 const addQuestion = async (questionInput: QuestionCreateInput, req: Request): Promise<Question> => {
@@ -37,15 +39,23 @@ const getQuestionsByUser = async (req: Request): Promise<Question[]> => {
     .where('userID', req.params.userID)
 }
 
-const getQuestionsByGroup = async (questionsInput: CursorInput, req: Request): Promise<BatchWithCursor<Question> & { groupID: number }> => {
-  const { startCursor, limit, firstLimit } = questionsInput
+const getQuestionsByGroup = async (questionsInput: QuestionCursorInput, req: Request): Promise<BatchWithCursor<Question & { answers: BatchWithCursor<Answer> }> & { groupID: number }> => {
+  const {
+    startCursor,
+    limit,
+    answerLimit = 1,
+    page,
+    sortBy = 'votes_desc',
+    q
+  } = questionsInput
   const { groupID } = req.params
 
-  let questions = await db('questions')
+  let questions = await db<Question>('questions')
     .where('groupID', groupID)
 
   const votes = await db<Vote>('votes')
     .whereNotNull('questionID')
+    .orWhereNotNull('answerID')
 
   questions = questions
     .map((q) => {
@@ -57,16 +67,57 @@ const getQuestionsByGroup = async (questionsInput: CursorInput, req: Request): P
       return { ...q, votes: voteSum, type: 'question' }
     })
 
-  return {
+  if (q !== undefined) {
+    questions = questions
+      .filter((_, i) =>
+        fuseIndexes(questions, [ 'content' ], q).includes(i))
+  }
+
+  questions = sortItems(questions, sortBy)
+
+  let questionsWithCursor = {
     ...getCursor({
       startCursor,
       limit,
-      firstLimit,
       idProp: 'questionID',
       data: questions
     }),
     groupID: Number(groupID)
   }
+
+  const questionIDs = Object.values(questionsWithCursor.batch)
+    .map((q: Question) => q.questionID)
+
+  let answers = await db<Answer>('answers')
+    .whereIn('questionID', questionIDs)
+
+  answers = answers
+    .map((q) => {
+      const voteSum = votes
+        .filter((v) => v.answerID === q.answerID)
+        .reduce((acc, cur) => (
+          acc += cur.vote ? 1 : -1
+        ), 0)
+      return { ...q, votes: voteSum, type: 'answer' }
+    })
+
+  questionsWithCursor = {
+    ...questionsWithCursor,
+    batch: questionsWithCursor.batch.map((q: Question) => {
+      const curAnswers = answers.filter((a) => a.questionID === q.questionID)
+      return {
+        ...q,
+        answers: getCursor({
+          startCursor: undefined,
+          limit: answerLimit,
+          idProp: 'answersID',
+          data: sortItems(curAnswers, 'votes_desc')
+        })
+      }
+    })
+  }
+
+  return questionsWithCursor
 }
 
 const getQuestionByID = async (req: Request): Promise<Question &

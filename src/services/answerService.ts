@@ -24,7 +24,7 @@ const addAnswer = async (answerInput: AnswerCreateInput, req: Request): Promise<
 }
 
 const getAnswersByQuestion = async (CursorInput: CursorInput, req: Request): Promise<BatchWithCursor<Answer> & { questionID: number }> => {
-  const { startCursor, limit, firstLimit } = CursorInput
+  const { startCursor, limit } = CursorInput
   const { questionID } = req.params
 
   let answers = await db<Answer>('answers')
@@ -47,7 +47,6 @@ const getAnswersByQuestion = async (CursorInput: CursorInput, req: Request): Pro
     ...getCursor({
       startCursor,
       limit,
-      firstLimit,
       idProp: 'answerID',
       data: answers
     }),

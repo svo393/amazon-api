@@ -353,8 +353,12 @@ export type AnswerUpdateInput = Partial<Pick<Answer,
 export type CursorInput = {
   startCursor?: number;
   limit?: number;
-  firstLimit?: number;
+  page?: number;
+  sortBy?: string;
+  q?: string;
 }
+
+export type QuestionCursorInput = CursorInput & { answerLimit?: number }
 
 export type AnswerCommentCreateInput = Pick<AnswerComment,
   | 'content'

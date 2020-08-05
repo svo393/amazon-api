@@ -3,7 +3,6 @@ import StatusError from './StatusError'
 type Props = {
   startCursor?: number;
   limit?: number;
-  firstLimit?: number;
   idProp: string;
   data: any[];
 }
@@ -11,7 +10,6 @@ type Props = {
 export default ({
   startCursor,
   limit = 4,
-  firstLimit = limit,
   idProp,
   data
 }: Props) => {
@@ -24,18 +22,8 @@ export default ({
     start = index + 1
   }
 
-  const batch = start === 0
-    ? data.slice(start, start + firstLimit)
-    : data.slice(start, start + limit)
-
-  console.info('limit', limit)
-
-  const endItem = batch[batch.length - 1]
-
-  const endCursor = endItem !== undefined
-    ? endItem[idProp]
-    : null
-
+  const batch = data.slice(start, start + limit)
+  const endCursor = batch[batch.length - 1][idProp]
   const hasNextPage = start + limit < totalCount
 
   return {

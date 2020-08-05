@@ -1,7 +1,7 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoriesFiltersInput, CategoryCreateInput, CategoryUpdateInput, FeedFiltersInput, GroupVariationCreateInput, GroupVariationDeleteInput, GroupVariationUpdateInput, ImagesDeleteInput, ImagesFiltersInput, ImagesUpdateInput, InvoiceCreateInput, InvoicesFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ModerationStatus, OrderCreateInput, OrderProductInput, OrdersFiltersInput, OrderStatus, OrderUpdateInput, ParameterInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingsFiltersInput, RatingUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorInput, VendorsFiltersInput, VotesCreateInput, VotesFiltersInput, CursorInput } from '../types'
-import { canBeBoolean, canBeNumber, hasDefinedProps, isArray, isDate, isEmail, isInputProvided, isPasswordValid, isPositiveNumber, isProvided, isSomeProvided, isString, isObject } from './validatorLib'
+import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoriesFiltersInput, CategoryCreateInput, CategoryUpdateInput, CursorInput, FeedFiltersInput, GroupVariationCreateInput, GroupVariationDeleteInput, GroupVariationUpdateInput, ImagesDeleteInput, ImagesFiltersInput, ImagesUpdateInput, InvoiceCreateInput, InvoicesFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ModerationStatus, OrderCreateInput, OrderProductInput, OrdersFiltersInput, OrderStatus, OrderUpdateInput, ParameterInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionCursorInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingsFiltersInput, RatingUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorInput, VendorsFiltersInput, VotesCreateInput, VotesFiltersInput } from '../types'
+import { canBeBoolean, canBeNumber, hasDefinedProps, isArray, isDate, isEmail, isInputProvided, isObject, isPasswordValid, isPositiveNumber, isProvided, isSomeProvided, isString } from './validatorLib'
 
 // TODO implement PARTIAL<t>
 export const checkNewUser = ({ body }: Request): UserSignupInput => {
@@ -704,7 +704,7 @@ export const checkRatingCommentUpdate = ({ body }: Request): RatingCommentUpdate
   })
 }
 
-export const checkQuestions = ({ query }: Request): CursorInput => {
+export const checkQuestionsCursor = ({ query }: Request): QuestionCursorInput => {
   const startCursor = 'startCursor' in query
     ? canBeNumber({ name: 'startCursor', param: query.startCursor })
     : undefined
@@ -713,14 +713,14 @@ export const checkQuestions = ({ query }: Request): CursorInput => {
     ? canBeNumber({ name: 'limit', param: query.limit })
     : undefined
 
-  const firstLimit = 'firstLimit' in query
-    ? canBeNumber({ name: 'firstLimit', param: query.firstLimit })
+  const answerLimit = 'answerLimit' in query
+    ? canBeNumber({ name: 'answerLimit', param: query.answerLimit })
     : undefined
 
   return {
     startCursor: startCursor?.param,
     limit: limit?.param,
-    firstLimit: firstLimit?.param
+    answerLimit: answerLimit?.param
   }
 }
 
@@ -757,14 +757,9 @@ export const checkAnswers = ({ query }: Request): CursorInput => {
     ? canBeNumber({ name: 'limit', param: query.limit })
     : undefined
 
-  const firstLimit = 'firstLimit' in query
-    ? canBeNumber({ name: 'firstLimit', param: query.firstLimit })
-    : undefined
-
   return {
     startCursor: startCursor?.param,
-    limit: limit?.param,
-    firstLimit: firstLimit?.param
+    limit: limit?.param
   }
 }
 
