@@ -358,7 +358,10 @@ export type CursorInput = {
   q?: string;
 }
 
-export type QuestionCursorInput = CursorInput & { answerLimit?: number }
+export type QuestionCursorInput = CursorInput & {
+  answerLimit?: number;
+  answerCommentLimit?: number;
+ }
 
 export type AnswerCommentCreateInput = Pick<AnswerComment,
   | 'content'

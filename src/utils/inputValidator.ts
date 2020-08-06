@@ -717,10 +717,15 @@ export const checkQuestionsCursor = ({ query }: Request): QuestionCursorInput =>
     ? canBeNumber({ name: 'answerLimit', param: query.answerLimit })
     : undefined
 
+  const answerCommentLimit = 'answerCommentLimit' in query
+    ? canBeNumber({ name: 'answerCommentLimit', param: query.answerCommentLimit })
+    : undefined
+
   return {
     startCursor: startCursor?.param,
     limit: limit?.param,
-    answerLimit: answerLimit?.param
+    answerLimit: answerLimit?.param,
+    answerCommentLimit: answerCommentLimit?.param
   }
 }
 

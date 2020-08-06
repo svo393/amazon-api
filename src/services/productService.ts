@@ -351,11 +351,16 @@ const getProductByID = async (req: Request): Promise<ProductLimitedData| Product
   const productSizes = await db<ProductSize>('productSizes')
     .where('productID', product.productID)
 
+  const productParameters = await db('productParameters as pp')
+    .join('parameters as p', 'pp.parameterID', 'p.parameterID')
+    .where('pp.productID', product.productID)
+
   const fullProduct = {
     ...product,
     group: groupVariations,
     images,
-    productSizes
+    productSizes,
+    productParameters
   }
 
   return [ 'ROOT', 'ADMIN' ].includes(req.session?.role)

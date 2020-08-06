@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { Answer, BatchWithCursor, Image, Question, QuestionCreateInput, QuestionCursorInput, QuestionUpdateInput, Vote } from '../types'
+import { Answer, BatchWithCursor, Image, Question, QuestionCreateInput, QuestionCursorInput, QuestionUpdateInput, Vote, AnswerComment } from '../types'
 import { imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
 import fuseIndexes from '../utils/fuseIndexes'
@@ -39,11 +39,17 @@ const getQuestionsByUser = async (req: Request): Promise<Question[]> => {
     .where('userID', req.params.userID)
 }
 
-const getQuestionsByGroup = async (questionsInput: QuestionCursorInput, req: Request): Promise<BatchWithCursor<Question & { answers: BatchWithCursor<Answer> }> & { groupID: number }> => {
+const getQuestionsByGroup = async (questionsInput: QuestionCursorInput, req: Request): Promise<
+BatchWithCursor<Question & {
+  answers: BatchWithCursor<Answer & {
+    answerComments: BatchWithCursor<AnswerComment>;
+}>; }> & { groupID: number }
+> => {
   const {
     startCursor,
     limit,
-    answerLimit = 1,
+    answerLimit = 10,
+    answerCommentLimit = 10,
     page,
     sortBy = 'votes_desc',
     q
@@ -64,7 +70,7 @@ const getQuestionsByGroup = async (questionsInput: QuestionCursorInput, req: Req
         .reduce((acc, cur) => (
           acc += cur.vote ? 1 : -1
         ), 0)
-      return { ...q, votes: voteSum, type: 'question' }
+      return { ...q, votes: voteSum }
     })
 
   if (q !== undefined) {
@@ -98,23 +104,59 @@ const getQuestionsByGroup = async (questionsInput: QuestionCursorInput, req: Req
         .reduce((acc, cur) => (
           acc += cur.vote ? 1 : -1
         ), 0)
-      return { ...q, votes: voteSum, type: 'answer' }
+      return { ...q, votes: voteSum }
     })
 
-  questionsWithCursor = {
-    ...questionsWithCursor,
-    batch: questionsWithCursor.batch.map((q: Question) => {
-      const curAnswers = answers.filter((a) => a.questionID === q.questionID)
-      return {
-        ...q,
-        answers: getCursor({
-          startCursor: undefined,
-          limit: answerLimit,
-          idProp: 'answersID',
-          data: sortItems(curAnswers, 'votes_desc')
-        })
+  if (answers.length !== 0) {
+    questionsWithCursor = {
+      ...questionsWithCursor,
+      batch: questionsWithCursor.batch.map((q: Question) => {
+        const curAnswers = answers.filter((a) => a.questionID === q.questionID)
+        return curAnswers.length !== 0
+          ? {
+            ...q,
+            answers: getCursor({
+              startCursor: undefined,
+              limit: answerLimit,
+              idProp: 'answerID',
+              data: sortItems(curAnswers, 'votes_desc')
+            })
+          }
+          : q
+      })
+    }
+
+    const answerIDs = R.flatten(Object.values(questionsWithCursor.batch)
+      .map((q: Question & { answers: BatchWithCursor<Answer> }) =>
+        q.answers.batch.map((a) => a.answerID)))
+
+    const answerComments = await db<AnswerComment>('answerComments')
+      .whereIn('answerID', answerIDs)
+
+    if (answerComments.length !== 0) {
+      questionsWithCursor = {
+        ...questionsWithCursor,
+        batch: questionsWithCursor.batch.map((q: Question & { answers: BatchWithCursor<Answer> }) => ({
+          ...q,
+          answers: {
+            batch: q.answers.batch.map((a: Answer) => {
+              const curAnswerComments = answerComments.filter((ac) => ac.answerID === a.answerID)
+              return curAnswerComments.length !== 0
+                ? {
+                  ...a,
+                  answerComments: getCursor({
+                    startCursor: undefined,
+                    limit: answerCommentLimit,
+                    idProp: 'answerCommentID',
+                    data: sortItems(curAnswerComments, 'createdAt')
+                  })
+                }
+                : a
+            })
+          }
+        }))
       }
-    })
+    }
   }
 
   return questionsWithCursor
