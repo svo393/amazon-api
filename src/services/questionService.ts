@@ -48,8 +48,8 @@ BatchWithCursor<Question & {
   const {
     startCursor,
     limit,
-    answerLimit = 10,
-    answerCommentLimit = 10,
+    answerLimit = 1,
+    answerCommentLimit = 0,
     page,
     sortBy = 'votes_desc',
     q
@@ -94,7 +94,19 @@ BatchWithCursor<Question & {
   const questionIDs = Object.values(questionsWithCursor.batch)
     .map((q: Question) => q.questionID)
 
-  let answers = await db<Answer>('answers')
+  let answers = await db<Answer>('answers as a')
+    .select(
+      'a.answerID',
+      'a.createdAt',
+      'a.updatedAt',
+      'a.content',
+      'a.moderationStatus',
+      'a.userID',
+      'a.questionID',
+      'u.email as userEmail',
+      'u.name as userName'
+    )
+    .leftJoin('users as u', 'a.userID', 'u.userID')
     .whereIn('questionID', questionIDs)
 
   answers = answers
@@ -126,35 +138,37 @@ BatchWithCursor<Question & {
       })
     }
 
-    const answerIDs = R.flatten(Object.values(questionsWithCursor.batch)
-      .map((q: Question & { answers: BatchWithCursor<Answer> }) =>
-        q.answers.batch.map((a) => a.answerID)))
+    if (answerCommentLimit !== 0) {
+      const answerIDs = R.flatten(Object.values(questionsWithCursor.batch)
+        .map((q: Question & { answers: BatchWithCursor<Answer> }) =>
+          q.answers.batch.map((a) => a.answerID)))
 
-    const answerComments = await db<AnswerComment>('answerComments')
-      .whereIn('answerID', answerIDs)
+      const answerComments = await db<AnswerComment>('answerComments')
+        .whereIn('answerID', answerIDs)
 
-    if (answerComments.length !== 0) {
-      questionsWithCursor = {
-        ...questionsWithCursor,
-        batch: questionsWithCursor.batch.map((q: Question & { answers: BatchWithCursor<Answer> }) => ({
-          ...q,
-          answers: {
-            batch: q.answers.batch.map((a: Answer) => {
-              const curAnswerComments = answerComments.filter((ac) => ac.answerID === a.answerID)
-              return curAnswerComments.length !== 0
-                ? {
-                  ...a,
-                  answerComments: getCursor({
-                    startCursor: undefined,
-                    limit: answerCommentLimit,
-                    idProp: 'answerCommentID',
-                    data: sortItems(curAnswerComments, 'createdAt')
-                  })
-                }
-                : a
-            })
-          }
-        }))
+      if (answerComments.length !== 0) {
+        questionsWithCursor = {
+          ...questionsWithCursor,
+          batch: questionsWithCursor.batch.map((q: Question & { answers: BatchWithCursor<Answer & { userName: string }> }) => ({
+            ...q,
+            answers: {
+              batch: q.answers.batch.map((a: Answer & { userName: string }) => {
+                const curAnswerComments = answerComments.filter((ac) => ac.answerID === a.answerID)
+                return curAnswerComments.length !== 0
+                  ? {
+                    ...a,
+                    answerComments: getCursor({
+                      startCursor: undefined,
+                      limit: answerCommentLimit,
+                      idProp: 'answerCommentID',
+                      data: sortItems(curAnswerComments, 'createdAt')
+                    })
+                  }
+                  : a
+              })
+            }
+          }))
+        }
       }
     }
   }
