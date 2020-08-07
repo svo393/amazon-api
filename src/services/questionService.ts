@@ -52,8 +52,7 @@ BatchWithCursor<Question & {
     answerCommentLimit = 0,
     page,
     onlyAnswered = true,
-    sortBy = 'votes_desc',
-    q
+    sortBy = 'votes_desc'
   } = questionsInput
   const { groupID } = req.params
 
@@ -87,12 +86,6 @@ BatchWithCursor<Question & {
       delete q.answerCount
       return { ...q, votes: voteSum }
     })
-
-  if (q !== undefined) {
-    questions = questions
-      .filter((_, i) =>
-        fuseIndexes(questions, [ 'content' ], q).includes(i))
-  }
 
   questions = sortItems(questions, sortBy)
 

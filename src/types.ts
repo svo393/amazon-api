@@ -350,7 +350,6 @@ export type CursorInput = {
   limit?: number;
   page?: number;
   sortBy?: string;
-  q?: string;
 }
 
 export type QuestionCursorInput = CursorInput & {
