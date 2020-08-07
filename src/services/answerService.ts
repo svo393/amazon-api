@@ -62,7 +62,7 @@ const getAnswersByQuestion = async (CursorInput: CursorInput, req: Request): Pro
   return {
     ...getCursor({
       startCursor,
-      limit,
+      limit: 2,
       idProp: 'answerID',
       data: answers
     }),

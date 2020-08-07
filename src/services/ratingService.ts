@@ -52,7 +52,7 @@ const getRatings = async (ratingsFiltersInput: RatingsFiltersInput, req: Request
 
   const userHasPermission = [ 'ROOT', 'ADMIN' ].includes(req.session?.role)
 
-  let ratings: (Rating & { votes: number })[] = await db('ratings as r')
+  let ratings: (Rating & { votes: number; userEmail: string })[] = await db('ratings as r')
     .select(
       'r.ratingID',
       'r.createdAt',

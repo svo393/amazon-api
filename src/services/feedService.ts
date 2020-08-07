@@ -16,7 +16,7 @@ const getFeed = async (feedFiltersinput: FeedFiltersInput): Promise<{ batch: Fee
     userEmail
   } = feedFiltersinput
 
-  const ratingComments: RatingComment[] = await db('ratingComments as rc')
+  const ratingComments: (RatingComment & { userEmail: string })[] = await db('ratingComments as rc')
     .select(
       'rc.ratingCommentID',
       'rc.createdAt',
@@ -31,7 +31,7 @@ const getFeed = async (feedFiltersinput: FeedFiltersInput): Promise<{ batch: Fee
     .join('users as u', 'rc.userID', 'u.userID')
     .groupBy('rc.ratingCommentID', 'userEmail')
 
-  const questions: Question[] = await db('questions as q')
+  const questions: (Question & { userEmail: string })[] = await db('questions as q')
     .select(
       'q.questionID',
       'q.createdAt',
@@ -45,7 +45,7 @@ const getFeed = async (feedFiltersinput: FeedFiltersInput): Promise<{ batch: Fee
     .join('users as u', 'q.userID', 'u.userID')
     .groupBy('q.questionID', 'userEmail')
 
-  const answers: Answer[] = await db('answers as a')
+  const answers: (Answer & { userEmail: string })[] = await db('answers as a')
     .select(
       'a.answerID',
       'a.createdAt',
@@ -59,7 +59,7 @@ const getFeed = async (feedFiltersinput: FeedFiltersInput): Promise<{ batch: Fee
     .join('users as u', 'a.userID', 'u.userID')
     .groupBy('a.answerID', 'userEmail')
 
-  const answerComments: AnswerComment[] = await db('answerComments as ac')
+  const answerComments: (AnswerComment & { userEmail: string })[] = await db('answerComments as ac')
     .select(
       'ac.answerCommentID',
       'ac.createdAt',

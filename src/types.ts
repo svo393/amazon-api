@@ -156,7 +156,7 @@ type Activity = (
   Question |
   Answer |
   AnswerComment
-) & { type: string }
+) & { type: string; userEmail: string }
 
 export type Feed = Activity[]
 
