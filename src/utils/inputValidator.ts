@@ -3,7 +3,6 @@ import R from 'ramda'
 import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoriesFiltersInput, CategoryCreateInput, CategoryUpdateInput, CursorInput, FeedFiltersInput, GroupVariationCreateInput, GroupVariationDeleteInput, GroupVariationUpdateInput, ImagesDeleteInput, ImagesFiltersInput, ImagesUpdateInput, InvoiceCreateInput, InvoicesFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ModerationStatus, OrderCreateInput, OrderProductInput, OrdersFiltersInput, OrderStatus, OrderUpdateInput, ParameterInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionCursorInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingsFiltersInput, RatingUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorInput, VendorsFiltersInput, VotesCreateInput, VotesFiltersInput } from '../types'
 import { canBeBoolean, canBeNumber, hasDefinedProps, isArray, isDate, isEmail, isInputProvided, isObject, isPasswordValid, isPositiveNumber, isProvided, isSomeProvided, isString } from './validatorLib'
 
-// TODO implement PARTIAL<t>
 export const checkNewUser = ({ body }: Request): UserSignupInput => {
   const email = R.pipe(
     isProvided,
@@ -17,9 +16,15 @@ export const checkNewUser = ({ body }: Request): UserSignupInput => {
     isPasswordValid
   )({ name: 'password', param: body.password })
 
+  const name = R.pipe(
+    isProvided,
+    isString
+  )({ name: 'name', param: body.name })
+
   return {
     email: email.param.toLowerCase(),
-    password: password.param
+    password: password.param,
+    name: name.param
   }
 }
 
@@ -721,11 +726,16 @@ export const checkQuestionsCursor = ({ query }: Request): QuestionCursorInput =>
     ? canBeNumber({ name: 'answerCommentLimit', param: query.answerCommentLimit })
     : undefined
 
+  const onlyAnswered = 'onlyAnswered' in query
+    ? canBeBoolean({ name: 'onlyAnswered', param: query.onlyAnswered })
+    : undefined
+
   return {
     startCursor: startCursor?.param,
     limit: limit?.param,
     answerLimit: answerLimit?.param,
-    answerCommentLimit: answerCommentLimit?.param
+    answerCommentLimit: answerCommentLimit?.param,
+    onlyAnswered: onlyAnswered?.param
   }
 }
 

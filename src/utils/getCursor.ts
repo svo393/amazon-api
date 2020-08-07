@@ -9,7 +9,7 @@ type Props = {
 
 export default ({
   startCursor,
-  limit = 4,
+  limit = 1,
   idProp,
   data
 }: Props) => {

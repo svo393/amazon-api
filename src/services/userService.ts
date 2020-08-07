@@ -206,7 +206,6 @@ const updateUser = async (userInput: UserUpdateInput, res: Response, req: Reques
 
   if (updatedUser === undefined) { throw new StatusError(404, 'Not Found') }
 
-  role !== 'ROOT' && delete updatedUser.role
   return R.omit([
     'password',
     'resetToken',

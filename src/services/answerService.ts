@@ -27,7 +27,19 @@ const getAnswersByQuestion = async (CursorInput: CursorInput, req: Request): Pro
   const { startCursor, limit } = CursorInput
   const { questionID } = req.params
 
-  let answers = await db<Answer>('answers')
+  let answers: (Answer & { avatar?: boolean; userName?: string })[] = await db('answers as a')
+    .select(
+      'a.answerID',
+      'a.createdAt',
+      'a.updatedAt',
+      'a.content',
+      'a.moderationStatus',
+      'a.userID',
+      'a.questionID',
+      'u.avatar',
+      'u.name as userName'
+    )
+    .join('users as u', 'a.userID', 'u.userID')
     .where('questionID', questionID)
 
   const votes = await db<Vote>('votes')
@@ -40,7 +52,11 @@ const getAnswersByQuestion = async (CursorInput: CursorInput, req: Request): Pro
         .reduce((acc, cur) => (
           acc += cur.vote ? 1 : -1
         ), 0)
-      return { ...a, votes: voteSum, type: 'answer' }
+      return {
+        ...R.omit([ 'userName', 'avatar' ], a),
+        votes: voteSum,
+        author: { avatar: a.avatar, name: a.userName, userID: a.userID }
+      }
     })
 
   return {

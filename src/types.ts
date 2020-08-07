@@ -20,7 +20,7 @@ export type Address = {
 
 export type User = {
   userID: number;
-  name?: string;
+  name: string;
   info?: string;
   email: string;
   password: string;
@@ -107,7 +107,6 @@ export type Rating = {
   moderationStatus: string;
   userID: number;
   groupID: number;
-  userEmail?: string;
 }
 
 export type RatingComment = {
@@ -119,7 +118,6 @@ export type RatingComment = {
   userID: number;
   ratingID: number;
   parentRatingCommentID?: number;
-  userEmail: string;
 }
 
 export type Question = {
@@ -130,7 +128,6 @@ export type Question = {
   moderationStatus: string;
   userID: number;
   groupID: number;
-  userEmail: string;
 }
 
 export type Answer = {
@@ -141,7 +138,6 @@ export type Answer = {
   moderationStatus: string;
   userID: number;
   questionID: number;
-  userEmail: string;
 }
 
 export type AnswerComment = {
@@ -153,7 +149,6 @@ export type AnswerComment = {
   userID: number;
   answerID: number;
   parentAnswerCommentID?: number;
-  userEmail: string;
 }
 
 type Activity = (
@@ -231,9 +226,9 @@ export type ProductSize = { name: string; qty: number; productID: number }
 // Derivative types
 //
 
-export type UserSignupInput = Pick<User, 'email' | 'password'>
+export type UserSignupInput = Pick<User, 'email' | 'password' | 'name'>
 
-export type UserLoginInput = UserSignupInput & { remember: boolean } // TODO remember option
+export type UserLoginInput = Pick<User, 'email' | 'password'> & { remember: boolean } // TODO remember option
 
 export type UserUpdateInput = Partial<Pick<User,
   | 'name'
@@ -361,6 +356,7 @@ export type CursorInput = {
 export type QuestionCursorInput = CursorInput & {
   answerLimit?: number;
   answerCommentLimit?: number;
+  onlyAnswered?: boolean;
  }
 
 export type AnswerCommentCreateInput = Pick<AnswerComment,

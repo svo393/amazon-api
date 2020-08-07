@@ -9,17 +9,20 @@ const api = supertest(app)
 
 export const customerUser = {
   email: 'customer@example.com',
-  password: 'yW%491f8UGYJ'
+  password: 'yW%491f8UGYJ',
+  name: 'Shopper'
 }
 
 export const adminUser = {
   email: 'admin@example.com',
-  password: 'yW%491f8UGYJ'
+  password: 'yW%491f8UGYJ',
+  name: 'Adminus'
 }
 
 export const rootUser = {
   email: 'root@example.com',
-  password: 'yW%491f8UGYJ'
+  password: 'yW%491f8UGYJ',
+  name: 'Root-root'
 }
 
 export const sleep = (ms: number): Promise<any> =>

@@ -51,25 +51,40 @@ BatchWithCursor<Question & {
     answerLimit = 1,
     answerCommentLimit = 0,
     page,
+    onlyAnswered = true,
     sortBy = 'votes_desc',
     q
   } = questionsInput
   const { groupID } = req.params
 
-  let questions = await db<Question>('questions')
+  let questions: (Question & { answerCount?: string })[] = await db('questions as q')
+    .select(
+      'q.questionID',
+      'q.createdAt',
+      'q.updatedAt',
+      'q.content',
+      'q.moderationStatus',
+      'q.userID',
+      'q.groupID'
+    )
+    .count('a.questionID as answerCount')
     .where('groupID', groupID)
+    .join('answers as a', 'q.questionID', 'a.questionID')
+    .groupBy('q.questionID')
 
   const votes = await db<Vote>('votes')
     .whereNotNull('questionID')
     .orWhereNotNull('answerID')
 
   questions = questions
+    .filter((q) => onlyAnswered ? Number(q.answerCount) !== 0 : true)
     .map((q) => {
       const voteSum = votes
         .filter((v) => v.questionID === q.questionID)
         .reduce((acc, cur) => (
           acc += cur.vote ? 1 : -1
         ), 0)
+      delete q.answerCount
       return { ...q, votes: voteSum }
     })
 
@@ -94,7 +109,7 @@ BatchWithCursor<Question & {
   const questionIDs = Object.values(questionsWithCursor.batch)
     .map((q: Question) => q.questionID)
 
-  let answers = await db<Answer>('answers as a')
+  let answers: (Answer & { avatar?: boolean; userName?: string })[] = await db('answers as a')
     .select(
       'a.answerID',
       'a.createdAt',
@@ -103,20 +118,24 @@ BatchWithCursor<Question & {
       'a.moderationStatus',
       'a.userID',
       'a.questionID',
-      'u.email as userEmail',
+      'u.avatar',
       'u.name as userName'
     )
-    .leftJoin('users as u', 'a.userID', 'u.userID')
+    .join('users as u', 'a.userID', 'u.userID')
     .whereIn('questionID', questionIDs)
 
   answers = answers
-    .map((q) => {
+    .map((a) => {
       const voteSum = votes
-        .filter((v) => v.answerID === q.answerID)
+        .filter((v) => v.answerID === a.answerID)
         .reduce((acc, cur) => (
           acc += cur.vote ? 1 : -1
         ), 0)
-      return { ...q, votes: voteSum }
+      return {
+        ...R.omit([ 'userName', 'avatar' ], a),
+        votes: voteSum,
+        author: { avatar: a.avatar, name: a.userName, userID: a.userID }
+      }
     })
 
   if (answers.length !== 0) {
@@ -180,7 +199,7 @@ const getQuestionByID = async (req: Request): Promise<Question &
 { images: Image[] }> => {
   const { questionID } = req.params
 
-  const question = await db<Question>('questions as q')
+  const question = await db<Question & { userEmail: string }>('questions as q')
     .first(
       'q.questionID',
       'q.createdAt',

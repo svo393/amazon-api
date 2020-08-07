@@ -40,7 +40,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
 
     .createTable('users', (t) => {
       t.increments('userID')
-      t.string('name', 50)
+      t.string('name', 50).notNullable()
       t.string('info', 65535)
       t.string('email').unique().notNullable()
       t.string('password').notNullable()
