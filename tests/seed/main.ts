@@ -2,7 +2,7 @@ import path from 'path'
 import R from 'ramda'
 import supertest from 'supertest'
 import app from '../../src/app'
-import { Answer, AnswerComment, CartProduct, Invoice, List, Order, Product, Question, Rating, RatingComment } from '../../src/types'
+import { Answer, AnswerComment, CartProduct, Invoice, List, Order, Product, Question, Review, ReviewComment } from '../../src/types'
 import { apiURLs } from '../../src/utils/constants'
 import { db } from '../../src/utils/db'
 import { createOneCategory, createOneVendor, loginAs, populateUsers, purge, createOneParameter } from '../testHelper'
@@ -103,7 +103,7 @@ const seed = async (): Promise<void> => {
             .set('Cookie', `sessionID=${sessionID}`)
             .send({
               ...R.omit([
-                'ratings',
+                'reviews',
                 'questions',
                 'media',
                 'productParameters'
@@ -126,7 +126,7 @@ const seed = async (): Promise<void> => {
                 .set('Cookie', `sessionID=${sessionID}`)
                 .send({
                   ...R.omit([
-                    'ratings',
+                    'reviews',
                     'questions',
                     'media',
                     'productParameters'
@@ -161,29 +161,29 @@ const seed = async (): Promise<void> => {
               await uploadAPI
             }
 
-            if (p.ratings !== undefined) {
-              await Promise.all(p.ratings.map(async (r) => {
+            if (p.reviews !== undefined) {
+              await Promise.all(p.reviews.map(async (r) => {
                 const sessionID = users[r.author].sessionID
 
-                const { body }: { body: Rating } = await api
-                  .post(`${apiURLs.groups}/${groupID}/ratings`)
+                const { body }: { body: Review } = await api
+                  .post(`${apiURLs.groups}/${groupID}/reviews`)
                   .set('Cookie', `sessionID=${sessionID}`)
                   .send(R.omit([ 'author', 'comments', 'mediaFiles' ], r))
 
                 await api
-                  .put(`${apiURLs.ratings}/${body.ratingID}`)
+                  .put(`${apiURLs.reviews}/${body.reviewID}`)
                   .set('Cookie', `sessionID=${adminSessionID}`)
                   .send({ isVerified: true, moderationStatus: 'APPROVED' })
 
                 if (r.media !== undefined) {
                   const uploadAPI = api
-                    .post(`${apiURLs.ratings}/${body.ratingID}/upload`)
+                    .post(`${apiURLs.reviews}/${body.reviewID}/upload`)
                     .set('Cookie', `sessionID=${sessionID}`)
 
                   r.mediaFiles !== undefined && r.mediaFiles.map((m) => {
                     uploadAPI
-                      .attach('ratingImages', path.join(
-                        __dirname, `images/ratings/${m}.jpg`
+                      .attach('reviewImages', path.join(
+                        __dirname, `images/reviews/${m}.jpg`
                       ))
                   })
                   await uploadAPI
@@ -193,25 +193,25 @@ const seed = async (): Promise<void> => {
                   await Promise.all(r.comments.map(async (cm: any) => {
                     const sessionID = users[cm.author].sessionID
 
-                    const ratingComment: { body: RatingComment } = await api
-                      .post(`${apiURLs.ratings}/${body.ratingID}/comments`)
+                    const reviewComment: { body: ReviewComment } = await api
+                      .post(`${apiURLs.reviews}/${body.reviewID}/comments`)
                       .set('Cookie', `sessionID=${sessionID}`)
                       .send(R.omit([ 'author', 'mediaFiles' ], cm))
 
                     await api
-                      .put(`${apiURLs.ratingComments}/${ratingComment.body.ratingCommentID}`)
+                      .put(`${apiURLs.reviewComments}/${reviewComment.body.reviewCommentID}`)
                       .set('Cookie', `sessionID=${adminSessionID}`)
                       .send({ moderationStatus: 'APPROVED' })
 
                     if (cm.media !== undefined) {
                       const uploadAPI = api
-                        .post(`${apiURLs.ratings}/${body.ratingID}/comments/${ratingComment.body.ratingCommentID}/upload`)
+                        .post(`${apiURLs.reviews}/${body.reviewID}/comments/${reviewComment.body.reviewCommentID}/upload`)
                         .set('Cookie', `sessionID=${sessionID}`)
 
                       cm.mediaFiles !== undefined && cm.mediaFiles.map((m: number) => {
                         uploadAPI
-                          .attach('ratingCommentImages', path.join(
-                            __dirname, `images/ratingComments/${m}.jpg`
+                          .attach('reviewCommentImages', path.join(
+                            __dirname, `images/reviewComments/${m}.jpg`
                           ))
                       })
                       await uploadAPI

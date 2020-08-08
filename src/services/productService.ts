@@ -24,8 +24,8 @@ const getProductsQuery: any = db('products as p')
     'c.name as categoryName'
   )
   .avg('stars as stars')
-  .count('r.ratingID as ratingCount')
-  .leftJoin('ratings as r', 'p.groupID', 'r.groupID')
+  .count('r.reviewID as reviewCount')
+  .leftJoin('reviews as r', 'p.groupID', 'r.groupID')
   .leftJoin('vendors as v', 'p.vendorID', 'v.vendorID')
   .leftJoin('categories as c', 'p.categoryID', 'c.categoryID')
   .groupBy('p.productID', 'vendorName', 'categoryName')
@@ -107,14 +107,14 @@ type ProductListRawData = Pick<Product,
   | 'categoryID'
 > & {
   stars: string;
-  ratingCount: string;
+  reviewCount: string;
   vendorName: string;
   categoryName: string;
 }
 
-type ProductListData = Omit<ProductListRawData, 'stars' | 'ratingCount'> & {
+type ProductListData = Omit<ProductListRawData, 'stars' | 'reviewCount'> & {
   stars: number;
-  ratingCount: number;
+  reviewCount: number;
   images: {
     imageID: number;
     index: number;
@@ -137,8 +137,8 @@ const getProducts = async (productsFiltersInput: ProductsFiltersInput): Promise<
     isAvailable,
     starsMax,
     starsMin,
-    ratingMax,
-    ratingMin
+    reviewMax,
+    reviewMin
   } = productsFiltersInput
 
   // TODO refactor reusable queries
@@ -161,7 +161,7 @@ const getProducts = async (productsFiltersInput: ProductsFiltersInput): Promise<
       ...p,
       price: p.price / 100,
       stars: parseFloat(p.stars),
-      ratingCount: parseInt(p.ratingCount),
+      reviewCount: parseInt(p.reviewCount),
       productSizesSum: sizes !== undefined ? parseInt(sizes.sum) : null
     }
   })
@@ -214,14 +214,14 @@ const getProducts = async (productsFiltersInput: ProductsFiltersInput): Promise<
       .filter((p) => p.stars <= starsMax)
   }
 
-  if (ratingMin !== undefined) {
+  if (reviewMin !== undefined) {
     products = products
-      .filter((p) => p.ratingCount >= ratingMin)
+      .filter((p) => p.reviewCount >= reviewMin)
   }
 
-  if (ratingMax !== undefined) {
+  if (reviewMax !== undefined) {
     products = products
-      .filter((p) => p.ratingCount <= ratingMax)
+      .filter((p) => p.reviewCount <= reviewMax)
   }
 
   if (title !== undefined) {
@@ -311,7 +311,7 @@ type ProductLimitedData = Omit<ProductListData, 'images'> & {
 type ProductAllData = ProductLimitedData & Pick<ProductData, 'createdAt' | 'updatedAt' | 'userID' | 'listPrice'> & { userEmail: string }
 
 const getProductByID = async (req: Request): Promise<ProductLimitedData| ProductAllData> => {
-  const rawProduct: Omit<ProductAllData, 'stars' | 'ratingCount | questionCount'> & { stars: string; ratingCount: string; questionCount: string } = await getProductsQuery.clone()
+  const rawProduct: Omit<ProductAllData, 'stars' | 'reviewCount | questionCount'> & { stars: string; reviewCount: string; questionCount: string } = await getProductsQuery.clone()
     .first(
       'p.listPrice',
       'p.bullets',
@@ -338,7 +338,7 @@ const getProductByID = async (req: Request): Promise<ProductLimitedData| Product
       ? rawProduct.listPrice / 100
       : undefined,
     stars: parseFloat(rawProduct.stars),
-    ratingCount: parseInt(rawProduct.ratingCount),
+    reviewCount: parseInt(rawProduct.reviewCount),
     questionCount: parseInt(rawProduct.questionCount)
   }
 

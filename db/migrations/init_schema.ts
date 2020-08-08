@@ -185,8 +185,8 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.primary([ 'listID', 'productID' ])
     })
 
-    .createTable('ratings', (t) => {
-      t.increments('ratingID')
+    .createTable('reviews', (t) => {
+      t.increments('reviewID')
       t.dateTime('createdAt').notNullable()
       t.dateTime('updatedAt').notNullable()
       t.jsonb('variation')
@@ -211,12 +211,12 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .references('moderationStatuses.moderationStatusName')
         .defaultTo('NEW')
     })
-    .alterTable('ratings', (t) => {
+    .alterTable('reviews', (t) => {
       t.unique([ 'userID', 'groupID' ])
     })
 
-    .createTable('ratingComments', (t) => {
-      t.increments('ratingCommentID')
+    .createTable('reviewComments', (t) => {
+      t.increments('reviewCommentID')
       t.dateTime('createdAt').notNullable()
       t.dateTime('updatedAt').notNullable()
       t.string('content', 65535).notNullable()
@@ -228,14 +228,14 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .onDelete('CASCADE')
 
       t
-        .integer('ratingID')
-        .references('ratings.ratingID')
+        .integer('reviewID')
+        .references('reviews.reviewID')
         .notNullable()
         .onDelete('CASCADE')
 
       t
-        .integer('parentRatingCommentID')
-        .references('ratingComments.ratingCommentID')
+        .integer('parentReviewCommentID')
+        .references('reviewComments.reviewCommentID')
         .onDelete('SET NULL')
 
       t
@@ -331,8 +331,8 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .onDelete('CASCADE')
 
       t
-        .integer('ratingID')
-        .references('ratings.ratingID')
+        .integer('reviewID')
+        .references('reviews.reviewID')
         .onDelete('CASCADE')
 
       t
@@ -346,7 +346,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .onDelete('CASCADE')
     })
     .alterTable('votes', (t) => {
-      t.unique([ 'ratingID', 'userID' ])
+      t.unique([ 'reviewID', 'userID' ])
     })
     .alterTable('votes', (t) => {
       t.unique([ 'questionID', 'userID' ])
@@ -371,13 +371,13 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .onDelete('CASCADE')
 
       t
-        .integer('ratingID')
-        .references('ratings.ratingID')
+        .integer('reviewID')
+        .references('reviews.reviewID')
         .onDelete('CASCADE')
 
       t
-        .integer('ratingCommentID')
-        .references('ratingComments.ratingCommentID')
+        .integer('reviewCommentID')
+        .references('reviewComments.reviewCommentID')
         .onDelete('CASCADE')
 
       t
@@ -399,10 +399,10 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.unique([ 'productID', 'index' ])
     })
     .alterTable('images', (t) => {
-      t.unique([ 'ratingID', 'index' ])
+      t.unique([ 'reviewID', 'index' ])
     })
     .alterTable('images', (t) => {
-      t.unique([ 'ratingCommentID', 'index' ])
+      t.unique([ 'reviewCommentID', 'index' ])
     })
     .alterTable('images', (t) => {
       t.unique([ 'questionID', 'index' ])
@@ -565,8 +565,8 @@ export const down = (knex: Knex): Knex.SchemaBuilder =>
     .dropTableIfExists('answerComments')
     .dropTableIfExists('answers')
     .dropTableIfExists('questions')
-    .dropTableIfExists('ratingComments')
-    .dropTableIfExists('ratings')
+    .dropTableIfExists('reviewComments')
+    .dropTableIfExists('reviews')
     .dropTableIfExists('listProducts')
     .dropTableIfExists('productSizes')
     .dropTableIfExists('products')

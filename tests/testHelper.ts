@@ -1,6 +1,6 @@
 import supertest from 'supertest'
 import app from '../src/app'
-import { Address, AddressCreateInput, AddressType, AddressTypeInput, Answer, AnswerComment, AnswerCommentCreateInput, AnswerCreateInput, CartProduct, Category, CategoryCreateInput, Follower, Group, GroupVariation, GroupVariationCreateInput, Invoice, InvoiceCreateInput, InvoiceStatus, List, ListCreateInput, ListProduct, Order, OrderCreateInput, OrderProduct, OrderProductInput, OrderStatus, Parameter, ParameterInput, PaymentMethod, Product, ProductParameter, ProductPublicData, Question, QuestionCreateInput, Rating, RatingComment, RatingCommentCreateInput, RatingCreateInput, Role, ShippingMethod, ShippingMethodInput, User, UserAddress, Vendor, VendorInput, ModerationStatus } from '../src/types'
+import { Address, AddressCreateInput, AddressType, AddressTypeInput, Answer, AnswerComment, AnswerCommentCreateInput, AnswerCreateInput, CartProduct, Category, CategoryCreateInput, Follower, Group, GroupVariation, GroupVariationCreateInput, Invoice, InvoiceCreateInput, InvoiceStatus, List, ListCreateInput, ListProduct, Order, OrderCreateInput, OrderProduct, OrderProductInput, OrderStatus, Parameter, ParameterInput, PaymentMethod, Product, ProductParameter, ProductPublicData, Question, QuestionCreateInput, Review, ReviewComment, ReviewCommentCreateInput, ReviewCreateInput, Role, ShippingMethod, ShippingMethodInput, User, UserAddress, Vendor, VendorInput, ModerationStatus } from '../src/types'
 import { apiURLs } from '../src/utils/constants'
 import { db } from '../src/utils/db'
 import { products } from './testProductData'
@@ -116,12 +116,12 @@ export const cartProductsInDB = async (): Promise<CartProduct[]> => {
   return await db('cartProducts')
 }
 
-export const ratingsInDB = async (): Promise<Rating[]> => {
-  return await db('ratings')
+export const reviewsInDB = async (): Promise<Review[]> => {
+  return await db('reviews')
 }
 
-export const ratingCommentsInDB = async (): Promise<RatingComment[]> => {
-  return await db('ratingComments')
+export const reviewCommentsInDB = async (): Promise<ReviewComment[]> => {
+  return await db('reviewComments')
 }
 
 export const answerCommentsInDB = async (): Promise<AnswerComment[]> => {
@@ -155,8 +155,8 @@ export const purge = async (): Promise<void> => {
   await db('answerComments').del()
   await db('answers').del()
   await db('questions').del()
-  await db('ratingComments').del()
-  await db('ratings').del()
+  await db('reviewComments').del()
+  await db('reviews').del()
   await db('listProducts').del()
   await db('products').del()
   await db('groups').del()
@@ -385,37 +385,37 @@ export const createOneListProduct = async (): Promise<ListProduct & { sessionID:
   return { ...body, sessionID, userID }
 }
 
-export const newRating = (): RatingCreateInput => ({
-  title: `New Rating ${(new Date().getTime()).toString()}`,
+export const newReview = (): ReviewCreateInput => ({
+  title: `New Review ${(new Date().getTime()).toString()}`,
   review: `Long Review ${(new Date().getTime()).toString()}`,
   stars: 4,
   variation: { Style: 'Cool' }
 })
 
-export const createOneRating = async (): Promise<Rating & { sessionID: string }> => {
+export const createOneReview = async (): Promise<Review & { sessionID: string }> => {
   const { sessionID } = await loginAs('customer')
   const { addedProduct } = await createOneProduct('admin')
 
-  const { body }: { body: Rating } = await api
-    .post(`${apiURLs.groups}/${addedProduct.groupID}/ratings`)
+  const { body }: { body: Review } = await api
+    .post(`${apiURLs.groups}/${addedProduct.groupID}/reviews`)
     .set('Cookie', `sessionID=${sessionID}`)
-    .send(newRating())
+    .send(newReview())
 
   return { ...body, sessionID }
 }
 
-export const newRatingComment = (): RatingCommentCreateInput => ({
-  content: `New RatingComment ${(new Date().getTime()).toString()}`
+export const newReviewComment = (): ReviewCommentCreateInput => ({
+  content: `New ReviewComment ${(new Date().getTime()).toString()}`
 })
 
-export const createOneRatingComment = async (): Promise<RatingComment & { sessionID: string }> => {
+export const createOneReviewComment = async (): Promise<ReviewComment & { sessionID: string }> => {
   const { sessionID } = await loginAs('customer')
-  const { ratingID } = await createOneRating()
+  const { reviewID } = await createOneReview()
 
-  const { body }: { body: RatingComment } = await api
-    .post(`${apiURLs.ratings}/${ratingID}/comments`)
+  const { body }: { body: ReviewComment } = await api
+    .post(`${apiURLs.reviews}/${reviewID}/comments`)
     .set('Cookie', `sessionID=${sessionID}`)
-    .send(newRatingComment())
+    .send(newReviewComment())
 
   return { ...body, sessionID }
 }

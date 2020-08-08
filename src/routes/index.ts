@@ -20,8 +20,8 @@ import parametersRouter from './parameters'
 import paymentMethodsRouter from './paymentMethods'
 import productsRouter from './products'
 import questionsRouter from './questions'
-import ratingCommentsRouter from './ratingComments'
-import ratingsRouter from './ratings'
+import reviewCommentsRouter from './reviewComments'
+import reviewsRouter from './reviews'
 import rolesRouter from './roles'
 import shippingMethodsRouter from './shippingMethods'
 import usersRouter from './users'
@@ -47,8 +47,8 @@ export default Router()
   .use(apiURLs.paymentMethods, paymentMethodsRouter)
   .use(apiURLs.products, productsRouter)
   .use(apiURLs.questions, questionsRouter)
-  .use(apiURLs.ratingComments, ratingCommentsRouter)
-  .use(apiURLs.ratings, ratingsRouter)
+  .use(apiURLs.reviewComments, reviewCommentsRouter)
+  .use(apiURLs.reviews, reviewsRouter)
   .use(apiURLs.roles, rolesRouter)
   .use(apiURLs.shippingMethods, shippingMethodsRouter)
   .use(apiURLs.users, usersRouter)

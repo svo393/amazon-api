@@ -61,7 +61,7 @@ export const initialProducts = {
             { name: 'Brand Name', value: 'Acer' },
             { name: 'Series', value: 'Z24-890-UA91' },
             { name: 'Product model number', value: 'Z24-890-UA91' },
-            { name: 'Operating System', value: 'Windows 10 Home' },
+            { name: 'Opereview System', value: 'Windows 10 Home' },
             { name: 'Product Weight', value: '17.4 pounds' },
             { name: 'Product Dimensions', value: '21.3 x 1.4 x 17.3 inches' },
             { name: 'Product Dimensions L x W x H', value: '21.29 x 1.45 x 17.3 inches' },
@@ -73,7 +73,7 @@ export const initialProducts = {
             { name: 'Hard Drive Rotational Speed', value: '0.1 RPM' },
             { name: 'Optical Drive Type', value: 'DVD-RW' }
           ],
-          ratings: [
+          reviews: [
             {
               author: 0,
               stars: 1,
@@ -166,7 +166,7 @@ export const initialProducts = {
             { name: 'Brand Name', value: 'Acer' },
             { name: 'Series', value: 'Z24-890-UR13' },
             { name: 'Product model number', value: 'Z24-890-UR13' },
-            { name: 'Operating System', value: 'Windows 10 Home' },
+            { name: 'Opereview System', value: 'Windows 10 Home' },
             { name: 'Product Weight', value: '17.9 pounds' },
             { name: 'Product Dimensions', value: '21.3 x 1.4 x 17.3 inches' },
             { name: 'Product Dimensions L x W x H', value: '21.29 x 1.45 x 17.3 inches' },
@@ -200,7 +200,7 @@ export const initialProducts = {
             { name: 'Brand Name', value: 'Acer' },
             { name: 'Series', value: 'Z24-890-UR18' },
             { name: 'Product model number', value: 'Z24-890-UR18' },
-            { name: 'Operating System', value: 'Windows 10 Home' },
+            { name: 'Opereview System', value: 'Windows 10 Home' },
             { name: 'Product Weight', value: '17.4 pounds' },
             { name: 'Product Dimensions', value: '21.3 x 1.4 x 17.3 inches' },
             { name: 'Product Dimensions L x W x H', value: '21.29 x 1.45 x 17.3 inches' },

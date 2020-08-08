@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { Image, Rating, RatingCreateInput, RatingsFiltersInput, RatingUpdateInput, Vote } from '../types'
+import { Image, Review, ReviewCreateInput, ReviewsFiltersInput, ReviewUpdateInput, Vote } from '../types'
 import { defaultLimit, imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
 import fuseIndexes from '../utils/fuseIndexes'
@@ -9,17 +9,17 @@ import { uploadImages } from '../utils/img'
 import sortItems from '../utils/sortItems'
 import StatusError from '../utils/StatusError'
 
-const addRating = async (ratingInput: RatingCreateInput, req: Request): Promise<Rating> => {
+const addReview = async (reviewInput: ReviewCreateInput, req: Request): Promise<Review> => {
   const now = new Date()
 
-  const { rows: [ addedRating ] }: { rows: Rating[] } = await db.raw(
+  const { rows: [ addedReview ] }: { rows: Review[] } = await db.raw(
     `
     ? ON CONFLICT
       DO NOTHING
       RETURNING *;
     `,
-    [ db('ratings').insert({
-      ...ratingInput,
+    [ db('reviews').insert({
+      ...reviewInput,
       userID: req.session?.userID,
       createdAt: now,
       updatedAt: now,
@@ -27,13 +27,13 @@ const addRating = async (ratingInput: RatingCreateInput, req: Request): Promise<
     }) ]
   )
 
-  if (addedRating === undefined) {
+  if (addedReview === undefined) {
     throw new StatusError(409, 'You\'ve already left a review for this product')
   }
-  return addedRating
+  return addedReview
 }
 
-const getRatings = async (ratingsFiltersInput: RatingsFiltersInput, req: Request): Promise<{ batch: Rating[]; totalCount: number }> => {
+const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request): Promise<{ batch: Review[]; totalCount: number }> => {
   const {
     page = 1,
     sortBy = 'createdAt_desc',
@@ -48,13 +48,13 @@ const getRatings = async (ratingsFiltersInput: RatingsFiltersInput, req: Request
     starsMax,
     votesMin,
     votesMax
-  } = ratingsFiltersInput
+  } = reviewsFiltersInput
 
   const userHasPermission = [ 'ROOT', 'ADMIN' ].includes(req.session?.role)
 
-  let ratings: (Rating & { votes: number; userEmail: string })[] = await db('ratings as r')
+  let reviews: (Review & { votes: number; userEmail: string })[] = await db('reviews as r')
     .select(
-      'r.ratingID',
+      'r.reviewID',
       'r.createdAt',
       'r.updatedAt',
       'r.title',
@@ -67,15 +67,15 @@ const getRatings = async (ratingsFiltersInput: RatingsFiltersInput, req: Request
       'u.email as userEmail'
     )
     .join('users as u', 'r.userID', 'u.userID')
-    .groupBy('r.ratingID', 'userEmail')
+    .groupBy('r.reviewID', 'userEmail')
 
   const votes = await db<Vote>('votes')
-    .whereNotNull('ratingID')
+    .whereNotNull('reviewID')
 
-  ratings = ratings
+  reviews = reviews
     .map((r) => {
       const voteSum = votes
-        .filter((v) => v.ratingID === r.ratingID)
+        .filter((v) => v.reviewID === r.reviewID)
         .reduce((acc, cur) => (
           acc += cur.vote ? 1 : -1
         ), 0)
@@ -83,80 +83,80 @@ const getRatings = async (ratingsFiltersInput: RatingsFiltersInput, req: Request
     })
 
   if (groupID !== undefined) {
-    ratings = ratings
+    reviews = reviews
       .filter((r) => r.groupID === groupID)
   }
 
   if (userHasPermission && userEmail !== undefined) {
-    ratings = ratings
+    reviews = reviews
       .filter((r) => r.userEmail?.toLowerCase().includes(userEmail.toLowerCase()))
   }
 
   if (moderationStatuses !== undefined) {
-    ratings = ratings
+    reviews = reviews
       .filter((r) => moderationStatuses.split(',').includes(r.moderationStatus))
   }
 
   if (isVerified !== undefined) {
-    ratings = ratings
+    reviews = reviews
       .filter((r) => r.isVerified === isVerified)
   }
 
   if (createdFrom !== undefined) {
-    ratings = ratings
+    reviews = reviews
       .filter((r) => r.createdAt >= new Date(createdFrom))
   }
 
   if (createdTo !== undefined) {
-    ratings = ratings
+    reviews = reviews
       .filter((r) => r.createdAt <= new Date(createdTo))
   }
 
   if (starsMin !== undefined) {
-    ratings = ratings
+    reviews = reviews
       .filter((r) => r.stars >= starsMin)
   }
 
   if (starsMax !== undefined) {
-    ratings = ratings
+    reviews = reviews
       .filter((r) => r.stars <= starsMax)
   }
 
   if (votesMin !== undefined) {
-    ratings = ratings
+    reviews = reviews
       .filter((r) => r.votes >= votesMin)
   }
 
   if (votesMax !== undefined) {
-    ratings = ratings
+    reviews = reviews
       .filter((r) => r.votes <= votesMax)
   }
 
   if (q !== undefined) {
-    ratings = ratings
+    reviews = reviews
       .filter((_, i) =>
-        fuseIndexes(ratings, [ 'title', 'review' ], q).includes(i))
+        fuseIndexes(reviews, [ 'title', 'review' ], q).includes(i))
   }
 
-  const _ratings = userHasPermission
-    ? ratings
-    : ratings.map((r) => ({ ...R.omit([ 'userEmail' ], r) }))
+  const _reviews = userHasPermission
+    ? reviews
+    : reviews.map((r) => ({ ...R.omit([ 'userEmail' ], r) }))
 
-  const ratingsSorted = sortItems(_ratings, sortBy)
+  const reviewsSorted = sortItems(_reviews, sortBy)
 
   return {
-    batch: ratingsSorted.slice((page - 1) * defaultLimit, (page - 1) * defaultLimit + defaultLimit),
-    totalCount: _ratings.length
+    batch: reviewsSorted.slice((page - 1) * defaultLimit, (page - 1) * defaultLimit + defaultLimit),
+    totalCount: _reviews.length
   }
 }
 
-const getRatingByID = async (req: Request): Promise<Rating &
+const getReviewByID = async (req: Request): Promise<Review &
 { images: Image[]; votes: number }> => {
-  const { ratingID } = req.params
+  const { reviewID } = req.params
 
-  const rating = await db<Rating>('ratings as r')
+  const review = await db<Review>('reviews as r')
     .first(
-      'r.ratingID',
+      'r.reviewID',
       'r.createdAt',
       'r.updatedAt',
       'r.title',
@@ -168,58 +168,58 @@ const getRatingByID = async (req: Request): Promise<Rating &
       'r.groupID',
       'u.email as userEmail'
     )
-    .where('ratingID', ratingID)
+    .where('reviewID', reviewID)
     .join('users as u', 'r.userID', 'u.userID')
-    .groupBy('r.ratingID', 'userEmail')
+    .groupBy('r.reviewID', 'userEmail')
 
-  if (rating === undefined) throw new StatusError(404, 'Not Found')
+  if (review === undefined) throw new StatusError(404, 'Not Found')
 
   const images = await db<Image>('images')
-    .where('ratingID', ratingID)
+    .where('reviewID', reviewID)
 
   const votes = await db<Vote>('votes')
-    .where('ratingID', ratingID)
+    .where('reviewID', reviewID)
 
   const voteSum = votes.reduce((acc, cur) => (
     acc += cur.vote ? 1 : -1
   ), 0)
 
-  const _rating = {
-    ...rating,
+  const _review = {
+    ...review,
     images,
     votes: voteSum
   }
 
   return [ 'ROOT', 'ADMIN' ].includes(req.session?.role)
-    ? _rating
-    : R.omit([ 'userEmail' ], _rating)
+    ? _review
+    : R.omit([ 'userEmail' ], _review)
 }
 
-const updateRating = async (ratingInput: RatingUpdateInput, req: Request): Promise<Rating> => {
-  const [ updatedRating ]: Rating[] = await db('ratings')
+const updateReview = async (reviewInput: ReviewUpdateInput, req: Request): Promise<Review> => {
+  const [ updatedReview ]: Review[] = await db('reviews')
     .update({
-      ...ratingInput,
+      ...reviewInput,
       updatedAt: new Date()
     }, [ '*' ])
-    .where('ratingID', req.params.ratingID)
+    .where('reviewID', req.params.reviewID)
 
-  if (updatedRating === undefined) throw new StatusError(404, 'Not Found')
-  return updatedRating
+  if (updatedReview === undefined) throw new StatusError(404, 'Not Found')
+  return updatedReview
 }
 
-const deleteRating = async (req: Request): Promise<void> => {
-  const deleteCount = await db('ratings')
+const deleteReview = async (req: Request): Promise<void> => {
+  const deleteCount = await db('reviews')
     .del()
-    .where('ratingID', req.params.ratingID)
+    .where('reviewID', req.params.reviewID)
 
   if (deleteCount === 0) throw new StatusError(404, 'Not Found')
 }
 
-const uploadRatingImages = async (files: Express.Multer.File[], req: Request): Promise<void> => {
+const uploadReviewImages = async (files: Express.Multer.File[], req: Request): Promise<void> => {
   const filesWithIndexes = files.map((f) => {
     const index = getUploadIndex(f.filename)
     return {
-      ratingID: req.params.ratingID,
+      reviewID: req.params.reviewID,
       userID: req.session?.userID,
       index
     }
@@ -242,10 +242,10 @@ const uploadRatingImages = async (files: Express.Multer.File[], req: Request): P
 }
 
 export default {
-  addRating,
-  getRatings,
-  getRatingByID,
-  updateRating,
-  deleteRating,
-  uploadRatingImages
+  addReview,
+  getReviews,
+  getReviewByID,
+  updateReview,
+  deleteReview,
+  uploadReviewImages
 }

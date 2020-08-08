@@ -76,8 +76,8 @@ export type Image = {
   imageID: number;
   index: number;
   productID?: number;
-  ratingID?: number;
-  ratingCommentID?: number;
+  reviewID?: number;
+  reviewCommentID?: number;
   questionID?: number;
   answerID?: number;
   answerCommentID?: number;
@@ -87,7 +87,7 @@ export type Image = {
 export type Vote = {
   voteID: number;
   vote: boolean;
-  ratingID?: number;
+  reviewID?: number;
   questionID?: number;
   answerID?: number;
   userID: number;
@@ -95,8 +95,8 @@ export type Vote = {
 
 export type ListProduct = { listID: number; productID: number }
 
-export type Rating = {
-  ratingID: number;
+export type Review = {
+  reviewID: number;
   createdAt: Date;
   updatedAt: Date;
   variation: { [ k: string ]: string };
@@ -109,15 +109,15 @@ export type Rating = {
   groupID: number;
 }
 
-export type RatingComment = {
-  ratingCommentID: number;
+export type ReviewComment = {
+  reviewCommentID: number;
   createdAt: Date;
   updatedAt: Date;
   content: string;
   moderationStatus: string;
   userID: number;
-  ratingID: number;
-  parentRatingCommentID?: number;
+  reviewID: number;
+  parentReviewCommentID?: number;
 }
 
 export type Question = {
@@ -218,7 +218,7 @@ export type ProductSize = { name: string; qty: number; productID: number }
 //
 
 type Activity = (
-  RatingComment |
+  ReviewComment |
   Question |
   Answer |
   AnswerComment
@@ -237,7 +237,7 @@ export type AnswerCommentWithUser = AnswerComment & {
   author: Pick<User, 'name' | 'userID' | 'avatar'> & { email?: string };
 }
 
-export type RatingCommentWithUser = RatingComment & {
+export type ReviewCommentWithUser = ReviewComment & {
   images: Image[];
   author: Pick<User, 'name' | 'userID' | 'avatar'> & { email?: string };
 }
@@ -321,14 +321,14 @@ export type ProductPublicData = Omit<ProductData,
   | 'userID'
 >
 
-export type RatingCreateInput = Pick<Rating,
+export type ReviewCreateInput = Pick<Review,
   | 'title'
   | 'review'
   | 'variation'
   | 'stars'
 >
 
-export type RatingUpdateInput = Partial<Pick<Rating,
+export type ReviewUpdateInput = Partial<Pick<Review,
   | 'title'
   | 'review'
   | 'stars'
@@ -337,12 +337,12 @@ export type RatingUpdateInput = Partial<Pick<Rating,
   | 'moderationStatus'
 >>
 
-export type RatingCommentCreateInput = Pick<RatingComment,
+export type ReviewCommentCreateInput = Pick<ReviewComment,
   | 'content'
-  | 'parentRatingCommentID'
+  | 'parentReviewCommentID'
 >
 
-export type RatingCommentUpdateInput = Partial<Pick<RatingComment,
+export type ReviewCommentUpdateInput = Partial<Pick<ReviewComment,
   | 'content'
   | 'moderationStatus'
 >>
@@ -483,7 +483,7 @@ export type FeedFiltersInput = {
   userEmail?: string;
 }
 
-export type RatingsFiltersInput = {
+export type ReviewsFiltersInput = {
   q?: string;
   groupID?: number;
   userEmail?: string;
@@ -501,8 +501,8 @@ export type RatingsFiltersInput = {
 
 export type ImagesFiltersInput = {
   productID?: number;
-  ratingID?: number;
-  ratingCommentID?: number;
+  reviewID?: number;
+  reviewCommentID?: number;
   questionID?: number;
   answerID?: number;
   answerCommentID?: number;
@@ -515,7 +515,7 @@ export type VotesCreateInput = {
 }
 
 export type VotesFiltersInput = {
-  ratingID?: number;
+  reviewID?: number;
   questionID?: number;
   answerID?: number;
   userID?: number;
@@ -533,8 +533,8 @@ export type ProductsFiltersInput = {
   isAvailable?: boolean;
   starsMin?: number;
   starsMax?: number;
-  ratingMin?: number;
-  ratingMax?: number;
+  reviewMin?: number;
+  reviewMax?: number;
   page?: number;
   sortBy?: string;
 }
@@ -549,8 +549,8 @@ export type UsersFiltersInput = {
   sortBy?: string;
   orderCountMin?: number;
   orderCountMax?: number;
-  ratingCountMin?: number;
-  ratingCountMax?: number;
+  reviewCountMin?: number;
+  reviewCountMax?: number;
   activityCountMin?: number;
   activityCountMax?: number;
   email?: string;

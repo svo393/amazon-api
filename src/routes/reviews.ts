@@ -1,0 +1,64 @@
+import Router from 'express'
+import reviewCommentService from '../services/reviewCommentService'
+import reviewService from '../services/reviewService'
+import voteService from '../services/voteService'
+import { UPLOAD_TIMEOUT } from '../utils/config'
+import { checkMediaUpload, checkNewReviewComment, checkNewVote, checkReviewFilters, checkReviewUpdate } from '../utils/inputValidator'
+import { multerUpload, requireAdmin, requireAuth, requireCreator, requireCreatorOrAdmin } from '../utils/middleware'
+
+const router = Router()
+
+router.get('/', requireAdmin, async (req, res) => {
+  const reviewsFiltersinput = checkReviewFilters(req)
+  const reviews = await reviewService.getReviews(reviewsFiltersinput, req)
+  res.json(reviews)
+})
+
+router.get('/:reviewID', async (req, res) => {
+  const review = await reviewService.getReviewByID(req)
+  res.json(review)
+})
+
+router.put('/:reviewID', requireCreatorOrAdmin('reviews', 'reviewID', 'params'), async (req, res) => {
+  const reviewUpdateInput = checkReviewUpdate(req)
+  const updatedReview = await reviewService.updateReview(reviewUpdateInput, req)
+  res.json(updatedReview)
+})
+
+router.delete('/:reviewID', requireCreator('reviews', 'reviewID', 'params'), async (req, res) => {
+  await reviewService.deleteReview(req)
+  res.status(204).end()
+})
+
+router.post('/:reviewID/comments', requireAuth, async (req, res) => {
+  const reviewCommentCreateInput = checkNewReviewComment(req)
+  const addedReviewComment = await reviewCommentService.addReviewComment(reviewCommentCreateInput, req)
+  res.status(201).json(addedReviewComment)
+})
+
+router.get('/:reviewID/comments', async (req, res) => {
+  const reviewComments = await reviewCommentService.getCommentsByReview(req)
+  res.json(reviewComments)
+})
+
+router.post('/:reviewID/upload', requireCreator('reviews', 'reviewID', 'params'), multerUpload.array('reviewImages', 4), (req, res) => {
+  req.socket.setTimeout(UPLOAD_TIMEOUT)
+  const reviewImages = checkMediaUpload(req)
+  reviewService.uploadReviewImages(reviewImages, req)
+  res.status(204).end()
+})
+
+router.post('/:reviewID/comments/:reviewCommentID/upload', requireCreator('reviewComments', 'reviewCommentID', 'params'), multerUpload.array('reviewCommentImages', 4), (req, res) => {
+  req.socket.setTimeout(UPLOAD_TIMEOUT)
+  const reviewCommentImages = checkMediaUpload(req)
+  reviewCommentService.uploadReviewCommentImages(reviewCommentImages, req)
+  res.status(204).end()
+})
+
+router.post('/:reviewID/votes', requireAuth, async (req, res) => {
+  const voteCreateInput = checkNewVote(req)
+  const addedVote = await voteService.addVote(voteCreateInput, req)
+  res.status(201).json(addedVote)
+})
+
+export default router

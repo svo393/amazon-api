@@ -17,14 +17,14 @@ const getUsersQuery: any = db('users as u')
     'role'
   )
   .count('o.orderID as orderCount')
-  .count('r.ratingID as ratingCount')
-  .count('rc.ratingCommentID as ratingCommentCount')
+  .count('r.reviewID as reviewCount')
+  .count('rc.reviewCommentID as reviewCommentCount')
   .count('q.questionID as questionCount')
   .count('a.answerID as answerCount')
   .count('ac.answerID as answerCommentCount')
   .leftJoin('orders as o', 'u.userID', 'o.userID')
-  .leftJoin('ratings as r', 'u.userID', 'r.userID')
-  .leftJoin('ratingComments as rc', 'u.userID', 'rc.userID')
+  .leftJoin('reviews as r', 'u.userID', 'r.userID')
+  .leftJoin('reviewComments as rc', 'u.userID', 'rc.userID')
   .leftJoin('questions as q', 'u.userID', 'q.userID')
   .leftJoin('answers as a', 'u.userID', 'a.userID')
   .leftJoin('answerComments as ac', 'u.userID', 'ac.userID')
@@ -37,8 +37,8 @@ type UserRawData = Omit<User,
   | 'resetTokenCreatedAt'
 > & {
   orderCount: string;
-  ratingCount: string;
-  ratingCommentCount: string;
+  reviewCount: string;
+  reviewCommentCount: string;
   questionCount: string;
   answerCount: string;
   answerCommentCount: string;
@@ -46,15 +46,15 @@ type UserRawData = Omit<User,
 
 type UserData = Omit<UserRawData,
   | 'orderCount'
-  | 'ratingCount'
-  | 'ratingCommentCount'
+  | 'reviewCount'
+  | 'reviewCommentCount'
   | 'questionCount'
   | 'answerCount'
   | 'answerCommentCount'
 > & {
   activityCount: number;
   orderCount: number;
-  ratingCount: number;
+  reviewCount: number;
 }
 
 const getUsers = async (usersFiltersinput: UsersFiltersInput): Promise<{ batch: UserData[]; totalCount: number }> => {
@@ -66,8 +66,8 @@ const getUsers = async (usersFiltersinput: UsersFiltersInput): Promise<{ batch: 
     createdTo,
     orderCountMin,
     orderCountMax,
-    ratingCountMin,
-    ratingCountMax,
+    reviewCountMin,
+    reviewCountMax,
     activityCountMin,
     activityCountMax,
     email
@@ -79,17 +79,17 @@ const getUsers = async (usersFiltersinput: UsersFiltersInput): Promise<{ batch: 
     .map((u) => ({
       ...u,
       orderCount: parseInt(u.orderCount),
-      ratingCount: parseInt(u.ratingCount)
+      reviewCount: parseInt(u.reviewCount)
     }))
     .map((u) => ({
       ...R.omit([
-        'ratingCommentCount',
+        'reviewCommentCount',
         'questionCount',
         'answerCount',
         'answerCommentCount'
       ], u),
       activityCount: [
-        parseInt(u.ratingCommentCount),
+        parseInt(u.reviewCommentCount),
         parseInt(u.questionCount),
         parseInt(u.answerCount),
         parseInt(u.answerCommentCount)
@@ -121,14 +121,14 @@ const getUsers = async (usersFiltersinput: UsersFiltersInput): Promise<{ batch: 
       .filter((u) => u.orderCount <= orderCountMax)
   }
 
-  if (ratingCountMin !== undefined) {
+  if (reviewCountMin !== undefined) {
     users = users
-      .filter((u) => u.ratingCount >= ratingCountMin)
+      .filter((u) => u.reviewCount >= reviewCountMin)
   }
 
-  if (ratingCountMax !== undefined) {
+  if (reviewCountMax !== undefined) {
     users = users
-      .filter((u) => u.ratingCount <= ratingCountMax)
+      .filter((u) => u.reviewCount <= reviewCountMax)
   }
 
   if (activityCountMin !== undefined) {
@@ -170,19 +170,19 @@ const getUserByID = async (req: Request): Promise<UserData | UserPublicData> => 
 
   const user = {
     ...R.omit([
-      'ratingCommentCount',
+      'reviewCommentCount',
       'questionCount',
       'answerCount',
       'answerCommentCount'
     ], rawUser),
     activityCount: [
-      parseInt(rawUser.ratingCommentCount),
+      parseInt(rawUser.reviewCommentCount),
       parseInt(rawUser.questionCount),
       parseInt(rawUser.answerCount),
       parseInt(rawUser.answerCommentCount)
     ].reduce((acc, cur) => acc + cur, 0),
     orderCount: parseInt(rawUser.orderCount),
-    ratingCount: parseInt(rawUser.ratingCount)
+    reviewCount: parseInt(rawUser.reviewCount)
   }
 
   const hasPermission = [ 'ROOT', 'ADMIN' ].includes(req.session?.role)

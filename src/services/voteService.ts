@@ -4,7 +4,7 @@ import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
 const addVote = async (voteInput: VotesCreateInput, req: Request): Promise<Vote> => {
-  const { ratingID, questionID, answerID } = req.params
+  const { reviewID, questionID, answerID } = req.params
 
   const { rows: [ addedVote ] }: { rows: Vote[] } = await db.raw(
     `
@@ -15,7 +15,7 @@ const addVote = async (voteInput: VotesCreateInput, req: Request): Promise<Vote>
     [ db('votes').insert({
       ...voteInput,
       userID: req.session?.userID,
-      ratingID,
+      reviewID,
       questionID,
       answerID
     }) ]
@@ -29,7 +29,7 @@ const addVote = async (voteInput: VotesCreateInput, req: Request): Promise<Vote>
 
 const getVotes = async (votesFiltersinput: VotesFiltersInput): Promise<Vote[]> => {
   const {
-    ratingID,
+    reviewID,
     questionID,
     answerID,
     userID
@@ -37,9 +37,9 @@ const getVotes = async (votesFiltersinput: VotesFiltersInput): Promise<Vote[]> =
 
   let votes = await db<Vote>('votes')
 
-  if (ratingID !== undefined) {
+  if (reviewID !== undefined) {
     votes = votes
-      .filter((i) => i.ratingID === ratingID)
+      .filter((i) => i.reviewID === reviewID)
   }
 
   if (questionID !== undefined) {

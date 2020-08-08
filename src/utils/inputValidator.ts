@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoriesFiltersInput, CategoryCreateInput, CategoryUpdateInput, CursorInput, FeedFiltersInput, GroupVariationCreateInput, GroupVariationDeleteInput, GroupVariationUpdateInput, ImagesDeleteInput, ImagesFiltersInput, ImagesUpdateInput, InvoiceCreateInput, InvoicesFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ModerationStatus, OrderCreateInput, OrderProductInput, OrdersFiltersInput, OrderStatus, OrderUpdateInput, ParameterInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionCursorInput, QuestionUpdateInput, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCreateInput, RatingsFiltersInput, RatingUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorInput, VendorsFiltersInput, VotesCreateInput, VotesFiltersInput } from '../types'
+import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, CartProduct, CartProductInput, CategoriesFiltersInput, CategoryCreateInput, CategoryUpdateInput, CursorInput, FeedFiltersInput, GroupVariationCreateInput, GroupVariationDeleteInput, GroupVariationUpdateInput, ImagesDeleteInput, ImagesFiltersInput, ImagesUpdateInput, InvoiceCreateInput, InvoicesFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ModerationStatus, OrderCreateInput, OrderProductInput, OrdersFiltersInput, OrderStatus, OrderUpdateInput, ParameterInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionCursorInput, QuestionUpdateInput, ReviewCommentCreateInput, ReviewCommentUpdateInput, ReviewCreateInput, ReviewsFiltersInput, ReviewUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorInput, VendorsFiltersInput, VotesCreateInput, VotesFiltersInput } from '../types'
 import { canBeBoolean, canBeNumber, hasDefinedProps, isArray, isDate, isEmail, isInputProvided, isObject, isPasswordValid, isPositiveNumber, isProvided, isSomeProvided, isString } from './validatorLib'
 
 export const checkNewUser = ({ body }: Request): UserSignupInput => {
@@ -614,7 +614,7 @@ export const checkListUpdate = ({ body }: Request): ListCreateInput => {
   return { name: name.param }
 }
 
-export const checkNewRating = ({ body }: Request): RatingCreateInput => {
+export const checkNewReview = ({ body }: Request): ReviewCreateInput => {
   const title = 'title' in body
     ? isString({ name: 'title', param: body.title })
     : undefined
@@ -642,7 +642,7 @@ export const checkNewRating = ({ body }: Request): RatingCreateInput => {
   }
 }
 
-export const checkRatingUpdate = ({ body }: Request): RatingUpdateInput => {
+export const checkReviewUpdate = ({ body }: Request): ReviewUpdateInput => {
   const title = 'title' in body
     ? isString({ name: 'title', param: body.title })
     : undefined
@@ -667,7 +667,7 @@ export const checkRatingUpdate = ({ body }: Request): RatingUpdateInput => {
     ? isString({ name: 'moderationStatus', param: body.moderationStatus })
     : undefined
 
-  return hasDefinedProps<RatingUpdateInput>({
+  return hasDefinedProps<ReviewUpdateInput>({
     title: title?.param,
     review: review?.param,
     variation: variation?.param,
@@ -677,25 +677,25 @@ export const checkRatingUpdate = ({ body }: Request): RatingUpdateInput => {
   })
 }
 
-export const checkNewRatingComment = ({ body }: Request): RatingCommentCreateInput => {
+export const checkNewReviewComment = ({ body }: Request): ReviewCommentCreateInput => {
   const content = R.pipe(
     isProvided,
     isString
   )({ name: 'content', param: body.content })
 
-  const parentRatingCommentID = 'parentRatingCommentID' in body
+  const parentReviewCommentID = 'parentReviewCommentID' in body
     ? canBeNumber(
-      { name: 'parentRatingCommentID', param: body.parentRatingCommentID }
+      { name: 'parentReviewCommentID', param: body.parentReviewCommentID }
     )
     : undefined
 
   return {
     content: content.param,
-    parentRatingCommentID: parentRatingCommentID?.param
+    parentReviewCommentID: parentReviewCommentID?.param
   }
 }
 
-export const checkRatingCommentUpdate = ({ body }: Request): RatingCommentUpdateInput => {
+export const checkReviewCommentUpdate = ({ body }: Request): ReviewCommentUpdateInput => {
   const content = 'content' in body
     ? isString({ name: 'content', param: body.content })
     : undefined
@@ -703,7 +703,7 @@ export const checkRatingCommentUpdate = ({ body }: Request): RatingCommentUpdate
   const moderationStatus = 'moderationStatus' in body
     ? isString({ name: 'moderationStatus', param: body.moderationStatus }) : undefined
 
-  return hasDefinedProps<RatingCommentUpdateInput>({
+  return hasDefinedProps<ReviewCommentUpdateInput>({
     content: content?.param,
     moderationStatus: moderationStatus?.param
   })
@@ -1212,12 +1212,12 @@ export const checkUserFilters = ({ query }: Request): UsersFiltersInput => {
     ? canBeNumber({ name: 'orderCountMax', param: query.orderCountMax })
     : undefined
 
-  const ratingCountMin = 'ratingCountMin' in query
-    ? canBeNumber({ name: 'ratingCountMin', param: query.ratingCountMin })
+  const reviewCountMin = 'reviewCountMin' in query
+    ? canBeNumber({ name: 'reviewCountMin', param: query.reviewCountMin })
     : undefined
 
-  const ratingCountMax = 'ratingCountMax' in query
-    ? canBeNumber({ name: 'ratingCountMax', param: query.ratingCountMax })
+  const reviewCountMax = 'reviewCountMax' in query
+    ? canBeNumber({ name: 'reviewCountMax', param: query.reviewCountMax })
     : undefined
 
   const activityCountMin = 'activityCountMin' in query
@@ -1240,8 +1240,8 @@ export const checkUserFilters = ({ query }: Request): UsersFiltersInput => {
     createdTo: createdTo?.param,
     orderCountMin: orderCountMin?.param,
     orderCountMax: orderCountMax?.param,
-    ratingCountMin: ratingCountMin?.param,
-    ratingCountMax: ratingCountMax?.param,
+    reviewCountMin: reviewCountMin?.param,
+    reviewCountMax: reviewCountMax?.param,
     activityCountMin: activityCountMin?.param,
     activityCountMax: activityCountMax?.param,
     email: email?.param
@@ -1357,12 +1357,12 @@ export const checkProductFilters = ({ query }: Request): ProductsFiltersInput =>
     ? canBeNumber({ name: 'starsMax', param: query.starsMax })
     : undefined
 
-  const ratingMin = 'ratingMin' in query
-    ? canBeNumber({ name: 'ratingMin', param: query.ratingMin })
+  const reviewMin = 'reviewMin' in query
+    ? canBeNumber({ name: 'reviewMin', param: query.reviewMin })
     : undefined
 
-  const ratingMax = 'ratingMax' in query
-    ? canBeNumber({ name: 'ratingMax', param: query.ratingMax })
+  const reviewMax = 'reviewMax' in query
+    ? canBeNumber({ name: 'reviewMax', param: query.reviewMax })
     : undefined
 
   return {
@@ -1379,8 +1379,8 @@ export const checkProductFilters = ({ query }: Request): ProductsFiltersInput =>
     isAvailable: isAvailable?.param,
     starsMin: starsMin?.param,
     starsMax: starsMax?.param,
-    ratingMin: ratingMin?.param,
-    ratingMax: ratingMax?.param
+    reviewMin: reviewMin?.param,
+    reviewMax: reviewMax?.param
   }
 }
 
@@ -1418,7 +1418,7 @@ export const checkImagesDelete = ({ body }: Request): ImagesDeleteInput => {
   }))
 }
 
-export const checkRatingFilters = ({ query }: Request): RatingsFiltersInput => {
+export const checkReviewFilters = ({ query }: Request): ReviewsFiltersInput => {
   const q = 'q' in query
     ? isString({ name: 'q', param: query.q })
     : undefined
@@ -1496,12 +1496,12 @@ export const checkImageFilters = ({ query }: Request): ImagesFiltersInput => {
     ? canBeNumber({ name: 'productID', param: query.productID })
     : undefined
 
-  const ratingID = 'ratingID' in query
-    ? canBeNumber({ name: 'ratingID', param: query.ratingID })
+  const reviewID = 'reviewID' in query
+    ? canBeNumber({ name: 'reviewID', param: query.reviewID })
     : undefined
 
-  const ratingCommentID = 'ratingCommentID' in query
-    ? canBeNumber({ name: 'ratingCommentID', param: query.ratingCommentID })
+  const reviewCommentID = 'reviewCommentID' in query
+    ? canBeNumber({ name: 'reviewCommentID', param: query.reviewCommentID })
     : undefined
 
   const questionID = 'questionID' in query
@@ -1522,8 +1522,8 @@ export const checkImageFilters = ({ query }: Request): ImagesFiltersInput => {
 
   return {
     productID: productID?.param,
-    ratingID: ratingID?.param,
-    ratingCommentID: ratingCommentID?.param,
+    reviewID: reviewID?.param,
+    reviewCommentID: reviewCommentID?.param,
     questionID: questionID?.param,
     answerID: answerID?.param,
     answerCommentID: answerCommentID?.param,
@@ -1546,8 +1546,8 @@ export const checkNewVote = ({ body }: Request): VotesCreateInput => {
 }
 
 export const checkVoteFilters = ({ query }: Request): VotesFiltersInput => {
-  const ratingID = 'ratingID' in query
-    ? canBeNumber({ name: 'ratingID', param: query.ratingID })
+  const reviewID = 'reviewID' in query
+    ? canBeNumber({ name: 'reviewID', param: query.reviewID })
     : undefined
 
   const questionID = 'questionID' in query
@@ -1563,7 +1563,7 @@ export const checkVoteFilters = ({ query }: Request): VotesFiltersInput => {
     : undefined
 
   return {
-    ratingID: ratingID?.param,
+    reviewID: reviewID?.param,
     questionID: questionID?.param,
     answerID: answerID?.param,
     userID: userID?.param

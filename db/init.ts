@@ -18,8 +18,8 @@ export const init = async (): Promise<void> => {
   await db('answerComments').del()
   await db('answers').del()
   await db('questions').del()
-  await db('ratingComments').del()
-  await db('ratings').del()
+  await db('reviewComments').del()
+  await db('reviews').del()
   await db('votes').del()
   await db('listProducts').del()
   await db('productSizes').del()
@@ -46,8 +46,8 @@ export const init = async (): Promise<void> => {
     ALTER SEQUENCE "answerComments_answerCommentID_seq" START WITH ${randomNumber(511, 597)} INCREMENT BY 3 RESTART;
     ALTER SEQUENCE "answers_answerID_seq" START WITH ${randomNumber(411, 497)} INCREMENT BY 3 RESTART;
     ALTER SEQUENCE "questions_questionID_seq" START WITH ${randomNumber(311, 397)}  INCREMENT BY 3 RESTART;
-    ALTER SEQUENCE "ratingComments_ratingCommentID_seq" START WITH ${randomNumber(511, 597)} INCREMENT BY 3 RESTART;
-    ALTER SEQUENCE "ratings_ratingID_seq" START WITH ${randomNumber(711, 797)} INCREMENT BY 3 RESTART;
+    ALTER SEQUENCE "reviewComments_reviewCommentID_seq" START WITH ${randomNumber(511, 597)} INCREMENT BY 3 RESTART;
+    ALTER SEQUENCE "reviews_reviewID_seq" START WITH ${randomNumber(711, 797)} INCREMENT BY 3 RESTART;
     ALTER SEQUENCE "products_productID_seq" START WITH ${randomNumber(11011, 13997)} INCREMENT BY 3 RESTART;
     ALTER SEQUENCE "groups_groupID_seq" START WITH ${randomNumber(31, 79)} INCREMENT BY 3 RESTART;
     ALTER SEQUENCE "vendors_vendorID_seq" START WITH ${randomNumber(511, 597)} INCREMENT BY 3 RESTART;

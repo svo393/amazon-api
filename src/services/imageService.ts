@@ -9,8 +9,8 @@ import StatusError from '../utils/StatusError'
 const getImages = async (imagesFiltersinput: ImagesFiltersInput): Promise<Image[]> => {
   const {
     productID,
-    ratingID,
-    ratingCommentID,
+    reviewID,
+    reviewCommentID,
     questionID,
     answerID,
     answerCommentID,
@@ -24,14 +24,14 @@ const getImages = async (imagesFiltersinput: ImagesFiltersInput): Promise<Image[
       .filter((i) => i.productID === productID)
   }
 
-  if (ratingID !== undefined) {
+  if (reviewID !== undefined) {
     images = images
-      .filter((i) => i.ratingID === ratingID)
+      .filter((i) => i.reviewID === reviewID)
   }
 
-  if (ratingCommentID !== undefined) {
+  if (reviewCommentID !== undefined) {
     images = images
-      .filter((i) => i.ratingCommentID === ratingCommentID)
+      .filter((i) => i.reviewCommentID === reviewCommentID)
   }
 
   if (questionID !== undefined) {

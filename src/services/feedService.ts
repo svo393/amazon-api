@@ -1,4 +1,4 @@
-import { Answer, AnswerComment, Feed, FeedFiltersInput, Question, RatingComment } from '../types'
+import { Answer, AnswerComment, Feed, FeedFiltersInput, Question, ReviewComment } from '../types'
 import { defaultLimit } from '../utils/constants'
 import { db } from '../utils/db'
 import fuseIndexes from '../utils/fuseIndexes'
@@ -16,20 +16,20 @@ const getFeed = async (feedFiltersinput: FeedFiltersInput): Promise<{ batch: Fee
     userEmail
   } = feedFiltersinput
 
-  const ratingComments: (RatingComment & { userEmail: string })[] = await db('ratingComments as rc')
+  const reviewComments: (ReviewComment & { userEmail: string })[] = await db('reviewComments as rc')
     .select(
-      'rc.ratingCommentID',
+      'rc.reviewCommentID',
       'rc.createdAt',
       'rc.updatedAt',
       'rc.content',
       'rc.moderationStatus',
       'rc.userID',
-      'rc.ratingID',
-      'rc.parentRatingCommentID',
+      'rc.reviewID',
+      'rc.parentReviewCommentID',
       'u.email as userEmail'
     )
     .join('users as u', 'rc.userID', 'u.userID')
-    .groupBy('rc.ratingCommentID', 'userEmail')
+    .groupBy('rc.reviewCommentID', 'userEmail')
 
   const questions: (Question & { userEmail: string })[] = await db('questions as q')
     .select(
@@ -74,7 +74,7 @@ const getFeed = async (feedFiltersinput: FeedFiltersInput): Promise<{ batch: Fee
     .groupBy('ac.answerCommentID', 'userEmail')
 
   let feed: Feed = [
-    ...ratingComments.map((rc) => ({ ...rc, type: 'ratingComment' })),
+    ...reviewComments.map((rc) => ({ ...rc, type: 'reviewComment' })),
     ...answerComments.map((ac) => ({ ...ac, type: 'answerComment' })),
     ...questions.map((q) => ({ ...q, type: 'question' })),
     ...answers.map((a) => ({ ...a, type: 'answer' }))
