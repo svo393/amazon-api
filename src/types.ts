@@ -234,7 +234,11 @@ export type AnswerWithUser = Answer & {
 
 export type AnswerCommentWithUser = AnswerComment & {
   images: Image[];
-  votes: number;
+  author: Pick<User, 'name' | 'userID' | 'avatar'> & { email?: string };
+}
+
+export type RatingCommentWithUser = RatingComment & {
+  images: Image[];
   author: Pick<User, 'name' | 'userID' | 'avatar'> & { email?: string };
 }
 

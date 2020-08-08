@@ -102,7 +102,7 @@ const getAnswerByID = async (req: Request): Promise<AnswerWithUser> => {
   ), 0)
 
   const _answer: AnswerWithUser = {
-    ...(R.omit([ 'userName', 'userEmail', 'avatar' ], answer) as Answer),
+    ...(R.omit([ 'userName', 'userEmail', 'avatar', 'userID' ], answer) as Answer),
     images,
     votes: voteSum,
     author: {

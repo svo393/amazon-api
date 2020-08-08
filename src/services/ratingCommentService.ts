@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { Image, RatingComment, RatingCommentCreateInput, RatingCommentUpdateInput } from '../types'
+import { Image, RatingComment, RatingCommentCreateInput, RatingCommentUpdateInput, RatingCommentWithUser } from '../types'
 import { imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
 import getUploadIndex from '../utils/getUploadIndex'
@@ -27,8 +27,7 @@ const getCommentsByRating = async (req: Request): Promise<RatingComment[]> => {
     .where('ratingID', req.params.ratingID)
 }
 
-const getRatingCommentByID = async (req: Request): Promise<RatingComment &
-{ images: Image[] }> => {
+const getRatingCommentByID = async (req: Request): Promise<RatingCommentWithUser> => {
   const { ratingCommentID } = req.params
 
   const ratingComment = await db<RatingComment>('ratingComments as rc')
@@ -41,20 +40,33 @@ const getRatingCommentByID = async (req: Request): Promise<RatingComment &
       'rc.userID',
       'rc.ratingID',
       'rc.parentRatingCommentID',
+      'u.avatar',
+      'u.name as userName',
       'u.email as userEmail'
     )
     .where('ratingCommentID', ratingCommentID)
     .join('users as u', 'rc.userID', 'u.userID')
-    .groupBy('rc.ratingCommentID', 'userEmail')
 
   if (ratingComment === undefined) throw new StatusError(404, 'Not Found')
 
   const images = await db<Image>('images')
     .where('ratingCommentID', ratingCommentID)
 
-  return [ 'ROOT', 'ADMIN' ].includes(req.session?.role)
-    ? { ...ratingComment, images, type: 'ratingComment' }
-    : { ...R.omit([ 'userEmail' ], ratingComment), images, type: 'ratingComment' }
+  const _ratingComment: RatingCommentWithUser = {
+    ...(R.omit([ 'userName', 'userEmail', 'avatar', 'userID' ], ratingComment) as RatingComment),
+    images,
+    author: {
+      avatar: ratingComment.avatar,
+      name: ratingComment.userName,
+      email: ratingComment.userEmail,
+      userID: ratingComment.userID
+    }
+  }
+
+  ![ 'ROOT', 'ADMIN' ].includes(req.session?.role) &&
+    delete _ratingComment.author.email
+
+  return _ratingComment
 }
 
 const updateRatingComment = async (ratingCommentInput: RatingCommentUpdateInput, req: Request): Promise<RatingComment> => {
