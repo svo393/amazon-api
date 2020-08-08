@@ -41,6 +41,7 @@ const getAnswersByQuestion = async (CursorInput: CursorInput, req: Request): Pro
     )
     .join('users as u', 'a.userID', 'u.userID')
     .where('questionID', questionID)
+    .andWhere('a.moderationStatus', 'APPROVED')
 
   const votes = await db<Vote>('votes')
     .whereNotNull('answerID')
