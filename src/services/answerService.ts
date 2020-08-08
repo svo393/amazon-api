@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { Answer, AnswerCreateInput, AnswerUpdateInput, CursorInput, Image, Vote, BatchWithCursor } from '../types'
+import { Answer, AnswerCreateInput, AnswerUpdateInput, CursorInput, Image, Vote, BatchWithCursor, User, AnswerWithUser } from '../types'
 import { imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
 import getUploadIndex from '../utils/getUploadIndex'
@@ -70,11 +70,10 @@ const getAnswersByQuestion = async (CursorInput: CursorInput, req: Request): Pro
   }
 }
 
-const getAnswerByID = async (req: Request): Promise<Answer &
-{ images: Image[] }> => {
+const getAnswerByID = async (req: Request): Promise<AnswerWithUser> => {
   const { answerID } = req.params
 
-  const answer = await db<Answer>('answers as a')
+  const answer: Answer & { avatar: boolean; userName: string; userEmail: string } = await db('answers as a')
     .first(
       'a.answerID',
       'a.createdAt',
@@ -83,11 +82,12 @@ const getAnswerByID = async (req: Request): Promise<Answer &
       'a.moderationStatus',
       'a.userID',
       'a.questionID',
+      'u.avatar',
+      'u.name as userName',
       'u.email as userEmail'
     )
     .where('answerID', answerID)
     .join('users as u', 'a.userID', 'u.userID')
-    .groupBy('a.answerID', 'userEmail')
 
   if (answer === undefined) throw new StatusError(404, 'Not Found')
 
@@ -101,16 +101,22 @@ const getAnswerByID = async (req: Request): Promise<Answer &
     acc += cur.vote ? 1 : -1
   ), 0)
 
-  const _answer = {
-    ...answer,
+  const _answer: AnswerWithUser = {
+    ...(R.omit([ 'userName', 'userEmail', 'avatar' ], answer) as Answer),
     images,
     votes: voteSum,
-    type: 'answer'
+    author: {
+      avatar: answer.avatar,
+      name: answer.userName,
+      email: answer.userEmail,
+      userID: answer.userID
+    }
   }
 
-  return [ 'ROOT', 'ADMIN' ].includes(req.session?.role)
-    ? _answer
-    : R.omit([ 'userEmail' ], _answer)
+  ![ 'ROOT', 'ADMIN' ].includes(req.session?.role) &&
+    delete _answer.author.email
+
+  return _answer
 }
 
 const updateAnswer = async (answerInput: AnswerUpdateInput, req: Request): Promise<Answer> => {

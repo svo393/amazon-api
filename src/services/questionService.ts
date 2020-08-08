@@ -1,9 +1,8 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { Answer, BatchWithCursor, Image, Question, QuestionCreateInput, QuestionCursorInput, QuestionUpdateInput, Vote, AnswerComment } from '../types'
+import { Answer, AnswerComment, AnswerCommentWithUser, AnswerWithUser, BatchWithCursor, Image, Question, QuestionCreateInput, QuestionCursorInput, QuestionUpdateInput, Vote } from '../types'
 import { imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
-import fuseIndexes from '../utils/fuseIndexes'
 import getCursor from '../utils/getCursor'
 import getUploadIndex from '../utils/getUploadIndex'
 import { uploadImages } from '../utils/img'
@@ -39,12 +38,14 @@ const getQuestionsByUser = async (req: Request): Promise<Question[]> => {
     .where('userID', req.params.userID)
 }
 
-const getQuestionsByGroup = async (questionsInput: QuestionCursorInput, req: Request): Promise<
+type QuestionWithDescendants =
 BatchWithCursor<Question & {
-  answers: BatchWithCursor<Answer & {
-    answerComments: BatchWithCursor<AnswerComment>;
-}>; }> & { groupID: number }
-> => {
+  answers?: BatchWithCursor<AnswerWithUser & {
+    answerComments?: BatchWithCursor<AnswerCommentWithUser>;
+  }>;
+}> & { groupID: number }
+
+const getQuestionsByGroup = async (questionsInput: QuestionCursorInput, req: Request): Promise<QuestionWithDescendants> => {
   const {
     startCursor,
     limit,
@@ -68,6 +69,7 @@ BatchWithCursor<Question & {
     )
     .count('a.questionID as answerCount')
     .where('groupID', groupID)
+    .andWhere('q.moderationStatus', 'APPROVED')
     .join('answers as a', 'q.questionID', 'a.questionID')
     .groupBy('q.questionID')
 
@@ -116,6 +118,7 @@ BatchWithCursor<Question & {
     )
     .join('users as u', 'a.userID', 'u.userID')
     .whereIn('questionID', questionIDs)
+    .andWhere('a.moderationStatus', 'APPROVED')
 
   answers = answers
     .map((a) => {
@@ -155,8 +158,28 @@ BatchWithCursor<Question & {
         .map((q: Question & { answers: BatchWithCursor<Answer> }) =>
           q.answers.batch.map((a) => a.answerID)))
 
-      const answerComments = await db<AnswerComment>('answerComments')
+      let answerComments = await db<AnswerComment>('answerComments as ac')
+        .select(
+          'ac.answerCommentID',
+          'ac.createdAt',
+          'ac.updatedAt',
+          'ac.content',
+          'ac.moderationStatus',
+          'ac.userID',
+          'ac.answerID',
+          'ac.parentAnswerCommentID',
+          'u.avatar',
+          'u.name as userName'
+        )
+        .join('users as u', 'ac.userID', 'u.userID')
         .whereIn('answerID', answerIDs)
+        .andWhere('ac.moderationStatus', 'APPROVED')
+
+      answerComments = answerComments
+        .map((ac) => ({
+          ...R.omit([ 'userName', 'avatar' ], ac),
+          author: { avatar: ac.avatar, name: ac.userName, userID: ac.userID }
+        }))
 
       if (answerComments.length !== 0) {
         questionsWithCursor = {
@@ -222,8 +245,7 @@ const getQuestionByID = async (req: Request): Promise<Question &
   const _question = {
     ...question,
     images,
-    votes: voteSum,
-    type: 'question'
+    votes: voteSum
   }
 
   return [ 'ROOT', 'ADMIN' ].includes(req.session?.role)

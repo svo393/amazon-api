@@ -151,15 +151,6 @@ export type AnswerComment = {
   parentAnswerCommentID?: number;
 }
 
-type Activity = (
-  RatingComment |
-  Question |
-  Answer |
-  AnswerComment
-) & { type: string; userEmail: string }
-
-export type Feed = Activity[]
-
 export type GroupVariation = {
   name: string;
   value: string;
@@ -225,6 +216,27 @@ export type ProductSize = { name: string; qty: number; productID: number }
 //
 // Derivative types
 //
+
+type Activity = (
+  RatingComment |
+  Question |
+  Answer |
+  AnswerComment
+) & { type: string; userEmail: string }
+
+export type Feed = Activity[]
+
+export type AnswerWithUser = Answer & {
+  images: Image[];
+  votes: number;
+  author: Pick<User, 'name' | 'userID' | 'avatar'> & { email?: string };
+}
+
+export type AnswerCommentWithUser = AnswerComment & {
+  images: Image[];
+  votes: number;
+  author: Pick<User, 'name' | 'userID' | 'avatar'> & { email?: string };
+}
 
 export type UserSignupInput = Pick<User, 'email' | 'password' | 'name'>
 

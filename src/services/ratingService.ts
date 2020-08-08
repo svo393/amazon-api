@@ -187,8 +187,7 @@ const getRatingByID = async (req: Request): Promise<Rating &
   const _rating = {
     ...rating,
     images,
-    votes: voteSum,
-    type: 'rating'
+    votes: voteSum
   }
 
   return [ 'ROOT', 'ADMIN' ].includes(req.session?.role)
