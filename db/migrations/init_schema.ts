@@ -191,7 +191,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.dateTime('updatedAt').notNullable()
       t.jsonb('variation')
       t.string('title')
-      t.string('review', 65535).notNullable()
+      t.string('content', 65535).notNullable()
       t.integer('stars').notNullable().unsigned()
       t.boolean('isVerified').defaultTo(false).notNullable()
 

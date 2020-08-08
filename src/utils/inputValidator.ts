@@ -619,10 +619,10 @@ export const checkNewReview = ({ body }: Request): ReviewCreateInput => {
     ? isString({ name: 'title', param: body.title })
     : undefined
 
-  const review = R.pipe(
+  const content = R.pipe(
     isProvided,
     isString
-  )({ name: 'review', param: body.review })
+  )({ name: 'content', param: body.content })
 
   const variation = R.pipe(
     isProvided,
@@ -636,7 +636,7 @@ export const checkNewReview = ({ body }: Request): ReviewCreateInput => {
 
   return {
     title: title?.param,
-    review: review.param,
+    content: content.param,
     variation: variation.param,
     stars: stars.param
   }
@@ -647,15 +647,15 @@ export const checkReviewUpdate = ({ body }: Request): ReviewUpdateInput => {
     ? isString({ name: 'title', param: body.title })
     : undefined
 
-  const review = 'review' in body
-    ? isString({ name: 'review', param: body.review })
+  const review = 'content' in body
+    ? isString({ name: 'content', param: body.review })
     : undefined
 
   const variation = 'variation' in body
     ? isObject({ name: 'variation', param: body.variation })
     : undefined
 
-  const stars = 'review' in body
+  const stars = 'content' in body
     ? canBeNumber({ name: 'stars', param: body.stars })
     : undefined
 
@@ -669,7 +669,7 @@ export const checkReviewUpdate = ({ body }: Request): ReviewUpdateInput => {
 
   return hasDefinedProps<ReviewUpdateInput>({
     title: title?.param,
-    review: review?.param,
+    content: review?.param,
     variation: variation?.param,
     stars: stars?.param,
     isVerified: isVerified?.param,

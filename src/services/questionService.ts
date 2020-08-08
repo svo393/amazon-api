@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { Answer, AnswerComment, AnswerCommentWithUser, AnswerWithUser, BatchWithCursor, Image, Question, QuestionCreateInput, QuestionCursorInput, QuestionUpdateInput, Vote } from '../types'
+import { Answer, AnswerComment, AnswerCommentWithUser, AnswerWithUser, BatchWithCursor, Image, Question, QuestionCreateInput, QuestionCursorInput, QuestionUpdateInput, QuestionWithUser, Vote } from '../types'
 import { imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
 import getCursor from '../utils/getCursor'
@@ -211,8 +211,7 @@ const getQuestionsByGroup = async (questionsInput: QuestionCursorInput, req: Req
   return questionsWithCursor
 }
 
-const getQuestionByID = async (req: Request): Promise<Question &
-{ images: Image[] }> => {
+const getQuestionByID = async (req: Request): Promise<QuestionWithUser> => {
   const { questionID } = req.params
 
   const question = await db<Question & { userEmail: string }>('questions as q')
@@ -224,11 +223,12 @@ const getQuestionByID = async (req: Request): Promise<Question &
       'q.moderationStatus',
       'q.userID',
       'q.groupID',
+      'u.avatar',
+      'u.name as userName',
       'u.email as userEmail'
     )
     .where('questionID', questionID)
     .join('users as u', 'q.userID', 'u.userID')
-    .groupBy('q.questionID', 'userEmail')
 
   if (question === undefined) throw new StatusError(404, 'Not Found')
 
@@ -242,15 +242,22 @@ const getQuestionByID = async (req: Request): Promise<Question &
     acc += cur.vote ? 1 : -1
   ), 0)
 
-  const _question = {
-    ...question,
+  const _question: QuestionWithUser = {
+    ...(R.omit([ 'userName', 'userEmail', 'avatar', 'userID' ], question) as Question),
     images,
-    votes: voteSum
+    votes: voteSum,
+    author: {
+      avatar: question.avatar,
+      name: question.userName,
+      email: question.userEmail,
+      userID: question.userID
+    }
   }
 
-  return [ 'ROOT', 'ADMIN' ].includes(req.session?.role)
-    ? _question
-    : R.omit([ 'userEmail' ], _question)
+  ![ 'ROOT', 'ADMIN' ].includes(req.session?.role) &&
+    delete _question.author.email
+
+  return _question
 }
 
 const updateQuestion = async (questionInput: QuestionUpdateInput, req: Request): Promise<Question> => {

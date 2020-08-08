@@ -8,28 +8,37 @@ import sortItems from '../utils/sortItems'
 import StatusError from '../utils/StatusError'
 
 const getUsersQuery: any = db('users as u')
+  .distinct()
   .select('email',
     'u.name',
-    'info',
-    'avatar',
+    'u.info',
+    'u.avatar',
     'u.createdAt',
     'u.userID',
-    'role'
+    'u.role'
   )
   .count('o.orderID as orderCount')
   .count('r.reviewID as reviewCount')
   .count('rc.reviewCommentID as reviewCommentCount')
   .count('q.questionID as questionCount')
   .count('a.answerID as answerCount')
-  .count('ac.answerID as answerCommentCount')
+  .count('ac.answerCommentID as answerCommentCount')
   .leftJoin('orders as o', 'u.userID', 'o.userID')
   .leftJoin('reviews as r', 'u.userID', 'r.userID')
   .leftJoin('reviewComments as rc', 'u.userID', 'rc.userID')
   .leftJoin('questions as q', 'u.userID', 'q.userID')
   .leftJoin('answers as a', 'u.userID', 'a.userID')
   .leftJoin('answerComments as ac', 'u.userID', 'ac.userID')
-  .where('role', '!=', 'ROOT')
-  .groupBy('u.userID')
+  .where('u.role', '!=', 'ROOT')
+  .groupBy(
+    'u.userID',
+    'o.orderID',
+    'r.reviewID',
+    'rc.reviewCommentID',
+    'q.questionID',
+    'a.answerID',
+    'ac.answerCommentID'
+  )
 
 type UserRawData = Omit<User,
   | 'password'
@@ -198,8 +207,6 @@ const getUserByID = async (req: Request): Promise<UserData | UserPublicData> => 
 }
 
 const updateUser = async (userInput: UserUpdateInput, res: Response, req: Request): Promise<UserSafeData> => {
-  const role: string | undefined = req.session?.role
-
   const [ updatedUser ]: User[] = await db('users')
     .update(userInput, [ '*' ])
     .where('userID', req.params.userID)

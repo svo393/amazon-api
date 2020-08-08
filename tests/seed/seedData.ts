@@ -82,13 +82,13 @@ export const initialProducts = {
                 Size: '12GB / 512GB SSD'
               },
               title: 'Brand New ACER AIO has dead pixel.',
-              review: 'PC is ok, less than thrilled that this brand new machine has a dead pixel and it is required that it have 2 dead pixels to be covered under warranty. Acer customer service was not helpful. They suggested troubleshooting solutions that I completed but were pointless. Their customer service staff also clearly did not communicate well with one another. On a subsequent call it appeared that the notes provided by the previous CSR were inadequate to communicate the steps we already took. They are unwilling to provide a positive outcome.. Will never buy another Acer product. Very unhappy.',
+              content: 'PC is ok, less than thrilled that this brand new machine has a dead pixel and it is required that it have 2 dead pixels to be covered under warranty. Acer customer service was not helpful. They suggested troubleshooting solutions that I completed but were pointless. Their customer service staff also clearly did not communicate well with one another. On a subsequent call it appeared that the notes provided by the previous CSR were inadequate to communicate the steps we already took. They are unwilling to provide a positive outcome.. Will never buy another Acer product. Very unhappy.',
               comments: [
                 {
                   author: 1,
                   content: 'This product is worthless.',
                   media: 1,
-                  mediaFiles: [ 1 ]
+                  mediaFiles: [ 0 ]
                 }
               ]
             },
@@ -100,7 +100,7 @@ export const initialProducts = {
                 Size: '8GB / 1TB HDD'
               },
               title: 'We Would Give More Stars If We Could',
-              review: `Wow. This is a great computer. Any complaints made about the C24-865 have been resoundingly addressed here.
+              content: `Wow. This is a great computer. Any complaints made about the C24-865 have been resoundingly addressed here.
 
               Notable features:
               -The keyboard USB dongle is in the bottom edge of the monitor. This is a great improvement, as often they plug into the back causing bad/choppy keyboard response.
@@ -118,7 +118,7 @@ export const initialProducts = {
               
               My husband is in IT and works with this stuff every day. He loves this computer. We have installed it in a public area and created accounts for everyone. The whole family uses it, and the kids are getting a jump on back to school assignments using this. It’s amazing!`,
               media: 2,
-              mediaFiles: [ 1, 2 ]
+              mediaFiles: [ 0, 1 ]
             }
           ],
           questions: [

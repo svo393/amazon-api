@@ -387,7 +387,7 @@ export const createOneListProduct = async (): Promise<ListProduct & { sessionID:
 
 export const newReview = (): ReviewCreateInput => ({
   title: `New Review ${(new Date().getTime()).toString()}`,
-  review: `Long Review ${(new Date().getTime()).toString()}`,
+  content: `Long Review ${(new Date().getTime()).toString()}`,
   stars: 4,
   variation: { Style: 'Cool' }
 })

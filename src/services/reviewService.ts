@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { Image, Review, ReviewCreateInput, ReviewsFiltersInput, ReviewUpdateInput, Vote } from '../types'
+import { Image, Review, ReviewCreateInput, ReviewsFiltersInput, ReviewUpdateInput, ReviewWithUser, Vote } from '../types'
 import { defaultLimit, imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
 import fuseIndexes from '../utils/fuseIndexes'
@@ -58,7 +58,7 @@ const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request
       'r.createdAt',
       'r.updatedAt',
       'r.title',
-      'r.review',
+      'r.content',
       'r.stars',
       'r.isVerified',
       'r.moderationStatus',
@@ -135,7 +135,7 @@ const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request
   if (q !== undefined) {
     reviews = reviews
       .filter((_, i) =>
-        fuseIndexes(reviews, [ 'title', 'review' ], q).includes(i))
+        fuseIndexes(reviews, [ 'title', 'content' ], q).includes(i))
   }
 
   const _reviews = userHasPermission
@@ -150,8 +150,7 @@ const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request
   }
 }
 
-const getReviewByID = async (req: Request): Promise<Review &
-{ images: Image[]; votes: number }> => {
+const getReviewByID = async (req: Request): Promise<ReviewWithUser> => {
   const { reviewID } = req.params
 
   const review = await db<Review>('reviews as r')
@@ -160,17 +159,18 @@ const getReviewByID = async (req: Request): Promise<Review &
       'r.createdAt',
       'r.updatedAt',
       'r.title',
-      'r.review',
+      'r.content',
       'r.stars',
       'r.isVerified',
       'r.moderationStatus',
       'r.userID',
       'r.groupID',
+      'u.avatar',
+      'u.name as userName',
       'u.email as userEmail'
     )
     .where('reviewID', reviewID)
     .join('users as u', 'r.userID', 'u.userID')
-    .groupBy('r.reviewID', 'userEmail')
 
   if (review === undefined) throw new StatusError(404, 'Not Found')
 
@@ -184,15 +184,22 @@ const getReviewByID = async (req: Request): Promise<Review &
     acc += cur.vote ? 1 : -1
   ), 0)
 
-  const _review = {
-    ...review,
+  const _review: ReviewWithUser = {
+    ...(R.omit([ 'userName', 'userEmail', 'avatar', 'userID' ], review) as Review),
     images,
-    votes: voteSum
+    votes: voteSum,
+    author: {
+      avatar: review.avatar,
+      name: review.userName,
+      email: review.userEmail,
+      userID: review.userID
+    }
   }
 
-  return [ 'ROOT', 'ADMIN' ].includes(req.session?.role)
-    ? _review
-    : R.omit([ 'userEmail' ], _review)
+  ![ 'ROOT', 'ADMIN' ].includes(req.session?.role) &&
+    delete _review.author.email
+
+  return _review
 }
 
 const updateReview = async (reviewInput: ReviewUpdateInput, req: Request): Promise<Review> => {

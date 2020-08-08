@@ -101,7 +101,7 @@ export type Review = {
   updatedAt: Date;
   variation: { [ k: string ]: string };
   title?: string;
-  review: string;
+  content: string;
   stars: number;
   isVerified: boolean;
   moderationStatus: string;
@@ -217,6 +217,12 @@ export type ProductSize = { name: string; qty: number; productID: number }
 // Derivative types
 //
 
+export type ReviewWithUser = Review & {
+  images: Image[];
+  votes: number;
+  author: Pick<User, 'name' | 'userID' | 'avatar'> & { email?: string };
+}
+
 type Activity = (
   ReviewComment |
   Question |
@@ -225,6 +231,12 @@ type Activity = (
 ) & { type: string; userEmail: string }
 
 export type Feed = Activity[]
+
+export type QuestionWithUser = Question & {
+  images: Image[];
+  votes: number;
+  author: Pick<User, 'name' | 'userID' | 'avatar'> & { email?: string };
+}
 
 export type AnswerWithUser = Answer & {
   images: Image[];
@@ -323,14 +335,14 @@ export type ProductPublicData = Omit<ProductData,
 
 export type ReviewCreateInput = Pick<Review,
   | 'title'
-  | 'review'
+  | 'content'
   | 'variation'
   | 'stars'
 >
 
 export type ReviewUpdateInput = Partial<Pick<Review,
   | 'title'
-  | 'review'
+  | 'content'
   | 'stars'
   | 'variation'
   | 'isVerified'
