@@ -66,7 +66,7 @@ export type Product = {
   createdAt: Date;
   updatedAt: Date;
   isAvailable: boolean;
-  userID: number;
+  userID?: number;
   categoryID: number;
   vendorID: number;
   groupID: number;

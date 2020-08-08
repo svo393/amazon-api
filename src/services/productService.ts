@@ -1,7 +1,7 @@
 import { Request } from 'express'
 import Knex from 'knex'
 import R from 'ramda'
-import { GroupVariation, Image, Product, ProductCreateInput, ProductData, ProductParameter, ProductsFiltersInput, ProductSize, ProductsMinFiltersInput, ProductUpdateInput } from '../types'
+import { GroupVariation, Image, Product, ProductCreateInput, ProductData, ProductParameter, ProductsFiltersInput, ProductSize, ProductsMinFiltersInput, ProductUpdateInput, User } from '../types'
 import { imagesBasePath, defaultLimit } from '../utils/constants'
 import { db, dbTrans } from '../utils/db'
 import fuseIndexes from '../utils/fuseIndexes'
@@ -308,10 +308,13 @@ type ProductLimitedData = Omit<ProductListData, 'images'> & {
   createdAt: Date;
 }
 
-type ProductAllData = ProductLimitedData & Pick<ProductData, 'createdAt' | 'updatedAt' | 'userID' | 'listPrice'> & { userEmail: string }
+type ProductAllData = ProductLimitedData &
+Pick<ProductData, 'createdAt' | 'updatedAt' | 'userID' | 'listPrice'> & {
+   author: Pick<User, 'name' | 'userID' | 'avatar'> & { email?: string };
+  }
 
 const getProductByID = async (req: Request): Promise<ProductLimitedData| ProductAllData> => {
-  const rawProduct: Omit<ProductAllData, 'stars' | 'reviewCount | questionCount'> & { stars: string; reviewCount: string; questionCount: string } = await getProductsQuery.clone()
+  const rawProduct: Omit<ProductAllData, 'stars' | 'reviewCount | questionCount'> & { stars: string; reviewCount: string; questionCount: string; avatar: boolean; userName: string; userEmail: string } = await getProductsQuery.clone()
     .first(
       'p.listPrice',
       'p.bullets',
@@ -321,13 +324,15 @@ const getProductByID = async (req: Request): Promise<ProductLimitedData| Product
       'p.userID',
       'p.categoryID',
       'p.vendorID',
+      'u.avatar',
+      'u.name as userName',
       'u.email as userEmail'
     )
     .count('q.questionID as questionCount')
     .where('p.productID', req.params.productID)
     .leftJoin('users as u', 'p.userID', 'u.userID')
     .leftJoin('questions as q', 'p.groupID', 'q.groupID')
-    .groupBy('userEmail', 'q.questionID')
+    .groupBy('u.userID', 'q.questionID')
 
   if (rawProduct === undefined) throw new StatusError(404, 'Not Found')
 
@@ -356,19 +361,24 @@ const getProductByID = async (req: Request): Promise<ProductLimitedData| Product
     .where('pp.productID', product.productID)
 
   const fullProduct = {
-    ...product,
+    ...(R.omit([ 'userName', 'userEmail', 'avatar', 'userID' ], product) as ProductAllData),
     group: groupVariations,
     images,
     productSizes,
-    productParameters
+    productParameters,
+    author: {
+      avatar: product.avatar,
+      name: product.userName,
+      email: product.userEmail,
+      userID: product.userID
+    }
   }
 
   return [ 'ROOT', 'ADMIN' ].includes(req.session?.role)
     ? fullProduct
     : R.omit([
       'updatedAt',
-      'userID',
-      'userEmail'
+      'author'
     ], fullProduct)
 }
 
