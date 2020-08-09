@@ -772,8 +772,13 @@ export const checkAnswers = ({ query }: Request): CursorInput => {
     ? canBeNumber({ name: 'limit', param: query.limit })
     : undefined
 
+  const page = 'page' in query
+    ? canBeNumber({ name: 'page', param: query.page })
+    : undefined
+
   return {
     startCursor: startCursor?.param,
+    page: page?.param,
     limit: limit?.param
   }
 }

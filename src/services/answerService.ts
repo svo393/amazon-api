@@ -7,6 +7,7 @@ import getUploadIndex from '../utils/getUploadIndex'
 import { uploadImages } from '../utils/img'
 import StatusError from '../utils/StatusError'
 import getCursor from '../utils/getCursor'
+import sortItems from '../utils/sortItems'
 
 const addAnswer = async (answerInput: AnswerCreateInput, req: Request): Promise<Answer> => {
   const now = new Date()
@@ -23,8 +24,8 @@ const addAnswer = async (answerInput: AnswerCreateInput, req: Request): Promise<
   return addedAnswer
 }
 
-const getAnswersByQuestion = async (CursorInput: CursorInput, req: Request): Promise<BatchWithCursor<Answer> & { questionID: number }> => {
-  const { startCursor, limit = 2 } = CursorInput
+const getAnswersByQuestion = async (CursorInput: CursorInput, req: Request): Promise<BatchWithCursor<Answer> | { batch: Answer[]; totalCount: number } & { questionID: number }> => {
+  const { startCursor, limit = 2, page } = CursorInput
   const { questionID } = req.params
 
   let answers: (Answer & { avatar?: boolean; userName?: string })[] = await db('answers as a')
@@ -53,19 +54,39 @@ const getAnswersByQuestion = async (CursorInput: CursorInput, req: Request): Pro
         .reduce((acc, cur) => (
           acc += cur.vote ? 1 : -1
         ), 0)
+
+      const upVoteSum = votes
+        .filter((v) => v.answerID === a.answerID && v.vote)
+        .reduce((acc, cur) => (
+          acc += cur.vote ? 1 : -1
+        ), 0)
       return {
         ...R.omit([ 'userName', 'avatar' ], a),
         votes: voteSum,
+        upVotes: upVoteSum,
         author: { avatar: a.avatar, name: a.userName, userID: a.userID }
       }
     })
 
+  const answersSorted = sortItems(answers, 'votes_desc')
+  const perPageLimit = 2
+
+  if (page !== undefined) {
+    const end = (page - 1) * perPageLimit + perPageLimit
+    const totalCount = answers.length
+    return {
+      batch: answersSorted.slice((page - 1) * perPageLimit, end),
+      totalCount,
+      hasNextPage: end < totalCount,
+      questionID: Number(questionID)
+    }
+  }
   return {
     ...getCursor({
       startCursor,
       limit,
       idProp: 'answerID',
-      data: answers
+      data: answersSorted
     }),
     questionID: Number(questionID)
   }
