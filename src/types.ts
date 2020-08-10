@@ -398,7 +398,7 @@ export type AnswerCommentUpdateInput = Partial<Pick<AnswerComment,
 
 export type BatchWithCursor<T> = {
   totalCount: number;
-  endCursor: number;
+  endCursor?: number;
   hasNextPage: boolean;
   batch: T[];
 }

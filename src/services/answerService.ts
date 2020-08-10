@@ -24,7 +24,7 @@ const addAnswer = async (answerInput: AnswerCreateInput, req: Request): Promise<
   return addedAnswer
 }
 
-const getAnswersByQuestion = async (CursorInput: CursorInput, req: Request): Promise<BatchWithCursor<Answer> | { batch: Answer[]; totalCount: number } & { questionID: number }> => {
+const getAnswersByQuestion = async (CursorInput: CursorInput, req: Request): Promise<BatchWithCursor<Answer> & { questionID: number }> => {
   const { startCursor, limit = 2, page } = CursorInput
   const { questionID } = req.params
 
@@ -68,25 +68,27 @@ const getAnswersByQuestion = async (CursorInput: CursorInput, req: Request): Pro
       }
     })
 
-  const answersSorted = sortItems(answers, 'votes_desc')
+  answers = sortItems(answers, 'votes_desc')
   const perPageLimit = 2
 
   if (page !== undefined) {
     const end = (page - 1) * perPageLimit + perPageLimit
     const totalCount = answers.length
+
     return {
-      batch: answersSorted.slice((page - 1) * perPageLimit, end),
+      batch: answers.slice((page - 1) * perPageLimit, end),
       totalCount,
       hasNextPage: end < totalCount,
       questionID: Number(questionID)
     }
   }
+
   return {
     ...getCursor({
       startCursor,
       limit,
       idProp: 'answerID',
-      data: answersSorted
+      data: answers
     }),
     questionID: Number(questionID)
   }

@@ -90,15 +90,30 @@ const getQuestionsByGroup = async (questionsInput: QuestionCursorInput, req: Req
     })
 
   questions = sortItems(questions, sortBy)
+  const perPageLimit = 1
 
-  let questionsWithCursor = {
-    ...getCursor({
-      startCursor,
-      limit,
-      idProp: 'questionID',
-      data: questions
-    }),
-    groupID: Number(groupID)
+  let questionsWithCursor
+
+  if (page !== undefined) {
+    const end = (page - 1) * perPageLimit + perPageLimit
+    const totalCount = questions.length
+
+    questionsWithCursor = {
+      batch: questions.slice((page - 1) * perPageLimit, end),
+      totalCount,
+      hasNextPage: end < totalCount,
+      groupID: Number(groupID)
+    }
+  } else {
+    questionsWithCursor = {
+      ...getCursor({
+        startCursor,
+        limit,
+        idProp: 'questionID',
+        data: questions
+      }),
+      groupID: Number(groupID)
+    }
   }
 
   const questionIDs = Object.values(questionsWithCursor.batch)
@@ -137,8 +152,9 @@ const getQuestionsByGroup = async (questionsInput: QuestionCursorInput, req: Req
   if (answers.length !== 0) {
     questionsWithCursor = {
       ...questionsWithCursor,
-      batch: questionsWithCursor.batch.map((q: Question) => {
+      batch: (questionsWithCursor.batch as any).map((q: Question) => {
         const curAnswers = answers.filter((a) => a.questionID === q.questionID)
+
         return curAnswers.length !== 0
           ? {
             ...q,
@@ -155,8 +171,8 @@ const getQuestionsByGroup = async (questionsInput: QuestionCursorInput, req: Req
 
     if (answerCommentLimit !== 0) {
       const answerIDs = R.flatten(Object.values(questionsWithCursor.batch)
-        .map((q: Question & { answers: BatchWithCursor<Answer> }) =>
-          q.answers.batch.map((a) => a.answerID)))
+        .map((q: any) =>
+          q.answers.batch.map((a: any) => a.answerID)))
 
       let answerComments = await db<AnswerComment>('answerComments as ac')
         .select(
