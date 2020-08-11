@@ -44,6 +44,7 @@ export const apiURLs = {
   reviewComments: `${baseAPI}/review-comments`,
   reviews: `${baseAPI}/reviews`,
   roles: `${baseAPI}/roles`,
+  search: `${baseAPI}/search`,
   shippingMethods: `${baseAPI}/shipping-methods`,
   users: `${baseAPI}/users`,
   vendors: `${baseAPI}/vendors`

@@ -100,7 +100,7 @@ export type Review = {
   createdAt: Date;
   updatedAt: Date;
   variation: { [ k: string ]: string };
-  title?: string;
+  title: string;
   content: string;
   stars: number;
   isVerified: boolean;
@@ -494,6 +494,8 @@ export type FeedFiltersInput = {
   createdTo?: string;
   userEmail?: string;
 }
+
+export type AskFiltersInput = { q: string }
 
 export type ReviewsFiltersInput = {
   q?: string;

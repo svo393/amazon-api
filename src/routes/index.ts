@@ -23,6 +23,7 @@ import questionsRouter from './questions'
 import reviewCommentsRouter from './reviewComments'
 import reviewsRouter from './reviews'
 import rolesRouter from './roles'
+import searchRouter from './search'
 import shippingMethodsRouter from './shippingMethods'
 import usersRouter from './users'
 import vendorsRouter from './vendors'
@@ -50,6 +51,7 @@ export default Router()
   .use(apiURLs.reviewComments, reviewCommentsRouter)
   .use(apiURLs.reviews, reviewsRouter)
   .use(apiURLs.roles, rolesRouter)
+  .use(apiURLs.search, searchRouter)
   .use(apiURLs.shippingMethods, shippingMethodsRouter)
   .use(apiURLs.users, usersRouter)
   .use(apiURLs.vendors, vendorsRouter)
