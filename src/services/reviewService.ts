@@ -69,6 +69,7 @@ const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request
     .join('users as u', 'r.userID', 'u.userID')
     .groupBy('r.reviewID', 'userEmail')
 
+  // TODO move votes query after sorting
   const votes = await db<Vote>('votes')
     .whereNotNull('reviewID')
 

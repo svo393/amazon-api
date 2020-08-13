@@ -1,25 +1,31 @@
 import { Request } from 'express'
-import R from 'ramda'
-import { AskFiltersInput, ObjIndexed, Product, Question, Review } from '../types'
+import Fuse from 'fuse.js'
+import { flatten, isEmpty, isNil, omit } from 'ramda'
+import { AskFiltersInput, ObjIndexed, Product, Question, Review, Vote } from '../types'
 import { db } from '../utils/db'
-import fuseIndexes from '../utils/fuseIndexes'
+import fuseMatches from '../utils/fuseMatches'
 import StatusError from '../utils/StatusError'
 
 type ProductData = Pick<Product, 'groupID' | 'description'>
 
 type QuestionData = Pick<Question, 'questionID' | 'content'> & { answer: string; answerID: number } & Author
 
-type ReviewData = Pick<Review, 'reviewID' | 'content' | 'title'> & Author
+type ReviewData = Pick<Review, 'reviewID' | 'content' | 'title' | 'stars'> & Author
 
 type Author = { name: string; userID: number }
 type AnswerData = { answerID: number; content: string }
 
-type Questions = (Omit<QuestionData, 'name' | 'userID' | 'answer' | 'answerID'> & { answers: (AnswerData & { author: Author })[] })[]
+type Questions = (Omit<QuestionData, 'name' | 'userID' | 'answer' | 'answerID'> & { votes: number; matches: Matches; answers: (AnswerData & { author: Author; votes: number; matches: Matches })[] })[]
+
+type Matches = {
+  indices: readonly Fuse.RangeTuple[];
+  key?: string | undefined;
+}[]
 
 type Return = {
   product: ProductData;
   questions: Questions;
-  reviews: (Omit<ReviewData, 'name' | 'userID'> & { author: Author })[];
+  reviews: (Omit<ReviewData, 'name' | 'userID'> & { author: Author; votes: number; matches: Matches })[];
 }
 
 const getAsk = async (askFiltersinput: AskFiltersInput, req: Request): Promise<Return> => {
@@ -44,28 +50,40 @@ const getAsk = async (askFiltersinput: AskFiltersInput, req: Request): Promise<R
     .join('users as u', 'a.userID', 'u.userID')
     .where('q.groupID', product.groupID)
 
-  const questions: Questions = Object.values(_questions
-    .filter((_, i) =>
-      fuseIndexes(_questions, [ 'content', 'answer' ], q).includes(i))
+  const questionMatches = fuseMatches(_questions, [ 'content', 'title' ], q, 'questionID')
+  const answerMatches = fuseMatches(_questions, [ 'answer' ], q, 'answerID')
+
+  let questions: Questions = Object.values(_questions
     .reduce((acc, cur) => {
       const answer = {
         answerID: cur.answerID,
         content: cur.answer,
-        author: { name: cur.name, userID: cur.userID }
+        author: { name: cur.name, userID: cur.userID },
+        matches: cur.answerID in answerMatches
+          ? answerMatches[cur.answerID].map((m) => ({
+            ...m, key: m.key === 'answer' ? 'content' : m.key
+          }))
+          : undefined
       }
 
       if (!(cur.questionID in acc)) {
-        acc[cur.questionID] = { ...cur, answers: [ answer ] }
+        acc[cur.questionID] = {
+          ...cur,
+          matches: questionMatches[cur.questionID],
+          answers: [ answer ]
+        }
       } else { acc[cur.questionID].answers.push(answer) }
       return acc
     }, {} as ObjIndexed))
-  console.info('_questions', _questions)
 
-  // TODO add votes
+  questions = questions
+    .map((q) => ({ ...q, answers: q.answers.filter((a) => !isNil(a.matches)) }))
+    .filter((q) => !isNil(q.matches) || !isEmpty(q.answers))
 
   let _reviews: ReviewData[] = await db('reviews as r')
     .select(
       'r.reviewID',
+      'r.stars',
       'r.title',
       'r.content',
       'u.name',
@@ -74,21 +92,56 @@ const getAsk = async (askFiltersinput: AskFiltersInput, req: Request): Promise<R
     .join('users as u', 'r.userID', 'u.userID')
     .where('r.groupID', product.groupID)
 
-  _reviews = _reviews
-    .filter((_, i) =>
-      fuseIndexes(_reviews, [ 'content', 'title' ], q).includes(i))
+  const reviewMatches = fuseMatches(_reviews, [ 'content', 'title' ], q, 'reviewID')
 
-  const reviews = _reviews.map((a) => ({
-    ...R.omit([ 'name', 'userID' ], a),
-    author: { name: a.name, userID: a.userID }
-  }))
+  const reviews = _reviews
+    .map((r) => ({
+      ...omit([ 'name', 'userID' ], r),
+      author: { name: r.name, userID: r.userID },
+      matches: reviewMatches[r.reviewID]
+    }))
+    .filter((r) => !isNil(r.matches))
+
+  const reviewIDs = reviews.map((r) => r.reviewID)
+  const questionIDs = questions.map((q) => q.questionID)
+  const answerIDs = flatten(questions.map((q) => q.answers.map((a) => a.answerID)))
+
+  const votes = await db<Vote>('votes')
+    .whereIn('answerID', answerIDs)
+    .orWhereIn('questionID', questionIDs)
+    .orWhereIn('reviewID', reviewIDs)
 
   return {
     product,
-    questions: questions.map((q) => ({
-      ...R.omit([ 'name', 'userID', 'answer', 'answerID' ], q)
-    })),
-    reviews
+    questions: questions.map((q) => {
+      const voteSum = votes
+        .filter((v) => v.questionID === q.questionID)
+        .reduce((acc, cur) => (
+          acc += cur.vote ? 1 : -1
+        ), 0)
+      return {
+        ...omit([ 'name', 'userID', 'answer', 'answerID' ], q),
+        votes: voteSum,
+        answers: q.answers
+          .map((a) => {
+            const voteSum = votes
+              .filter((v) => v.answerID === a.answerID)
+              .reduce((acc, cur) => (
+                acc += cur.vote ? 1 : -1
+              ), 0)
+            return { ...a, votes: voteSum }
+          })
+      }
+    }),
+    reviews: reviews
+      .map((r) => {
+        const voteSum = votes
+          .filter((v) => v.reviewID === r.reviewID)
+          .reduce((acc, cur) => (
+            acc += cur.vote ? 1 : -1
+          ), 0)
+        return { ...r, votes: voteSum }
+      })
   }
 }
 
