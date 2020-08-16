@@ -90,7 +90,7 @@ const getQuestionsByGroup = async (questionsInput: QuestionCursorInput, req: Req
     })
 
   questions = sortItems(questions, sortBy)
-  const perPageLimit = 1
+  const perPageLimit = 10
 
   let questionsWithCursor
 

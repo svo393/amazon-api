@@ -718,6 +718,10 @@ export const checkQuestionsCursor = ({ query }: Request): QuestionCursorInput =>
     ? canBeNumber({ name: 'limit', param: query.limit })
     : undefined
 
+  const sortBy = 'sortBy' in query
+    ? isString({ name: 'sortBy', param: query.sortBy })
+    : undefined
+
   const page = 'page' in query
     ? canBeNumber({ name: 'page', param: query.page })
     : undefined
@@ -738,6 +742,7 @@ export const checkQuestionsCursor = ({ query }: Request): QuestionCursorInput =>
     startCursor: startCursor?.param,
     limit: limit?.param,
     page: page?.param,
+    sortBy: sortBy?.param,
     answerLimit: answerLimit?.param,
     answerCommentLimit: answerCommentLimit?.param,
     onlyAnswered: onlyAnswered?.param

@@ -69,7 +69,7 @@ const getAnswersByQuestion = async (CursorInput: CursorInput, req: Request): Pro
     })
 
   answers = sortItems(answers, 'votes_desc')
-  const perPageLimit = 2
+  const perPageLimit = 10
 
   if (page !== undefined) {
     const end = (page - 1) * perPageLimit + perPageLimit
