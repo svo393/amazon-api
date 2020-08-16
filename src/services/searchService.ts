@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import Fuse from 'fuse.js'
-import { flatten, isEmpty, isNil, omit } from 'ramda'
+import { flatten, omit } from 'ramda'
 import { AskFiltersInput, ObjIndexed, Product, Question, Review, Vote } from '../types'
 import { db } from '../utils/db'
 import fuseMatches from '../utils/fuseMatches'
@@ -8,14 +8,18 @@ import StatusError from '../utils/StatusError'
 
 type ProductData = Pick<Product, 'groupID' | 'bullets'>
 
-type QuestionData = Pick<Question, 'questionID' | 'content'> & { answer: string; answerID: number; createdAt: string } & Author
+type QuestionData = Pick<Question, 'questionID' | 'content'> & { answerContent: string; answerID: number; createdAt: string } & Author
 
 type ReviewData = Pick<Review, 'reviewID' | 'content' | 'title' | 'stars'> & Author
 
 type Author = { name: string; userID: number }
 type AnswerData = { answerID: number; content: string; createdAt: string }
 
-type Questions = (Omit<QuestionData, 'name' | 'userID' | 'answer' | 'answerID' | 'createdAt'> & { votes: number; matches: Matches; answers: (AnswerData & { author: Author; votes: number; matches: Matches })[] })[]
+type QuestionItem = (Omit<QuestionData, 'name' | 'userID' | 'answerContent' | 'answerID' | 'createdAt'> & {
+  votes: number;
+  matches: Matches;
+  answers: (AnswerData & { author: Author; votes: number; matches: Matches })[];
+})
 
 type Matches = {
   indices: readonly Fuse.RangeTuple[];
@@ -24,7 +28,7 @@ type Matches = {
 
 type Return = {
   product?: ProductData & { matches: Matches };
-  questions: Questions;
+  questions: (Omit<QuestionItem, 'answers'> & { answer: (AnswerData & { author: Author; votes: number; matches: Matches }) })[];
   reviews: (Omit<ReviewData, 'name' | 'userID'> & { author: Author; votes: number; matches: Matches })[];
 }
 
@@ -43,7 +47,7 @@ const getAsk = async (askFiltersinput: AskFiltersInput, req: Request): Promise<R
     .select(
       'q.questionID',
       'q.content',
-      'a.content as answer',
+      'a.content as answerContent',
       'a.answerID',
       'a.createdAt',
       'u.name',
@@ -55,18 +59,18 @@ const getAsk = async (askFiltersinput: AskFiltersInput, req: Request): Promise<R
 
   const questionMatches = fuseMatches(_questions, [ 'content' ], q, 'questionID')
 
-  const answerMatches = fuseMatches(_questions, [ 'answer' ], q, 'answerID')
+  const answerMatches = fuseMatches(_questions, [ 'answerContent' ], q, 'answerID')
 
-  let questions: Questions = Object.values(_questions
+  let questions: QuestionItem[] = Object.values(_questions
     .reduce((acc, cur) => {
       const answer = {
         answerID: cur.answerID,
-        content: cur.answer,
+        content: cur.answerContent,
         createdAt: cur.createdAt,
         author: { name: cur.name, userID: cur.userID },
         matches: cur.answerID in answerMatches
           ? answerMatches[cur.answerID].map((m) => ({
-            ...m, key: m.key === 'answer' ? 'content' : m.key
+            ...m, key: m.key === 'answerContent' ? 'content' : m.key
           }))
           : undefined
       }
@@ -80,10 +84,6 @@ const getAsk = async (askFiltersinput: AskFiltersInput, req: Request): Promise<R
       } else { acc[cur.questionID].answers.push(answer) }
       return acc
     }, {} as ObjIndexed))
-
-  questions = questions
-    .map((q) => ({ ...q, answers: q.answers.filter((a) => !isNil(a.matches)) }))
-    .filter((q) => !isNil(q.matches) || !isEmpty(q.answers))
 
   let _reviews: ReviewData[] = await db('reviews as r')
     .select(
@@ -105,7 +105,7 @@ const getAsk = async (askFiltersinput: AskFiltersInput, req: Request): Promise<R
       author: { name: r.name, userID: r.userID },
       matches: reviewMatches[r.reviewID]
     }))
-    .filter((r) => !isNil(r.matches))
+    .filter((r) => r.matches !== undefined)
 
   const reviewIDs = reviews.map((r) => r.reviewID)
   const questionIDs = questions.map((q) => q.questionID)
@@ -117,7 +117,10 @@ const getAsk = async (askFiltersinput: AskFiltersInput, req: Request): Promise<R
     .orWhereIn('reviewID', reviewIDs)
 
   return {
-    product: productMatches ? { ...product, matches: productMatches } : undefined,
+    product: productMatches
+      ? { ...product, matches: productMatches }
+      : undefined,
+
     questions: questions.map((q) => {
       const voteSum = votes
         .filter((v) => v.questionID === q.questionID)
@@ -125,9 +128,9 @@ const getAsk = async (askFiltersinput: AskFiltersInput, req: Request): Promise<R
           acc += cur.vote ? 1 : -1
         ), 0)
       return {
-        ...omit([ 'name', 'userID', 'answer', 'answerID', 'createdAt' ], q),
+        ...omit([ 'name', 'userID', 'answerContent', 'answers', 'answerID', 'createdAt' ], q),
         votes: voteSum,
-        answers: q.answers
+        answer: q.answers
           .map((a) => {
             const voteSum = votes
               .filter((v) => v.answerID === a.answerID)
@@ -135,9 +138,14 @@ const getAsk = async (askFiltersinput: AskFiltersInput, req: Request): Promise<R
                 acc += cur.vote ? 1 : -1
               ), 0)
             return { ...a, votes: voteSum }
-          }).sort((a, b) => a.votes - b.votes)
+          }).sort((a, b) => b.votes - a.votes)[0]
       }
-    }).sort((a, b) => b.votes - a.votes),
+    })
+      .sort((a, b) => b.votes - a.votes)
+      .filter((q) =>
+        q.answer.matches !== undefined || q.matches !== undefined
+      ),
+
     reviews: reviews
       .map((r) => {
         const voteSum = votes
