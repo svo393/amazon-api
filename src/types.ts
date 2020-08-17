@@ -499,6 +499,7 @@ export type AskFiltersInput = { q: string }
 
 export type ReviewsFiltersInput = {
   q?: string;
+  limit?: number;
   groupID?: number;
   userEmail?: string;
   page?: number;

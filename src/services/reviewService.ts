@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { Image, Review, ReviewCreateInput, ReviewsFiltersInput, ReviewUpdateInput, ReviewWithUser, Vote } from '../types'
+import { BatchWithCursor, Image, Review, ReviewCreateInput, ReviewsFiltersInput, ReviewUpdateInput, ReviewWithUser, Vote } from '../types'
 import { defaultLimit, imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
 import fuseIndexes from '../utils/fuseIndexes'
@@ -33,9 +33,10 @@ const addReview = async (reviewInput: ReviewCreateInput, req: Request): Promise<
   return addedReview
 }
 
-const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request): Promise<{ batch: Review[]; totalCount: number }> => {
+const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request): Promise<BatchWithCursor<Review & { votes: number; upVotes: number }> & { groupID?: number }> => {
   const {
     page = 1,
+    limit,
     sortBy = 'createdAt_desc',
     q,
     groupID,
@@ -80,7 +81,13 @@ const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request
         .reduce((acc, cur) => (
           acc += cur.vote ? 1 : -1
         ), 0)
-      return { ...r, votes: voteSum }
+
+      const upVoteSum = votes
+        .filter((v) => v.reviewID === r.reviewID && v.vote)
+        .reduce((acc, cur) => (
+          acc += cur.vote ? 1 : -1
+        ), 0)
+      return { ...r, votes: voteSum, upVotes: upVoteSum }
     })
 
   if (groupID !== undefined) {
@@ -144,10 +151,15 @@ const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request
     : reviews.map((r) => ({ ...R.omit([ 'userEmail' ], r) }))
 
   const reviewsSorted = sortItems(_reviews, sortBy)
+  const totalCount = _reviews.length
+  const _limit = limit ?? defaultLimit
+  const end = (page - 1) * _limit + _limit
 
   return {
-    batch: reviewsSorted.slice((page - 1) * defaultLimit, (page - 1) * defaultLimit + defaultLimit),
-    totalCount: _reviews.length
+    batch: reviewsSorted.slice((page - 1) * _limit, end),
+    totalCount,
+    hasNextPage: end < totalCount,
+    groupID
   }
 }
 

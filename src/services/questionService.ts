@@ -1,7 +1,7 @@
 import { Request } from 'express'
 import R from 'ramda'
 import { Answer, AnswerComment, AnswerCommentWithUser, AnswerWithUser, BatchWithCursor, Image, Question, QuestionCreateInput, QuestionCursorInput, QuestionUpdateInput, QuestionWithUser, Vote } from '../types'
-import { imagesBasePath } from '../utils/constants'
+import { defaultLimit, imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
 import getCursor from '../utils/getCursor'
 import getUploadIndex from '../utils/getUploadIndex'
@@ -90,16 +90,16 @@ const getQuestionsByGroup = async (questionsInput: QuestionCursorInput, req: Req
     })
 
   questions = sortItems(questions, sortBy)
-  const perPageLimit = 10
 
   let questionsWithCursor
+  const _limit = limit ?? defaultLimit
 
   if (page !== undefined) {
-    const end = (page - 1) * perPageLimit + perPageLimit
+    const end = (page - 1) * _limit + _limit
     const totalCount = questions.length
 
     questionsWithCursor = {
-      batch: questions.slice((page - 1) * perPageLimit, end),
+      batch: questions.slice((page - 1) * _limit, end),
       totalCount,
       hasNextPage: end < totalCount,
       groupID: Number(groupID)

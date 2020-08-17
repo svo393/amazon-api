@@ -1438,6 +1438,10 @@ export const checkReviewFilters = ({ query }: Request): ReviewsFiltersInput => {
     ? isString({ name: 'q', param: query.q })
     : undefined
 
+  const limit = 'limit' in query
+    ? canBeNumber({ name: 'limit', param: query.limit })
+    : undefined
+
   const groupID = 'groupID' in query
     ? canBeNumber({ name: 'groupID', param: query.groupID })
     : undefined
@@ -1492,6 +1496,7 @@ export const checkReviewFilters = ({ query }: Request): ReviewsFiltersInput => {
   return {
     sortBy: sortBy?.param,
     page: page?.param,
+    limit: limit?.param,
     q: q?.param,
     groupID: groupID?.param,
     userEmail: userEmail?.param,
