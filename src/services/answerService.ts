@@ -28,7 +28,7 @@ const getAnswersByQuestion = async (CursorInput: CursorInput, req: Request): Pro
   const { startCursor, limit = 2, page } = CursorInput
   const { questionID } = req.params
 
-  let answers: (Answer & { avatar?: boolean; userName?: string })[] = await db('answers as a')
+  let answers = await db('answers as a')
     .select(
       'a.answerID',
       'a.createdAt',

@@ -33,7 +33,7 @@ const addReview = async (reviewInput: ReviewCreateInput, req: Request): Promise<
   return addedReview
 }
 
-const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request): Promise<BatchWithCursor<Review & { votes: number; upVotes: number }> & { groupID?: number }> => {
+const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request): Promise<BatchWithCursor<Review & { images: Image[]; votes: number; upVotes: number }> & { groupID?: number }> => {
   const {
     page = 1,
     limit,
@@ -53,22 +53,27 @@ const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request
 
   const userHasPermission = [ 'ROOT', 'ADMIN' ].includes(req.session?.role)
 
-  let reviews: (Review & { votes: number; userEmail: string })[] = await db('reviews as r')
+  let reviews = await db('reviews as r')
     .select(
       'r.reviewID',
       'r.createdAt',
       'r.updatedAt',
       'r.title',
+      'r.variation',
       'r.content',
       'r.stars',
       'r.isVerified',
       'r.moderationStatus',
       'r.userID',
       'r.groupID',
-      'u.email as userEmail'
+      'u.avatar',
+      'u.email as userEmail',
+      'u.name as userName'
     )
     .join('users as u', 'r.userID', 'u.userID')
-    .groupBy('r.reviewID', 'userEmail')
+
+  const images = await db<Image>('images')
+    .whereNotNull('reviewID')
 
   // TODO move votes query after sorting
   const votes = await db<Vote>('votes')
@@ -87,7 +92,13 @@ const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request
         .reduce((acc, cur) => (
           acc += cur.vote ? 1 : -1
         ), 0)
-      return { ...r, votes: voteSum, upVotes: upVoteSum }
+      return {
+        ...R.omit([ 'userName', 'avatar' ], r),
+        images: images.filter((i) => i.reviewID === r.reviewID),
+        votes: voteSum,
+        upVotes: upVoteSum,
+        author: { avatar: r.avatar, name: r.userName, userID: r.userID }
+      }
     })
 
   if (groupID !== undefined) {
