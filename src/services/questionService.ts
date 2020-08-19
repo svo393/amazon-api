@@ -119,7 +119,7 @@ const getQuestionsByGroup = async (questionsInput: QuestionCursorInput, req: Req
   const questionIDs = Object.values(questionsWithCursor.batch)
     .map((q: Question) => q.questionID)
 
-  let answers: (Answer & { avatar?: boolean; userName?: string })[] = await db('answers as a')
+  let answers = await db('answers as a')
     .select(
       'a.answerID',
       'a.createdAt',
@@ -143,7 +143,7 @@ const getQuestionsByGroup = async (questionsInput: QuestionCursorInput, req: Req
           acc += cur.vote ? 1 : -1
         ), 0)
       return {
-        ...R.omit([ 'userName', 'avatar' ], a),
+        ...R.omit([ 'userName', 'userEmail', 'avatar', 'userID' ], a),
         votes: voteSum,
         author: { avatar: a.avatar, name: a.userName, userID: a.userID }
       }

@@ -1,5 +1,5 @@
 import { Request } from 'express'
-import R from 'ramda'
+import R, { flatten } from 'ramda'
 import { BatchWithCursor, Image, Review, ReviewCreateInput, ReviewsFiltersInput, ReviewUpdateInput, ReviewWithUser, Vote } from '../types'
 import { defaultLimit, imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
@@ -33,7 +33,7 @@ const addReview = async (reviewInput: ReviewCreateInput, req: Request): Promise<
   return addedReview
 }
 
-const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request): Promise<BatchWithCursor<Review & { images: Image[]; votes: number; upVotes: number }> & { groupID?: number }> => {
+const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request): Promise<BatchWithCursor<Review & { images: Image[]; votes: number; upVotes: number }> & { groupID?: number; images?: Image[] }> => {
   const {
     page = 1,
     limit,
@@ -93,7 +93,7 @@ const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request
           acc += cur.vote ? 1 : -1
         ), 0)
       return {
-        ...R.omit([ 'userName', 'avatar' ], r),
+        ...R.omit([ 'userName', 'userEmail', 'avatar', 'userID' ], r),
         images: images.filter((i) => i.reviewID === r.reviewID),
         votes: voteSum,
         upVotes: upVoteSum,
@@ -101,9 +101,13 @@ const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request
       }
     })
 
+  let reviewIDs: number[]
+
   if (groupID !== undefined) {
     reviews = reviews
       .filter((r) => r.groupID === groupID)
+
+    reviewIDs = flatten(reviews.map((r) => r.reviewID))
   }
 
   if (userHasPermission && userEmail !== undefined) {
@@ -162,6 +166,7 @@ const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request
     : reviews.map((r) => ({ ...R.omit([ 'userEmail' ], r) }))
 
   const reviewsSorted = sortItems(_reviews, sortBy)
+
   const totalCount = _reviews.length
   const _limit = limit ?? defaultLimit
   const end = (page - 1) * _limit + _limit
@@ -170,7 +175,8 @@ const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request
     batch: reviewsSorted.slice((page - 1) * _limit, end),
     totalCount,
     hasNextPage: end < totalCount,
-    groupID
+    groupID,
+    images: groupID !== undefined ? images.filter((i) => reviewIDs.includes(i.reviewID as number)) : undefined
   }
 }
 
@@ -183,6 +189,7 @@ const getReviewByID = async (req: Request): Promise<ReviewWithUser> => {
       'r.createdAt',
       'r.updatedAt',
       'r.title',
+      'r.variation',
       'r.content',
       'r.stars',
       'r.isVerified',

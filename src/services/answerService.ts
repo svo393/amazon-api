@@ -61,7 +61,7 @@ const getAnswersByQuestion = async (CursorInput: CursorInput, req: Request): Pro
           acc += cur.vote ? 1 : -1
         ), 0)
       return {
-        ...R.omit([ 'userName', 'avatar' ], a),
+        ...R.omit([ 'userName', 'userEmail', 'avatar', 'userID' ], a),
         votes: voteSum,
         upVotes: upVoteSum,
         author: { avatar: a.avatar, name: a.userName, userID: a.userID }
