@@ -695,6 +695,26 @@ export const checkNewReviewComment = ({ body }: Request): ReviewCommentCreateInp
   }
 }
 
+export const checkReviewComments = ({ query }: Request): CursorInput => {
+  const startCursor = 'startCursor' in query
+    ? canBeNumber({ name: 'startCursor', param: query.startCursor })
+    : undefined
+
+  const limit = 'limit' in query
+    ? canBeNumber({ name: 'limit', param: query.limit })
+    : undefined
+
+  const sortBy = 'sortBy' in query
+    ? isString({ name: 'sortBy', param: query.sortBy })
+    : undefined
+
+  return {
+    startCursor: startCursor?.param,
+    sortBy: sortBy?.param,
+    limit: limit?.param
+  }
+}
+
 export const checkReviewCommentUpdate = ({ body }: Request): ReviewCommentUpdateInput => {
   const content = 'content' in body
     ? isString({ name: 'content', param: body.content })

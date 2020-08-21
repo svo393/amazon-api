@@ -24,8 +24,8 @@ const addAnswer = async (answerInput: AnswerCreateInput, req: Request): Promise<
   return addedAnswer
 }
 
-const getAnswersByQuestion = async (CursorInput: CursorInput, req: Request): Promise<BatchWithCursor<Answer & { votes: number; upVotes: number }> & { questionID: number }> => {
-  const { startCursor, limit = 2, page } = CursorInput
+const getAnswersByQuestion = async (cursorInput: CursorInput, req: Request): Promise<BatchWithCursor<Answer & { votes: number; upVotes: number }> & { questionID: number }> => {
+  const { startCursor, limit = 2, page } = cursorInput
   const { questionID } = req.params
 
   let answers = await db('answers as a')

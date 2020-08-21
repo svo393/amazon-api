@@ -9,7 +9,8 @@ import StatusError from '../utils/StatusError'
 
 const getUsersQuery: any = db('users as u')
   .distinct()
-  .select('email',
+  .select(
+    'u.email',
     'u.name',
     'u.info',
     'u.avatar',

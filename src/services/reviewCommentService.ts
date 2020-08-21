@@ -1,10 +1,12 @@
 import { Request } from 'express'
 import R from 'ramda'
-import { Image, ReviewComment, ReviewCommentCreateInput, ReviewCommentUpdateInput, ReviewCommentWithUser } from '../types'
+import { BatchWithCursor, CursorInput, Image, ReviewComment, ReviewCommentCreateInput, ReviewCommentUpdateInput, ReviewCommentWithUser, Vote } from '../types'
 import { imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
+import getCursor from '../utils/getCursor'
 import getUploadIndex from '../utils/getUploadIndex'
 import { uploadImages } from '../utils/img'
+import sortItems from '../utils/sortItems'
 import StatusError from '../utils/StatusError'
 
 const addReviewComment = async (reviewCommentInput: ReviewCommentCreateInput, req: Request): Promise<ReviewComment> => {
@@ -22,9 +24,44 @@ const addReviewComment = async (reviewCommentInput: ReviewCommentCreateInput, re
   return addedReviewComment
 }
 
-const getCommentsByReview = async (req: Request): Promise<ReviewComment[]> => {
-  return await db('reviews')
-    .where('reviewID', req.params.reviewID)
+const getCommentsByReview = async (cursorInput: CursorInput, req: Request): Promise<BatchWithCursor<ReviewComment> & { reviewID: number }> => {
+  const { startCursor, limit = 5, sortBy = 'createdAt_desc' } = cursorInput
+  const { reviewID } = req.params
+
+  let reviewComments = await db('reviewComments as rc')
+    .select(
+      'rc.reviewCommentID',
+      'rc.parentReviewCommentID',
+      'rc.createdAt',
+      'rc.updatedAt',
+      'rc.content',
+      'rc.moderationStatus',
+      'rc.userID',
+      'rc.reviewID',
+      'u.avatar',
+      'u.name as userName'
+    )
+    .join('users as u', 'rc.userID', 'u.userID')
+    .where('reviewID', reviewID)
+    .andWhere('rc.moderationStatus', 'APPROVED')
+
+  reviewComments = reviewComments
+    .map((rc) => ({
+      ...R.omit([ 'userName', 'userEmail', 'avatar', 'userID' ], rc),
+      author: { avatar: rc.avatar, name: rc.userName, userID: rc.userID }
+    }))
+
+  reviewComments = sortItems(reviewComments, sortBy)
+
+  return {
+    ...getCursor({
+      startCursor,
+      limit,
+      idProp: 'reviewCommentID',
+      data: reviewComments
+    }),
+    reviewID: Number(reviewID)
+  }
 }
 
 const getReviewCommentByID = async (req: Request): Promise<ReviewCommentWithUser> => {

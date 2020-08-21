@@ -53,7 +53,7 @@ const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request
 
   const userHasPermission = [ 'ROOT', 'ADMIN' ].includes(req.session?.role)
 
-  let reviews = await db('reviews as r')
+  let reviews: any[] = await db('reviews as r')
     .select(
       'r.reviewID',
       'r.createdAt',
@@ -70,7 +70,15 @@ const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request
       'u.email as userEmail',
       'u.name as userName'
     )
-    .join('users as u', 'r.userID', 'u.userID')
+    .count('rc.reviewCommentID as reviewCommentCount')
+    .leftJoin('users as u', 'r.userID', 'u.userID')
+    .leftJoin('reviewComments as rc', 'r.reviewID', 'rc.reviewID')
+    .groupBy(
+      'r.reviewID',
+      'u.avatar',
+      'u.name',
+      'u.email'
+    )
 
   const images = await db<Image>('images')
     .whereNotNull('reviewID')
@@ -96,6 +104,7 @@ const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request
         ...R.omit([ 'userName', 'userEmail', 'avatar', 'userID' ], r),
         images: images.filter((i) => i.reviewID === r.reviewID),
         votes: voteSum,
+        reviewCommentCount: parseInt(r.reviewCommentCount),
         upVotes: upVoteSum,
         author: { avatar: r.avatar, name: r.userName, userID: r.userID }
       }
@@ -183,7 +192,7 @@ const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request
 const getReviewByID = async (req: Request): Promise<ReviewWithUser> => {
   const { reviewID } = req.params
 
-  const review = await db<Review>('reviews as r')
+  const review: any = await db('reviews as r')
     .first(
       'r.reviewID',
       'r.createdAt',
@@ -200,8 +209,16 @@ const getReviewByID = async (req: Request): Promise<ReviewWithUser> => {
       'u.name as userName',
       'u.email as userEmail'
     )
-    .where('reviewID', reviewID)
-    .join('users as u', 'r.userID', 'u.userID')
+    .count('rc.reviewCommentID as reviewCommentCount')
+    .where('r.reviewID', reviewID)
+    .leftJoin('users as u', 'r.userID', 'u.userID')
+    .leftJoin('reviewComments as rc', 'r.reviewID', 'rc.reviewID')
+    .groupBy(
+      'r.reviewID',
+      'u.avatar',
+      'u.name',
+      'u.email'
+    )
 
   if (review === undefined) throw new StatusError(404, 'Not Found')
 
@@ -215,10 +232,18 @@ const getReviewByID = async (req: Request): Promise<ReviewWithUser> => {
     acc += cur.vote ? 1 : -1
   ), 0)
 
+  const upVoteSum = votes
+    .filter((v) => v.vote)
+    .reduce((acc, cur) => (
+      acc += cur.vote ? 1 : -1
+    ), 0)
+
   const _review: ReviewWithUser = {
     ...(R.omit([ 'userName', 'userEmail', 'avatar', 'userID' ], review) as Review),
     images,
     votes: voteSum,
+    reviewCommentCount: parseInt(review.reviewCommentCount),
+    upVotes: upVoteSum,
     author: {
       avatar: review.avatar,
       name: review.userName,

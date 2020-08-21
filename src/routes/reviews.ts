@@ -3,7 +3,7 @@ import reviewCommentService from '../services/reviewCommentService'
 import reviewService from '../services/reviewService'
 import voteService from '../services/voteService'
 import { UPLOAD_TIMEOUT } from '../utils/config'
-import { checkMediaUpload, checkNewReviewComment, checkNewVote, checkReviewFilters, checkReviewUpdate } from '../utils/inputValidator'
+import { checkMediaUpload, checkNewReviewComment, checkNewVote, checkReviewComments, checkReviewFilters, checkReviewUpdate } from '../utils/inputValidator'
 import { multerUpload, requireAdmin, requireAuth, requireCreator, requireCreatorOrAdmin } from '../utils/middleware'
 
 const router = Router()
@@ -37,7 +37,8 @@ router.post('/:reviewID/comments', requireAuth, async (req, res) => {
 })
 
 router.get('/:reviewID/comments', async (req, res) => {
-  const reviewComments = await reviewCommentService.getCommentsByReview(req)
+  const reviewCommentsInput = checkReviewComments(req)
+  const reviewComments = await reviewCommentService.getCommentsByReview(reviewCommentsInput, req)
   res.json(reviewComments)
 })
 

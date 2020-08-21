@@ -220,7 +220,9 @@ export type ProductSize = { name: string; qty: number; productID: number }
 export type ReviewWithUser = Review & {
   images: Image[];
   votes: number;
+  upVotes: number;
   author: Pick<User, 'name' | 'userID' | 'avatar'> & { email?: string };
+  reviewCommentCount: string | number;
 }
 
 type Activity = (
