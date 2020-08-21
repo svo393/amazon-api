@@ -1470,6 +1470,10 @@ export const checkReviewFilters = ({ query }: Request): ReviewsFiltersInput => {
     ? isString({ name: 'sortBy', param: query.sortBy })
     : undefined
 
+  const variation = 'variation' in query
+    ? isString({ name: 'variation', param: query.variation })
+    : undefined
+
   const page = 'page' in query
     ? R.pipe(
       canBeNumber,
@@ -1519,6 +1523,7 @@ export const checkReviewFilters = ({ query }: Request): ReviewsFiltersInput => {
     limit: limit?.param,
     q: q?.param,
     groupID: groupID?.param,
+    variation: variation?.param,
     userEmail: userEmail?.param,
     moderationStatuses: moderationStatuses?.param,
     isVerified: isVerified?.param,

@@ -1,9 +1,10 @@
 import { Request } from 'express'
-import R, { flatten } from 'ramda'
-import { BatchWithCursor, Image, Review, ReviewCreateInput, ReviewsFiltersInput, ReviewUpdateInput, ReviewWithUser, Vote } from '../types'
+import R, { equals, flatten, omit } from 'ramda'
+import { BatchWithCursor, Image, Matches, Review, ReviewCreateInput, ReviewsFiltersInput, ReviewUpdateInput, ReviewWithUser, Vote } from '../types'
 import { defaultLimit, imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
 import fuseIndexes from '../utils/fuseIndexes'
+import fuseMatches from '../utils/fuseMatches'
 import getUploadIndex from '../utils/getUploadIndex'
 import { uploadImages } from '../utils/img'
 import sortItems from '../utils/sortItems'
@@ -33,13 +34,14 @@ const addReview = async (reviewInput: ReviewCreateInput, req: Request): Promise<
   return addedReview
 }
 
-const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request): Promise<BatchWithCursor<Review & { images: Image[]; votes: number; upVotes: number }> & { groupID?: number; images?: Image[] }> => {
+const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request): Promise<BatchWithCursor<Review & { images: Image[]; votes: number; upVotes: number; matches?: Matches }> & { groupID?: number; images?: Image[] }> => {
   const {
     page = 1,
     limit,
     sortBy = 'createdAt_desc',
     q,
     groupID,
+    variation,
     userEmail,
     moderationStatuses,
     isVerified,
@@ -134,6 +136,11 @@ const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request
       .filter((r) => r.isVerified === isVerified)
   }
 
+  if (variation !== undefined) {
+    reviews = reviews
+      .filter((r) => equals(r.variation, JSON.parse(variation)))
+  }
+
   if (createdFrom !== undefined) {
     reviews = reviews
       .filter((r) => r.createdAt >= new Date(createdFrom))
@@ -165,9 +172,14 @@ const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request
   }
 
   if (q !== undefined) {
+    const reviewMatches = fuseMatches(reviews, [ 'content', 'title' ], q, 'reviewID')
+
     reviews = reviews
-      .filter((_, i) =>
-        fuseIndexes(reviews, [ 'title', 'content' ], q).includes(i))
+      .map((r) => ({
+        ...r,
+        matches: reviewMatches[r.reviewID]
+      }))
+      .filter((r) => r.matches !== undefined)
   }
 
   const _reviews = userHasPermission

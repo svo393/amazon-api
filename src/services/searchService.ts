@@ -1,7 +1,7 @@
 import { Request } from 'express'
 import Fuse from 'fuse.js'
 import { flatten, omit } from 'ramda'
-import { AskFiltersInput, ObjIndexed, Product, Question, Review, Vote } from '../types'
+import { AskFiltersInput, Matches, ObjIndexed, Product, Question, Review, Vote } from '../types'
 import { db } from '../utils/db'
 import fuseMatches from '../utils/fuseMatches'
 import StatusError from '../utils/StatusError'
@@ -20,11 +20,6 @@ type QuestionItem = (Omit<QuestionData, 'name' | 'userID' | 'answerContent' | 'a
   matches: Matches;
   answers: (AnswerData & { author: Author; votes: number; matches: Matches })[];
 })
-
-type Matches = {
-  indices: readonly Fuse.RangeTuple[];
-  key?: string | undefined;
-}[]
 
 type Return = {
   product?: ProductData & { matches: Matches };

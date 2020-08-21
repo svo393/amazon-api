@@ -1,3 +1,5 @@
+import Fuse from 'fuse.js'
+
 export interface ObjIndexed { [ k: string ]: any }
 
 //
@@ -216,6 +218,11 @@ export type ProductSize = { name: string; qty: number; productID: number }
 //
 // Derivative types
 //
+
+export type Matches = {
+  indices: readonly Fuse.RangeTuple[];
+  key?: string | undefined;
+}[]
 
 export type ReviewWithUser = Review & {
   images: Image[];
@@ -509,6 +516,7 @@ export type ReviewsFiltersInput = {
   moderationStatuses?: string;
   isVerified?: boolean;
   createdFrom?: string;
+  variation?: string;
   createdTo?: string;
   starsMin?: number;
   starsMax?: number;
