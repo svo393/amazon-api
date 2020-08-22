@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import Knex from 'knex'
-import R from 'ramda'
+import R, { indexBy, prop } from 'ramda'
 import { GroupVariation, Image, Product, ProductCreateInput, ProductData, ProductParameter, ProductsFiltersInput, ProductSize, ProductsMinFiltersInput, ProductUpdateInput, User } from '../types'
 import { imagesBasePath, defaultLimit } from '../utils/constants'
 import { db, dbTrans } from '../utils/db'
@@ -307,6 +307,7 @@ type ProductLimitedData = Omit<ProductListData, 'images'> & {
   productSizes: ProductSize[];
   images: Image[];
   createdAt: Date;
+  ratingStats: { [ k: number ]: number };
 }
 
 type ProductAllData = ProductLimitedData &
@@ -314,8 +315,10 @@ Pick<ProductData, 'createdAt' | 'updatedAt' | 'userID' | 'listPrice'> & {
    author: Pick<User, 'name' | 'userID' | 'avatar'> & { email?: string };
   }
 
+type RawProduct = Omit<ProductAllData, 'stars' | 'reviewCount | questionCount'> & { stars: string; reviewCount: string; questionCount: string; avatar: boolean; userName: string; userEmail: string }
+
 const getProductByID = async (req: Request): Promise<ProductLimitedData| ProductAllData> => {
-  const rawProduct: Omit<ProductAllData, 'stars' | 'reviewCount | questionCount'> & { stars: string; reviewCount: string; questionCount: string; avatar: boolean; userName: string; userEmail: string } = await getProductsQuery.clone()
+  const rawProduct: RawProduct = await getProductsQuery.clone()
     .first(
       'p.listPrice',
       'p.bullets',
@@ -337,6 +340,12 @@ const getProductByID = async (req: Request): Promise<ProductLimitedData| Product
 
   if (rawProduct === undefined) throw new StatusError(404, 'Not Found')
 
+  const ratingStats: { stars: number; count: string }[] = await db('reviews')
+    .select('stars')
+    .count('stars')
+    .where('groupID', rawProduct.groupID)
+    .groupBy('stars')
+
   const product = {
     ...rawProduct,
     price: rawProduct.price / 100,
@@ -345,7 +354,11 @@ const getProductByID = async (req: Request): Promise<ProductLimitedData| Product
       : undefined,
     stars: parseFloat(rawProduct.stars),
     reviewCount: parseInt(rawProduct.reviewCount),
-    questionCount: parseInt(rawProduct.questionCount)
+    questionCount: parseInt(rawProduct.questionCount),
+    ratingStats: ratingStats.reduce((acc, cur) => {
+      acc[cur.stars] = Number(cur.count)
+      return acc
+    }, {} as { [ k: number ]: number })
   }
 
   const groupVariations = await db<GroupVariation>('groupVariations')
