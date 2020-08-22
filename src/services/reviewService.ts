@@ -43,7 +43,7 @@ const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request
     groupID,
     variation,
     userEmail,
-    moderationStatuses,
+    moderationStatuses = 'APPROVED',
     isVerified,
     createdFrom,
     createdTo,
@@ -204,6 +204,8 @@ const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request
 const getReviewByID = async (req: Request): Promise<ReviewWithUser> => {
   const { reviewID } = req.params
 
+  const userHasPermission = [ 'ROOT', 'ADMIN' ].includes(req.session?.role)
+
   const review: any = await db('reviews as r')
     .first(
       'r.reviewID',
@@ -232,7 +234,7 @@ const getReviewByID = async (req: Request): Promise<ReviewWithUser> => {
       'u.email'
     )
 
-  if (review === undefined) throw new StatusError(404, 'Not Found')
+  if (review === undefined || (review.moderationStatus !== 'APPROVED' && !userHasPermission)) throw new StatusError(404, 'Not Found')
 
   const images = await db<Image>('images')
     .where('reviewID', reviewID)
@@ -264,8 +266,7 @@ const getReviewByID = async (req: Request): Promise<ReviewWithUser> => {
     }
   }
 
-  ![ 'ROOT', 'ADMIN' ].includes(req.session?.role) &&
-    delete _review.author.email
+  !userHasPermission && delete _review.author.email
 
   return _review
 }
