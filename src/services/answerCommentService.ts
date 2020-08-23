@@ -1,5 +1,5 @@
 import { Request } from 'express'
-import R from 'ramda'
+import { omit } from 'ramda'
 import { AnswerComment, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCommentWithUser, Image } from '../types'
 import { imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
@@ -53,7 +53,7 @@ const getAnswerCommentByID = async (req: Request): Promise<AnswerCommentWithUser
     .where('answerCommentID', answerCommentID)
 
   const _answerComment: AnswerCommentWithUser = {
-    ...(R.omit([ 'userName', 'userEmail', 'avatar', 'userID' ], answerComment) as AnswerComment),
+    ...(omit([ 'userName', 'userEmail', 'avatar', 'userID' ], answerComment) as AnswerComment),
     images,
     author: {
       avatar: answerComment.avatar,

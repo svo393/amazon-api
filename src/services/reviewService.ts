@@ -1,9 +1,8 @@
 import { Request } from 'express'
-import R, { equals, flatten, omit } from 'ramda'
+import { equals, flatten, omit } from 'ramda'
 import { BatchWithCursor, Image, Matches, Review, ReviewCreateInput, ReviewsFiltersInput, ReviewUpdateInput, ReviewWithUser, Vote } from '../types'
 import { defaultLimit, imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
-import fuseIndexes from '../utils/fuseIndexes'
 import fuseMatches from '../utils/fuseMatches'
 import getUploadIndex from '../utils/getUploadIndex'
 import { uploadImages } from '../utils/img'
@@ -103,7 +102,7 @@ const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request
           acc += cur.vote ? 1 : -1
         ), 0)
       return {
-        ...R.omit([ 'userName', 'userEmail', 'avatar', 'userID' ], r),
+        ...omit([ 'userName', 'userEmail', 'avatar', 'userID' ], r),
         images: images.filter((i) => i.reviewID === r.reviewID),
         votes: voteSum,
         reviewCommentCount: parseInt(r.reviewCommentCount),
@@ -184,7 +183,7 @@ const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request
 
   const _reviews = userHasPermission
     ? reviews
-    : reviews.map((r) => ({ ...R.omit([ 'userEmail' ], r) }))
+    : reviews.map((r) => ({ ...omit([ 'userEmail' ], r) }))
 
   const reviewsSorted = sortItems(_reviews, sortBy)
 
@@ -253,7 +252,7 @@ const getReviewByID = async (req: Request): Promise<ReviewWithUser> => {
     ), 0)
 
   const _review: ReviewWithUser = {
-    ...(R.omit([ 'userName', 'userEmail', 'avatar', 'userID' ], review) as Review),
+    ...(omit([ 'userName', 'userEmail', 'avatar', 'userID' ], review) as Review),
     images,
     votes: voteSum,
     reviewCommentCount: parseInt(review.reviewCommentCount),

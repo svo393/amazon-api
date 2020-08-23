@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt'
 import { randomBytes } from 'crypto'
 import { Request } from 'express'
-import R from 'ramda'
+import { omit } from 'ramda'
 import { promisify } from 'util'
 import { PasswordRequestInput, PasswordResetInput, User, UserLoginInput, UserSafeData, UserSignupInput } from '../types'
 import { db } from '../utils/db'
@@ -37,7 +37,7 @@ const signupUser = async (userInput: UserSignupInput, req: Request): Promise<Use
     req.session.userID = addedUser.userID
     req.session.role = addedUser.role
   }
-  return R.omit([
+  return omit([
     'password',
     'resetToken',
     'resetTokenCreatedAt'
@@ -70,7 +70,7 @@ const loginUser = async (userInput: UserLoginInput, req: Request, requiresAdmin 
     req.session.role = existingUser.role
   }
 
-  return R.omit([
+  return omit([
     'password',
     'resetToken',
     'resetTokenCreatedAt'
@@ -151,7 +151,7 @@ const resetPassword = async ({ password, resetToken }: PasswordResetInput): Prom
     }, [ '*' ])
     .where('userID', user.userID)
 
-  return R.omit([
+  return omit([
     'password',
     'resetToken',
     'resetTokenCreatedAt'

@@ -1,5 +1,5 @@
 import { Request } from 'express'
-import R from 'ramda'
+import { map, omit } from 'ramda'
 import { Role, User, UserSafeData } from '../types'
 import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
@@ -41,7 +41,7 @@ const updateRole = async (roleInput: Role, req: Request): Promise<SingleRoleData
 
   return {
     ...updatedRole,
-    users: R.map(R.omit([
+    users: map(omit([
       'password',
       'resetToken',
       'resetTokenCreatedAt'

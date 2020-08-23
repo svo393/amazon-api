@@ -1,14 +1,14 @@
 import { Request } from 'express'
 import Knex from 'knex'
-import R, { indexBy, prop } from 'ramda'
+import { flatten, omit } from 'ramda'
 import { GroupVariation, Image, Product, ProductCreateInput, ProductData, ProductParameter, ProductsFiltersInput, ProductSize, ProductsMinFiltersInput, ProductUpdateInput, User } from '../types'
-import { imagesBasePath, defaultLimit } from '../utils/constants'
+import { defaultLimit, imagesBasePath } from '../utils/constants'
 import { db, dbTrans } from '../utils/db'
 import fuseIndexes from '../utils/fuseIndexes'
 import getUploadIndex from '../utils/getUploadIndex'
 import { uploadImages } from '../utils/img'
-import StatusError from '../utils/StatusError'
 import sortItems from '../utils/sortItems'
+import StatusError from '../utils/StatusError'
 
 const getProductsQuery: any = db('products as p')
   .select(
@@ -43,7 +43,7 @@ const addProduct = async (productInput: ProductCreateInput, req: Request): Promi
 
     const [ addedProduct ]: Product[] = await trx('products')
       .insert({
-        ...R.omit([ 'productParameters', 'groupVariations', 'productSizes' ], productInput),
+        ...omit([ 'productParameters', 'groupVariations', 'productSizes' ], productInput),
         listPrice: listPrice !== undefined
           ? listPrice * 100
           : undefined,
@@ -391,7 +391,7 @@ const getProductByID = async (req: Request): Promise<ProductLimitedData| Product
     .where('pp.productID', product.productID)
 
   const fullProduct = {
-    ...(R.omit([ 'userName', 'userEmail', 'avatar', 'userID' ], product) as ProductAllData),
+    ...(omit([ 'userName', 'userEmail', 'avatar', 'userID' ], product) as ProductAllData),
     group: groupVariations,
     images,
     productSizes,
@@ -406,7 +406,7 @@ const getProductByID = async (req: Request): Promise<ProductLimitedData| Product
 
   return [ 'ROOT', 'ADMIN' ].includes(req.session?.role)
     ? fullProduct
-    : R.omit([
+    : omit([
       'updatedAt',
       'author'
     ], fullProduct)
@@ -423,7 +423,7 @@ const updateProduct = async (productInput: ProductUpdateInput, req: Request): Pr
   return await dbTrans(async (trx: Knex.Transaction) => {
     const [ updatedProduct ]: Product[] = await trx('products')
       .update({
-        ...R.omit([ 'productParameters', 'groupVariations', 'productSizes' ], productInput),
+        ...omit([ 'productParameters', 'groupVariations', 'productSizes' ], productInput),
         price: price !== undefined
           ? price * 100
           : undefined,
@@ -495,7 +495,7 @@ const updateProduct = async (productInput: ProductUpdateInput, req: Request): Pr
 
       processedProductSizes = [
         ...addedProductSizes,
-        ...R.flatten(updatedProductSizes)
+        ...flatten(updatedProductSizes)
       ]
     }
 
@@ -545,7 +545,7 @@ const updateProduct = async (productInput: ProductUpdateInput, req: Request): Pr
 
       processedGroupVariations = [
         ...addedGroupVariations,
-        ...R.flatten(updatedGroupVariations)
+        ...flatten(updatedGroupVariations)
       ]
     }
 

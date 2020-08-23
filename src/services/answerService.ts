@@ -1,13 +1,13 @@
 import { Request } from 'express'
-import R from 'ramda'
-import { Answer, AnswerCreateInput, AnswerUpdateInput, CursorInput, Image, Vote, BatchWithCursor, User, AnswerWithUser } from '../types'
+import { omit } from 'ramda'
+import { Answer, AnswerCreateInput, AnswerUpdateInput, AnswerWithUser, BatchWithCursor, CursorInput, Image, Vote } from '../types'
 import { imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
+import getCursor from '../utils/getCursor'
 import getUploadIndex from '../utils/getUploadIndex'
 import { uploadImages } from '../utils/img'
-import StatusError from '../utils/StatusError'
-import getCursor from '../utils/getCursor'
 import sortItems from '../utils/sortItems'
+import StatusError from '../utils/StatusError'
 
 const addAnswer = async (answerInput: AnswerCreateInput, req: Request): Promise<Answer> => {
   const now = new Date()
@@ -61,7 +61,7 @@ const getAnswersByQuestion = async (cursorInput: CursorInput, req: Request): Pro
           acc += cur.vote ? 1 : -1
         ), 0)
       return {
-        ...R.omit([ 'userName', 'userEmail', 'avatar', 'userID' ], a),
+        ...omit([ 'userName', 'userEmail', 'avatar', 'userID' ], a),
         votes: voteSum,
         upVotes: upVoteSum,
         author: { avatar: a.avatar, name: a.userName, userID: a.userID }
@@ -126,7 +126,7 @@ const getAnswerByID = async (req: Request): Promise<AnswerWithUser> => {
   ), 0)
 
   const _answer: AnswerWithUser = {
-    ...(R.omit([ 'userName', 'userEmail', 'avatar', 'userID' ], answer) as Answer),
+    ...(omit([ 'userName', 'userEmail', 'avatar', 'userID' ], answer) as Answer),
     images,
     votes: voteSum,
     author: {

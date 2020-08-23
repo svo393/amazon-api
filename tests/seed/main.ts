@@ -1,11 +1,11 @@
 import path from 'path'
-import R from 'ramda'
+import { flatten, omit } from 'ramda'
 import supertest from 'supertest'
 import app from '../../src/app'
 import { Answer, AnswerComment, CartProduct, Invoice, List, Order, Product, Question, Review, ReviewComment } from '../../src/types'
 import { apiURLs } from '../../src/utils/constants'
 import { db } from '../../src/utils/db'
-import { createOneCategory, createOneVendor, loginAs, populateUsers, purge, createOneParameter } from '../testHelper'
+import { createOneCategory, createOneParameter, createOneVendor, loginAs, populateUsers, purge } from '../testHelper'
 import { initialProducts, initialUsers } from './seedData'
 
 const api = supertest(app)
@@ -33,7 +33,7 @@ const seed = async (): Promise<void> => {
       await api
         .put(`${apiURLs.users}/${u.userID}`)
         .set('Cookie', `sessionID=${u.sessionID}`)
-        .send(R.omit([ 'email', 'password', 'userID', 'sessionID' ], u))
+        .send(omit([ 'email', 'password', 'userID', 'sessionID' ], u))
     }))
 
     await Promise.all(users.map(async (u) => {
@@ -88,7 +88,7 @@ const seed = async (): Promise<void> => {
       return [ addedParameter.name, addedParameter.parameterID ]
     }))
 
-    const products = R.flatten(await Promise.all(Object.entries(initialProducts).map(async (c) => {
+    const products = flatten(await Promise.all(Object.entries(initialProducts).map(async (c) => {
       const { sessionID, userID } = await loginAs('admin')
       const { addedCategory } = await createOneCategory('admin', c[0])
 
@@ -102,7 +102,7 @@ const seed = async (): Promise<void> => {
             .post(apiURLs.products)
             .set('Cookie', `sessionID=${sessionID}`)
             .send({
-              ...R.omit([
+              ...omit([
                 'reviews',
                 'questions',
                 'media',
@@ -125,7 +125,7 @@ const seed = async (): Promise<void> => {
                 .post(apiURLs.products)
                 .set('Cookie', `sessionID=${sessionID}`)
                 .send({
-                  ...R.omit([
+                  ...omit([
                     'reviews',
                     'questions',
                     'media',
@@ -168,7 +168,7 @@ const seed = async (): Promise<void> => {
                 const { body }: { body: Review } = await api
                   .post(`${apiURLs.groups}/${groupID}/reviews`)
                   .set('Cookie', `sessionID=${sessionID}`)
-                  .send(R.omit([ 'author', 'comments', 'mediaFiles' ], r))
+                  .send(omit([ 'author', 'comments', 'mediaFiles' ], r))
 
                 await api
                   .put(`${apiURLs.reviews}/${body.reviewID}`)
@@ -196,7 +196,7 @@ const seed = async (): Promise<void> => {
                     const reviewComment: { body: ReviewComment } = await api
                       .post(`${apiURLs.reviews}/${body.reviewID}/comments`)
                       .set('Cookie', `sessionID=${sessionID}`)
-                      .send(R.omit([ 'author', 'mediaFiles' ], cm))
+                      .send(omit([ 'author', 'mediaFiles' ], cm))
 
                     await api
                       .put(`${apiURLs.reviewComments}/${reviewComment.body.reviewCommentID}`)
@@ -228,7 +228,7 @@ const seed = async (): Promise<void> => {
                 const { body }: { body: Question } = await api
                   .post(`${apiURLs.groups}/${groupID}/questions`)
                   .set('Cookie', `sessionID=${sessionID}`)
-                  .send(R.omit([ 'author', 'answers', 'mediaFiles' ], q))
+                  .send(omit([ 'author', 'answers', 'mediaFiles' ], q))
 
                 // await api
                 //   .put(`${apiURLs.questions}/${body.questionID}`)
@@ -256,7 +256,7 @@ const seed = async (): Promise<void> => {
                     const answer: { body: Answer } = await api
                       .post(`${apiURLs.questions}/${body.questionID}/answers`)
                       .set('Cookie', `sessionID=${sessionID}`)
-                      .send(R.omit([ 'author', 'mediaFiles' ], a))
+                      .send(omit([ 'author', 'mediaFiles' ], a))
 
                     // await api
                     //   .put(`${apiURLs.answers}/${answer.body.answerID}`)
@@ -284,7 +284,7 @@ const seed = async (): Promise<void> => {
                         const answerComment: { body: AnswerComment } = await api
                           .post(`${apiURLs.answers}/${answer.body.answerID}/comments`)
                           .set('Cookie', `sessionID=${sessionID}`)
-                          .send(R.omit([ 'author', 'mediaFiles' ], ac))
+                          .send(omit([ 'author', 'mediaFiles' ], ac))
 
                         // await api
                         //   .put(`${apiURLs.answerComments}/${answerComment.body.answerCommentID}`)

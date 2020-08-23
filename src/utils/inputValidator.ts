@@ -1,22 +1,22 @@
 import { Request } from 'express'
-import R from 'ramda'
+import { pipe } from 'ramda'
 import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, AskFiltersInput, CartProduct, CartProductInput, CategoriesFiltersInput, CategoryCreateInput, CategoryUpdateInput, CursorInput, FeedFiltersInput, GroupVariationCreateInput, GroupVariationDeleteInput, GroupVariationUpdateInput, ImagesDeleteInput, ImagesFiltersInput, ImagesUpdateInput, InvoiceCreateInput, InvoicesFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ModerationStatus, OrderCreateInput, OrderProductInput, OrdersFiltersInput, OrderStatus, OrderUpdateInput, ParameterInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionCursorInput, QuestionUpdateInput, ReviewCommentCreateInput, ReviewCommentUpdateInput, ReviewCreateInput, ReviewsFiltersInput, ReviewUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorInput, VendorsFiltersInput, VotesCreateInput, VotesFiltersInput } from '../types'
 import { canBeBoolean, canBeNumber, hasDefinedProps, isArray, isDate, isEmail, isInputProvided, isObject, isPasswordValid, isPositiveNumber, isProvided, isSomeProvided, isString } from './validatorLib'
 
 export const checkNewUser = ({ body }: Request): UserSignupInput => {
-  const email = R.pipe(
+  const email = pipe(
     isProvided,
     isString,
     isEmail
   )({ name: 'email', param: body.email })
 
-  const password = R.pipe(
+  const password = pipe(
     isProvided,
     isString,
     isPasswordValid
   )({ name: 'password', param: body.password })
 
-  const name = R.pipe(
+  const name = pipe(
     isProvided,
     isString
   )({ name: 'name', param: body.name })
@@ -29,18 +29,18 @@ export const checkNewUser = ({ body }: Request): UserSignupInput => {
 }
 
 export const checkUserLogin = ({ body }: Request): UserLoginInput => {
-  const email = R.pipe(
+  const email = pipe(
     isProvided,
     isString,
     isEmail
   )({ name: 'email', param: body.email })
 
-  const password = R.pipe(
+  const password = pipe(
     isProvided,
     isString
   )({ name: 'password', param: body.password })
 
-  const remember = R.pipe(
+  const remember = pipe(
     isProvided,
     canBeBoolean
   )({ name: 'remember', param: body.remember })
@@ -54,14 +54,14 @@ export const checkUserLogin = ({ body }: Request): UserLoginInput => {
 
 export const checkUserUpdate = ({ body }: Request): UserUpdateInput => {
   const password = 'password' in body
-    ? R.pipe(
+    ? pipe(
       isString,
       isPasswordValid
     )({ name: 'password', param: body.password })
     : undefined
 
   const email = 'email' in body
-    ? R.pipe(
+    ? pipe(
       isString,
       isEmail
     )({ name: 'email', param: body.email })
@@ -96,7 +96,7 @@ export const checkUserUpdate = ({ body }: Request): UserUpdateInput => {
 }
 
 export const checkUserResetRequest = ({ body }: Request): PasswordRequestInput => {
-  const email = R.pipe(
+  const email = pipe(
     isProvided,
     isString,
     isEmail
@@ -106,12 +106,12 @@ export const checkUserResetRequest = ({ body }: Request): PasswordRequestInput =
 }
 
 export const checkUserResetToken = ({ body }: Request): PasswordResetInput => {
-  const resetToken = R.pipe(
+  const resetToken = pipe(
     isProvided,
     isString
   )({ name: 'resetToken', param: body.resetToken })
 
-  const password = R.pipe(
+  const password = pipe(
     isProvided,
     isString,
     isPasswordValid
@@ -124,7 +124,7 @@ export const checkUserResetToken = ({ body }: Request): PasswordResetInput => {
 }
 
 export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
-  const title = R.pipe(
+  const title = pipe(
     isProvided,
     isString
   )({ name: 'title', param: body.title })
@@ -133,12 +133,12 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
     ? canBeNumber({ name: 'listPrice', param: body.listPrice })
     : undefined
 
-  const price = R.pipe(
+  const price = pipe(
     isProvided,
     canBeNumber
   )({ name: 'price', param: body.price })
 
-  const bullets = R.pipe(
+  const bullets = pipe(
     isProvided,
     isString
   )({ name: 'bullets', param: body.bullets })
@@ -158,11 +158,11 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
   productSizes = {
     ...productSizes,
     param: productSizes?.param.map((pp: any) => ({
-      name: R.pipe(
+      name: pipe(
         isProvided,
         isString
       )({ name: 'name', param: pp.name }).param,
-      qty: R.pipe(
+      qty: pipe(
         isProvided,
         canBeNumber
       )({ name: 'qty', param: pp.qty }).param
@@ -174,17 +174,17 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
     names: [ 'stock', 'productSizes' ]
   })
 
-  const isAvailable = R.pipe(
+  const isAvailable = pipe(
     isProvided,
     canBeBoolean
   )({ name: 'isAvailable', param: body.isAvailable })
 
-  const categoryID = R.pipe(
+  const categoryID = pipe(
     isProvided,
     canBeNumber
   )({ name: 'categoryID', param: body.categoryID })
 
-  const vendorID = R.pipe(
+  const vendorID = pipe(
     isProvided,
     canBeNumber
   )({ name: 'vendorID', param: body.vendorID })
@@ -200,11 +200,11 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
   groupVariations = {
     ...groupVariations,
     param: groupVariations?.param.map((gv: any) => ({
-      name: R.pipe(
+      name: pipe(
         isProvided,
         isString
       )({ name: 'name', param: gv.name }).param,
-      value: R.pipe(
+      value: pipe(
         isProvided,
         isString
       )({ name: 'value', param: gv.value }).param
@@ -218,11 +218,11 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
   productParameters = {
     ...productParameters,
     param: productParameters?.param.map((pp: any) => ({
-      parameterID: R.pipe(
+      parameterID: pipe(
         isProvided,
         canBeNumber
       )({ name: 'parameterID', param: pp.parameterID }).param,
-      value: R.pipe(
+      value: pipe(
         isProvided,
         isString
       )({ name: 'value', param: pp.value }).param
@@ -247,7 +247,7 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
 }
 
 export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
-  const title = R.pipe(
+  const title = pipe(
     isProvided,
     isString
   )({ name: 'title', param: body.title })
@@ -256,17 +256,17 @@ export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
     ? canBeNumber({ name: 'listPrice', param: body.listPrice })
     : undefined
 
-  const price = R.pipe(
+  const price = pipe(
     isProvided,
     canBeNumber
   )({ name: 'price', param: body.price })
 
-  const bullets = R.pipe(
+  const bullets = pipe(
     isProvided,
     isString
   )({ name: 'bullets', param: body.bullets })
 
-  const description = R.pipe(
+  const description = pipe(
     isProvided,
     isString
   )({ name: 'description', param: body.description })
@@ -282,11 +282,11 @@ export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
   productSizes = {
     ...productSizes,
     param: productSizes?.param.map((pp: any) => ({
-      name: R.pipe(
+      name: pipe(
         isProvided,
         isString
       )({ name: 'name', param: pp.name }).param,
-      qty: R.pipe(
+      qty: pipe(
         isProvided,
         canBeNumber
       )({ name: 'qty', param: pp.qty }).param
@@ -298,22 +298,22 @@ export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
     names: [ 'stock', 'productSizes' ]
   })
 
-  const isAvailable = R.pipe(
+  const isAvailable = pipe(
     isProvided,
     canBeBoolean
   )({ name: 'isAvailable', param: body.isAvailable })
 
-  const categoryID = R.pipe(
+  const categoryID = pipe(
     isProvided,
     canBeNumber
   )({ name: 'categoryID', param: body.categoryID })
 
-  const vendorID = R.pipe(
+  const vendorID = pipe(
     isProvided,
     canBeNumber
   )({ name: 'vendorID', param: body.vendorID })
 
-  const groupID = R.pipe(
+  const groupID = pipe(
     isProvided,
     canBeNumber
   )({ name: 'groupID', param: body.groupID })
@@ -325,11 +325,11 @@ export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
   groupVariations = {
     ...groupVariations,
     param: groupVariations?.param.map((gv: any) => ({
-      name: R.pipe(
+      name: pipe(
         isProvided,
         isString
       )({ name: 'name', param: gv.name }).param,
-      value: R.pipe(
+      value: pipe(
         isProvided,
         isString
       )({ name: 'value', param: gv.value }).param
@@ -343,11 +343,11 @@ export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
   productParameters = {
     ...productParameters,
     param: productParameters?.param.map((pp: any) => ({
-      parameterID: R.pipe(
+      parameterID: pipe(
         isProvided,
         canBeNumber
       )({ name: 'parameterID', param: pp.parameterID }).param,
-      value: R.pipe(
+      value: pipe(
         isProvided,
         isString
       )({ name: 'value', param: pp.value }).param
@@ -383,7 +383,7 @@ export const checkSingleMediaUpload = ({ file }: Request): Express.Multer.File =
 }
 
 export const checkNewCategory = ({ body }: Request): CategoryCreateInput => {
-  const name = R.pipe(
+  const name = pipe(
     isProvided,
     isString
   )({ name: 'name', param: body.name })
@@ -414,7 +414,7 @@ export const checkCategoryUpdate = ({ body }: Request): CategoryUpdateInput => {
 }
 
 export const checkVendor = ({ body }: Request): VendorInput => {
-  const name = R.pipe(
+  const name = pipe(
     isProvided,
     isString
   )({ name: 'name', param: body.name })
@@ -423,7 +423,7 @@ export const checkVendor = ({ body }: Request): VendorInput => {
 }
 
 export const checkRole = ({ body }: Request): Role => {
-  const roleName = R.pipe(
+  const roleName = pipe(
     isProvided,
     isString
   )({ name: 'roleName', param: body.roleName })
@@ -432,7 +432,7 @@ export const checkRole = ({ body }: Request): Role => {
 }
 
 export const checkNewModerationStatus = ({ body }: Request): ModerationStatus => {
-  const moderationStatusName = R.pipe(
+  const moderationStatusName = pipe(
     isProvided,
     isString
   )({ name: 'moderationStatusName', param: body.moderationStatusName })
@@ -441,7 +441,7 @@ export const checkNewModerationStatus = ({ body }: Request): ModerationStatus =>
 }
 
 export const checkModerationStatusUpdate = ({ body }: Request): ModerationStatus => {
-  const moderationStatusName = R.pipe(
+  const moderationStatusName = pipe(
     isProvided,
     isString
   )({ name: 'moderationStatusName', param: body.moderationStatusName })
@@ -450,7 +450,7 @@ export const checkModerationStatusUpdate = ({ body }: Request): ModerationStatus
 }
 
 export const checkNewOrderStatus = ({ body }: Request): OrderStatus => {
-  const orderStatusName = R.pipe(
+  const orderStatusName = pipe(
     isProvided,
     isString
   )({ name: 'orderStatusName', param: body.orderStatusName })
@@ -459,7 +459,7 @@ export const checkNewOrderStatus = ({ body }: Request): OrderStatus => {
 }
 
 export const checkOrderStatusUpdate = ({ body }: Request): OrderStatus => {
-  const orderStatusName = R.pipe(
+  const orderStatusName = pipe(
     isProvided,
     isString
   )({ name: 'orderStatusName', param: body.orderStatusName })
@@ -468,7 +468,7 @@ export const checkOrderStatusUpdate = ({ body }: Request): OrderStatus => {
 }
 
 export const checkNewInvoiceStatus = ({ body }: Request): InvoiceStatus => {
-  const invoiceStatusName = R.pipe(
+  const invoiceStatusName = pipe(
     isProvided,
     isString
   )({ name: 'invoiceStatusName', param: body.invoiceStatusName })
@@ -477,7 +477,7 @@ export const checkNewInvoiceStatus = ({ body }: Request): InvoiceStatus => {
 }
 
 export const checkInvoiceStatusUpdate = ({ body }: Request): InvoiceStatus => {
-  const invoiceStatusName = R.pipe(
+  const invoiceStatusName = pipe(
     isProvided,
     isString
   )({ name: 'invoiceStatusName', param: body.invoiceStatusName })
@@ -486,7 +486,7 @@ export const checkInvoiceStatusUpdate = ({ body }: Request): InvoiceStatus => {
 }
 
 export const checkShippingMethod = ({ body }: Request): ShippingMethodInput => {
-  const shippingMethodName = R.pipe(
+  const shippingMethodName = pipe(
     isProvided,
     isString
   )({ name: 'shippingMethodName', param: body.shippingMethodName })
@@ -502,7 +502,7 @@ export const checkShippingMethod = ({ body }: Request): ShippingMethodInput => {
 }
 
 export const checkAddressType = ({ body }: Request): AddressTypeInput => {
-  const addressTypeName = R.pipe(
+  const addressTypeName = pipe(
     isProvided,
     isString
   )({ name: 'addressTypeName', param: body.addressTypeName })
@@ -518,17 +518,17 @@ export const checkAddressType = ({ body }: Request): AddressTypeInput => {
 }
 
 export const checkNewCartProduct = ({ body }: Request): CartProduct => {
-  const qty = R.pipe(
+  const qty = pipe(
     isProvided,
     canBeNumber
   )({ name: 'qty', param: body.qty })
 
-  const userID = R.pipe(
+  const userID = pipe(
     isProvided,
     canBeNumber
   )({ name: 'userID', param: body.userID })
 
-  const productID = R.pipe(
+  const productID = pipe(
     isProvided,
     canBeNumber
   )({ name: 'productID', param: body.productID })
@@ -541,7 +541,7 @@ export const checkNewCartProduct = ({ body }: Request): CartProduct => {
 }
 
 export const checkCartProductUpdate = ({ body }: Request): CartProductInput => {
-  const qty = R.pipe(
+  const qty = pipe(
     isProvided,
     canBeNumber
   )({ name: 'qty', param: body.qty })
@@ -549,7 +549,7 @@ export const checkCartProductUpdate = ({ body }: Request): CartProductInput => {
 }
 
 export const checkPaymentMethod = ({ body }: Request): PaymentMethod => {
-  const paymentMethodName = R.pipe(
+  const paymentMethodName = pipe(
     isProvided,
     isString
   )({ name: 'paymentMethodName', param: body.paymentMethodName })
@@ -562,12 +562,12 @@ export const checkNewAddress = ({ body }: Request): AddressCreateInput => {
     ? canBeBoolean({ name: 'isDefault', param: body.isDefault })
     : undefined
 
-  const addr = R.pipe(
+  const addr = pipe(
     isProvided,
     isString
   )({ name: 'addr', param: body.addr })
 
-  const addressType = R.pipe(
+  const addressType = pipe(
     isProvided,
     isString
   )({ name: 'addressType', param: body.addressType })
@@ -588,7 +588,7 @@ export const checkNewUserAddress = ({ body }: Request): UserAddressCreateInput =
 }
 
 export const checkUserAddressesUpdate = ({ body }: Request): UserAddressUpdateInput => {
-  const isDefault = R.pipe(
+  const isDefault = pipe(
     isProvided,
     canBeBoolean
   )({ name: 'isDefault', param: body.isDefault })
@@ -597,7 +597,7 @@ export const checkUserAddressesUpdate = ({ body }: Request): UserAddressUpdateIn
 }
 
 export const checkNewList = ({ body }: Request): ListCreateInput => {
-  const name = R.pipe(
+  const name = pipe(
     isProvided,
     isString
   )({ name: 'name', param: body.name })
@@ -606,7 +606,7 @@ export const checkNewList = ({ body }: Request): ListCreateInput => {
 }
 
 export const checkListUpdate = ({ body }: Request): ListCreateInput => {
-  const name = R.pipe(
+  const name = pipe(
     isProvided,
     isString
   )({ name: 'name', param: body.name })
@@ -619,17 +619,17 @@ export const checkNewReview = ({ body }: Request): ReviewCreateInput => {
     ? isString({ name: 'title', param: body.title })
     : undefined
 
-  const content = R.pipe(
+  const content = pipe(
     isProvided,
     isString
   )({ name: 'content', param: body.content })
 
-  const variation = R.pipe(
+  const variation = pipe(
     isProvided,
     isObject
   )({ name: 'variation', param: body.variation })
 
-  const stars = R.pipe(
+  const stars = pipe(
     isProvided,
     canBeNumber
   )({ name: 'stars', param: body.stars })
@@ -678,7 +678,7 @@ export const checkReviewUpdate = ({ body }: Request): ReviewUpdateInput => {
 }
 
 export const checkNewReviewComment = ({ body }: Request): ReviewCommentCreateInput => {
-  const content = R.pipe(
+  const content = pipe(
     isProvided,
     isString
   )({ name: 'content', param: body.content })
@@ -770,7 +770,7 @@ export const checkQuestionsCursor = ({ query }: Request): QuestionCursorInput =>
 }
 
 export const checkNewQuestion = ({ body }: Request): QuestionCreateInput => {
-  const content = R.pipe(
+  const content = pipe(
     isProvided,
     isString
   )({ name: 'content', param: body.content })
@@ -814,7 +814,7 @@ export const checkAnswers = ({ query }: Request): CursorInput => {
 }
 
 export const checkNewAnswer = ({ body }: Request): AnswerCreateInput => {
-  const content = R.pipe(
+  const content = pipe(
     isProvided,
     isString
   )({ name: 'content', param: body.content })
@@ -838,7 +838,7 @@ export const checkAnswerUpdate = ({ body }: Request): AnswerUpdateInput => {
 }
 
 export const checkNewAnswerComment = ({ body }: Request): AnswerCommentCreateInput => {
-  const content = R.pipe(
+  const content = pipe(
     isProvided,
     isString
   )({ name: 'content', param: body.content })
@@ -870,7 +870,7 @@ export const checkAnswerCommentUpdate = ({ body }: Request): AnswerCommentUpdate
 }
 
 export const checkParameter = ({ body }: Request): ParameterInput => {
-  const name = R.pipe(
+  const name = pipe(
     isProvided,
     isString
   )({ name: 'name', param: body.name })
@@ -879,12 +879,12 @@ export const checkParameter = ({ body }: Request): ParameterInput => {
 }
 
 export const checkNewGroupVariation = ({ body }: Request): GroupVariationCreateInput => {
-  const name = R.pipe(
+  const name = pipe(
     isProvided,
     isString
   )({ name: 'name', param: body.name })
 
-  const value = R.pipe(
+  const value = pipe(
     isProvided,
     isString
   )({ name: 'value', param: body.value })
@@ -896,7 +896,7 @@ export const checkNewGroupVariation = ({ body }: Request): GroupVariationCreateI
 }
 
 export const checkGroupVariationUpdate = ({ body }: Request): GroupVariationUpdateInput => {
-  const value = R.pipe(
+  const value = pipe(
     isProvided,
     isString
   )({ name: 'value', param: body.value })
@@ -905,7 +905,7 @@ export const checkGroupVariationUpdate = ({ body }: Request): GroupVariationUpda
 }
 
 export const checkGroupVariationDeletion = ({ body }: Request): GroupVariationDeleteInput => {
-  const name = R.pipe(
+  const name = pipe(
     isProvided,
     isString
   )({ name: 'name', param: body.name })
@@ -914,27 +914,27 @@ export const checkGroupVariationDeletion = ({ body }: Request): GroupVariationDe
 }
 
 export const checkNewOrder = ({ body }: Request): OrderCreateInput => {
-  const address = R.pipe(
+  const address = pipe(
     isProvided,
     isString
   )({ name: 'address', param: body.address })
 
-  const shippingMethod = R.pipe(
+  const shippingMethod = pipe(
     isProvided,
     isString
   )({ name: 'shippingMethod', param: body.shippingMethod })
 
-  const details = R.pipe(
+  const details = pipe(
     isProvided,
     isString
   )({ name: 'details', param: body.details })
 
-  const paymentMethod = R.pipe(
+  const paymentMethod = pipe(
     isProvided,
     isString
   )({ name: 'paymentMethod', param: body.paymentMethod })
 
-  const cart = R.pipe(
+  const cart = pipe(
     isProvided,
     isArray
   )({ name: 'cart', param: body.cart })
@@ -975,12 +975,12 @@ export const checkOrderUpdate = ({ body }: Request): OrderUpdateInput => {
 }
 
 export const checkNewOrderProduct = ({ body }: Request): OrderProductInput => {
-  const qty = R.pipe(
+  const qty = pipe(
     isProvided,
     canBeNumber
   )({ name: 'qty', param: body.qty })
 
-  const price = R.pipe(
+  const price = pipe(
     isProvided,
     canBeNumber
   )({ name: 'price', param: body.price })
@@ -1004,27 +1004,27 @@ export const checkOrderProductUpdate = ({ body }: Request): OrderProductInput =>
 }
 
 export const checkNewInvoice = ({ body }: Request): InvoiceCreateInput => {
-  const details = R.pipe(
+  const details = pipe(
     isProvided,
     isString
   )({ name: 'details', param: body.details })
 
-  const amount = R.pipe(
+  const amount = pipe(
     isProvided,
     canBeNumber
   )({ name: 'amount', param: body.amount })
 
-  const paymentMethod = R.pipe(
+  const paymentMethod = pipe(
     isProvided,
     isString
   )({ name: 'paymentMethod', param: body.paymentMethod })
 
-  const userID = R.pipe(
+  const userID = pipe(
     isProvided,
     canBeNumber
   )({ name: 'userID', param: body.userID })
 
-  const orderID = R.pipe(
+  const orderID = pipe(
     isProvided,
     canBeNumber
   )({ name: 'orderID', param: body.orderID })
@@ -1073,7 +1073,7 @@ export const checkInvoiceFilters = ({ query }: Request): InvoicesFiltersInput =>
     : undefined
 
   const page = 'page' in query
-    ? R.pipe(
+    ? pipe(
       canBeNumber,
       isPositiveNumber
     )({ name: 'page', param: query.page })
@@ -1126,7 +1126,7 @@ export const checkOrderFilters = ({ query }: Request): OrdersFiltersInput => {
     : undefined
 
   const page = 'page' in query
-    ? R.pipe(
+    ? pipe(
       canBeNumber,
       isPositiveNumber
     )({ name: 'page', param: query.page })
@@ -1179,7 +1179,7 @@ export const checkVendorFilters = ({ query }: Request): VendorsFiltersInput => {
     : undefined
 
   const page = 'page' in query
-    ? R.pipe(
+    ? pipe(
       canBeNumber,
       isPositiveNumber
     )({ name: 'page', param: query.page })
@@ -1202,7 +1202,7 @@ export const checkCategoryFilters = ({ query }: Request): CategoriesFiltersInput
     : undefined
 
   const page = 'page' in query
-    ? R.pipe(
+    ? pipe(
       canBeNumber,
       isPositiveNumber
     )({ name: 'page', param: query.page })
@@ -1233,7 +1233,7 @@ export const checkUserFilters = ({ query }: Request): UsersFiltersInput => {
     : undefined
 
   const page = 'page' in query
-    ? R.pipe(
+    ? pipe(
       canBeNumber,
       isPositiveNumber
     )({ name: 'page', param: query.page })
@@ -1297,7 +1297,7 @@ export const checkFeedFilters = ({ query }: Request): FeedFiltersInput => {
     : undefined
 
   const page = 'page' in query
-    ? R.pipe(
+    ? pipe(
       canBeNumber,
       isPositiveNumber
     )({ name: 'page', param: query.page })
@@ -1346,7 +1346,7 @@ export const checkProductFilters = ({ query }: Request): ProductsFiltersInput =>
     : undefined
 
   const page = 'page' in query
-    ? R.pipe(
+    ? pipe(
       canBeNumber,
       isPositiveNumber
     )({ name: 'page', param: query.page })
@@ -1431,11 +1431,11 @@ export const checkImagesUpdate = ({ body }: Request): ImagesUpdateInput => {
   const images: any[] = isArray({ name: 'images', param: body }).param
 
   return images.map((i) => ({
-    imageID: R.pipe(
+    imageID: pipe(
       isProvided,
       canBeNumber
     )({ name: 'imageID', param: i.imageID }).param,
-    index: R.pipe(
+    index: pipe(
       isProvided,
       canBeNumber
     )({ name: 'index', param: i.index }).param
@@ -1446,7 +1446,7 @@ export const checkImagesDelete = ({ body }: Request): ImagesDeleteInput => {
   const images: any[] = isArray({ name: 'images', param: body }).param
 
   return images.map((i) => ({
-    imageID: R.pipe(
+    imageID: pipe(
       isProvided,
       canBeNumber
     )({ name: 'imageID', param: i.imageID }).param
@@ -1475,7 +1475,7 @@ export const checkReviewFilters = ({ query }: Request): ReviewsFiltersInput => {
     : undefined
 
   const page = 'page' in query
-    ? R.pipe(
+    ? pipe(
       canBeNumber,
       isPositiveNumber
     )({ name: 'page', param: query.page })
@@ -1577,12 +1577,12 @@ export const checkImageFilters = ({ query }: Request): ImagesFiltersInput => {
 }
 
 export const checkNewVote = ({ body }: Request): VotesCreateInput => {
-  const vote = R.pipe(
+  const vote = pipe(
     isProvided,
     canBeBoolean
   )({ name: 'vote', param: body.vote })
 
-  const userID = R.pipe(
+  const userID = pipe(
     isProvided,
     isString
   )({ name: 'userID', param: body.userID })
@@ -1616,7 +1616,7 @@ export const checkVoteFilters = ({ query }: Request): VotesFiltersInput => {
 }
 
 export const checkAskFilters = ({ query }: Request): AskFiltersInput => {
-  const q = R.pipe(
+  const q = pipe(
     isProvided,
     isString
   )({ name: 'q', param: query.q })

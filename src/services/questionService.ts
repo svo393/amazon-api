@@ -1,5 +1,5 @@
 import { Request } from 'express'
-import R from 'ramda'
+import { flatten, omit } from 'ramda'
 import { Answer, AnswerComment, AnswerCommentWithUser, AnswerWithUser, BatchWithCursor, Image, Question, QuestionCreateInput, QuestionCursorInput, QuestionUpdateInput, QuestionWithUser, Vote } from '../types'
 import { defaultLimit, imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
@@ -143,7 +143,7 @@ const getQuestionsByGroup = async (questionsInput: QuestionCursorInput, req: Req
           acc += cur.vote ? 1 : -1
         ), 0)
       return {
-        ...R.omit([ 'userName', 'userEmail', 'avatar', 'userID' ], a),
+        ...omit([ 'userName', 'userEmail', 'avatar', 'userID' ], a),
         votes: voteSum,
         author: { avatar: a.avatar, name: a.userName, userID: a.userID }
       }
@@ -170,7 +170,7 @@ const getQuestionsByGroup = async (questionsInput: QuestionCursorInput, req: Req
     }
 
     if (answerCommentLimit !== 0) {
-      const answerIDs = R.flatten(Object.values(questionsWithCursor.batch)
+      const answerIDs = flatten(Object.values(questionsWithCursor.batch)
         .map((q: any) =>
           q.answers.batch.map((a: any) => a.answerID)))
 
@@ -193,7 +193,7 @@ const getQuestionsByGroup = async (questionsInput: QuestionCursorInput, req: Req
 
       answerComments = answerComments
         .map((ac) => ({
-          ...R.omit([ 'userName', 'avatar' ], ac),
+          ...omit([ 'userName', 'avatar' ], ac),
           author: { avatar: ac.avatar, name: ac.userName, userID: ac.userID }
         }))
 
@@ -259,7 +259,7 @@ const getQuestionByID = async (req: Request): Promise<QuestionWithUser> => {
   ), 0)
 
   const _question: QuestionWithUser = {
-    ...(R.omit([ 'userName', 'userEmail', 'avatar', 'userID' ], question) as Question),
+    ...(omit([ 'userName', 'userEmail', 'avatar', 'userID' ], question) as Question),
     images,
     votes: voteSum,
     author: {

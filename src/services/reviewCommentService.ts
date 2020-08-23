@@ -1,6 +1,6 @@
 import { Request } from 'express'
-import R from 'ramda'
-import { BatchWithCursor, CursorInput, Image, ReviewComment, ReviewCommentCreateInput, ReviewCommentUpdateInput, ReviewCommentWithUser, Vote } from '../types'
+import { omit } from 'ramda'
+import { BatchWithCursor, CursorInput, Image, ReviewComment, ReviewCommentCreateInput, ReviewCommentUpdateInput, ReviewCommentWithUser } from '../types'
 import { imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
 import getCursor from '../utils/getCursor'
@@ -47,7 +47,7 @@ const getCommentsByReview = async (cursorInput: CursorInput, req: Request): Prom
 
   reviewComments = reviewComments
     .map((rc) => ({
-      ...R.omit([ 'userName', 'userEmail', 'avatar', 'userID' ], rc),
+      ...omit([ 'userName', 'userEmail', 'avatar', 'userID' ], rc),
       author: { avatar: rc.avatar, name: rc.userName, userID: rc.userID }
     }))
 
@@ -90,7 +90,7 @@ const getReviewCommentByID = async (req: Request): Promise<ReviewCommentWithUser
     .where('reviewCommentID', reviewCommentID)
 
   const _reviewComment: ReviewCommentWithUser = {
-    ...(R.omit([ 'userName', 'userEmail', 'avatar', 'userID' ], reviewComment) as ReviewComment),
+    ...(omit([ 'userName', 'userEmail', 'avatar', 'userID' ], reviewComment) as ReviewComment),
     images,
     author: {
       avatar: reviewComment.avatar,

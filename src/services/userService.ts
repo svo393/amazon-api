@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import R from 'ramda'
+import { omit } from 'ramda'
 import { User, UserSafeData, UsersFiltersInput, UserUpdateInput } from '../types'
 import { defaultLimit, imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
@@ -92,7 +92,7 @@ const getUsers = async (usersFiltersinput: UsersFiltersInput): Promise<{ batch: 
       reviewCount: parseInt(u.reviewCount)
     }))
     .map((u) => ({
-      ...R.omit([
+      ...omit([
         'reviewCommentCount',
         'questionCount',
         'answerCount',
@@ -179,7 +179,7 @@ const getUserByID = async (req: Request): Promise<UserData | UserPublicData> => 
   if (rawUser === undefined) { throw new StatusError(404, 'Not Found') }
 
   const user = {
-    ...R.omit([
+    ...omit([
       'reviewCommentCount',
       'questionCount',
       'answerCount',
@@ -199,7 +199,7 @@ const getUserByID = async (req: Request): Promise<UserData | UserPublicData> => 
 
   return hasPermission
     ? user
-    : R.omit([
+    : omit([
       'email',
       'createdAt',
       'orders',
@@ -214,7 +214,7 @@ const updateUser = async (userInput: UserUpdateInput, res: Response, req: Reques
 
   if (updatedUser === undefined) { throw new StatusError(404, 'Not Found') }
 
-  return R.omit([
+  return omit([
     'password',
     'resetToken',
     'resetTokenCreatedAt'

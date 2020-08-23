@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import Knex from 'knex'
-import R from 'ramda'
+import { omit, sum } from 'ramda'
 import { Invoice, Order, OrderCreateInput, OrderFullData, OrderProduct, OrderProductFullData, OrdersFiltersInput, OrderUpdateInput } from '../types'
 import { defaultLimit } from '../utils/constants'
 import { db, dbTrans } from '../utils/db'
@@ -16,7 +16,7 @@ const addOrder = async (orderInput: OrderCreateInput, req: Request): Promise<Ord
 
     const [ addedOrder ]: Order[] = await trx('orders')
       .insert({
-        ...R.omit([ 'cart', 'details', 'paymentMethod' ], orderInput),
+        ...omit([ 'cart', 'details', 'paymentMethod' ], orderInput),
         orderStatus: 'NEW',
         createdAt: now,
         updatedAt: now,
@@ -45,7 +45,7 @@ const addOrder = async (orderInput: OrderCreateInput, req: Request): Promise<Ord
 
     const [ addedInvoice ]: Invoice[] = await trx('invoices')
       .insert({
-        amount: R.sum(addedOrderProducts.map((op) => op.qty * op.price)),
+        amount: sum(addedOrderProducts.map((op) => op.qty * op.price)),
         details: orderInput.details,
         orderID: addedOrder.orderID,
         userID,

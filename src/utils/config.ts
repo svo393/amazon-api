@@ -1,5 +1,5 @@
 import dotenv from 'dotenv'
-import R from 'ramda'
+import { pickAll } from 'ramda'
 
 dotenv.config()
 
@@ -16,7 +16,7 @@ type Config = {
   BASE_URLS: (string | undefined)[];
 }
 
-const envVars: Config = R.pickAll([
+const envVars: Config = pickAll([
   'PORT',
   'REDIS_PASS',
   'SESSION_SECRET',

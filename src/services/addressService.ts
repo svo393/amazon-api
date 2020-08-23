@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import Knex from 'knex'
-import R from 'ramda'
+import { omit } from 'ramda'
 import { Address, AddressCreateInput, UserAddress } from '../types'
 import { db, dbTrans } from '../utils/db'
 import StatusError from '../utils/StatusError'
@@ -50,7 +50,7 @@ const addAddress = async (addressInput: AddressCreateInput, req: Request): Promi
   } else {
     curUA = await dbTrans(async (trx: Knex.Transaction) => {
       const [ addedAddress ]: Address[] = await trx
-        .insert(R.omit([ 'isDefault' ], addressInput), [ '*' ])
+        .insert(omit([ 'isDefault' ], addressInput), [ '*' ])
         .into('addresses')
 
       if (addedAddress === undefined) throw new StatusError()

@@ -4,11 +4,11 @@ import reviewService from '../services/reviewService'
 import voteService from '../services/voteService'
 import { UPLOAD_TIMEOUT } from '../utils/config'
 import { checkMediaUpload, checkNewReviewComment, checkNewVote, checkReviewComments, checkReviewFilters, checkReviewUpdate } from '../utils/inputValidator'
-import { multerUpload, requireAdmin, requireAuth, requireCreator, requireCreatorOrAdmin } from '../utils/middleware'
+import { multerUpload, requireAuth, requireCreator, requireCreatorOrAdmin } from '../utils/middleware'
 
 const router = Router()
 
-router.get('/', requireAdmin, async (req, res) => {
+router.get('/', async (req, res) => {
   const reviewsFiltersinput = checkReviewFilters(req)
   const reviews = await reviewService.getReviews(reviewsFiltersinput, req)
   res.json(reviews)
