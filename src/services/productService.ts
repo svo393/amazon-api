@@ -110,6 +110,7 @@ type ProductListRawData = Pick<Product,
   reviewCount: string;
   vendorName: string;
   categoryName: string;
+  ratingStats?: { [ k: number ]: number };
 }
 
 type ProductListData = Omit<ProductListRawData, 'stars' | 'reviewCount'> & {
@@ -147,6 +148,8 @@ const getProducts = async (productsFiltersInput: ProductsFiltersInput): Promise<
   const images = await db<Image>('images')
     .whereNotNull('productID')
 
+  let ratingStats: { stars: number; count: string }[]
+
   const productSizes: { productID: number; sum: string }[] = await db('productSizes')
     .select('productID')
     .sum('qty')
@@ -167,8 +170,21 @@ const getProducts = async (productsFiltersInput: ProductsFiltersInput): Promise<
   })
 
   if (groupID !== undefined) {
+    ratingStats = await db('reviews')
+      .select('stars')
+      .count('stars')
+      .where('groupID', groupID)
+      .groupBy('stars')
+
     products = products
       .filter((p) => p.groupID === groupID)
+      .map((p) => ({
+        ...p,
+        ratingStats: ratingStats.reduce((acc, cur) => {
+          acc[cur.stars] = Number(cur.count)
+          return acc
+        }, {} as { [ k: number ]: number })
+      }))
   }
 
   if (priceMin !== undefined) {
