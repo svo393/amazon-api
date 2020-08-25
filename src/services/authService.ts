@@ -77,12 +77,12 @@ const loginUser = async (userInput: UserLoginInput, req: Request, requiresAdmin 
   ], existingUser)
 }
 
-type UserInfo = { userID: number; role: string; avatar: boolean }
+type UserInfo = { userID: number; role: string; avatar: boolean; name: string }
 
 const checkInUser = async (req: Request): Promise<UserInfo> => {
   const user = await db<User>('users')
     .where('userID', req.session?.userID)
-    .first('userID', 'role', 'avatar')
+    .first('userID', 'role', 'avatar', 'name')
 
   if (user === undefined) { throw new StatusError(401, 'Unauthorized') }
   return user

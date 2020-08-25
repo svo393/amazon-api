@@ -44,6 +44,7 @@ const getCommentsByReview = async (cursorInput: CursorInput, req: Request): Prom
     .join('users as u', 'rc.userID', 'u.userID')
     .where('reviewID', reviewID)
     .andWhere('rc.moderationStatus', 'APPROVED')
+    .orWhere('rc.userID', req.session?.userID ?? 0)
 
   reviewComments = reviewComments
     .map((rc) => ({
