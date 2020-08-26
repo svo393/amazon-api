@@ -1,34 +1,56 @@
 import { Request } from 'express'
+import Knex from 'knex'
 import { omit } from 'ramda'
-import { BatchWithCursor, CursorInput, Image, ReviewComment, ReviewCommentCreateInput, ReviewCommentUpdateInput, ReviewCommentWithUser } from '../types'
-import { imagesBasePath } from '../utils/constants'
-import { db } from '../utils/db'
+import { BatchWithCursor, CursorInput, ReviewComment, ReviewCommentCreateInput, ReviewCommentUpdateInput, ReviewCommentWithUser, User } from '../types'
+import { db, dbTrans } from '../utils/db'
 import getCursor from '../utils/getCursor'
-import getUploadIndex from '../utils/getUploadIndex'
-import { uploadImages } from '../utils/img'
 import sortItems from '../utils/sortItems'
 import StatusError from '../utils/StatusError'
 
-const addReviewComment = async (reviewCommentInput: ReviewCommentCreateInput, req: Request): Promise<ReviewComment> => {
+const addReviewComment = async (reviewCommentInput: ReviewCommentCreateInput, req: Request): Promise<ReviewCommentWithUser> => {
   const now = new Date()
 
-  const [ addedReviewComment ]: ReviewComment[] = await db('reviewComments')
-    .insert({
-      ...reviewCommentInput,
-      userID: req.session?.userID,
-      createdAt: now,
-      updatedAt: now,
-      reviewID: req.params.reviewID
-    }, [ '*' ])
+  return await dbTrans(async (trx: Knex.Transaction) => {
+    if (reviewCommentInput.parentReviewCommentID !== undefined) {
+      const parentReviewComment = await trx<ReviewComment>('reviewComments')
+        .first('userID')
+        .where('reviewCommentID', reviewCommentInput.parentReviewCommentID)
 
-  return addedReviewComment
+      if (parentReviewComment?.userID === req.session?.userID) throw new StatusError(403, 'Forbidden')
+    }
+
+    const user = await trx<User>('users')
+      .first('name', 'avatar', 'userID')
+      .where('userID', req.session?.userID)
+
+    if (user === undefined) throw new StatusError()
+
+    const [ addedReviewComment ]: ReviewComment[] = await trx('reviewComments')
+      .insert({
+        ...reviewCommentInput,
+        userID: req.session?.userID,
+        createdAt: now,
+        updatedAt: now,
+        reviewID: req.params.reviewID
+      }, [ '*' ])
+
+    return {
+      ...addedReviewComment,
+      hasChildren: false,
+      author: {
+        avatar: user.avatar,
+        name: user.name,
+        userID: user.userID
+      }
+    }
+  })
 }
 
 const getCommentsByReview = async (cursorInput: CursorInput, req: Request): Promise<BatchWithCursor<ReviewComment> & { reviewID: number }> => {
   const { startCursor, limit = 5, sortBy = 'createdAt_desc' } = cursorInput
   const { reviewID } = req.params
 
-  let reviewComments = await db('reviewComments as rc')
+  let reviewComments: (Partial<ReviewComment & { avatar?: boolean; userName?: string; hasChildren?: boolean }>)[] = await db('reviewComments as rc')
     .select(
       'rc.reviewCommentID',
       'rc.parentReviewCommentID',
@@ -46,9 +68,17 @@ const getCommentsByReview = async (cursorInput: CursorInput, req: Request): Prom
     .andWhere('rc.moderationStatus', 'APPROVED')
     .orWhere('rc.userID', req.session?.userID ?? 0)
 
+  const childrenReviewComment = await db<ReviewComment>('reviewComments')
+    .select('parentReviewCommentID')
+    .whereNotNull('parentReviewCommentID')
+
+  const parentReviewCommentIDs = childrenReviewComment
+    .map((rc) => rc.parentReviewCommentID)
+
   reviewComments = reviewComments
     .map((rc) => ({
-      ...omit([ 'userName', 'userEmail', 'avatar', 'userID' ], rc),
+      ...omit([ 'userName', 'avatar', 'userID' ], rc),
+      hasChildren: parentReviewCommentIDs.includes(rc.reviewCommentID),
       author: { avatar: rc.avatar, name: rc.userName, userID: rc.userID }
     }))
 
@@ -87,12 +117,13 @@ const getReviewCommentByID = async (req: Request): Promise<ReviewCommentWithUser
 
   if (reviewComment === undefined) throw new StatusError(404, 'Not Found')
 
-  const images = await db<Image>('images')
-    .where('reviewCommentID', reviewCommentID)
+  const childReviewComment = await db<ReviewComment>('reviewComments')
+    .first('parentReviewCommentID')
+    .where('parentReviewCommentID', req.params.reviewCommentID)
 
   const _reviewComment: ReviewCommentWithUser = {
     ...(omit([ 'userName', 'userEmail', 'avatar', 'userID' ], reviewComment) as ReviewComment),
-    images,
+    hasChildren: childReviewComment !== undefined,
     author: {
       avatar: reviewComment.avatar,
       name: reviewComment.userName,
@@ -119,38 +150,18 @@ const updateReviewComment = async (reviewCommentInput: ReviewCommentUpdateInput,
   return updatedReviewComment
 }
 
-const deleteReviewComment = async (req: Request): Promise<void> => {
+const deleteReviewComment = async (req: Request): Promise<ReviewComment> => {
+  const reviewComment = await db<ReviewComment>('reviewComments')
+    .first()
+    .where('reviewCommentID', req.params.reviewCommentID)
+
   const deleteCount = await db('reviewComments')
     .del()
     .where('reviewCommentID', req.params.reviewCommentID)
 
-  if (deleteCount === 0) throw new StatusError(404, 'Not Found')
-}
+  if (deleteCount === 0 || reviewComment === undefined) throw new StatusError(404, 'Not Found')
 
-const uploadReviewCommentImages = async (files: Express.Multer.File[], req: Request): Promise<void> => {
-  const filesWithIndexes = files.map((f) => {
-    const index = getUploadIndex(f.filename)
-    return {
-      reviewCommentID: req.params.reviewCommentID,
-      userID: req.session?.userID,
-      index
-    }
-  })
-
-  const uploadedImages: Image[] = await db('images')
-    .insert(filesWithIndexes, [ '*' ])
-
-  const uploadConfig = {
-    fileNames: uploadedImages.map((i) => i.imageID),
-    imagesPath: `${imagesBasePath}/images`,
-    maxWidth: 1632,
-    maxHeight: 1632,
-    previewWidth: 175,
-    previewHeight: 175,
-    thumbWidth: 117,
-    thumbHeight: 117
-  }
-  uploadImages(files, uploadConfig)
+  return reviewComment
 }
 
 export default {
@@ -158,6 +169,5 @@ export default {
   getCommentsByReview,
   getReviewCommentByID,
   updateReviewComment,
-  deleteReviewComment,
-  uploadReviewCommentImages
+  deleteReviewComment
 }

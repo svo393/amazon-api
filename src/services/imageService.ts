@@ -10,10 +10,6 @@ const getImages = async (imagesFiltersinput: ImagesFiltersInput): Promise<Image[
   const {
     productID,
     reviewID,
-    reviewCommentID,
-    questionID,
-    answerID,
-    answerCommentID,
     userID
   } = imagesFiltersinput
 
@@ -27,26 +23,6 @@ const getImages = async (imagesFiltersinput: ImagesFiltersInput): Promise<Image[
   if (reviewID !== undefined) {
     images = images
       .filter((i) => i.reviewID === reviewID)
-  }
-
-  if (reviewCommentID !== undefined) {
-    images = images
-      .filter((i) => i.reviewCommentID === reviewCommentID)
-  }
-
-  if (questionID !== undefined) {
-    images = images
-      .filter((i) => i.questionID === questionID)
-  }
-
-  if (answerID !== undefined) {
-    images = images
-      .filter((i) => i.answerID === answerID)
-  }
-
-  if (answerCommentID !== undefined) {
-    images = images
-      .filter((i) => i.answerCommentID === answerCommentID)
   }
 
   if (userID !== undefined) {

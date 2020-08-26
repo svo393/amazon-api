@@ -79,10 +79,6 @@ export type Image = {
   index: number;
   productID?: number;
   reviewID?: number;
-  reviewCommentID?: number;
-  questionID?: number;
-  answerID?: number;
-  answerCommentID?: number;
   userID: number;
 }
 
@@ -242,24 +238,21 @@ type Activity = (
 export type Feed = Activity[]
 
 export type QuestionWithUser = Question & {
-  images: Image[];
   votes: number;
   author: Pick<User, 'name' | 'userID' | 'avatar'> & { email?: string };
 }
 
 export type AnswerWithUser = Answer & {
-  images: Image[];
   votes: number;
   author: Pick<User, 'name' | 'userID' | 'avatar'> & { email?: string };
 }
 
 export type AnswerCommentWithUser = AnswerComment & {
-  images: Image[];
   author: Pick<User, 'name' | 'userID' | 'avatar'> & { email?: string };
 }
 
 export type ReviewCommentWithUser = ReviewComment & {
-  images: Image[];
+  hasChildren: boolean;
   author: Pick<User, 'name' | 'userID' | 'avatar'> & { email?: string };
 }
 
@@ -527,10 +520,6 @@ export type ReviewsFiltersInput = {
 export type ImagesFiltersInput = {
   productID?: number;
   reviewID?: number;
-  reviewCommentID?: number;
-  questionID?: number;
-  answerID?: number;
-  answerCommentID?: number;
   userID?: number;
 }
 

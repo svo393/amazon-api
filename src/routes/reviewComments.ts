@@ -17,8 +17,8 @@ router.put('/:reviewCommentID', requireCreatorOrAdmin('reviewComments', 'reviewC
 })
 
 router.delete('/:reviewCommentID', requireCreator('reviewComments', 'reviewCommentID', 'params'), async (req, res) => {
-  await reviewCommentService.deleteReviewComment(req)
-  res.status(204).end()
+  const deletedReviewComment = await reviewCommentService.deleteReviewComment(req)
+  res.json(deletedReviewComment)
 })
 
 export default router

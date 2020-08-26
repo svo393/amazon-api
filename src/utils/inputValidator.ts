@@ -1545,22 +1545,6 @@ export const checkImageFilters = ({ query }: Request): ImagesFiltersInput => {
     ? canBeNumber({ name: 'reviewID', param: query.reviewID })
     : undefined
 
-  const reviewCommentID = 'reviewCommentID' in query
-    ? canBeNumber({ name: 'reviewCommentID', param: query.reviewCommentID })
-    : undefined
-
-  const questionID = 'questionID' in query
-    ? canBeNumber({ name: 'questionID', param: query.questionID })
-    : undefined
-
-  const answerID = 'answerID' in query
-    ? canBeNumber({ name: 'answerID', param: query.answerID })
-    : undefined
-
-  const answerCommentID = 'answerCommentID' in query
-    ? canBeNumber({ name: 'answerCommentID', param: query.answerCommentID })
-    : undefined
-
   const userID = 'userID' in query
     ? canBeNumber({ name: 'userID', param: query.userID })
     : undefined
@@ -1568,10 +1552,6 @@ export const checkImageFilters = ({ query }: Request): ImagesFiltersInput => {
   return {
     productID: productID?.param,
     reviewID: reviewID?.param,
-    reviewCommentID: reviewCommentID?.param,
-    questionID: questionID?.param,
-    answerID: answerID?.param,
-    answerCommentID: answerCommentID?.param,
     userID: userID?.param
   }
 }

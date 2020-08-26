@@ -374,44 +374,12 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .integer('reviewID')
         .references('reviews.reviewID')
         .onDelete('CASCADE')
-
-      t
-        .integer('reviewCommentID')
-        .references('reviewComments.reviewCommentID')
-        .onDelete('CASCADE')
-
-      t
-        .integer('questionID')
-        .references('questions.questionID')
-        .onDelete('CASCADE')
-
-      t
-        .integer('answerID')
-        .references('answers.answerID')
-        .onDelete('CASCADE')
-
-      t
-        .integer('answerCommentID')
-        .references('answerComments.answerCommentID')
-        .onDelete('CASCADE')
     })
     .alterTable('images', (t) => {
       t.unique([ 'productID', 'index' ])
     })
     .alterTable('images', (t) => {
       t.unique([ 'reviewID', 'index' ])
-    })
-    .alterTable('images', (t) => {
-      t.unique([ 'reviewCommentID', 'index' ])
-    })
-    .alterTable('images', (t) => {
-      t.unique([ 'questionID', 'index' ])
-    })
-    .alterTable('images', (t) => {
-      t.unique([ 'answerID', 'index' ])
-    })
-    .alterTable('images', (t) => {
-      t.unique([ 'answerCommentID', 'index' ])
     })
 
     .createTable('groupVariations', (t) => {

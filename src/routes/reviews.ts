@@ -49,13 +49,6 @@ router.post('/:reviewID/upload', requireCreator('reviews', 'reviewID', 'params')
   res.status(204).end()
 })
 
-router.post('/:reviewID/comments/:reviewCommentID/upload', requireCreator('reviewComments', 'reviewCommentID', 'params'), multerUpload.array('reviewCommentImages', 4), (req, res) => {
-  req.socket.setTimeout(UPLOAD_TIMEOUT)
-  const reviewCommentImages = checkMediaUpload(req)
-  reviewCommentService.uploadReviewCommentImages(reviewCommentImages, req)
-  res.status(204).end()
-})
-
 router.post('/:reviewID/votes', requireAuth, async (req, res) => {
   const voteCreateInput = checkNewVote(req)
   const addedVote = await voteService.addVote(voteCreateInput, req)

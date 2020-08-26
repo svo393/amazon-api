@@ -1,11 +1,9 @@
 import { Request } from 'express'
 import { flatten, omit } from 'ramda'
-import { Answer, AnswerComment, AnswerCommentWithUser, AnswerWithUser, BatchWithCursor, Image, Question, QuestionCreateInput, QuestionCursorInput, QuestionUpdateInput, QuestionWithUser, Vote } from '../types'
-import { defaultLimit, imagesBasePath } from '../utils/constants'
+import { Answer, AnswerComment, AnswerCommentWithUser, AnswerWithUser, BatchWithCursor, Question, QuestionCreateInput, QuestionCursorInput, QuestionUpdateInput, QuestionWithUser, Vote } from '../types'
+import { defaultLimit } from '../utils/constants'
 import { db } from '../utils/db'
 import getCursor from '../utils/getCursor'
-import getUploadIndex from '../utils/getUploadIndex'
-import { uploadImages } from '../utils/img'
 import sortItems from '../utils/sortItems'
 import StatusError from '../utils/StatusError'
 
@@ -248,9 +246,6 @@ const getQuestionByID = async (req: Request): Promise<QuestionWithUser> => {
 
   if (question === undefined) throw new StatusError(404, 'Not Found')
 
-  const images = await db<Image>('images')
-    .where('questionID', questionID)
-
   const votes = await db<Vote>('votes')
     .where('questionID', questionID)
 
@@ -260,7 +255,6 @@ const getQuestionByID = async (req: Request): Promise<QuestionWithUser> => {
 
   const _question: QuestionWithUser = {
     ...(omit([ 'userName', 'userEmail', 'avatar', 'userID' ], question) as Question),
-    images,
     votes: voteSum,
     author: {
       avatar: question.avatar,
@@ -296,38 +290,11 @@ const deleteQuestion = async (req: Request): Promise<void> => {
   if (deleteCount === 0) throw new StatusError(404, 'Not Found')
 }
 
-const uploadQuestionImages = async (files: Express.Multer.File[], req: Request): Promise<void> => {
-  const filesWithIndexes = files.map((f) => {
-    const index = getUploadIndex(f.filename)
-    return {
-      questionID: req.params.questionID,
-      userID: req.session?.userID,
-      index
-    }
-  })
-
-  const uploadedImages: Image[] = await db('images')
-    .insert(filesWithIndexes, [ '*' ])
-
-  const uploadConfig = {
-    fileNames: uploadedImages.map((i) => i.imageID),
-    imagesPath: `${imagesBasePath}/images`,
-    maxWidth: 1632,
-    maxHeight: 1632,
-    previewWidth: 175,
-    previewHeight: 175,
-    thumbWidth: 117,
-    thumbHeight: 117
-  }
-  uploadImages(files, uploadConfig)
-}
-
 export default {
   addQuestion,
   getQuestionsByUser,
   getQuestionsByGroup,
   getQuestionByID,
   updateQuestion,
-  deleteQuestion,
-  uploadQuestionImages
+  deleteQuestion
 }
