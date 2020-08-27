@@ -1,6 +1,6 @@
 import { Request } from 'express'
-import { flatten, omit } from 'ramda'
-import { Answer, AnswerComment, AnswerCommentWithUser, AnswerWithUser, BatchWithCursor, Question, QuestionCreateInput, QuestionCursorInput, QuestionUpdateInput, QuestionWithUser, Vote } from '../types'
+import { omit } from 'ramda'
+import { AnswerWithUser, BatchWithCursor, Question, QuestionCreateInput, QuestionCursorInput, QuestionUpdateInput, QuestionWithUser, Vote } from '../types'
 import { defaultLimit } from '../utils/constants'
 import { db } from '../utils/db'
 import getCursor from '../utils/getCursor'
@@ -38,9 +38,7 @@ const getQuestionsByUser = async (req: Request): Promise<Question[]> => {
 
 type QuestionWithDescendants =
 BatchWithCursor<Question & {
-  answers?: BatchWithCursor<AnswerWithUser & {
-    answerComments?: BatchWithCursor<AnswerCommentWithUser>;
-  }>;
+  answers?: BatchWithCursor<AnswerWithUser>;
 }> & { groupID: number }
 
 const getQuestionsByGroup = async (questionsInput: QuestionCursorInput, req: Request): Promise<QuestionWithDescendants> => {
@@ -48,7 +46,6 @@ const getQuestionsByGroup = async (questionsInput: QuestionCursorInput, req: Req
     startCursor,
     limit,
     answerLimit = 1,
-    answerCommentLimit = 0,
     page,
     onlyAnswered = true,
     sortBy = 'votes_desc'
@@ -166,60 +163,6 @@ const getQuestionsByGroup = async (questionsInput: QuestionCursorInput, req: Req
           : q
       })
     }
-
-    if (answerCommentLimit !== 0) {
-      const answerIDs = flatten(Object.values(questionsWithCursor.batch)
-        .map((q: any) =>
-          q.answers.batch.map((a: any) => a.answerID)))
-
-      let answerComments = await db<AnswerComment>('answerComments as ac')
-        .select(
-          'ac.answerCommentID',
-          'ac.createdAt',
-          'ac.updatedAt',
-          'ac.content',
-          'ac.moderationStatus',
-          'ac.userID',
-          'ac.answerID',
-          'ac.parentAnswerCommentID',
-          'u.avatar',
-          'u.name as userName'
-        )
-        .join('users as u', 'ac.userID', 'u.userID')
-        .whereIn('answerID', answerIDs)
-        .andWhere('ac.moderationStatus', 'APPROVED')
-
-      answerComments = answerComments
-        .map((ac) => ({
-          ...omit([ 'userName', 'avatar' ], ac),
-          author: { avatar: ac.avatar, name: ac.userName, userID: ac.userID }
-        }))
-
-      if (answerComments.length !== 0) {
-        questionsWithCursor = {
-          ...questionsWithCursor,
-          batch: questionsWithCursor.batch.map((q: Question & { answers: BatchWithCursor<Answer & { userName: string }> }) => ({
-            ...q,
-            answers: {
-              batch: q.answers.batch.map((a: Answer & { userName: string }) => {
-                const curAnswerComments = answerComments.filter((ac) => ac.answerID === a.answerID)
-                return curAnswerComments.length !== 0
-                  ? {
-                    ...a,
-                    answerComments: getCursor({
-                      startCursor: undefined,
-                      limit: answerCommentLimit,
-                      idProp: 'answerCommentID',
-                      data: sortItems(curAnswerComments, 'createdAt')
-                    })
-                  }
-                  : a
-              })
-            }
-          }))
-        }
-      }
-    }
   }
 
   return questionsWithCursor
@@ -265,7 +208,7 @@ const getQuestionByID = async (req: Request): Promise<QuestionWithUser> => {
   }
 
   ![ 'ROOT', 'ADMIN' ].includes(req.session?.role) &&
-    delete _question.author.email
+    delete _question.author
 
   return _question
 }

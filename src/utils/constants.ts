@@ -24,7 +24,6 @@ export const baseAPI = '/api'
 export const apiURLs = {
   addresses: `${baseAPI}/addresses`,
   addressTypes: `${baseAPI}/address-types`,
-  answerComments: `${baseAPI}/answer-comments`,
   answers: `${baseAPI}/answers`,
   auth: `${baseAPI}/auth`,
   categories: `${baseAPI}/categories`,

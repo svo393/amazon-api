@@ -291,35 +291,6 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .defaultTo('NEW')
     })
 
-    .createTable('answerComments', (t) => {
-      t.increments('answerCommentID')
-      t.dateTime('createdAt').notNullable()
-      t.dateTime('updatedAt').notNullable()
-      t.string('content', 65535).notNullable()
-
-      t
-        .integer('userID')
-        .references('users.userID')
-        .notNullable()
-        .onDelete('CASCADE')
-
-      t
-        .integer('answerID')
-        .references('answers.answerID')
-        .notNullable()
-        .onDelete('CASCADE')
-
-      t
-        .integer('parentAnswerCommentID')
-        .references('answerComments.answerCommentID')
-        .onDelete('SET NULL')
-
-      t
-        .string('moderationStatus')
-        .references('moderationStatuses.moderationStatusName')
-        .defaultTo('NEW')
-    })
-
     .createTable('votes', (t) => {
       t.increments('voteID')
       t.boolean('vote').notNullable()
@@ -530,7 +501,6 @@ export const down = (knex: Knex): Knex.SchemaBuilder =>
     .dropTableIfExists('groupVariations')
     .dropTableIfExists('images')
     .dropTableIfExists('votes')
-    .dropTableIfExists('answerComments')
     .dropTableIfExists('answers')
     .dropTableIfExists('questions')
     .dropTableIfExists('reviewComments')

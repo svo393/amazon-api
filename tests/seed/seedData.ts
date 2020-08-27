@@ -133,10 +133,7 @@ export const initialProducts = {
                 { author: 3, content: '17 inch' },
                 {
                   author: 2,
-                  content: '17.5"',
-                  comments: [
-                    { author: 1, content: 'Will check it out, thanks.' }
-                  ]
+                  content: '17.5"'
                 }
               ]
             }

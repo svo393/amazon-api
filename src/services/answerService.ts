@@ -1,24 +1,47 @@
 import { Request } from 'express'
+import Knex from 'knex'
 import { omit } from 'ramda'
-import { Answer, AnswerCreateInput, AnswerUpdateInput, AnswerWithUser, BatchWithCursor, CursorInput, Vote } from '../types'
-import { db } from '../utils/db'
+import { Answer, AnswerCreateInput, AnswerUpdateInput, AnswerWithUser, BatchWithCursor, CursorInput, User, Vote } from '../types'
+import { db, dbTrans } from '../utils/db'
 import getCursor from '../utils/getCursor'
 import sortItems from '../utils/sortItems'
 import StatusError from '../utils/StatusError'
 
-const addAnswer = async (answerInput: AnswerCreateInput, req: Request): Promise<Answer> => {
+const addAnswer = async (answerInput: AnswerCreateInput, req: Request): Promise<AnswerWithUser> => {
   const now = new Date()
 
-  const [ addedAnswer ]: Answer[] = await db('answers')
-    .insert({
-      ...answerInput,
-      userID: req.session?.userID,
-      createdAt: now,
-      updatedAt: now,
-      questionID: req.params.questionID
-    }, [ '*' ])
+  return await dbTrans(async (trx: Knex.Transaction) => {
+    const [ addedAnswer ]: Answer[] = await trx('answers')
+      .insert({
+        ...answerInput,
+        userID: req.session?.userID,
+        createdAt: now,
+        updatedAt: now,
+        questionID: req.params.questionID
+      }, [ '*' ])
 
-  return addedAnswer
+    const user = await trx<User>('users')
+      .first()
+      .where('userID', addedAnswer.userID)
+
+    if (user === undefined) throw new StatusError()
+
+    const _addedAnswer: AnswerWithUser = {
+      ...addedAnswer,
+      votes: 0,
+      author: {
+        avatar: user.avatar,
+        name: user.name,
+        email: user.email,
+        userID: user.userID
+      }
+    }
+
+    ![ 'ROOT', 'ADMIN' ].includes(req.session?.role) &&
+    delete _addedAnswer.author.email
+
+    return _addedAnswer
+  })
 }
 
 const getAnswersByQuestion = async (cursorInput: CursorInput, req: Request): Promise<BatchWithCursor<Answer & { votes: number; upVotes: number }> & { questionID: number }> => {
@@ -39,7 +62,11 @@ const getAnswersByQuestion = async (cursorInput: CursorInput, req: Request): Pro
     )
     .join('users as u', 'a.userID', 'u.userID')
     .where('questionID', questionID)
-    .andWhere('a.moderationStatus', 'APPROVED')
+    .where((builder) => {
+      builder
+        .where('a.moderationStatus', 'APPROVED')
+        .orWhere('a.userID', req.session?.userID ?? 0)
+    })
 
   const votes = await db<Vote>('votes')
     .whereNotNull('answerID')

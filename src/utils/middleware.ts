@@ -20,7 +20,6 @@ type Entities =
   | 'reviewComments'
   | 'questions'
   | 'answers'
-  | 'answerComments'
   | 'cartProducts'
   | 'orderStatuses'
   | 'invoiceStatuses'

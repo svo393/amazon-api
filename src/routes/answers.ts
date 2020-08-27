@@ -1,8 +1,7 @@
 import Router from 'express'
-import answerCommentService from '../services/answerCommentService'
 import answerService from '../services/answerService'
 import voteService from '../services/voteService'
-import { checkAnswerUpdate, checkNewAnswerComment, checkNewVote } from '../utils/inputValidator'
+import { checkAnswerUpdate, checkNewVote } from '../utils/inputValidator'
 import { requireAuth, requireCreator, requireCreatorOrAdmin } from '../utils/middleware'
 
 const router = Router()
@@ -21,17 +20,6 @@ router.put('/:answerID', requireCreatorOrAdmin('answers', 'answerID', 'params'),
 router.delete('/:answerID', requireCreator('answers', 'answerID', 'params'), async (req, res) => {
   await answerService.deleteAnswer(req)
   res.status(204).end()
-})
-
-router.post('/:answerID/comments', requireAuth, async (req, res) => {
-  const answerCommentCreateInput = checkNewAnswerComment(req)
-  const addedAnswerComment = await answerCommentService.addAnswerComment(answerCommentCreateInput, req)
-  res.status(201).json(addedAnswerComment)
-})
-
-router.get('/:answerID/comments', async (req, res) => {
-  const answerComments = await answerCommentService.getCommentsByAnswer(req)
-  res.json(answerComments)
 })
 
 router.post('/:answerID/votes', requireAuth, async (req, res) => {

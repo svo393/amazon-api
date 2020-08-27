@@ -3,7 +3,6 @@ import 'express-async-errors'
 import { apiURLs } from '../utils/constants'
 import addressesRouter from './addresses'
 import addressTypesRouter from './addressTypes'
-import answerCommentsRouter from './answerComments'
 import answersRouter from './answers'
 import authRouter from './auth'
 import categoriesRouter from './categories'
@@ -31,7 +30,6 @@ import vendorsRouter from './vendors'
 export default Router()
   .use(apiURLs.addresses, addressesRouter)
   .use(apiURLs.addressTypes, addressTypesRouter)
-  .use(apiURLs.answerComments, answerCommentsRouter)
   .use(apiURLs.answers, answersRouter)
   .use(apiURLs.auth, authRouter)
   .use(apiURLs.categories, categoriesRouter)

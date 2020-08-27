@@ -15,7 +15,6 @@ export const init = async (): Promise<void> => {
   await db('parameters').del()
   await db('groupVariations').del()
   await db('images').del()
-  await db('answerComments').del()
   await db('answers').del()
   await db('questions').del()
   await db('reviewComments').del()
@@ -43,7 +42,6 @@ export const init = async (): Promise<void> => {
     ALTER SEQUENCE "invoices_invoiceID_seq" START WITH ${randomNumber(211, 297)} INCREMENT BY 3 RESTART;
     ALTER SEQUENCE "orders_orderID_seq" START WITH ${randomNumber(511, 597)} INCREMENT BY 3 RESTART;
     ALTER SEQUENCE "images_imageID_seq" START WITH ${randomNumber(1011, 1997)} INCREMENT BY 3 RESTART;
-    ALTER SEQUENCE "answerComments_answerCommentID_seq" START WITH ${randomNumber(511, 597)} INCREMENT BY 3 RESTART;
     ALTER SEQUENCE "answers_answerID_seq" START WITH ${randomNumber(411, 497)} INCREMENT BY 3 RESTART;
     ALTER SEQUENCE "questions_questionID_seq" START WITH ${randomNumber(311, 397)}  INCREMENT BY 3 RESTART;
     ALTER SEQUENCE "reviewComments_reviewCommentID_seq" START WITH ${randomNumber(511, 597)} INCREMENT BY 3 RESTART;

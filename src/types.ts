@@ -138,17 +138,6 @@ export type Answer = {
   questionID: number;
 }
 
-export type AnswerComment = {
-  answerCommentID: number;
-  createdAt: Date;
-  updatedAt: Date;
-  content: string;
-  moderationStatus: string;
-  userID: number;
-  answerID: number;
-  parentAnswerCommentID?: number;
-}
-
 export type GroupVariation = {
   name: string;
   value: string;
@@ -231,23 +220,18 @@ export type ReviewWithUser = Review & {
 type Activity = (
   ReviewComment |
   Question |
-  Answer |
-  AnswerComment
+  Answer
 ) & { type: string; userEmail: string }
 
 export type Feed = Activity[]
 
 export type QuestionWithUser = Question & {
   votes: number;
-  author: Pick<User, 'name' | 'userID' | 'avatar'> & { email?: string };
+  author?: Pick<User, 'name' | 'userID' | 'avatar' | 'email'>;
 }
 
 export type AnswerWithUser = Answer & {
   votes: number;
-  author: Pick<User, 'name' | 'userID' | 'avatar'> & { email?: string };
-}
-
-export type AnswerCommentWithUser = AnswerComment & {
   author: Pick<User, 'name' | 'userID' | 'avatar'> & { email?: string };
 }
 
@@ -384,19 +368,8 @@ export type CursorInput = {
 
 export type QuestionCursorInput = CursorInput & {
   answerLimit?: number;
-  answerCommentLimit?: number;
   onlyAnswered?: boolean;
  }
-
-export type AnswerCommentCreateInput = Pick<AnswerComment,
-  | 'content'
-  | 'parentAnswerCommentID'
->
-
-export type AnswerCommentUpdateInput = Partial<Pick<AnswerComment,
-  | 'content'
-  | 'moderationStatus'
->>
 
 export type BatchWithCursor<T> = {
   totalCount: number;

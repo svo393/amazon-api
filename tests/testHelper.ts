@@ -1,6 +1,6 @@
 import supertest from 'supertest'
 import app from '../src/app'
-import { Address, AddressCreateInput, AddressType, AddressTypeInput, Answer, AnswerComment, AnswerCommentCreateInput, AnswerCreateInput, CartProduct, Category, CategoryCreateInput, Follower, Group, GroupVariation, GroupVariationCreateInput, Invoice, InvoiceCreateInput, InvoiceStatus, List, ListCreateInput, ListProduct, Order, OrderCreateInput, OrderProduct, OrderProductInput, OrderStatus, Parameter, ParameterInput, PaymentMethod, Product, ProductParameter, ProductPublicData, Question, QuestionCreateInput, Review, ReviewComment, ReviewCommentCreateInput, ReviewCreateInput, Role, ShippingMethod, ShippingMethodInput, User, UserAddress, Vendor, VendorInput, ModerationStatus } from '../src/types'
+import { Address, AddressCreateInput, AddressType, AddressTypeInput, Answer, AnswerCreateInput, CartProduct, Category, CategoryCreateInput, Follower, Group, GroupVariation, GroupVariationCreateInput, Invoice, InvoiceCreateInput, InvoiceStatus, List, ListCreateInput, ListProduct, Order, OrderCreateInput, OrderProduct, OrderProductInput, OrderStatus, Parameter, ParameterInput, PaymentMethod, Product, ProductParameter, ProductPublicData, Question, QuestionCreateInput, Review, ReviewComment, ReviewCommentCreateInput, ReviewCreateInput, Role, ShippingMethod, ShippingMethodInput, User, UserAddress, Vendor, VendorInput, ModerationStatus } from '../src/types'
 import { apiURLs } from '../src/utils/constants'
 import { db } from '../src/utils/db'
 import { products } from './testProductData'
@@ -124,10 +124,6 @@ export const reviewCommentsInDB = async (): Promise<ReviewComment[]> => {
   return await db('reviewComments')
 }
 
-export const answerCommentsInDB = async (): Promise<AnswerComment[]> => {
-  return await db('answerComments')
-}
-
 export const questionsInDB = async (): Promise<Question[]> => {
   return await db('questions')
 }
@@ -152,7 +148,6 @@ export const purge = async (): Promise<void> => {
   await db('productParameters').del()
   await db('parameters').del()
   await db('groupVariations').del()
-  await db('answerComments').del()
   await db('answers').del()
   await db('questions').del()
   await db('reviewComments').del()
@@ -448,22 +443,6 @@ export const createOneAnswer = async (): Promise<Answer & { sessionID: string }>
     .post(`${apiURLs.questions}/${questionID}/answers`)
     .set('Cookie', `sessionID=${sessionID}`)
     .send(newAnswer())
-
-  return { ...body, sessionID }
-}
-
-export const newAnswerComment = (): AnswerCommentCreateInput => ({
-  content: `New AnswerComment ${(new Date().getTime()).toString()}`
-})
-
-export const createOneAnswerComment = async (): Promise<AnswerComment & { sessionID: string }> => {
-  const { sessionID } = await loginAs('customer')
-  const { answerID } = await createOneAnswer()
-
-  const { body }: { body: AnswerComment } = await api
-    .post(`${apiURLs.answers}/${answerID}/comments`)
-    .set('Cookie', `sessionID=${sessionID}`)
-    .send(newAnswerComment())
 
   return { ...body, sessionID }
 }

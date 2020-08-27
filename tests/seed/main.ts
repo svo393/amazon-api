@@ -2,7 +2,7 @@ import path from 'path'
 import { flatten, omit } from 'ramda'
 import supertest from 'supertest'
 import app from '../../src/app'
-import { Answer, AnswerComment, CartProduct, Invoice, List, Order, Product, Question, Review, ReviewComment } from '../../src/types'
+import { Answer, CartProduct, Invoice, List, Order, Product, Question, Review, ReviewComment } from '../../src/types'
 import { apiURLs } from '../../src/utils/constants'
 import { db } from '../../src/utils/db'
 import { createOneCategory, createOneParameter, createOneVendor, loginAs, populateUsers, purge } from '../testHelper'
@@ -275,36 +275,6 @@ const seed = async (): Promise<void> => {
                           ))
                       })
                       await uploadAPI
-                    }
-
-                    if (a.comments !== undefined) {
-                      await Promise.all(a.comments.map(async (ac: any) => {
-                        const sessionID = users[ac.author].sessionID
-
-                        const answerComment: { body: AnswerComment } = await api
-                          .post(`${apiURLs.answers}/${answer.body.answerID}/comments`)
-                          .set('Cookie', `sessionID=${sessionID}`)
-                          .send(omit([ 'author', 'mediaFiles' ], ac))
-
-                        // await api
-                        //   .put(`${apiURLs.answerComments}/${answerComment.body.answerCommentID}`)
-                        //   .set('Cookie', `sessionID=${adminSessionID}`)
-                        //   .send({ moderationStatus: 'APPROVED' })
-
-                        if (ac.media !== undefined) {
-                          const uploadAPI = api
-                            .post(`${apiURLs.answers}/${answer.body.answerID}/comments/${answerComment.body.answerCommentID}/upload`)
-                            .set('Cookie', `sessionID=${sessionID}`)
-
-                          ac.mediaFiles !== undefined && ac.mediaFiles.map((m: number) => {
-                            uploadAPI
-                              .attach('answerCommentImages', path.join(
-                                __dirname, `images/answerComments/${m}.jpg`
-                              ))
-                          })
-                          await uploadAPI
-                        }
-                      }))
                     }
                   }))
                 }

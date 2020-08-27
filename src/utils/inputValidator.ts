@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import { pipe } from 'ramda'
-import { AddressCreateInput, AddressTypeInput, AnswerCommentCreateInput, AnswerCommentUpdateInput, AnswerCreateInput, AnswerUpdateInput, AskFiltersInput, CartProduct, CartProductInput, CategoriesFiltersInput, CategoryCreateInput, CategoryUpdateInput, CursorInput, FeedFiltersInput, GroupVariationCreateInput, GroupVariationDeleteInput, GroupVariationUpdateInput, ImagesDeleteInput, ImagesFiltersInput, ImagesUpdateInput, InvoiceCreateInput, InvoicesFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ModerationStatus, OrderCreateInput, OrderProductInput, OrdersFiltersInput, OrderStatus, OrderUpdateInput, ParameterInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionCursorInput, QuestionUpdateInput, ReviewCommentCreateInput, ReviewCommentUpdateInput, ReviewCreateInput, ReviewsFiltersInput, ReviewUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorInput, VendorsFiltersInput, VotesCreateInput, VotesFiltersInput } from '../types'
+import { AddressCreateInput, AddressTypeInput, AnswerCreateInput, AnswerUpdateInput, AskFiltersInput, CartProduct, CartProductInput, CategoriesFiltersInput, CategoryCreateInput, CategoryUpdateInput, CursorInput, FeedFiltersInput, GroupVariationCreateInput, GroupVariationDeleteInput, GroupVariationUpdateInput, ImagesDeleteInput, ImagesFiltersInput, ImagesUpdateInput, InvoiceCreateInput, InvoicesFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ModerationStatus, OrderCreateInput, OrderProductInput, OrdersFiltersInput, OrderStatus, OrderUpdateInput, ParameterInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionCursorInput, QuestionUpdateInput, ReviewCommentCreateInput, ReviewCommentUpdateInput, ReviewCreateInput, ReviewsFiltersInput, ReviewUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorInput, VendorsFiltersInput, VotesCreateInput, VotesFiltersInput } from '../types'
 import { canBeBoolean, canBeNumber, hasDefinedProps, isArray, isDate, isEmail, isInputProvided, isObject, isPasswordValid, isPositiveNumber, isProvided, isSomeProvided, isString } from './validatorLib'
 
 export const checkNewUser = ({ body }: Request): UserSignupInput => {
@@ -750,10 +750,6 @@ export const checkQuestionsCursor = ({ query }: Request): QuestionCursorInput =>
     ? canBeNumber({ name: 'answerLimit', param: query.answerLimit })
     : undefined
 
-  const answerCommentLimit = 'answerCommentLimit' in query
-    ? canBeNumber({ name: 'answerCommentLimit', param: query.answerCommentLimit })
-    : undefined
-
   const onlyAnswered = 'onlyAnswered' in query
     ? canBeBoolean({ name: 'onlyAnswered', param: query.onlyAnswered })
     : undefined
@@ -764,7 +760,6 @@ export const checkQuestionsCursor = ({ query }: Request): QuestionCursorInput =>
     page: page?.param,
     sortBy: sortBy?.param,
     answerLimit: answerLimit?.param,
-    answerCommentLimit: answerCommentLimit?.param,
     onlyAnswered: onlyAnswered?.param
   }
 }
@@ -832,38 +827,6 @@ export const checkAnswerUpdate = ({ body }: Request): AnswerUpdateInput => {
     : undefined
 
   return hasDefinedProps<AnswerUpdateInput>({
-    content: content?.param,
-    moderationStatus: moderationStatus?.param
-  })
-}
-
-export const checkNewAnswerComment = ({ body }: Request): AnswerCommentCreateInput => {
-  const content = pipe(
-    isProvided,
-    isString
-  )({ name: 'content', param: body.content })
-
-  const parentAnswerCommentID = 'parentAnswerCommentID' in body
-    ? canBeNumber(
-      { name: 'parentAnswerCommentID', param: body.parentAnswerCommentID }
-    )
-    : undefined
-
-  return {
-    content: content.param,
-    parentAnswerCommentID: parentAnswerCommentID?.param
-  }
-}
-
-export const checkAnswerCommentUpdate = ({ body }: Request): AnswerCommentUpdateInput => {
-  const content = 'content' in body
-    ? isString({ name: 'content', param: body.content })
-    : undefined
-
-  const moderationStatus = 'moderationStatus' in body
-    ? isString({ name: 'moderationStatus', param: body.moderationStatus }) : undefined
-
-  return hasDefinedProps<AnswerCommentUpdateInput>({
     content: content?.param,
     moderationStatus: moderationStatus?.param
   })

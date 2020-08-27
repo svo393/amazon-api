@@ -23,13 +23,11 @@ const getUsersQuery: any = db('users as u')
   .count('rc.reviewCommentID as reviewCommentCount')
   .count('q.questionID as questionCount')
   .count('a.answerID as answerCount')
-  .count('ac.answerCommentID as answerCommentCount')
   .leftJoin('orders as o', 'u.userID', 'o.userID')
   .leftJoin('reviews as r', 'u.userID', 'r.userID')
   .leftJoin('reviewComments as rc', 'u.userID', 'rc.userID')
   .leftJoin('questions as q', 'u.userID', 'q.userID')
   .leftJoin('answers as a', 'u.userID', 'a.userID')
-  .leftJoin('answerComments as ac', 'u.userID', 'ac.userID')
   .where('u.role', '!=', 'ROOT')
   .groupBy(
     'u.userID',
@@ -37,8 +35,7 @@ const getUsersQuery: any = db('users as u')
     'r.reviewID',
     'rc.reviewCommentID',
     'q.questionID',
-    'a.answerID',
-    'ac.answerCommentID'
+    'a.answerID'
   )
 
 type UserRawData = Omit<User,
@@ -51,7 +48,6 @@ type UserRawData = Omit<User,
   reviewCommentCount: string;
   questionCount: string;
   answerCount: string;
-  answerCommentCount: string;
 }
 
 type UserData = Omit<UserRawData,
@@ -60,7 +56,6 @@ type UserData = Omit<UserRawData,
   | 'reviewCommentCount'
   | 'questionCount'
   | 'answerCount'
-  | 'answerCommentCount'
 > & {
   activityCount: number;
   orderCount: number;
@@ -95,14 +90,12 @@ const getUsers = async (usersFiltersinput: UsersFiltersInput): Promise<{ batch: 
       ...omit([
         'reviewCommentCount',
         'questionCount',
-        'answerCount',
-        'answerCommentCount'
+        'answerCount'
       ], u),
       activityCount: [
         parseInt(u.reviewCommentCount),
         parseInt(u.questionCount),
-        parseInt(u.answerCount),
-        parseInt(u.answerCommentCount)
+        parseInt(u.answerCount)
       ].reduce((acc, cur) => acc + cur, 0)
     }))
 
@@ -182,14 +175,12 @@ const getUserByID = async (req: Request): Promise<UserData | UserPublicData> => 
     ...omit([
       'reviewCommentCount',
       'questionCount',
-      'answerCount',
-      'answerCommentCount'
+      'answerCount'
     ], rawUser),
     activityCount: [
       parseInt(rawUser.reviewCommentCount),
       parseInt(rawUser.questionCount),
-      parseInt(rawUser.answerCount),
-      parseInt(rawUser.answerCommentCount)
+      parseInt(rawUser.answerCount)
     ].reduce((acc, cur) => acc + cur, 0),
     orderCount: parseInt(rawUser.orderCount),
     reviewCount: parseInt(rawUser.reviewCount)
