@@ -64,9 +64,12 @@ const getCommentsByReview = async (cursorInput: CursorInput, req: Request): Prom
       'u.name as userName'
     )
     .join('users as u', 'rc.userID', 'u.userID')
-    .where('reviewID', reviewID)
-    .andWhere('rc.moderationStatus', 'APPROVED')
-    .orWhere('rc.userID', req.session?.userID ?? 0)
+    .where('rc.reviewID', reviewID)
+    .where((builder) => {
+      builder
+        .where('rc.moderationStatus', 'APPROVED')
+        .orWhere('rc.userID', req.session?.userID ?? 0)
+    })
 
   const childrenReviewComment = await db<ReviewComment>('reviewComments')
     .select('parentReviewCommentID')
