@@ -7,7 +7,7 @@ import getCursor from '../utils/getCursor'
 import sortItems from '../utils/sortItems'
 import StatusError from '../utils/StatusError'
 
-const addAnswer = async (answerInput: AnswerCreateInput, req: Request): Promise<AnswerWithUser> => {
+const addAnswer = async (answerInput: AnswerCreateInput, req: Request): Promise<AnswerWithUser & { upVotes: number }> => {
   const now = new Date()
 
   return await dbTrans(async (trx: Knex.Transaction) => {
@@ -26,9 +26,10 @@ const addAnswer = async (answerInput: AnswerCreateInput, req: Request): Promise<
 
     if (user === undefined) throw new StatusError()
 
-    const _addedAnswer: AnswerWithUser = {
+    const _addedAnswer: AnswerWithUser & { upVotes: number } = {
       ...addedAnswer,
       votes: 0,
+      upVotes: 0,
       author: {
         avatar: user.avatar,
         name: user.name,

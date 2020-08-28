@@ -496,10 +496,7 @@ export type ImagesFiltersInput = {
   userID?: number;
 }
 
-export type VotesCreateInput = {
-  vote: boolean;
-  userID: number;
-}
+export type VotesCreateInput = { vote: boolean }
 
 export type VotesFiltersInput = {
   reviewID?: number;

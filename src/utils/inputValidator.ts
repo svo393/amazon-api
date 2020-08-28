@@ -1525,12 +1525,7 @@ export const checkNewVote = ({ body }: Request): VotesCreateInput => {
     canBeBoolean
   )({ name: 'vote', param: body.vote })
 
-  const userID = pipe(
-    isProvided,
-    isString
-  )({ name: 'userID', param: body.userID })
-
-  return { vote: vote.param, userID: userID.param }
+  return { vote: vote.param }
 }
 
 export const checkVoteFilters = ({ query }: Request): VotesFiltersInput => {

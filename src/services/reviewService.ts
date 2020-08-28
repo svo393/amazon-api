@@ -72,6 +72,11 @@ const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request
       'u.name as userName'
     )
     .count('rc.reviewCommentID as reviewCommentCount')
+    .where((builder) => {
+      builder
+        .where('rc.moderationStatus', 'APPROVED')
+        .orWhere('rc.userID', req.session?.userID ?? 0)
+    })
     .leftJoin('users as u', 'r.userID', 'u.userID')
     .leftJoin('reviewComments as rc', 'r.reviewID', 'rc.reviewID')
     .groupBy(
@@ -224,6 +229,11 @@ const getReviewByID = async (req: Request): Promise<ReviewWithUser> => {
     )
     .count('rc.reviewCommentID as reviewCommentCount')
     .where('r.reviewID', reviewID)
+    .where((builder) => {
+      builder
+        .where('rc.moderationStatus', 'APPROVED')
+        .orWhere('rc.userID', req.session?.userID ?? 0)
+    })
     .leftJoin('users as u', 'r.userID', 'u.userID')
     .leftJoin('reviewComments as rc', 'r.reviewID', 'rc.reviewID')
     .groupBy(

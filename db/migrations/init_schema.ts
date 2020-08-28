@@ -271,7 +271,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.increments('answerID')
       t.dateTime('createdAt').notNullable()
       t.dateTime('updatedAt').notNullable()
-      t.string('content', 65535).unique().notNullable()
+      t.string('content', 65535).notNullable()
 
       t
         .integer('userID')
