@@ -45,7 +45,7 @@ const addAnswer = async (answerInput: AnswerCreateInput, req: Request): Promise<
   })
 }
 
-const getAnswersByQuestion = async (cursorInput: CursorInput, req: Request): Promise<BatchWithCursor<Answer & { votes: number; upVotes: number }> & { questionID: number }> => {
+const getAnswersByQuestion = async (cursorInput: CursorInput, req: Request): Promise<BatchWithCursor<Answer & { votes: number; upVotes: number; voted?: boolean }> & { questionID: number }> => {
   const { startCursor, limit = 2, page } = cursorInput
   const { questionID } = req.params
 
@@ -76,19 +76,18 @@ const getAnswersByQuestion = async (cursorInput: CursorInput, req: Request): Pro
     .map((a) => {
       const voteSum = votes
         .filter((v) => v.answerID === a.answerID)
-        .reduce((acc, cur) => (
-          acc += cur.vote ? 1 : -1
-        ), 0)
+        .length
 
       const upVoteSum = votes
         .filter((v) => v.answerID === a.answerID && v.vote)
-        .reduce((acc, cur) => (
-          acc += cur.vote ? 1 : -1
-        ), 0)
+        .length
+
+      const voted = votes.find((v) => v.answerID === a.answerID && v.userID === req.session?.userID)
       return {
         ...omit([ 'userName', 'userEmail', 'avatar', 'userID' ], a),
         votes: voteSum,
         upVotes: upVoteSum,
+        voted: req.session?.userID ? Boolean(voted) : undefined,
         author: { avatar: a.avatar, name: a.userName, userID: a.userID }
       }
     })

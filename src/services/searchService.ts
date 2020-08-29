@@ -119,9 +119,7 @@ const getAsk = async (askFiltersinput: AskFiltersInput, req: Request): Promise<R
     questions: questions.map((q) => {
       const voteSum = votes
         .filter((v) => v.questionID === q.questionID)
-        .reduce((acc, cur) => (
-          acc += cur.vote ? 1 : -1
-        ), 0)
+        .length
       return {
         ...omit([ 'name', 'userID', 'answerContent', 'answers', 'answerID', 'createdAt' ], q),
         votes: voteSum,

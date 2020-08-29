@@ -38,6 +38,9 @@ const getQuestionsByUser = async (req: Request): Promise<Question[]> => {
 
 type QuestionWithDescendants =
 BatchWithCursor<Question & {
+  votes: number;
+  upVotes: number;
+  voted?: boolean;
   answers?: BatchWithCursor<AnswerWithUser>;
 }> & { groupID: number }
 
@@ -77,11 +80,21 @@ const getQuestionsByGroup = async (questionsInput: QuestionCursorInput, req: Req
     .map((q) => {
       const voteSum = votes
         .filter((v) => v.questionID === q.questionID)
-        .reduce((acc, cur) => (
-          acc += cur.vote ? 1 : -1
-        ), 0)
+        .length
+
+      const upVoteSum = votes
+        .filter((v) => v.questionID === q.questionID && v.vote)
+        .length
+
+      const voted = votes.find((v) => v.questionID === q.questionID && v.userID === req.session?.userID)
+
       delete q.answerCount
-      return { ...q, votes: voteSum }
+      return {
+        ...q,
+        votes: voteSum,
+        upVotes: upVoteSum,
+        voted: req.session?.userID ? Boolean(voted) : undefined
+      }
     })
 
   questions = sortItems(questions, sortBy)
@@ -134,9 +147,7 @@ const getQuestionsByGroup = async (questionsInput: QuestionCursorInput, req: Req
     .map((a) => {
       const voteSum = votes
         .filter((v) => v.answerID === a.answerID)
-        .reduce((acc, cur) => (
-          acc += cur.vote ? 1 : -1
-        ), 0)
+        .length
       return {
         ...omit([ 'userName', 'userEmail', 'avatar', 'userID' ], a),
         votes: voteSum,

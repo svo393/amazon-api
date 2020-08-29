@@ -97,15 +97,11 @@ const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request
     .map((r) => {
       const voteSum = votes
         .filter((v) => v.reviewID === r.reviewID)
-        .reduce((acc, cur) => (
-          acc += cur.vote ? 1 : -1
-        ), 0)
+        .length
 
       const upVoteSum = votes
         .filter((v) => v.reviewID === r.reviewID && v.vote)
-        .reduce((acc, cur) => (
-          acc += cur.vote ? 1 : -1
-        ), 0)
+        .length
       return {
         ...omit([ 'userName', 'userEmail', 'avatar', 'userID' ], r),
         images: images.filter((i) => i.reviewID === r.reviewID),
