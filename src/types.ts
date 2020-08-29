@@ -212,7 +212,6 @@ export type Matches = {
 export type ReviewWithUser = Review & {
   images: Image[];
   votes: number;
-  upVotes: number;
   author: Pick<User, 'name' | 'userID' | 'avatar'> & { email?: string };
   reviewCommentCount: string | number;
 }

@@ -45,7 +45,7 @@ const addAnswer = async (answerInput: AnswerCreateInput, req: Request): Promise<
   })
 }
 
-const getAnswersByQuestion = async (cursorInput: CursorInput, req: Request): Promise<BatchWithCursor<Answer & { votes: number; upVotes: number; voted?: boolean }> & { questionID: number }> => {
+const getAnswersByQuestion = async (cursorInput: CursorInput, req: Request): Promise<BatchWithCursor<Answer & { votes: number; upVotes: number; voted?: true }> & { questionID: number }> => {
   const { startCursor, limit = 2, page } = cursorInput
   const { questionID } = req.params
 

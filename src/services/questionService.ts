@@ -40,7 +40,7 @@ type QuestionWithDescendants =
 BatchWithCursor<Question & {
   votes: number;
   upVotes: number;
-  voted?: boolean;
+  voted?: true;
   answers?: BatchWithCursor<AnswerWithUser>;
 }> & { groupID: number }
 

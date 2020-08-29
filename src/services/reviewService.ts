@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import { equals, flatten, omit } from 'ramda'
-import { BatchWithCursor, Image, Matches, Review, ReviewCreateInput, ReviewsFiltersInput, ReviewUpdateInput, ReviewWithUser, Vote } from '../types'
+import { BatchWithCursor, Image, Matches, Review, ReviewComment, ReviewCreateInput, ReviewsFiltersInput, ReviewUpdateInput, ReviewWithUser, Vote } from '../types'
 import { defaultLimit, imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
 import fuseMatches from '../utils/fuseMatches'
@@ -33,7 +33,7 @@ const addReview = async (reviewInput: ReviewCreateInput, req: Request): Promise<
   return addedReview
 }
 
-const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request): Promise<BatchWithCursor<Review & { images: Image[]; votes: number; upVotes: number; matches?: Matches }> & { groupID?: number; images?: Image[] }> => {
+const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request): Promise<BatchWithCursor<Review & { images: Image[]; votes: number; voted?: true; matches?: Matches }> & { groupID?: number; images?: Image[] }> => {
   const {
     page = 1,
     limit,
@@ -74,8 +74,8 @@ const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request
     .count('rc.reviewCommentID as reviewCommentCount')
     .where((builder) => {
       builder
-        .where('rc.moderationStatus', 'APPROVED')
-        .orWhere('rc.userID', req.session?.userID ?? 0)
+        .where('r.moderationStatus', 'APPROVED')
+        .orWhere('r.userID', req.session?.userID ?? 0)
     })
     .leftJoin('users as u', 'r.userID', 'u.userID')
     .leftJoin('reviewComments as rc', 'r.reviewID', 'rc.reviewID')
@@ -99,16 +99,15 @@ const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request
         .filter((v) => v.reviewID === r.reviewID)
         .length
 
-      const upVoteSum = votes
-        .filter((v) => v.reviewID === r.reviewID && v.vote)
-        .length
+      const voted = votes.find((v) => v.reviewID === r.reviewID && v.userID === req.session?.userID)
+
       return {
         ...omit([ 'userName', 'userEmail', 'avatar', 'userID' ], r),
         images: images.filter((i) => i.reviewID === r.reviewID),
         votes: voteSum,
         reviewCommentCount: parseInt(r.reviewCommentCount),
-        upVotes: upVoteSum,
-        author: { avatar: r.avatar, name: r.userName, userID: r.userID }
+        author: { avatar: r.avatar, name: r.userName, userID: r.userID },
+        voted: req.session?.userID ? Boolean(voted) : undefined
       }
     })
 
@@ -223,21 +222,19 @@ const getReviewByID = async (req: Request): Promise<ReviewWithUser> => {
       'u.name as userName',
       'u.email as userEmail'
     )
-    .count('rc.reviewCommentID as reviewCommentCount')
     .where('r.reviewID', reviewID)
-    .where((builder) => {
-      builder
-        .where('rc.moderationStatus', 'APPROVED')
-        .orWhere('rc.userID', req.session?.userID ?? 0)
-    })
     .leftJoin('users as u', 'r.userID', 'u.userID')
-    .leftJoin('reviewComments as rc', 'r.reviewID', 'rc.reviewID')
     .groupBy(
       'r.reviewID',
       'u.avatar',
       'u.name',
       'u.email'
     )
+
+  const [ reviewComments ]: any = await db('reviewComments')
+    .count('reviewCommentID')
+    .where('moderationStatus', 'APPROVED')
+    .orWhere('userID', req.session?.userID ?? 0)
 
   if (review === undefined || (review.moderationStatus !== 'APPROVED' && !userHasPermission)) throw new StatusError(404, 'Not Found')
 
@@ -251,18 +248,11 @@ const getReviewByID = async (req: Request): Promise<ReviewWithUser> => {
     acc += cur.vote ? 1 : -1
   ), 0)
 
-  const upVoteSum = votes
-    .filter((v) => v.vote)
-    .reduce((acc, cur) => (
-      acc += cur.vote ? 1 : -1
-    ), 0)
-
   const _review: ReviewWithUser = {
     ...(omit([ 'userName', 'userEmail', 'avatar', 'userID' ], review) as Review),
     images,
     votes: voteSum,
-    reviewCommentCount: parseInt(review.reviewCommentCount),
-    upVotes: upVoteSum,
+    reviewCommentCount: parseInt(reviewComments.count),
     author: {
       avatar: review.avatar,
       name: review.userName,
