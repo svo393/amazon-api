@@ -74,6 +74,7 @@
   "private": true,
   "scripts": {
     "dev": "cross-env NODE_ENV=development ts-node-dev src/index.ts",
+    "debug": "cross-env NODE_ENV=development DEBUG=knex:query,knex:tx  ts-node-dev src/index.ts",
     "init": "cross-env NODE_ENV=development ts-node ./db/init.ts",
     "knex": "knex",
     "lint": "eslint **/*.ts --ignore-pattern node_modules/",

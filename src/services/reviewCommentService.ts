@@ -71,8 +71,6 @@ const getCommentsByReview = async (cursorInput: CursorInput, req: Request): Prom
         .orWhere('rc.userID', req.session?.userID ?? 0)
     })
 
-  console.info('reviewComments', reviewComments)
-
   const childrenReviewComment = await db<ReviewComment>('reviewComments')
     .select('parentReviewCommentID')
     .whereNotNull('parentReviewCommentID')

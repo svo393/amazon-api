@@ -62,7 +62,7 @@ const getAnswersByQuestion = async (cursorInput: CursorInput, req: Request): Pro
       'u.name as userName'
     )
     .join('users as u', 'a.userID', 'u.userID')
-    .where('questionID', questionID)
+    .where('a.questionID', questionID)
     .where((builder) => {
       builder
         .where('a.moderationStatus', 'APPROVED')

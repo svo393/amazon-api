@@ -14,6 +14,15 @@ export default ({
   data
 }: Props) => {
   const totalCount = data.length
+
+  if (totalCount === 0) {
+    return {
+      totalCount: 0,
+      hasNextPage: false,
+      batch: []
+    }
+  }
+
   let start = 0
 
   if (startCursor !== undefined) {

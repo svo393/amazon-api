@@ -233,8 +233,14 @@ const getReviewByID = async (req: Request): Promise<ReviewWithUser> => {
 
   const [ reviewComments ]: any = await db('reviewComments')
     .count('reviewCommentID')
-    .where('moderationStatus', 'APPROVED')
-    .orWhere('userID', req.session?.userID ?? 0)
+    .where('reviewID', reviewID)
+    .where((builder) => {
+      builder
+        .where('moderationStatus', 'APPROVED')
+        .orWhere('userID', req.session?.userID ?? 0)
+    })
+
+  console.info('reviewComments', reviewComments)
 
   if (review === undefined || (review.moderationStatus !== 'APPROVED' && !userHasPermission)) throw new StatusError(404, 'Not Found')
 
