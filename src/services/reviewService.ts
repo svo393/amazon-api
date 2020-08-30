@@ -71,45 +71,18 @@ const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request
       'u.email as userEmail',
       'u.name as userName'
     )
-    .count('rc.reviewCommentID as reviewCommentCount')
     .where((builder) => {
       builder
         .where('r.moderationStatus', 'APPROVED')
         .orWhere('r.userID', req.session?.userID ?? 0)
     })
     .leftJoin('users as u', 'r.userID', 'u.userID')
-    .leftJoin('reviewComments as rc', 'r.reviewID', 'rc.reviewID')
     .groupBy(
       'r.reviewID',
       'u.avatar',
       'u.name',
       'u.email'
     )
-
-  const images = await db<Image>('images')
-    .whereNotNull('reviewID')
-
-  // TODO move votes query after sorting
-  const votes = await db<Vote>('votes')
-    .whereNotNull('reviewID')
-
-  reviews = reviews
-    .map((r) => {
-      const voteSum = votes
-        .filter((v) => v.reviewID === r.reviewID)
-        .length
-
-      const voted = votes.find((v) => v.reviewID === r.reviewID && v.userID === req.session?.userID)
-
-      return {
-        ...omit([ 'userName', 'userEmail', 'avatar', 'userID' ], r),
-        images: images.filter((i) => i.reviewID === r.reviewID),
-        votes: voteSum,
-        reviewCommentCount: parseInt(r.reviewCommentCount),
-        author: { avatar: r.avatar, name: r.userName, userID: r.userID },
-        voted: req.session?.userID ? Boolean(voted) : undefined
-      }
-    })
 
   let reviewIDs: number[]
 
@@ -181,18 +154,60 @@ const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request
       .filter((r) => r.matches !== undefined)
   }
 
+  const images = await db<Image>('images')
+    .whereNotNull('reviewID')
+
+  const votes = await db<Vote>('votes')
+    .whereNotNull('reviewID')
+
+  reviews = reviews
+    .map((r) => {
+      const voteSum = votes
+        .filter((v) => v.reviewID === r.reviewID)
+        .length
+
+      const voted = votes.find((v) => v.reviewID === r.reviewID && v.userID === req.session?.userID)
+
+      return {
+        ...omit([ 'userName', 'userEmail', 'avatar', 'userID' ], r),
+        images: images.filter((i) => i.reviewID === r.reviewID),
+        votes: voteSum,
+        author: { avatar: r.avatar, name: r.userName, userID: r.userID },
+        voted: req.session?.userID ? Boolean(voted) : undefined
+      }
+    })
+
   const _reviews = userHasPermission
     ? reviews
     : reviews.map((r) => ({ ...omit([ 'userEmail' ], r) }))
 
-  const reviewsSorted = sortItems(_reviews, sortBy)
+  let reviewsSorted = sortItems(_reviews, sortBy)
 
   const totalCount = _reviews.length
   const _limit = limit ?? defaultLimit
   const end = (page - 1) * _limit + _limit
 
+  const _batch = reviewsSorted.slice((page - 1) * _limit, end)
+
+  const batch = await Promise.all(_batch
+    .map(async (r) => {
+      const [ reviewComments ]: any = await db('reviewComments')
+        .count('reviewCommentID')
+        .where('reviewID', r.reviewID)
+        .where((builder) => {
+          builder
+            .where('moderationStatus', 'APPROVED')
+            .orWhere('userID', req.session?.userID ?? 0)
+        })
+
+      return {
+        ...r,
+        reviewCommentCount: parseInt(reviewComments.count)
+      }
+    }))
+
   return {
-    batch: reviewsSorted.slice((page - 1) * _limit, end),
+    batch,
     totalCount,
     hasNextPage: end < totalCount,
     groupID,
@@ -239,8 +254,6 @@ const getReviewByID = async (req: Request): Promise<ReviewWithUser> => {
         .where('moderationStatus', 'APPROVED')
         .orWhere('userID', req.session?.userID ?? 0)
     })
-
-  console.info('reviewComments', reviewComments)
 
   if (review === undefined || (review.moderationStatus !== 'APPROVED' && !userHasPermission)) throw new StatusError(404, 'Not Found')
 

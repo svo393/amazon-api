@@ -1,6 +1,7 @@
 import Fuse from 'fuse.js'
 import { omit } from 'ramda'
 
+// TODO tune options
 export default (data: any[], keys: string[], query: string, idProp: string) =>
   (new Fuse(data, {
     minMatchCharLength: 3,
