@@ -1,34 +1,43 @@
 import { Request } from 'express'
+import Knex from 'knex'
 import { omit } from 'ramda'
-import { AnswerWithUser, BatchWithCursor, Question, QuestionCreateInput, QuestionCursorInput, QuestionUpdateInput, QuestionWithUser, Vote } from '../types'
+import { AnswerWithUser, BatchWithCursor, Question, QuestionCreateInput, QuestionCursorInput, QuestionUpdateInput, QuestionWithUser, User, Vote } from '../types'
 import { defaultLimit } from '../utils/constants'
-import { db } from '../utils/db'
+import { db, dbTrans } from '../utils/db'
 import getCursor from '../utils/getCursor'
 import sortItems from '../utils/sortItems'
 import StatusError from '../utils/StatusError'
 
-const addQuestion = async (questionInput: QuestionCreateInput, req: Request): Promise<Question> => {
+const addQuestion = async (questionInput: QuestionCreateInput, req: Request): Promise<QuestionWithUser & { upVotes: number }> => {
   const now = new Date()
 
-  const { rows: [ addedQuestion ] }: { rows: Question[] } = await db.raw(
-    `
-    ? ON CONFLICT
-      DO NOTHING
-      RETURNING *;
-    `,
-    [ db('questions').insert({
-      ...questionInput,
-      userID: req.session?.userID,
-      createdAt: now,
-      updatedAt: now,
-      groupID: req.params.groupID
-    }) ]
-  )
+  return await dbTrans(async (trx: Knex.Transaction) => {
+    const [ addedQuestion ]: Question[] = await trx('questions')
+      .insert({
+        ...questionInput,
+        userID: req.session?.userID,
+        createdAt: now,
+        updatedAt: now,
+        groupID: req.params.groupID
+      }, [ '*' ])
 
-  if (addedQuestion === undefined) {
-    throw new StatusError(409, 'You\'ve already left a review for this product')
-  }
-  return addedQuestion
+    const user = await trx<User>('users')
+      .first()
+      .where('userID', addedQuestion.userID)
+
+    if (user === undefined) throw new StatusError()
+
+    return {
+      ...addedQuestion,
+      votes: 0,
+      upVotes: 0,
+      author: {
+        avatar: user.avatar,
+        name: user.name,
+        userID: user.userID
+      }
+    }
+  })
 }
 
 const getQuestionsByUser = async (req: Request): Promise<Question[]> => {
@@ -50,8 +59,8 @@ const getQuestionsByGroup = async (questionsInput: QuestionCursorInput, req: Req
     limit,
     answerLimit = 1,
     page,
-    onlyAnswered = true,
-    sortBy = 'votes_desc'
+    onlyAnswered = false,
+    sortBy = 'votesDelta_desc'
   } = questionsInput
   const { groupID } = req.params
 
@@ -68,7 +77,7 @@ const getQuestionsByGroup = async (questionsInput: QuestionCursorInput, req: Req
     .count('a.questionID as answerCount')
     .where('groupID', groupID)
     .andWhere('q.moderationStatus', 'APPROVED')
-    .join('answers as a', 'q.questionID', 'a.questionID')
+    .leftJoin('answers as a', 'q.questionID', 'a.questionID')
     .groupBy('q.questionID')
 
   const votes = await db<Vote>('votes')
@@ -93,6 +102,7 @@ const getQuestionsByGroup = async (questionsInput: QuestionCursorInput, req: Req
         ...q,
         votes: voteSum,
         upVotes: upVoteSum,
+        votesDelta: upVoteSum - (voteSum - upVoteSum),
         voted: req.session?.userID ? Boolean(voted) : undefined
       }
     })
@@ -148,9 +158,15 @@ const getQuestionsByGroup = async (questionsInput: QuestionCursorInput, req: Req
       const voteSum = votes
         .filter((v) => v.answerID === a.answerID)
         .length
+
+      const upVoteSum = votes
+        .filter((v) => v.answerID === a.answerID && v.vote)
+        .length
+
       return {
         ...omit([ 'userName', 'userEmail', 'avatar', 'userID' ], a),
         votes: voteSum,
+        votesDelta: upVoteSum - (voteSum - upVoteSum),
         author: { avatar: a.avatar, name: a.userName, userID: a.userID }
       }
     })
@@ -163,15 +179,16 @@ const getQuestionsByGroup = async (questionsInput: QuestionCursorInput, req: Req
 
         return curAnswers.length !== 0
           ? {
-            ...q,
+            ...omit([ 'votesDelta' ], q),
             answers: getCursor({
               startCursor: undefined,
               limit: answerLimit,
               idProp: 'answerID',
-              data: sortItems(curAnswers, 'votes_desc')
+              data: sortItems(curAnswers, 'votesDelta_desc')
+                .map((a) => omit([ 'votesDelta' ], a))
             })
           }
-          : q
+          : omit([ 'votesDelta' ], q)
       })
     }
   }

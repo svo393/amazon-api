@@ -26,22 +26,16 @@ const addAnswer = async (answerInput: AnswerCreateInput, req: Request): Promise<
 
     if (user === undefined) throw new StatusError()
 
-    const _addedAnswer: AnswerWithUser & { upVotes: number } = {
+    return {
       ...addedAnswer,
       votes: 0,
       upVotes: 0,
       author: {
         avatar: user.avatar,
         name: user.name,
-        email: user.email,
         userID: user.userID
       }
     }
-
-    ![ 'ROOT', 'ADMIN' ].includes(req.session?.role) &&
-    delete _addedAnswer.author.email
-
-    return _addedAnswer
   })
 }
 
@@ -87,12 +81,13 @@ const getAnswersByQuestion = async (cursorInput: CursorInput, req: Request): Pro
         ...omit([ 'userName', 'userEmail', 'avatar', 'userID' ], a),
         votes: voteSum,
         upVotes: upVoteSum,
+        votesDelta: upVoteSum - (voteSum - upVoteSum),
         voted: req.session?.userID ? Boolean(voted) : undefined,
         author: { avatar: a.avatar, name: a.userName, userID: a.userID }
       }
     })
 
-  answers = sortItems(answers, 'votes_desc')
+  answers = sortItems(answers, 'votesDelta_desc')
   const perPageLimit = 10
 
   if (page !== undefined) {
@@ -100,7 +95,9 @@ const getAnswersByQuestion = async (cursorInput: CursorInput, req: Request): Pro
     const totalCount = answers.length
 
     return {
-      batch: answers.slice((page - 1) * perPageLimit, end),
+      batch: answers
+        .slice((page - 1) * perPageLimit, end)
+        .map((a) => omit([ 'votesDelta' ], a)) as any[],
       totalCount,
       hasNextPage: end < totalCount,
       questionID: Number(questionID)

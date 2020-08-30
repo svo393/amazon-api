@@ -166,12 +166,17 @@ const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request
         .filter((v) => v.reviewID === r.reviewID)
         .length
 
+      const upVoteSum = votes
+        .filter((v) => v.reviewID === r.reviewID && v.vote)
+        .length
+
       const voted = votes.find((v) => v.reviewID === r.reviewID && v.userID === req.session?.userID)
 
       return {
         ...omit([ 'userName', 'userEmail', 'avatar', 'userID' ], r),
         images: images.filter((i) => i.reviewID === r.reviewID),
         votes: voteSum,
+        votesDelta: upVoteSum - (voteSum - upVoteSum),
         author: { avatar: r.avatar, name: r.userName, userID: r.userID },
         voted: req.session?.userID ? Boolean(voted) : undefined
       }
@@ -189,7 +194,7 @@ const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request
 
   const _batch = reviewsSorted.slice((page - 1) * _limit, end)
 
-  const batch = await Promise.all(_batch
+  const batch: any = await Promise.all(_batch
     .map(async (r) => {
       const [ reviewComments ]: any = await db('reviewComments')
         .count('reviewCommentID')
@@ -201,7 +206,7 @@ const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request
         })
 
       return {
-        ...r,
+        ...omit([ 'votesDelta' ], r),
         reviewCommentCount: parseInt(reviewComments.count)
       }
     }))
