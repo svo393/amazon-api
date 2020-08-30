@@ -9,14 +9,14 @@ import { uploadImages } from '../utils/img'
 import sortItems from '../utils/sortItems'
 import StatusError from '../utils/StatusError'
 
-const addReview = async (reviewInput: ReviewCreateInput, req: Request): Promise<Review> => {
+const addReview = async (reviewInput: ReviewCreateInput, req: Request): Promise<Pick<Review, 'reviewID'>> => {
   const now = new Date()
 
   const { rows: [ addedReview ] }: { rows: Review[] } = await db.raw(
     `
     ? ON CONFLICT
       DO NOTHING
-      RETURNING *;
+      RETURNING "reviewID";
     `,
     [ db('reviews').insert({
       ...reviewInput,
@@ -42,7 +42,7 @@ const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request
     groupID,
     variation,
     userEmail,
-    moderationStatuses = 'APPROVED',
+    moderationStatuses,
     isVerified,
     createdFrom,
     createdTo,
@@ -71,11 +71,6 @@ const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request
       'u.email as userEmail',
       'u.name as userName'
     )
-    .where((builder) => {
-      builder
-        .where('r.moderationStatus', 'APPROVED')
-        .orWhere('r.userID', req.session?.userID ?? 0)
-    })
     .leftJoin('users as u', 'r.userID', 'u.userID')
     .groupBy(
       'r.reviewID',
@@ -154,7 +149,7 @@ const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request
       .filter((r) => r.matches !== undefined)
   }
 
-  const images = await db<Image>('images')
+  let images = await db<Image>('images')
     .whereNotNull('reviewID')
 
   const votes = await db<Vote>('votes')
@@ -184,7 +179,9 @@ const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request
 
   const _reviews = userHasPermission
     ? reviews
-    : reviews.map((r) => ({ ...omit([ 'userEmail' ], r) }))
+    : reviews
+      .filter((r) => r.moderationStatus === 'APPROVED')
+      .map((r) => ({ ...omit([ 'userEmail' ], r) }))
 
   let reviewsSorted = sortItems(_reviews, sortBy)
 
@@ -211,12 +208,21 @@ const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request
       }
     }))
 
+  images = userHasPermission
+    ? images
+    : images
+      .filter((i) =>
+        reviewsSorted.find((r) =>
+          r.reviewID === i.reviewID && r.moderationStatus === 'APPROVED'))
+
   return {
     batch,
     totalCount,
     hasNextPage: end < totalCount,
     groupID,
-    images: groupID !== undefined ? images.filter((i) => reviewIDs.includes(i.reviewID as number)) : undefined
+    images: groupID !== undefined
+      ? images.filter((i) => reviewIDs.includes(i.reviewID as number))
+      : undefined
   }
 }
 
