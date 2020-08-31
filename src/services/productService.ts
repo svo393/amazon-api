@@ -117,6 +117,7 @@ type ProductListRawData = Pick<Product,
 type ProductListData = Omit<ProductListRawData, 'stars' | 'reviewCount'> & {
   stars: number;
   reviewCount: number;
+  group?: GroupVariation[];
   images: {
     imageID: number;
     index: number;
@@ -145,6 +146,7 @@ const getProducts = async (productsFiltersInput: ProductsFiltersInput): Promise<
 
   // TODO refactor reusable queries
   const rawProducts: ProductListRawData[] = await getProductsQuery.clone()
+  let groupVariations: GroupVariation[]
 
   const images = await db<Image>('images')
     .whereNotNull('productID')
@@ -177,10 +179,14 @@ const getProducts = async (productsFiltersInput: ProductsFiltersInput): Promise<
       .where('groupID', groupID)
       .groupBy('stars')
 
+    groupVariations = await db<GroupVariation>('groupVariations')
+      .where('groupID', groupID)
+
     products = products
       .filter((p) => p.groupID === groupID)
       .map((p) => ({
         ...p,
+        group: groupVariations,
         ratingStats: ratingStats.reduce((acc, cur) => {
           acc[cur.stars] = Number(cur.count)
           return acc

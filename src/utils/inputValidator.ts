@@ -643,16 +643,14 @@ export const checkNewReview = ({ body }: Request): ReviewCreateInput => {
 }
 
 export const checkReviewUpdate = ({ body }: Request): ReviewUpdateInput => {
+  console.info('body', body)
+
   const title = 'title' in body
     ? isString({ name: 'title', param: body.title })
     : undefined
 
-  const review = 'content' in body
-    ? isString({ name: 'content', param: body.review })
-    : undefined
-
-  const variation = 'variation' in body
-    ? isObject({ name: 'variation', param: body.variation })
+  const content = 'content' in body
+    ? isString({ name: 'content', param: body.content })
     : undefined
 
   const stars = 'content' in body
@@ -669,8 +667,7 @@ export const checkReviewUpdate = ({ body }: Request): ReviewUpdateInput => {
 
   return hasDefinedProps<ReviewUpdateInput>({
     title: title?.param,
-    content: review?.param,
-    variation: variation?.param,
+    content: content?.param,
     stars: stars?.param,
     isVerified: isVerified?.param,
     moderationStatus: moderationStatus?.param

@@ -329,7 +329,6 @@ export type ReviewUpdateInput = Partial<Pick<Review,
   | 'title'
   | 'content'
   | 'stars'
-  | 'variation'
   | 'isVerified'
   | 'moderationStatus'
 >>
