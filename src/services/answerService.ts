@@ -172,12 +172,18 @@ const updateAnswer = async (answerInput: AnswerUpdateInput, req: Request): Promi
   return updatedAnswer
 }
 
-const deleteAnswer = async (req: Request): Promise<void> => {
+const deleteAnswer = async (req: Request): Promise<Answer> => {
+  const answer = await db<Answer>('answers')
+    .first()
+    .where('answerID', req.params.answerID)
+
   const deleteCount = await db('answers')
     .del()
     .where('answerID', req.params.answerID)
 
-  if (deleteCount === 0) throw new StatusError(404, 'Not Found')
+  if (deleteCount === 0 || answer === undefined) throw new StatusError(404, 'Not Found')
+
+  return answer
 }
 
 export default {

@@ -18,8 +18,8 @@ router.put('/:answerID', requireCreatorOrAdmin('answers', 'answerID', 'params'),
 })
 
 router.delete('/:answerID', requireCreator('answers', 'answerID', 'params'), async (req, res) => {
-  await answerService.deleteAnswer(req)
-  res.status(204).end()
+  const deletedAnswer = await answerService.deleteAnswer(req)
+  res.json(deletedAnswer)
 })
 
 router.post('/:answerID/votes', requireAuth, async (req, res) => {
