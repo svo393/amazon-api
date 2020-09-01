@@ -9,7 +9,7 @@ import questionService from '../services/questionService'
 import userAddressService from '../services/userAddressService'
 import userService from '../services/userService'
 import { UPLOAD_TIMEOUT } from '../utils/config'
-import { checkCartProductUpdate, checkNewCartProduct, checkNewOrder, checkSingleMediaUpload, checkUserAddressesUpdate, checkUserFilters, checkUserUpdate, checkNewInvoice } from '../utils/inputValidator'
+import { checkCartProductUpdate, checkNewCartProduct, checkNewOrder, checkSingleMediaUpload, checkUserAddressesUpdate, checkUserFilters, checkUserUpdate, checkNewInvoice, checkLocalCart } from '../utils/inputValidator'
 import { multerUpload, requireAdmin, requireSameUser, requireSameUserOrAdmin } from '../utils/middleware'
 
 const router = Router()
@@ -84,14 +84,15 @@ router.delete('/:userID/follows/:anotherUserID', requireSameUser('params'), asyn
   res.status(204).end()
 })
 
-router.post('/:userID/cartProducts', requireSameUserOrAdmin('params'), async (req, res) => {
+router.post('/:userID/cartProducts/:productID', requireSameUserOrAdmin('params'), async (req, res) => {
   const cartProductCreateInput = checkNewCartProduct(req)
-  const addedCartProduct = await cartProductService.addCartProduct(cartProductCreateInput)
+  const addedCartProduct = await cartProductService.addCartProduct(cartProductCreateInput, req)
   res.status(201).json(addedCartProduct)
 })
 
-router.get('/:userID/cartProducts', requireSameUserOrAdmin('params'), async (req, res) => {
-  const cartProducts = await cartProductService.getCartProductsByUser(req)
+router.post('/:userID/cartProducts', requireSameUserOrAdmin('params'), async (req, res) => {
+  const localCartProductInput = checkLocalCart(req)
+  const cartProducts = await cartProductService.getCartProductsByUser(localCartProductInput, req)
   res.json(cartProducts)
 })
 

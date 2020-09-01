@@ -78,7 +78,7 @@ env.NODE_ENV === 'development' && app.use(logger('dev'))
 // app.use(csrfProtection)
 
 app.use('/', router)
-// app.use(unknownEndpoint)
+app.use(unknownEndpoint)
 app.use(errorHandler)
 
 export default app

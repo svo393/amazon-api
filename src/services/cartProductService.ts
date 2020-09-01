@@ -1,9 +1,11 @@
 import { Request } from 'express'
-import { CartProduct, CartProductInput } from '../types'
-import { db } from '../utils/db'
+import Knex from 'knex'
+import { mergeDeepRight } from 'ramda'
+import { CartProduct, CartProductInput, LocalCart } from '../types'
+import { db, dbTrans } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
-const addCartProduct = async (cartProductInput: CartProduct): Promise<CartProduct> => {
+const addCartProduct = async (cartProductInput: CartProductInput, req: Request): Promise<CartProduct> => {
   const { rows: [ addedCP ] }: { rows: CartProduct[] } = await db.raw(
     `
     ? ON CONFLICT ("userID", "productID")
@@ -11,7 +13,11 @@ const addCartProduct = async (cartProductInput: CartProduct): Promise<CartProduc
       "qty" = EXCLUDED."qty"
       RETURNING *;
     `,
-    [ db('cartProducts').insert(cartProductInput) ]
+    [ db('cartProducts').insert({
+      ...cartProductInput,
+      userID: req.params.userID,
+      productID: req.params.productID
+    }) ]
   )
   return addedCP
 }
@@ -23,9 +29,24 @@ const getCartProductByID = async (req: Request): Promise<CartProduct> => {
     .andWhere('productID', req.params.productID)
 }
 
-const getCartProductsByUser = async (req: Request): Promise<CartProduct[]> => {
-  return await db('cartProducts')
-    .where('userID', req.params.userID)
+const getCartProductsByUser = async (localCart: LocalCart, req: Request): Promise<CartProduct[]> => {
+  const userID = req.params.userID
+  return await dbTrans(async (trx: Knex.Transaction) => {
+    await Promise.all(localCart.map(async (cp) => {
+      await trx.raw(
+        `
+        ? ON CONFLICT ("userID", "productID")
+          DO UPDATE SET
+          "qty" = EXCLUDED."qty"
+          RETURNING *;
+        `,
+        [ trx('cartProducts').insert({ ...cp, userID }) ]
+      )
+    }))
+
+    return await trx<CartProduct>('cartProducts')
+      .where('userID', userID)
+  })
 }
 
 const updateCartProduct = async (cartProductInput: CartProductInput, req: Request): Promise<CartProduct> => {

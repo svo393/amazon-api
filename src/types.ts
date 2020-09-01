@@ -388,6 +388,11 @@ export type ProductParametersInput = Pick<ProductParameter, 'value' | 'parameter
 
 export type CartProductInput = Pick<CartProduct, 'qty'>
 
+export type LocalCart = {
+  qty: number;
+  productID: number;
+}[]
+
 export type OrderCreateInput = Pick<Order,
   | 'address'
   | 'shippingMethod'

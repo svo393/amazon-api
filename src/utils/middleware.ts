@@ -138,7 +138,8 @@ export const errorHandler = (
   error: StatusError, _: Request, res: Response, next: NextFunction
 ): void => {
   const statusCode = error.statusCode ? error.statusCode : 500
-  env.NODE_ENV === 'test' && logger.error(error)
+  // env.NODE_ENV === 'test' && logger.error(error)
+  logger.error(error)
 
   res.status(statusCode).json({
     status: statusCode,

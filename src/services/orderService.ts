@@ -29,7 +29,7 @@ const addOrder = async (orderInput: OrderCreateInput, req: Request): Promise<Ord
       qty: number;
     }[] = await trx('cartProducts as cp')
       .select('p.productID', 'p.price', 'cp.qty')
-      .where('cp.userID', 'in', cart.map((cp) => cp.userID))
+      .where('cp.userID', userID)
       .andWhere('cp.productID', 'in', cart.map((cp) => cp.productID))
       .joinRaw('JOIN products as p USING ("productID")')
 
@@ -54,6 +54,12 @@ const addOrder = async (orderInput: OrderCreateInput, req: Request): Promise<Ord
         createdAt: now,
         updatedAt: now
       }, [ '*' ])
+
+    const deleteCount = await db('cartProducts')
+      .del()
+      .where('userID', userID)
+
+    if (deleteCount === 0) throw new StatusError()
 
     return {
       ...addedOrder,

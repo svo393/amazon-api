@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import { pipe } from 'ramda'
-import { AddressCreateInput, AddressTypeInput, AnswerCreateInput, AnswerUpdateInput, AskFiltersInput, CartProduct, CartProductInput, CategoriesFiltersInput, CategoryCreateInput, CategoryUpdateInput, CursorInput, FeedFiltersInput, GroupVariationCreateInput, GroupVariationDeleteInput, GroupVariationUpdateInput, ImagesDeleteInput, ImagesFiltersInput, ImagesUpdateInput, InvoiceCreateInput, InvoicesFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ModerationStatus, OrderCreateInput, OrderProductInput, OrdersFiltersInput, OrderStatus, OrderUpdateInput, ParameterInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionCursorInput, QuestionUpdateInput, ReviewCommentCreateInput, ReviewCommentUpdateInput, ReviewCreateInput, ReviewsFiltersInput, ReviewUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorInput, VendorsFiltersInput, VotesCreateInput, VotesFiltersInput } from '../types'
+import { AddressCreateInput, AddressTypeInput, AnswerCreateInput, AnswerUpdateInput, AskFiltersInput, CartProductInput, CategoriesFiltersInput, CategoryCreateInput, CategoryUpdateInput, CursorInput, FeedFiltersInput, GroupVariationCreateInput, GroupVariationDeleteInput, GroupVariationUpdateInput, ImagesDeleteInput, ImagesFiltersInput, ImagesUpdateInput, InvoiceCreateInput, InvoicesFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, LocalCart, ModerationStatus, OrderCreateInput, OrderProductInput, OrdersFiltersInput, OrderStatus, OrderUpdateInput, ParameterInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionCursorInput, QuestionUpdateInput, ReviewCommentCreateInput, ReviewCommentUpdateInput, ReviewCreateInput, ReviewsFiltersInput, ReviewUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorInput, VendorsFiltersInput, VotesCreateInput, VotesFiltersInput } from '../types'
 import { canBeBoolean, canBeNumber, hasDefinedProps, isArray, isDate, isEmail, isInputProvided, isObject, isPasswordValid, isPositiveNumber, isProvided, isSomeProvided, isString } from './validatorLib'
 
 export const checkNewUser = ({ body }: Request): UserSignupInput => {
@@ -517,27 +517,28 @@ export const checkAddressType = ({ body }: Request): AddressTypeInput => {
   }
 }
 
-export const checkNewCartProduct = ({ body }: Request): CartProduct => {
+export const checkLocalCart = ({ body }: Request): LocalCart => {
+  console.info('body', body)
+  const localCart: any[] = body ?? []
+  return localCart.map((cp) => ({
+    qty: pipe(
+      isProvided,
+      canBeNumber
+    )({ name: 'qty', param: cp.qty }).param,
+    productID: pipe(
+      isProvided,
+      canBeNumber
+    )({ name: 'productID', param: cp.productID }).param
+  }))
+}
+
+export const checkNewCartProduct = ({ body }: Request): CartProductInput => {
   const qty = pipe(
     isProvided,
     canBeNumber
   )({ name: 'qty', param: body.qty })
 
-  const userID = pipe(
-    isProvided,
-    canBeNumber
-  )({ name: 'userID', param: body.userID })
-
-  const productID = pipe(
-    isProvided,
-    canBeNumber
-  )({ name: 'productID', param: body.productID })
-
-  return {
-    qty: qty.param,
-    userID: userID.param,
-    productID: productID.param
-  }
+  return { qty: qty.param }
 }
 
 export const checkCartProductUpdate = ({ body }: Request): CartProductInput => {
