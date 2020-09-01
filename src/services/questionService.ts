@@ -62,6 +62,7 @@ const getQuestionsByGroup = async (questionsInput: QuestionCursorInput, req: Req
     onlyAnswered = false,
     sortBy = 'votesDelta_desc'
   } = questionsInput
+
   const { groupID } = req.params
 
   let questions: (Question & { answerCount?: string })[] = await db('questions as q')
@@ -77,6 +78,7 @@ const getQuestionsByGroup = async (questionsInput: QuestionCursorInput, req: Req
     .count('a.questionID as answerCount')
     .where('groupID', groupID)
     .andWhere('q.moderationStatus', 'APPROVED')
+    .andWhere('a.moderationStatus', 'APPROVED')
     .leftJoin('answers as a', 'q.questionID', 'a.questionID')
     .groupBy('q.questionID')
 

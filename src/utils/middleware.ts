@@ -145,7 +145,7 @@ export const errorHandler = (
     error: error.message
   })
 
-  next(error)
+  next()
 }
 
 const storage = multer.diskStorage({
