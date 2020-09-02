@@ -100,13 +100,22 @@ const updateCartProduct = async (cartProductInput: CartProductInput, req: Reques
   return updatedCP
 }
 
-const deleteCartProduct = async (req: Request): Promise<void> => {
-  const deleteCount = await db('cartProducts')
-    .del()
-    .where('userID', req.params.userID)
-    .andWhere('productID', req.params.productID)
+const deleteCartProduct = async (req: Request): Promise<CartProduct> => {
+  return await dbTrans(async (trx: Knex.Transaction) => {
+    const cartProduct = await trx<CartProduct>('cartProducts')
+      .first()
+      .where('userID', req.params.userID)
+      .andWhere('productID', req.params.productID)
 
-  if (deleteCount === 0) throw new StatusError(404, 'Not Found')
+    const deleteCount = await trx('cartProducts')
+      .del()
+      .where('userID', req.params.userID)
+      .andWhere('productID', req.params.productID)
+
+    if (deleteCount === 0 || cartProduct === undefined) throw new StatusError(404, 'Not Found')
+
+    return cartProduct
+  })
 }
 
 export default {

@@ -173,17 +173,19 @@ const updateAnswer = async (answerInput: AnswerUpdateInput, req: Request): Promi
 }
 
 const deleteAnswer = async (req: Request): Promise<Answer> => {
-  const answer = await db<Answer>('answers')
-    .first()
-    .where('answerID', req.params.answerID)
+  return await dbTrans(async (trx: Knex.Transaction) => {
+    const answer = await trx<Answer>('answers')
+      .first()
+      .where('answerID', req.params.answerID)
 
-  const deleteCount = await db('answers')
-    .del()
-    .where('answerID', req.params.answerID)
+    const deleteCount = await trx('answers')
+      .del()
+      .where('answerID', req.params.answerID)
 
-  if (deleteCount === 0 || answer === undefined) throw new StatusError(404, 'Not Found')
+    if (deleteCount === 0 || answer === undefined) throw new StatusError(404, 'Not Found')
 
-  return answer
+    return answer
+  })
 }
 
 export default {

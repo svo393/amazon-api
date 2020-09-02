@@ -108,8 +108,8 @@ router.put('/:userID/cartProducts/:productID', requireSameUserOrAdmin('params'),
 })
 
 router.delete('/:userID/cartProducts/:productID', requireSameUserOrAdmin('params'), async (req, res) => {
-  await cartProductService.deleteCartProduct(req)
-  res.status(204).end()
+  const deletedCartProduct = await cartProductService.deleteCartProduct(req)
+  res.json(deletedCartProduct)
 })
 
 // TODO remove redundant routes
