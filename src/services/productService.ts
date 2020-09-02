@@ -344,6 +344,7 @@ const getProductByID = async (req: Request): Promise<ProductLimitedData| Product
   const rawProduct: RawProduct = await getProductsQuery.clone()
     .first(
       'p.listPrice',
+      'p.price',
       'p.bullets',
       'p.description',
       'p.createdAt',

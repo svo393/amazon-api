@@ -518,7 +518,6 @@ export const checkAddressType = ({ body }: Request): AddressTypeInput => {
 }
 
 export const checkLocalCart = ({ body }: Request): LocalCart => {
-  console.info('body', body)
   const localCart: any[] = body ?? []
   return localCart.map((cp) => ({
     qty: pipe(
