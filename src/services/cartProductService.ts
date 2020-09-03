@@ -103,7 +103,7 @@ const updateCartProduct = async (cartProductInput: CartProductInput, req: Reques
 const deleteCartProduct = async (req: Request): Promise<CartProduct> => {
   return await dbTrans(async (trx: Knex.Transaction) => {
     const cartProduct = await trx<CartProduct>('cartProducts')
-      .first()
+      .first('productID')
       .where('userID', req.params.userID)
       .andWhere('productID', req.params.productID)
 
