@@ -1,8 +1,9 @@
 import Router from 'express'
+import cartProductService from '../services/cartProductService'
 import parameterService from '../services/parameterService'
 import productService from '../services/productService'
 import { UPLOAD_TIMEOUT } from '../utils/config'
-import { checkMediaUpload, checkNewProduct, checkProductFilters, checkProductMinFilters, checkProductUpdate } from '../utils/inputValidator'
+import { checkLocalCart, checkMediaUpload, checkNewProduct, checkProductFilters, checkProductMinFilters, checkProductUpdate } from '../utils/inputValidator'
 import { requireAdmin, multerUpload } from '../utils/middleware'
 
 const router = Router()
@@ -46,6 +47,12 @@ router.post('/:productID/upload', requireAdmin, multerUpload.array('productImage
 router.get('/:productID/parameters', async (req, res) => {
   const productParameters = await parameterService.getParametersByProduct(req)
   res.json(productParameters)
+})
+
+router.post('/localCart', async (req, res) => {
+  const localCartProductInput = checkLocalCart(req)
+  const cartProducts = await cartProductService.getProductsForLocalCart(localCartProductInput)
+  res.json(cartProducts)
 })
 
 export default router

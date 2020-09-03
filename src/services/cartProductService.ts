@@ -5,7 +5,7 @@ import { db, dbTrans } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
 type Cart = {
-  products: Pick<Product, 'productID' |'title' |'price' |'stock' |'isAvailable'> & { images: Image[] };
+  products: (Pick<Product, 'productID' |'title' |'price' |'stock' |'isAvailable'> & { images: Image[] })[];
   cart: CartProduct[];
 }
 
@@ -90,6 +90,25 @@ const getCartProductsByUser = async (localCart: LocalCart, req: Request): Promis
   })
 }
 
+const getProductsForLocalCart = async (localCart: LocalCart): Promise<Pick<Cart, 'products'>> => {
+  const productIDs = localCart.map((cp) => cp.productID)
+
+  const products = await db<Product>('products')
+    .select('productID', 'title', 'price', 'stock', 'isAvailable')
+    .whereIn('productID', productIDs)
+
+  const images = await db<Image>('images')
+    .whereIn('productID', productIDs)
+
+  return {
+    products: products.map((p) => ({
+      ...p,
+      price: p.price / 100,
+      images: images.filter((i) => i.productID === p.productID)
+    }))
+  }
+}
+
 const updateCartProduct = async (cartProductInput: CartProductInput, req: Request): Promise<CartProduct> => {
   const [ updatedCP ]: CartProduct[] = await db('cartProducts')
     .update(cartProductInput, [ '*' ])
@@ -123,5 +142,6 @@ export default {
   getCartProductByID,
   updateCartProduct,
   getCartProductsByUser,
+  getProductsForLocalCart,
   deleteCartProduct
 }
