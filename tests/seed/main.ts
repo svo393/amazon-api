@@ -2,7 +2,7 @@ import path from 'path'
 import { flatten, omit } from 'ramda'
 import supertest from 'supertest'
 import app from '../../src/app'
-import { Answer, CartProduct, Invoice, List, Order, Product, Question, Review, ReviewComment } from '../../src/types'
+import { Address, Answer, CartProduct, Invoice, List, ObjIndexed, Order, Product, Question, Review, ReviewComment, UserAddress } from '../../src/types'
 import { apiURLs } from '../../src/utils/constants'
 import { db } from '../../src/utils/db'
 import { createOneCategory, createOneParameter, createOneVendor, loginAs, populateUsers, purge } from '../testHelper'
@@ -20,7 +20,7 @@ const seed = async (): Promise<void> => {
     const users = await Promise.all(initialUsers.map(async (u) => {
       const res = await api
         .post(apiURLs.auth)
-        .send({ email: u.email, password: u.password })
+        .send({ email: u.email, password: u.password, name: u.name })
 
       return {
         ...u,
@@ -47,15 +47,19 @@ const seed = async (): Promise<void> => {
         ))
     }))
 
-    await Promise.all(users.map(async (u) => {
-      await api
-        .post(apiURLs.addresses)
-        .set('Cookie', `sessionID=${u.sessionID}`)
-        .send({
-          addr: u.address,
-          addressType: 'SHIPPING'
-        })
-    }))
+    const addresses: (Address & UserAddress)[] = await Promise.all(users
+      .filter((u) => u.address !== undefined)
+      .map(async (u) =>
+        (await api
+          .post(apiURLs.addresses)
+          .set('Cookie', `sessionID=${u.sessionID}`)
+          .send({
+            ...u.address as ObjIndexed,
+            addressType: 'SHIPPING'
+          })).body
+      ))
+
+    console.info('addresses', addresses)
 
     await api
       .post(`${apiURLs.users}/${users[0].userID}/follows/${users[3].userID}`)
@@ -196,26 +200,12 @@ const seed = async (): Promise<void> => {
                     const reviewComment: { body: ReviewComment } = await api
                       .post(`${apiURLs.reviews}/${body.reviewID}/comments`)
                       .set('Cookie', `sessionID=${sessionID}`)
-                      .send(omit([ 'author', 'mediaFiles' ], cm))
+                      .send(omit([ 'author' ], cm))
 
                     await api
                       .put(`${apiURLs.reviewComments}/${reviewComment.body.reviewCommentID}`)
                       .set('Cookie', `sessionID=${adminSessionID}`)
                       .send({ moderationStatus: 'APPROVED' })
-
-                    if (cm.media !== undefined) {
-                      const uploadAPI = api
-                        .post(`${apiURLs.reviews}/${body.reviewID}/comments/${reviewComment.body.reviewCommentID}/upload`)
-                        .set('Cookie', `sessionID=${sessionID}`)
-
-                      cm.mediaFiles !== undefined && cm.mediaFiles.map((m: number) => {
-                        uploadAPI
-                          .attach('reviewCommentImages', path.join(
-                            __dirname, `images/reviewComments/${m}.jpg`
-                          ))
-                      })
-                      await uploadAPI
-                    }
                   }))
                 }
               }))
@@ -315,24 +305,23 @@ const seed = async (): Promise<void> => {
       )
       .set('Cookie', `sessionID=${users[2].sessionID}`)
 
-    const cartProduct1: { body: CartProduct } = await api
+    const cartProduct1: { body: { cart: CartProduct[] } } = await api
       .post(`${apiURLs.users}/${users[0].userID}/cartProducts`)
       .set('Cookie', `sessionID=${users[0].sessionID}`)
-      .send({
+      .send([ {
         qty: 1,
-        userID: users[0].userID,
         productID: products[1].productID
-      })
+      } ])
 
     const order1: { body: Order & Invoice } = await api
       .post(`${apiURLs.users}/${users[0].userID}/orders`)
       .set('Cookie', `sessionID=${users[0].sessionID}`)
       .send({
-        address: users[0].address,
+        addressID: (addresses.find((a) => a.userID === users[0].userID))?.addressID,
         details: 'Card 4242 4242 4242 4242',
         shippingMethod: 'DOOR',
         paymentMethod: 'CARD',
-        cart: [ cartProduct1.body ]
+        cart: [ cartProduct1.body.cart[0] ]
       })
 
     // await api
@@ -345,24 +334,23 @@ const seed = async (): Promise<void> => {
     //   .set('Cookie', `sessionID=${adminSessionID}`)
     //   .send({ invoiceStatus: 'DONE' })
 
-    const cartProduct2: { body: CartProduct } = await api
+    const cartProduct2: { body: { cart: CartProduct[] } } = await api
       .post(`${apiURLs.users}/${users[2].userID}/cartProducts`)
       .set('Cookie', `sessionID=${users[2].sessionID}`)
-      .send({
+      .send([ {
         qty: 1,
-        userID: users[2].userID,
         productID: products[0].productID
-      })
+      } ])
 
     const order2: { body: Order & Invoice } = await api
       .post(`${apiURLs.users}/${users[2].userID}/orders`)
       .set('Cookie', `sessionID=${users[2].sessionID}`)
       .send({
-        address: users[2].address,
+        addressID: (addresses.find((a) => a.userID === users[2].userID))?.addressID,
         details: 'Take my money',
         shippingMethod: 'LOCKER',
         paymentMethod: 'CASH',
-        cart: [ cartProduct2.body ]
+        cart: [ cartProduct2.body.cart[0] ]
       })
 
     // await api

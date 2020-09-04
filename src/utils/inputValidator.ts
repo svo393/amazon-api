@@ -597,12 +597,12 @@ export const checkNewAddress = ({ body }: Request): AddressCreateInput => {
 
   const postalCode = pipe(
     isProvided,
-    isString
+    canBeNumber
   )({ name: 'postalCode', param: body.postalCode })
 
   const phoneNumber = pipe(
     isProvided,
-    canBeNumber
+    isString
   )({ name: 'phoneNumber', param: body.phoneNumber })
 
   return {
@@ -738,8 +738,6 @@ export const checkNewReview = ({ body }: Request): ReviewCreateInput => {
 }
 
 export const checkReviewUpdate = ({ body }: Request): ReviewUpdateInput => {
-  console.info('body', body)
-
   const title = 'title' in body
     ? isString({ name: 'title', param: body.title })
     : undefined
@@ -969,10 +967,10 @@ export const checkGroupVariationDeletion = ({ body }: Request): GroupVariationDe
 }
 
 export const checkNewOrder = ({ body }: Request): OrderCreateInput => {
-  const address = pipe(
+  const addressID = pipe(
     isProvided,
-    isString
-  )({ name: 'address', param: body.address })
+    canBeNumber
+  )({ name: 'addressID', param: body.addressID })
 
   const shippingMethod = pipe(
     isProvided,
@@ -1001,7 +999,7 @@ export const checkNewOrder = ({ body }: Request): OrderCreateInput => {
   })
 
   return {
-    address: address.param,
+    addressID: addressID.param,
     shippingMethod: shippingMethod.param,
     details: details.param,
     paymentMethod: paymentMethod.param,
@@ -1010,8 +1008,8 @@ export const checkNewOrder = ({ body }: Request): OrderCreateInput => {
 }
 
 export const checkOrderUpdate = ({ body }: Request): OrderUpdateInput => {
-  const address = 'address' in body
-    ? isString({ name: 'address', param: body.address })
+  const addressID = 'addressID' in body
+    ? canBeNumber({ name: 'addressID', param: body.addressID })
     : undefined
 
   const orderStatus = 'orderStatus' in body
@@ -1023,7 +1021,7 @@ export const checkOrderUpdate = ({ body }: Request): OrderUpdateInput => {
     : undefined
 
   return hasDefinedProps<OrderUpdateInput>({
-    address: address?.param,
+    addressID: addressID?.param,
     orderStatus: orderStatus?.param,
     shippingMethod: shippingMethod?.param
   })

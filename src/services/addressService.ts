@@ -20,12 +20,12 @@ const addAddress = async (addressInput: AddressCreateInput, req: Request): Promi
       .andWhere('isDefault', true)
       .update({ isDefault: false }, [ '*' ])
 
-    const addedAddress: Address = await trx('addresses')
+    const [ addedAddress ]: Address[] = await trx('addresses')
       .insert(omit([ 'isDefault' ], addressInput), [ '*' ])
 
     const [ addedUserAddress ]: UserAddress[] = await trx('userAddresses')
       .insert({
-        isDefault,
+        isDefault: isDefault ?? existingUserAddresses.length === 0,
         addressID: addedAddress.addressID,
         userID
       }, [ '*' ])

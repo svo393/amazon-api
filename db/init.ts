@@ -1,4 +1,4 @@
-import { addressTypes, invoiceStatuses, lockerAddresses, moderationStatuses, orderStatuses, paymentMethods, roles, shippingMethods } from '../src/utils/constants'
+import { addressTypes, invoiceStatuses, moderationStatuses, orderStatuses, paymentMethods, roles, shippingMethods } from '../src/utils/constants'
 import { db } from '../src/utils/db'
 
 const randomNumber = (min: number, max: number) =>
@@ -65,10 +65,6 @@ export const init = async (): Promise<void> => {
   await db('paymentMethods').insert(paymentMethods.map((pt) => ({ paymentMethodName: pt })))
 
   await db('addressTypes').insert(addressTypes)
-
-  await db('addresses').insert(lockerAddresses.map((a) => ({
-    addr: a, addressType: 'LOCKER'
-  })))
 
   await db('orderStatuses').insert(orderStatuses.map((os) => ({ orderStatusName: os })))
 

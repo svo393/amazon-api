@@ -422,7 +422,6 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
 
     .createTable('orders', (t) => {
       t.increments('orderID')
-      t.string('address').notNullable()
       t.dateTime('createdAt').notNullable()
       t.dateTime('updatedAt').notNullable()
 
@@ -439,6 +438,11 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t
         .string('shippingMethod')
         .references('shippingMethods.shippingMethodName')
+        .notNullable()
+
+      t
+        .integer('addressID')
+        .references('addresses.addressID')
         .notNullable()
     })
 

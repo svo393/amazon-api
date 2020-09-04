@@ -275,7 +275,12 @@ export const createOneFollower = async (): Promise<Follower & { sessionID: strin
 export const newAddress = async (): Promise<AddressCreateInput> => {
   const { addedAddressType } = await createOneAddressType('root')
   return {
-    addr: `New Address ${(new Date().getTime()).toString()}`,
+    country: `New Address ${(new Date().getTime()).toString()}`,
+    fullName: `New Address ${(new Date().getTime()).toString()}`,
+    streetAddressLine1: `New Address ${(new Date().getTime()).toString()}`,
+    city: `New Address ${(new Date().getTime()).toString()}`,
+    postalCode: new Date().getTime(),
+    phoneNumber: `New Address ${(new Date().getTime()).toString()}`,
     addressType: addedAddressType.addressTypeName,
     isDefault: true
   }
@@ -559,8 +564,8 @@ export const createOneInvoiceStatus = async (invoiceStatus: string): Promise<{ a
   return { addedInvoiceStatus: body, sessionID }
 }
 
-export const newOrder = (address: string, shippingMethod: string, cart: CartProduct[], paymentMethod: string): OrderCreateInput => ({
-  address,
+export const newOrder = (addressID: number, shippingMethod: string, cart: CartProduct[], paymentMethod: string): OrderCreateInput => ({
+  addressID,
   details: 'Card 4242 4242 4242 4242',
   paymentMethod,
   shippingMethod,
@@ -578,7 +583,7 @@ export const createOneOrder = async (role: string): Promise<{ addedOrder: Order;
     .post(`${apiURLs.users}/${userID}/orders`)
     .set('Cookie', `sessionID=${sessionID}`)
     .send(newOrder(
-      addedAddress.addr,
+      addedAddress.addressID,
       addedShippingMethod.shippingMethodName,
       [ addedCartProduct1, addedCartProduct2 ],
       addedPaymentMethod.paymentMethodName

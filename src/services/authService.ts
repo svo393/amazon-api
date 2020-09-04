@@ -11,7 +11,7 @@ import StatusError from '../utils/StatusError'
 type UserBaseData = Omit<UserSafeData, | 'role'>
 
 const signupUser = async (userInput: UserSignupInput, req: Request): Promise<UserBaseData> => {
-  const { email, password } = userInput
+  const { email, password, name } = userInput
 
   const existingUser = await db<User>('users')
     .first('userID')
@@ -25,6 +25,7 @@ const signupUser = async (userInput: UserSignupInput, req: Request): Promise<Use
 
   const [ addedUser ]: User[] = await db<User>('users')
     .insert({
+      name,
       email,
       password: passwordHash,
       createdAt: new Date(),

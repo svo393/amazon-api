@@ -11,7 +11,7 @@ export const initialUsers = [
       streetAddressLine1: 'PXC2+MJ',
       city: 'Jersey City',
       region: 'New Jersey',
-      postalCode: '',
+      postalCode: 512124,
       phoneNumber: '01487755568'
     }
   },
@@ -32,7 +32,7 @@ export const initialUsers = [
       streetAddressLine1: 'PXC2+MJ',
       city: 'Jersey City',
       region: 'New Jersey',
-      postalCode: '',
+      postalCode: 154898,
       phoneNumber: '01487755568'
     }
   },
@@ -41,8 +41,7 @@ export const initialUsers = [
     password: 'p2&MR5w$Z7pF',
     name: 'Marette',
     avatar: true,
-    info: 'I run a home-based business. I don\'t have time to go to the store all the time so I shop on amazon. We donate a lot to our local animal shelter and help with fundraisers, so we are always in need of giveaways. Amazon is always our go-to for all our home, office needs, donation needs. Please do not contact me for doing reviews. I do reviews on what I purchase already.',
-    address: '2QXW+7W Los Angeles, California, United States'
+    info: 'I run a home-based business. I don\'t have time to go to the store all the time so I shop on amazon. We donate a lot to our local animal shelter and help with fundraisers, so we are always in need of giveaways. Amazon is always our go-to for all our home, office needs, donation needs. Please do not contact me for doing reviews. I do reviews on what I purchase already.'
   }
 ]
 
@@ -133,7 +132,7 @@ export const initialProducts = {
               
               My husband is in IT and works with this stuff every day. He loves this computer. We have installed it in a public area and created accounts for everyone. The whole family uses it, and the kids are getting a jump on back to school assignments using this. It’s amazing!`,
               media: 2,
-              mediaFiles: [ 0, 1 ]
+              mediaFiles: [ 1, 2 ]
             }
           ],
           questions: [

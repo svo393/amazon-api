@@ -9,10 +9,6 @@ export const addressTypes = [
   { addressTypeName: 'SHIPPING', isPrivate: true },
   { addressTypeName: 'LOCKER' }
 ]
-export const lockerAddresses = [
-  'Pokrovka St, 17, Moscow, 101000 Russian Federation',
-  'Altuf\'yevskoye Shosse, 70к1, Moscow, 127549 Russian Federation'
-]
 
 export const moderationStatuses = [ 'NEW', 'APPROVED', 'REJECTED' ]
 export const orderStatuses = [ 'DONE', 'PROCESSING', 'NEW', 'CANCELED' ]
