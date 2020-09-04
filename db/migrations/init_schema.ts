@@ -41,9 +41,6 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .references('addressTypes.addressTypeName')
         .notNullable()
     })
-    .alterTable('addresses', (t) => {
-      t.unique([ 'addr', 'addressType' ])
-    })
 
     .createTable('users', (t) => {
       t.increments('userID')

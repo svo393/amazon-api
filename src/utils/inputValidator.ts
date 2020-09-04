@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import { pipe } from 'ramda'
-import { AddressCreateInput, AddressTypeInput, AnswerCreateInput, AnswerUpdateInput, AskFiltersInput, CartProductInput, CategoriesFiltersInput, CategoryCreateInput, CategoryUpdateInput, CursorInput, FeedFiltersInput, GroupVariationCreateInput, GroupVariationDeleteInput, GroupVariationUpdateInput, ImagesDeleteInput, ImagesFiltersInput, ImagesUpdateInput, InvoiceCreateInput, InvoicesFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, LocalCart, ModerationStatus, OrderCreateInput, OrderProductInput, OrdersFiltersInput, OrderStatus, OrderUpdateInput, ParameterInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionCursorInput, QuestionUpdateInput, ReviewCommentCreateInput, ReviewCommentUpdateInput, ReviewCreateInput, ReviewsFiltersInput, ReviewUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorInput, VendorsFiltersInput, VotesCreateInput, VotesFiltersInput } from '../types'
+import { AddressCreateInput, AddressTypeInput, AddressUpdateInput, AnswerCreateInput, AnswerUpdateInput, AskFiltersInput, CartProductInput, CategoriesFiltersInput, CategoryCreateInput, CategoryUpdateInput, CursorInput, FeedFiltersInput, GroupVariationCreateInput, GroupVariationDeleteInput, GroupVariationUpdateInput, ImagesDeleteInput, ImagesFiltersInput, ImagesUpdateInput, InvoiceCreateInput, InvoicesFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, LocalCart, ModerationStatus, OrderCreateInput, OrderProductInput, OrdersFiltersInput, OrderStatus, OrderUpdateInput, ParameterInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionCursorInput, QuestionUpdateInput, ReviewCommentCreateInput, ReviewCommentUpdateInput, ReviewCreateInput, ReviewsFiltersInput, ReviewUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorInput, VendorsFiltersInput, VotesCreateInput, VotesFiltersInput } from '../types'
 import { canBeBoolean, canBeNumber, hasDefinedProps, isArray, isDate, isEmail, isInputProvided, isObject, isPasswordValid, isPositiveNumber, isProvided, isSomeProvided, isString } from './validatorLib'
 
 export const checkNewUser = ({ body }: Request): UserSignupInput => {
@@ -562,21 +562,116 @@ export const checkNewAddress = ({ body }: Request): AddressCreateInput => {
     ? canBeBoolean({ name: 'isDefault', param: body.isDefault })
     : undefined
 
-  const addr = pipe(
+  const country = pipe(
     isProvided,
     isString
-  )({ name: 'addr', param: body.addr })
+  )({ name: 'country', param: body.country })
 
   const addressType = pipe(
     isProvided,
     isString
   )({ name: 'addressType', param: body.addressType })
 
+  const fullName = pipe(
+    isProvided,
+    isString
+  )({ name: 'fullName', param: body.fullName })
+
+  const streetAddressLine1 = pipe(
+    isProvided,
+    isString
+  )({ name: 'streetAddressLine1', param: body.streetAddressLine1 })
+
+  const streetAddressLine2 = 'streetAddressLine2' in body
+    ? isString({ name: 'streetAddressLine2', param: body.streetAddressLine2 })
+    : undefined
+
+  const city = pipe(
+    isProvided,
+    isString
+  )({ name: 'city', param: body.city })
+
+  const region = 'region' in body
+    ? isString({ name: 'region', param: body.region })
+    : undefined
+
+  const postalCode = pipe(
+    isProvided,
+    isString
+  )({ name: 'postalCode', param: body.postalCode })
+
+  const phoneNumber = pipe(
+    isProvided,
+    canBeNumber
+  )({ name: 'phoneNumber', param: body.phoneNumber })
+
   return {
     isDefault: isDefault?.param,
-    addr: addr.param,
-    addressType: addressType.param
+    addressType: addressType.param,
+    country: country.param,
+    fullName: fullName.param,
+    streetAddressLine1: streetAddressLine1.param,
+    streetAddressLine2: streetAddressLine2?.param,
+    city: city.param,
+    region: region?.param,
+    postalCode: postalCode.param,
+    phoneNumber: phoneNumber.param
   }
+}
+
+export const checkAddressUpdate = ({ body }: Request): AddressUpdateInput => {
+  const isDefault = 'isDefault' in body
+    ? canBeBoolean({ name: 'isDefault', param: body.isDefault })
+    : undefined
+
+  const addressType = 'addressType' in body
+    ? isString({ name: 'addressType', param: body.addressType })
+    : undefined
+
+  const country = 'country' in body
+    ? isString({ name: 'country', param: body.country })
+    : undefined
+
+  const fullName = 'fullName' in body
+    ? isString({ name: 'fullName', param: body.fullName })
+    : undefined
+
+  const streetAddressLine1 = 'streetAddressLine1' in body
+    ? isString({ name: 'streetAddressLine1', param: body.streetAddressLine1 })
+    : undefined
+
+  const streetAddressLine2 = 'streetAddressLine2' in body
+    ? isString({ name: 'streetAddressLine2', param: body.streetAddressLine2 })
+    : undefined
+
+  const city = 'city' in body
+    ? isString({ name: 'city', param: body.city })
+    : undefined
+
+  const region = 'region' in body
+    ? isString({ name: 'region', param: body.region })
+    : undefined
+
+  const postalCode = 'postalCode' in body
+    ? canBeNumber({ name: 'postalCode', param: body.postalCode })
+    : undefined
+
+  const phoneNumber = 'phoneNumber' in body
+    ? isString({ name: 'phoneNumber', param: body.phoneNumber })
+    : undefined
+
+  return hasDefinedProps<AddressUpdateInput>({
+    isDefault: isDefault?.param,
+    addressType: addressType?.param,
+    country: country?.param,
+    fullName: fullName?.param,
+    streetAddressLine1: streetAddressLine1?.param,
+    streetAddressLine2: streetAddressLine2?.param,
+    city: city?.param,
+    region: region?.param,
+    postalCode: postalCode?.param,
+    phoneNumber: phoneNumber?.param
+  })
 }
 
 export const checkNewUserAddress = ({ body }: Request): UserAddressCreateInput => {

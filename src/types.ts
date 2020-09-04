@@ -24,10 +24,11 @@ export type Address = {
   region?: string;
   postalCode: number;
   phoneNumber: string;
+  addressType: string;
 }
 
-export type AddressCreateInput = Omit<Answer, 'addressID'>
-export type AddressUpdateInput = Partial<AddressCreateInput> & { isDefault?: boolean }
+export type AddressCreateInput = Omit<Address, 'addressID'> & { isDefault?: true }
+export type AddressUpdateInput = Partial<AddressCreateInput>
 
 export type User = {
   userID: number;

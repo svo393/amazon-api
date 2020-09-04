@@ -5,21 +5,36 @@ export const initialUsers = [
     name: 'Bob Smith',
     avatar: true,
     info: 'Work on electronics to maintain their electrical component. Enjoy testing the durability of items.',
-    address: 'PXC2+MJ Jersey City, New Jersey, United States'
+    address: {
+      country: 'United States',
+      fullName: 'Bob Smith',
+      streetAddressLine1: 'PXC2+MJ',
+      city: 'Jersey City',
+      region: 'New Jersey',
+      postalCode: '',
+      phoneNumber: '01487755568'
+    }
   },
   {
     email: 'alice@example.com',
     password: '8I&o9FSv%VrU',
     name: 'Alice',
     avatar: true,
-    info: 'Wife... & Mother of 3. Love Shopping ( mainly on Amazon!) and Crafting. Addicted to my Cricut, Home Renovation shows and my kiddos.',
-    address: 'M3P2+MG Brooklyn, New York, United States'
+    info: 'Wife... & Mother of 3. Love Shopping ( mainly on Amazon!) and Crafting. Addicted to my Cricut, Home Renovation shows and my kiddos.'
   },
   {
     email: 'john@example.com',
     password: 'VgJ48q&8%^Dm',
     name: 'Jools',
-    address: '531-577 Bryant St, Rahway, NJ 07065, USA'
+    address: {
+      country: 'United States',
+      fullName: 'Bob Smith',
+      streetAddressLine1: 'PXC2+MJ',
+      city: 'Jersey City',
+      region: 'New Jersey',
+      postalCode: '',
+      phoneNumber: '01487755568'
+    }
   },
   {
     email: 'mary@example.com',

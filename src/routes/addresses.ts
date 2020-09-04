@@ -1,8 +1,8 @@
 import Router from 'express'
 import addressService from '../services/addressService'
 import userAddressService from '../services/userAddressService'
-import { checkNewAddress, checkNewUserAddress } from '../utils/inputValidator'
-import { requireAuth, requireCreator } from '../utils/middleware'
+import { checkAddressUpdate, checkNewAddress, checkNewUserAddress } from '../utils/inputValidator'
+import { requireAuth } from '../utils/middleware'
 
 const router = Router()
 
@@ -15,6 +15,17 @@ router.post('/', requireAuth, async (req, res) => {
 router.get('/:addressID', async (req, res) => {
   const address = await addressService.getAddressByID(req)
   res.json(address)
+})
+
+router.put('/:addressID', requireAuth, async (req, res) => {
+  const addressUpdateInput = checkAddressUpdate(req)
+  const updatedAddress = await addressService.updateAddress(addressUpdateInput, req)
+  res.json(updatedAddress)
+})
+
+router.delete('/:addressID', requireAuth, async (req, res) => {
+  const deletedAddress = await addressService.deleteAddress(req)
+  res.json(deletedAddress)
 })
 
 router.post('/:addressID/userAddresses', requireAuth, async (req, res) => {
