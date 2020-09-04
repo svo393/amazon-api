@@ -59,8 +59,6 @@ const seed = async (): Promise<void> => {
           })).body
       ))
 
-    console.info('addresses', addresses)
-
     await api
       .post(`${apiURLs.users}/${users[0].userID}/follows/${users[3].userID}`)
       .set('Cookie', `sessionID=${users[0].sessionID}`)
