@@ -16,9 +16,18 @@ export type PaymentMethod = { paymentMethodName: string }
 
 export type Address = {
   addressID: number;
-  addr: string;
-  addressType: string;
+  country: string;
+  fullName: string;
+  streetAddressLine1: string;
+  streetAddressLine2?: string;
+  city: string;
+  region?: string;
+  postalCode: number;
+  phoneNumber: string;
 }
+
+export type AddressCreateInput = Omit<Answer, 'addressID'>
+export type AddressUpdateInput = Partial<AddressCreateInput> & { isDefault?: boolean }
 
 export type User = {
   userID: number;
@@ -276,13 +285,7 @@ export type AddressTypeInput = { addressTypeName: string; isPrivate?: boolean }
 
 export type ShippingMethodInput = { shippingMethodName: string; isPrivate?: boolean }
 
-export type AddressCreateInput = Pick<Address, 'addr' | 'addressType'> & {
-  isDefault?: boolean;
-}
-
 export type AddressFetchInput = { userID?: number; addressType?: string }
-
-export type AddressUpdateInput = { name?: string; addressType?: string }
 
 export type FollowerFetchInput = { userID?: number; follows?: number }
 

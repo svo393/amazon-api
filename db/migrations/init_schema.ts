@@ -27,7 +27,14 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
 
     .createTable('addresses', (t) => {
       t.increments('addressID')
-      t.string('addr').notNullable()
+      t.string('country').notNullable()
+      t.string('fullName').notNullable()
+      t.string('streetAddressLine1').notNullable()
+      t.string('streetAddressLine2')
+      t.string('city').notNullable()
+      t.string('region')
+      t.integer('postalCode').notNullable()
+      t.string('phoneNumber').notNullable()
 
       t
         .string('addressType')
