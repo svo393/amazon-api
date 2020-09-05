@@ -28,8 +28,8 @@ export const initialUsers = [
     name: 'Jools',
     address: {
       country: 'United States',
-      fullName: 'Bob Smith',
-      streetAddressLine1: 'PXC2+MJ',
+      fullName: 'Jools Willow',
+      streetAddressLine1: '12XC2+MJ',
       city: 'Jersey City',
       region: 'New Jersey',
       postalCode: 154898,

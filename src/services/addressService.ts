@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import Knex from 'knex'
-import { omit } from 'ramda'
+import { equals, omit, pick } from 'ramda'
 import { Address, AddressCreateInput, AddressUpdateInput, UserAddress } from '../types'
 import { db, dbTrans } from '../utils/db'
 import StatusError from '../utils/StatusError'
@@ -74,31 +74,61 @@ const getAddressByID = async (req: Request): Promise<AddressFullData> => {
   return address
 }
 
-const updateAddress = async (addressInput: AddressUpdateInput, req: Request): Promise<Address> => {
-  const [ updatedAddress ]: Address[] = await db('addresses')
-    .update({
-      ...addressInput,
-      updatedAt: new Date()
-    }, [ '*' ])
-    .where('addressID', req.params.addressID)
+const updateAddress = async (addressInput: AddressUpdateInput, req: Request): Promise<Address & UserAddress> => {
+  const { addressID } = req.params
+  const userID = req.session?.userID
 
-  if (updatedAddress === undefined) throw new StatusError(404, 'Not Found')
-  return updatedAddress
+  const setDefaultOnly = equals(Object.keys(addressInput), [ 'isDefault' ])
+
+  return await dbTrans(async (trx: Knex.Transaction) => {
+    let updatedAddress = {}
+    let updatedUserAddress = {}
+
+    addressInput.isDefault && await trx('userAddresses')
+      .where('userID', userID)
+      .andWhere('isDefault', true)
+      .update({ isDefault: false }, [ '*' ])
+
+    if (!setDefaultOnly) {
+      updatedAddress = (await trx('addresses')
+        .update({ ...omit([ 'isDefault' ], addressInput) }, [ '*' ])
+        .where('addressID', addressID))[0]
+    }
+
+    if (addressInput.isDefault !== undefined) {
+      updatedUserAddress = await trx('userAddresses')
+        .update({ ...pick([ 'isDefault' ], addressInput) }, [ '*' ])
+        .where('addressID', addressID)
+        .andWhere('userID', userID)
+    }
+
+    if ((setDefaultOnly && updatedAddress === undefined) || updatedUserAddress === undefined) throw new StatusError(404, 'Not Found')
+
+    return { ...updatedAddress, ...updatedUserAddress }
+  })
 }
 
 const deleteAddress = async (req: Request): Promise<Address> => {
   return await dbTrans(async (trx: Knex.Transaction) => {
+    const userAddress = await trx<Address>('userAddresses')
+      .first()
+      .where('addressID', req.params.addressID)
+
+    const userAddressDeleteCount = await trx('userAddresses')
+      .del()
+      .where('addressID', req.params.addressID)
+
     const address = await trx<Address>('addresses')
       .first()
       .where('addressID', req.params.addressID)
 
-    const deleteCount = await trx('addresses')
+    const addressDeleteCount = await trx('addresses')
       .del()
       .where('addressID', req.params.addressID)
 
-    if (deleteCount === 0 || address === undefined) throw new StatusError(404, 'Not Found')
+    if (addressDeleteCount === 0 || address === undefined || userAddressDeleteCount === 0 || address === undefined) throw new StatusError(404, 'Not Found')
 
-    return address
+    return { ...address, ...userAddress }
   })
 }
 

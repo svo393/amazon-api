@@ -54,9 +54,16 @@ const getCartProductByID = async (req: Request): Promise<CartProduct> => {
 
 const getCartProductsByUser = async (localCart: LocalCart, req: Request): Promise<Cart> => {
   const userID = req.params.userID
+  const localCartProductIDs = localCart.map((cp) => cp.productID)
   return await dbTrans(async (trx: Knex.Transaction) => {
+    const existingProducts = await trx<Product>('products')
+      .select('productID')
+      .whereIn('productID', localCartProductIDs)
+
+    const existingProductIDs = existingProducts.map((p) => p.productID)
+
     await Promise.all(localCart.map(async (cp) => {
-      await trx.raw(
+      existingProductIDs.includes(cp.productID) && await trx.raw(
         `
         ? ON CONFLICT ("userID", "productID")
           DO UPDATE SET
