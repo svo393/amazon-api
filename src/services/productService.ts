@@ -1,7 +1,7 @@
 import { Request } from 'express'
 import Knex from 'knex'
 import { flatten, omit } from 'ramda'
-import { GroupVariation, Image, Product, ProductCreateInput, ProductData, ProductParameter, ProductsFiltersInput, ProductSize, ProductsMinFiltersInput, ProductUpdateInput, User } from '../types'
+import { GroupVariation, Image, Product, ProductCreateInput, ProductData, ProductParameter, ProductsFiltersInput, ProductSize, ProductsMinFiltersInput, ProductUpdateInput, Question, User } from '../types'
 import { defaultLimit, imagesBasePath } from '../utils/constants'
 import { db, dbTrans } from '../utils/db'
 import fuseIndexes from '../utils/fuseIndexes'
@@ -24,8 +24,6 @@ const getProductsQuery: any = db('products as p')
     'c.name as categoryName'
   )
   .avg('stars as stars')
-  .count('r.reviewID as reviewCount')
-  .where('r.moderationStatus', 'APPROVED')
   .leftJoin('reviews as r', 'p.groupID', 'r.groupID')
   .leftJoin('vendors as v', 'p.vendorID', 'v.vendorID')
   .leftJoin('categories as c', 'p.categoryID', 'c.categoryID')
@@ -160,17 +158,22 @@ const getProducts = async (productsFiltersInput: ProductsFiltersInput): Promise<
 
   let products: Omit<ProductListData, 'images'>[]
 
-  products = rawProducts.map((p) => {
+  products = await Promise.all(rawProducts.map(async (p) => {
     const sizes = productSizes.find((ps) => ps.productID === p.productID)
+
+    const [ { reviewCount } ] = await db('reviews')
+      .count('reviewID as reviewCount')
+      .where('moderationStatus', 'APPROVED')
+      .andWhere('groupID', p.groupID)
 
     return {
       ...p,
       price: p.price / 100,
       stars: parseFloat(p.stars),
-      reviewCount: parseInt(p.reviewCount),
+      reviewCount: parseInt(reviewCount as string),
       productSizesSum: sizes !== undefined ? parseInt(sizes.sum) : null
     }
-  })
+  }))
 
   if (groupID !== undefined) {
     ratingStats = await db('reviews')
@@ -356,13 +359,22 @@ const getProductByID = async (req: Request): Promise<ProductLimitedData| Product
       'u.name as userName',
       'u.email as userEmail'
     )
-    .count('q.questionID as questionCount')
     .where('p.productID', req.params.productID)
     .leftJoin('users as u', 'p.userID', 'u.userID')
     .leftJoin('questions as q', 'p.groupID', 'q.groupID')
     .groupBy('u.userID', 'q.questionID')
 
   if (rawProduct === undefined) throw new StatusError(404, 'Not Found')
+
+  const [ { reviewCount } ] = await db('reviews')
+    .count('reviewID as reviewCount')
+    .where('moderationStatus', 'APPROVED')
+    .andWhere('groupID', rawProduct.groupID)
+
+  const [ { questionCount } ] = await db('questions')
+    .count('questionID as questionCount')
+    .where('moderationStatus', 'APPROVED')
+    .andWhere('groupID', rawProduct.groupID)
 
   const ratingStats: { stars: number; count: string }[] = await db('reviews')
     .select('stars')
@@ -377,8 +389,8 @@ const getProductByID = async (req: Request): Promise<ProductLimitedData| Product
       ? rawProduct.listPrice / 100
       : undefined,
     stars: parseFloat(rawProduct.stars),
-    reviewCount: parseInt(rawProduct.reviewCount),
-    questionCount: parseInt(rawProduct.questionCount),
+    reviewCount: parseInt(reviewCount as string),
+    questionCount: parseInt(questionCount as string),
     ratingStats: ratingStats.reduce((acc, cur) => {
       acc[cur.stars] = Number(cur.count)
       return acc
