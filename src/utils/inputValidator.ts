@@ -642,7 +642,7 @@ export const checkAddressUpdate = ({ body }: Request): AddressUpdateInput => {
     : undefined
 
   const streetAddressLine2 = 'streetAddressLine2' in body
-    ? isNonEmptyString({ name: 'streetAddressLine2', param: body.streetAddressLine2 })
+    ? isString({ name: 'streetAddressLine2', param: body.streetAddressLine2 })
     : undefined
 
   const city = 'city' in body
