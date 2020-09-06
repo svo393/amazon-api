@@ -21,7 +21,7 @@ export type Address = {
   streetAddressLine1: string;
   streetAddressLine2?: string;
   city: string;
-  region?: string;
+  region: string;
   postalCode: number;
   phoneNumber: string;
   addressType: string;
@@ -404,6 +404,7 @@ export type OrderCreateInput = Pick<Order,
   details: string;
   paymentMethod: string;
   cart: CartProduct[];
+  promo?: string;
 }
 
 export type OrderUpdateInput = Partial<Pick<Order,

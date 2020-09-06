@@ -55,6 +55,13 @@ export const isInputProvided = (param: object, msg = 'Missing input'): void => {
 
 export const isString: CP = ({ name, param }) => {
   if (
+    (typeof (param) !== 'string' && !(param instanceof String))
+  ) { throw new StatusError(400, `Incorrect ${name}: ${param}`) }
+  return { name, param: param.trim() ?? undefined }
+}
+
+export const isNonEmptyString: CP = ({ name, param }) => {
+  if (
     (typeof (param) !== 'string' && !(param instanceof String)) ||
     param === ''
   ) { throw new StatusError(400, `Incorrect ${name}: ${param}`) }

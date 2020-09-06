@@ -1,24 +1,24 @@
 import { Request } from 'express'
 import { pipe } from 'ramda'
 import { AddressCreateInput, AddressTypeInput, AddressUpdateInput, AnswerCreateInput, AnswerUpdateInput, AskFiltersInput, CartProductInput, CategoriesFiltersInput, CategoryCreateInput, CategoryUpdateInput, CursorInput, FeedFiltersInput, GroupVariationCreateInput, GroupVariationDeleteInput, GroupVariationUpdateInput, ImagesDeleteInput, ImagesFiltersInput, ImagesUpdateInput, InvoiceCreateInput, InvoicesFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, LocalCart, ModerationStatus, OrderCreateInput, OrderProductInput, OrdersFiltersInput, OrderStatus, OrderUpdateInput, ParameterInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionCursorInput, QuestionUpdateInput, ReviewCommentCreateInput, ReviewCommentUpdateInput, ReviewCreateInput, ReviewsFiltersInput, ReviewUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorInput, VendorsFiltersInput, VotesCreateInput, VotesFiltersInput } from '../types'
-import { canBeBoolean, canBeNumber, hasDefinedProps, isArray, isDate, isEmail, isInputProvided, isObject, isPasswordValid, isPositiveNumber, isProvided, isSomeProvided, isString } from './validatorLib'
+import { canBeBoolean, canBeNumber, hasDefinedProps, isArray, isDate, isEmail, isInputProvided, isNonEmptyString, isObject, isPasswordValid, isPositiveNumber, isProvided, isSomeProvided, isString } from './validatorLib'
 
 export const checkNewUser = ({ body }: Request): UserSignupInput => {
   const email = pipe(
     isProvided,
-    isString,
+    isNonEmptyString,
     isEmail
   )({ name: 'email', param: body.email })
 
   const password = pipe(
     isProvided,
-    isString,
+    isNonEmptyString,
     isPasswordValid
   )({ name: 'password', param: body.password })
 
   const name = pipe(
     isProvided,
-    isString
+    isNonEmptyString
   )({ name: 'name', param: body.name })
 
   return {
@@ -31,13 +31,13 @@ export const checkNewUser = ({ body }: Request): UserSignupInput => {
 export const checkUserLogin = ({ body }: Request): UserLoginInput => {
   const email = pipe(
     isProvided,
-    isString,
+    isNonEmptyString,
     isEmail
   )({ name: 'email', param: body.email })
 
   const password = pipe(
     isProvided,
-    isString
+    isNonEmptyString
   )({ name: 'password', param: body.password })
 
   const remember = pipe(
@@ -55,26 +55,26 @@ export const checkUserLogin = ({ body }: Request): UserLoginInput => {
 export const checkUserUpdate = ({ body }: Request): UserUpdateInput => {
   const password = 'password' in body
     ? pipe(
-      isString,
+      isNonEmptyString,
       isPasswordValid
     )({ name: 'password', param: body.password })
     : undefined
 
   const email = 'email' in body
     ? pipe(
-      isString,
+      isNonEmptyString,
       isEmail
     )({ name: 'email', param: body.email })
     : undefined
 
   const name = 'name' in body
-    ? isString(
+    ? isNonEmptyString(
       { name: 'name', param: body.name }
     )
     : undefined
 
   const info = 'info' in body
-    ? isString({ name: 'info', param: body.info })
+    ? isNonEmptyString({ name: 'info', param: body.info })
     : undefined
 
   const avatar = 'avatar' in body
@@ -82,7 +82,7 @@ export const checkUserUpdate = ({ body }: Request): UserUpdateInput => {
     : undefined
 
   const role = 'role' in body
-    ? isString({ name: 'role', param: body.role })
+    ? isNonEmptyString({ name: 'role', param: body.role })
     : undefined
 
   return hasDefinedProps<UserUpdateInput>({
@@ -98,7 +98,7 @@ export const checkUserUpdate = ({ body }: Request): UserUpdateInput => {
 export const checkUserResetRequest = ({ body }: Request): PasswordRequestInput => {
   const email = pipe(
     isProvided,
-    isString,
+    isNonEmptyString,
     isEmail
   )({ name: 'email', param: body.email })
 
@@ -108,12 +108,12 @@ export const checkUserResetRequest = ({ body }: Request): PasswordRequestInput =
 export const checkUserResetToken = ({ body }: Request): PasswordResetInput => {
   const resetToken = pipe(
     isProvided,
-    isString
+    isNonEmptyString
   )({ name: 'resetToken', param: body.resetToken })
 
   const password = pipe(
     isProvided,
-    isString,
+    isNonEmptyString,
     isPasswordValid
   )({ name: 'password', param: body.password })
 
@@ -126,7 +126,7 @@ export const checkUserResetToken = ({ body }: Request): PasswordResetInput => {
 export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
   const title = pipe(
     isProvided,
-    isString
+    isNonEmptyString
   )({ name: 'title', param: body.title })
 
   const listPrice = 'listPrice' in body
@@ -140,11 +140,11 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
 
   const bullets = pipe(
     isProvided,
-    isString
+    isNonEmptyString
   )({ name: 'bullets', param: body.bullets })
 
   const description = 'description' in body
-    ? isString({ name: 'description', param: body.description })
+    ? isNonEmptyString({ name: 'description', param: body.description })
     : undefined
 
   const stock = 'stock' in body
@@ -160,7 +160,7 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
     param: productSizes?.param.map((pp: any) => ({
       name: pipe(
         isProvided,
-        isString
+        isNonEmptyString
       )({ name: 'name', param: pp.name }).param,
       qty: pipe(
         isProvided,
@@ -202,11 +202,11 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
     param: groupVariations?.param.map((gv: any) => ({
       name: pipe(
         isProvided,
-        isString
+        isNonEmptyString
       )({ name: 'name', param: gv.name }).param,
       value: pipe(
         isProvided,
-        isString
+        isNonEmptyString
       )({ name: 'value', param: gv.value }).param
     }))
   }
@@ -224,7 +224,7 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
       )({ name: 'parameterID', param: pp.parameterID }).param,
       value: pipe(
         isProvided,
-        isString
+        isNonEmptyString
       )({ name: 'value', param: pp.value }).param
     }))
   }
@@ -249,7 +249,7 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
 export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
   const title = pipe(
     isProvided,
-    isString
+    isNonEmptyString
   )({ name: 'title', param: body.title })
 
   const listPrice = 'listPrice' in body
@@ -263,12 +263,12 @@ export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
 
   const bullets = pipe(
     isProvided,
-    isString
+    isNonEmptyString
   )({ name: 'bullets', param: body.bullets })
 
   const description = pipe(
     isProvided,
-    isString
+    isNonEmptyString
   )({ name: 'description', param: body.description })
 
   const stock = 'stock' in body
@@ -284,7 +284,7 @@ export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
     param: productSizes?.param.map((pp: any) => ({
       name: pipe(
         isProvided,
-        isString
+        isNonEmptyString
       )({ name: 'name', param: pp.name }).param,
       qty: pipe(
         isProvided,
@@ -327,11 +327,11 @@ export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
     param: groupVariations?.param.map((gv: any) => ({
       name: pipe(
         isProvided,
-        isString
+        isNonEmptyString
       )({ name: 'name', param: gv.name }).param,
       value: pipe(
         isProvided,
-        isString
+        isNonEmptyString
       )({ name: 'value', param: gv.value }).param
     }))
   }
@@ -349,7 +349,7 @@ export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
       )({ name: 'parameterID', param: pp.parameterID }).param,
       value: pipe(
         isProvided,
-        isString
+        isNonEmptyString
       )({ name: 'value', param: pp.value }).param
     }))
   }
@@ -385,7 +385,7 @@ export const checkSingleMediaUpload = ({ file }: Request): Express.Multer.File =
 export const checkNewCategory = ({ body }: Request): CategoryCreateInput => {
   const name = pipe(
     isProvided,
-    isString
+    isNonEmptyString
   )({ name: 'name', param: body.name })
 
   const parentCategoryID = 'parentCategoryID' in body
@@ -400,7 +400,7 @@ export const checkNewCategory = ({ body }: Request): CategoryCreateInput => {
 
 export const checkCategoryUpdate = ({ body }: Request): CategoryUpdateInput => {
   const name = 'name' in body
-    ? isString({ name: 'name', param: body.name })
+    ? isNonEmptyString({ name: 'name', param: body.name })
     : undefined
 
   const parentCategoryID = 'parentCategoryID' in body
@@ -416,7 +416,7 @@ export const checkCategoryUpdate = ({ body }: Request): CategoryUpdateInput => {
 export const checkVendor = ({ body }: Request): VendorInput => {
   const name = pipe(
     isProvided,
-    isString
+    isNonEmptyString
   )({ name: 'name', param: body.name })
 
   return { name: name.param }
@@ -425,7 +425,7 @@ export const checkVendor = ({ body }: Request): VendorInput => {
 export const checkRole = ({ body }: Request): Role => {
   const roleName = pipe(
     isProvided,
-    isString
+    isNonEmptyString
   )({ name: 'roleName', param: body.roleName })
 
   return { roleName: roleName.param }
@@ -434,7 +434,7 @@ export const checkRole = ({ body }: Request): Role => {
 export const checkNewModerationStatus = ({ body }: Request): ModerationStatus => {
   const moderationStatusName = pipe(
     isProvided,
-    isString
+    isNonEmptyString
   )({ name: 'moderationStatusName', param: body.moderationStatusName })
 
   return { moderationStatusName: moderationStatusName.param }
@@ -443,7 +443,7 @@ export const checkNewModerationStatus = ({ body }: Request): ModerationStatus =>
 export const checkModerationStatusUpdate = ({ body }: Request): ModerationStatus => {
   const moderationStatusName = pipe(
     isProvided,
-    isString
+    isNonEmptyString
   )({ name: 'moderationStatusName', param: body.moderationStatusName })
 
   return { moderationStatusName: moderationStatusName.param }
@@ -452,7 +452,7 @@ export const checkModerationStatusUpdate = ({ body }: Request): ModerationStatus
 export const checkNewOrderStatus = ({ body }: Request): OrderStatus => {
   const orderStatusName = pipe(
     isProvided,
-    isString
+    isNonEmptyString
   )({ name: 'orderStatusName', param: body.orderStatusName })
 
   return { orderStatusName: orderStatusName.param }
@@ -461,7 +461,7 @@ export const checkNewOrderStatus = ({ body }: Request): OrderStatus => {
 export const checkOrderStatusUpdate = ({ body }: Request): OrderStatus => {
   const orderStatusName = pipe(
     isProvided,
-    isString
+    isNonEmptyString
   )({ name: 'orderStatusName', param: body.orderStatusName })
 
   return { orderStatusName: orderStatusName.param }
@@ -470,7 +470,7 @@ export const checkOrderStatusUpdate = ({ body }: Request): OrderStatus => {
 export const checkNewInvoiceStatus = ({ body }: Request): InvoiceStatus => {
   const invoiceStatusName = pipe(
     isProvided,
-    isString
+    isNonEmptyString
   )({ name: 'invoiceStatusName', param: body.invoiceStatusName })
 
   return { invoiceStatusName: invoiceStatusName.param }
@@ -479,7 +479,7 @@ export const checkNewInvoiceStatus = ({ body }: Request): InvoiceStatus => {
 export const checkInvoiceStatusUpdate = ({ body }: Request): InvoiceStatus => {
   const invoiceStatusName = pipe(
     isProvided,
-    isString
+    isNonEmptyString
   )({ name: 'invoiceStatusName', param: body.invoiceStatusName })
 
   return { invoiceStatusName: invoiceStatusName.param }
@@ -488,7 +488,7 @@ export const checkInvoiceStatusUpdate = ({ body }: Request): InvoiceStatus => {
 export const checkShippingMethod = ({ body }: Request): ShippingMethodInput => {
   const shippingMethodName = pipe(
     isProvided,
-    isString
+    isNonEmptyString
   )({ name: 'shippingMethodName', param: body.shippingMethodName })
 
   const isPrivate = 'isPrivate' in body
@@ -504,7 +504,7 @@ export const checkShippingMethod = ({ body }: Request): ShippingMethodInput => {
 export const checkAddressType = ({ body }: Request): AddressTypeInput => {
   const addressTypeName = pipe(
     isProvided,
-    isString
+    isNonEmptyString
   )({ name: 'addressTypeName', param: body.addressTypeName })
 
   const isPrivate = 'isPrivate' in body
@@ -551,7 +551,7 @@ export const checkCartProductUpdate = ({ body }: Request): CartProductInput => {
 export const checkPaymentMethod = ({ body }: Request): PaymentMethod => {
   const paymentMethodName = pipe(
     isProvided,
-    isString
+    isNonEmptyString
   )({ name: 'paymentMethodName', param: body.paymentMethodName })
 
   return { paymentMethodName: paymentMethodName.param }
@@ -564,22 +564,22 @@ export const checkNewAddress = ({ body }: Request): AddressCreateInput => {
 
   const country = pipe(
     isProvided,
-    isString
+    isNonEmptyString
   )({ name: 'country', param: body.country })
 
   const addressType = pipe(
     isProvided,
-    isString
+    isNonEmptyString
   )({ name: 'addressType', param: body.addressType })
 
   const fullName = pipe(
     isProvided,
-    isString
+    isNonEmptyString
   )({ name: 'fullName', param: body.fullName })
 
   const streetAddressLine1 = pipe(
     isProvided,
-    isString
+    isNonEmptyString
   )({ name: 'streetAddressLine1', param: body.streetAddressLine1 })
 
   const streetAddressLine2 = 'streetAddressLine2' in body
@@ -588,12 +588,13 @@ export const checkNewAddress = ({ body }: Request): AddressCreateInput => {
 
   const city = pipe(
     isProvided,
-    isString
+    isNonEmptyString
   )({ name: 'city', param: body.city })
 
-  const region = 'region' in body
-    ? isString({ name: 'region', param: body.region })
-    : undefined
+  const region = pipe(
+    isProvided,
+    isNonEmptyString
+  )({ name: 'region', param: body.region })
 
   const postalCode = pipe(
     isProvided,
@@ -602,7 +603,7 @@ export const checkNewAddress = ({ body }: Request): AddressCreateInput => {
 
   const phoneNumber = pipe(
     isProvided,
-    isString
+    isNonEmptyString
   )({ name: 'phoneNumber', param: body.phoneNumber })
 
   return {
@@ -613,7 +614,7 @@ export const checkNewAddress = ({ body }: Request): AddressCreateInput => {
     streetAddressLine1: streetAddressLine1.param,
     streetAddressLine2: streetAddressLine2?.param,
     city: city.param,
-    region: region?.param,
+    region: region.param,
     postalCode: postalCode.param,
     phoneNumber: phoneNumber.param
   }
@@ -625,31 +626,31 @@ export const checkAddressUpdate = ({ body }: Request): AddressUpdateInput => {
     : undefined
 
   const addressType = 'addressType' in body
-    ? isString({ name: 'addressType', param: body.addressType })
+    ? isNonEmptyString({ name: 'addressType', param: body.addressType })
     : undefined
 
   const country = 'country' in body
-    ? isString({ name: 'country', param: body.country })
+    ? isNonEmptyString({ name: 'country', param: body.country })
     : undefined
 
   const fullName = 'fullName' in body
-    ? isString({ name: 'fullName', param: body.fullName })
+    ? isNonEmptyString({ name: 'fullName', param: body.fullName })
     : undefined
 
   const streetAddressLine1 = 'streetAddressLine1' in body
-    ? isString({ name: 'streetAddressLine1', param: body.streetAddressLine1 })
+    ? isNonEmptyString({ name: 'streetAddressLine1', param: body.streetAddressLine1 })
     : undefined
 
   const streetAddressLine2 = 'streetAddressLine2' in body
-    ? isString({ name: 'streetAddressLine2', param: body.streetAddressLine2 })
+    ? isNonEmptyString({ name: 'streetAddressLine2', param: body.streetAddressLine2 })
     : undefined
 
   const city = 'city' in body
-    ? isString({ name: 'city', param: body.city })
+    ? isNonEmptyString({ name: 'city', param: body.city })
     : undefined
 
   const region = 'region' in body
-    ? isString({ name: 'region', param: body.region })
+    ? isNonEmptyString({ name: 'region', param: body.region })
     : undefined
 
   const postalCode = 'postalCode' in body
@@ -657,7 +658,7 @@ export const checkAddressUpdate = ({ body }: Request): AddressUpdateInput => {
     : undefined
 
   const phoneNumber = 'phoneNumber' in body
-    ? isString({ name: 'phoneNumber', param: body.phoneNumber })
+    ? isNonEmptyString({ name: 'phoneNumber', param: body.phoneNumber })
     : undefined
 
   return hasDefinedProps<AddressUpdateInput>({
@@ -694,7 +695,7 @@ export const checkUserAddressesUpdate = ({ body }: Request): UserAddressUpdateIn
 export const checkNewList = ({ body }: Request): ListCreateInput => {
   const name = pipe(
     isProvided,
-    isString
+    isNonEmptyString
   )({ name: 'name', param: body.name })
 
   return { name: name.param }
@@ -703,7 +704,7 @@ export const checkNewList = ({ body }: Request): ListCreateInput => {
 export const checkListUpdate = ({ body }: Request): ListCreateInput => {
   const name = pipe(
     isProvided,
-    isString
+    isNonEmptyString
   )({ name: 'name', param: body.name })
 
   return { name: name.param }
@@ -711,12 +712,12 @@ export const checkListUpdate = ({ body }: Request): ListCreateInput => {
 
 export const checkNewReview = ({ body }: Request): ReviewCreateInput => {
   const title = 'title' in body
-    ? isString({ name: 'title', param: body.title })
+    ? isNonEmptyString({ name: 'title', param: body.title })
     : undefined
 
   const content = pipe(
     isProvided,
-    isString
+    isNonEmptyString
   )({ name: 'content', param: body.content })
 
   const variation = pipe(
@@ -739,11 +740,11 @@ export const checkNewReview = ({ body }: Request): ReviewCreateInput => {
 
 export const checkReviewUpdate = ({ body }: Request): ReviewUpdateInput => {
   const title = 'title' in body
-    ? isString({ name: 'title', param: body.title })
+    ? isNonEmptyString({ name: 'title', param: body.title })
     : undefined
 
   const content = 'content' in body
-    ? isString({ name: 'content', param: body.content })
+    ? isNonEmptyString({ name: 'content', param: body.content })
     : undefined
 
   const stars = 'content' in body
@@ -755,7 +756,7 @@ export const checkReviewUpdate = ({ body }: Request): ReviewUpdateInput => {
     : undefined
 
   const moderationStatus = 'moderationStatus' in body
-    ? isString({ name: 'moderationStatus', param: body.moderationStatus })
+    ? isNonEmptyString({ name: 'moderationStatus', param: body.moderationStatus })
     : undefined
 
   return hasDefinedProps<ReviewUpdateInput>({
@@ -770,7 +771,7 @@ export const checkReviewUpdate = ({ body }: Request): ReviewUpdateInput => {
 export const checkNewReviewComment = ({ body }: Request): ReviewCommentCreateInput => {
   const content = pipe(
     isProvided,
-    isString
+    isNonEmptyString
   )({ name: 'content', param: body.content })
 
   const parentReviewCommentID = 'parentReviewCommentID' in body
@@ -795,7 +796,7 @@ export const checkReviewComments = ({ query }: Request): CursorInput => {
     : undefined
 
   const sortBy = 'sortBy' in query
-    ? isString({ name: 'sortBy', param: query.sortBy })
+    ? isNonEmptyString({ name: 'sortBy', param: query.sortBy })
     : undefined
 
   return {
@@ -807,11 +808,11 @@ export const checkReviewComments = ({ query }: Request): CursorInput => {
 
 export const checkReviewCommentUpdate = ({ body }: Request): ReviewCommentUpdateInput => {
   const content = 'content' in body
-    ? isString({ name: 'content', param: body.content })
+    ? isNonEmptyString({ name: 'content', param: body.content })
     : undefined
 
   const moderationStatus = 'moderationStatus' in body
-    ? isString({ name: 'moderationStatus', param: body.moderationStatus }) : undefined
+    ? isNonEmptyString({ name: 'moderationStatus', param: body.moderationStatus }) : undefined
 
   return hasDefinedProps<ReviewCommentUpdateInput>({
     content: content?.param,
@@ -829,7 +830,7 @@ export const checkQuestionsCursor = ({ query }: Request): QuestionCursorInput =>
     : undefined
 
   const sortBy = 'sortBy' in query
-    ? isString({ name: 'sortBy', param: query.sortBy })
+    ? isNonEmptyString({ name: 'sortBy', param: query.sortBy })
     : undefined
 
   const page = 'page' in query
@@ -857,7 +858,7 @@ export const checkQuestionsCursor = ({ query }: Request): QuestionCursorInput =>
 export const checkNewQuestion = ({ body }: Request): QuestionCreateInput => {
   const content = pipe(
     isProvided,
-    isString
+    isNonEmptyString
   )({ name: 'content', param: body.content })
 
   return { content: content.param }
@@ -865,11 +866,11 @@ export const checkNewQuestion = ({ body }: Request): QuestionCreateInput => {
 
 export const checkQuestionUpdate = ({ body }: Request): QuestionUpdateInput => {
   const content = 'content' in body
-    ? isString({ name: 'content', param: body.content })
+    ? isNonEmptyString({ name: 'content', param: body.content })
     : undefined
 
   const moderationStatus = 'moderationStatus' in body
-    ? isString({ name: 'moderationStatus', param: body.moderationStatus })
+    ? isNonEmptyString({ name: 'moderationStatus', param: body.moderationStatus })
     : undefined
 
   return hasDefinedProps<QuestionUpdateInput>({
@@ -901,7 +902,7 @@ export const checkAnswers = ({ query }: Request): CursorInput => {
 export const checkNewAnswer = ({ body }: Request): AnswerCreateInput => {
   const content = pipe(
     isProvided,
-    isString
+    isNonEmptyString
   )({ name: 'content', param: body.content })
 
   return { content: content.param }
@@ -909,11 +910,11 @@ export const checkNewAnswer = ({ body }: Request): AnswerCreateInput => {
 
 export const checkAnswerUpdate = ({ body }: Request): AnswerUpdateInput => {
   const content = 'content' in body
-    ? isString({ name: 'content', param: body.content })
+    ? isNonEmptyString({ name: 'content', param: body.content })
     : undefined
 
   const moderationStatus = 'moderationStatus' in body
-    ? isString({ name: 'moderationStatus', param: body.moderationStatus })
+    ? isNonEmptyString({ name: 'moderationStatus', param: body.moderationStatus })
     : undefined
 
   return hasDefinedProps<AnswerUpdateInput>({
@@ -925,7 +926,7 @@ export const checkAnswerUpdate = ({ body }: Request): AnswerUpdateInput => {
 export const checkParameter = ({ body }: Request): ParameterInput => {
   const name = pipe(
     isProvided,
-    isString
+    isNonEmptyString
   )({ name: 'name', param: body.name })
 
   return { name: name.param }
@@ -934,12 +935,12 @@ export const checkParameter = ({ body }: Request): ParameterInput => {
 export const checkNewGroupVariation = ({ body }: Request): GroupVariationCreateInput => {
   const name = pipe(
     isProvided,
-    isString
+    isNonEmptyString
   )({ name: 'name', param: body.name })
 
   const value = pipe(
     isProvided,
-    isString
+    isNonEmptyString
   )({ name: 'value', param: body.value })
 
   return {
@@ -951,7 +952,7 @@ export const checkNewGroupVariation = ({ body }: Request): GroupVariationCreateI
 export const checkGroupVariationUpdate = ({ body }: Request): GroupVariationUpdateInput => {
   const value = pipe(
     isProvided,
-    isString
+    isNonEmptyString
   )({ name: 'value', param: body.value })
 
   return { value: value.param }
@@ -960,7 +961,7 @@ export const checkGroupVariationUpdate = ({ body }: Request): GroupVariationUpda
 export const checkGroupVariationDeletion = ({ body }: Request): GroupVariationDeleteInput => {
   const name = pipe(
     isProvided,
-    isString
+    isNonEmptyString
   )({ name: 'name', param: body.name })
 
   return { name: name.param }
@@ -974,17 +975,17 @@ export const checkNewOrder = ({ body }: Request): OrderCreateInput => {
 
   const shippingMethod = pipe(
     isProvided,
-    isString
+    isNonEmptyString
   )({ name: 'shippingMethod', param: body.shippingMethod })
 
   const details = pipe(
     isProvided,
-    isString
+    isNonEmptyString
   )({ name: 'details', param: body.details })
 
   const paymentMethod = pipe(
     isProvided,
-    isString
+    isNonEmptyString
   )({ name: 'paymentMethod', param: body.paymentMethod })
 
   const cart = pipe(
@@ -1013,11 +1014,11 @@ export const checkOrderUpdate = ({ body }: Request): OrderUpdateInput => {
     : undefined
 
   const orderStatus = 'orderStatus' in body
-    ? isString({ name: 'orderStatus', param: body.orderStatus })
+    ? isNonEmptyString({ name: 'orderStatus', param: body.orderStatus })
     : undefined
 
   const shippingMethod = 'shippingMethod' in body
-    ? isString({ name: 'shippingMethod', param: body.shippingMethod })
+    ? isNonEmptyString({ name: 'shippingMethod', param: body.shippingMethod })
     : undefined
 
   return hasDefinedProps<OrderUpdateInput>({
@@ -1059,7 +1060,7 @@ export const checkOrderProductUpdate = ({ body }: Request): OrderProductInput =>
 export const checkNewInvoice = ({ body }: Request): InvoiceCreateInput => {
   const details = pipe(
     isProvided,
-    isString
+    isNonEmptyString
   )({ name: 'details', param: body.details })
 
   const amount = pipe(
@@ -1069,7 +1070,7 @@ export const checkNewInvoice = ({ body }: Request): InvoiceCreateInput => {
 
   const paymentMethod = pipe(
     isProvided,
-    isString
+    isNonEmptyString
   )({ name: 'paymentMethod', param: body.paymentMethod })
 
   const userID = pipe(
@@ -1097,15 +1098,15 @@ export const checkInvoiceUpdate = ({ body }: Request): InvoiceUpdateInput => {
     : undefined
 
   const details = 'details' in body
-    ? isString({ name: 'details', param: body.details })
+    ? isNonEmptyString({ name: 'details', param: body.details })
     : undefined
 
   const invoiceStatus = 'invoiceStatus' in body
-    ? isString({ name: 'invoiceStatus', param: body.invoiceStatus })
+    ? isNonEmptyString({ name: 'invoiceStatus', param: body.invoiceStatus })
     : undefined
 
   const paymentMethod = 'paymentMethod' in body
-    ? isString({ name: 'paymentMethod', param: body.paymentMethod })
+    ? isNonEmptyString({ name: 'paymentMethod', param: body.paymentMethod })
     : undefined
 
   return hasDefinedProps<InvoiceUpdateInput>({
@@ -1122,7 +1123,7 @@ export const checkInvoiceFilters = ({ query }: Request): InvoicesFiltersInput =>
     : undefined
 
   const sortBy = 'sortBy' in query
-    ? isString({ name: 'sortBy', param: query.sortBy })
+    ? isNonEmptyString({ name: 'sortBy', param: query.sortBy })
     : undefined
 
   const page = 'page' in query
@@ -1145,15 +1146,15 @@ export const checkInvoiceFilters = ({ query }: Request): InvoicesFiltersInput =>
     : undefined
 
   const invoiceStatuses = 'invoiceStatuses' in query
-    ? isString({ name: 'invoiceStatuses', param: query.invoiceStatuses })
+    ? isNonEmptyString({ name: 'invoiceStatuses', param: query.invoiceStatuses })
     : undefined
 
   const paymentMethods = 'paymentMethods' in query
-    ? isString({ name: 'paymentMethods', param: query.paymentMethods })
+    ? isNonEmptyString({ name: 'paymentMethods', param: query.paymentMethods })
     : undefined
 
   const userEmail = 'userEmail' in query
-    ? isString({ name: 'userEmail', param: query.userEmail })
+    ? isNonEmptyString({ name: 'userEmail', param: query.userEmail })
     : undefined
 
   return {
@@ -1175,7 +1176,7 @@ export const checkOrderFilters = ({ query }: Request): OrdersFiltersInput => {
     : undefined
 
   const sortBy = 'sortBy' in query
-    ? isString({ name: 'sortBy', param: query.sortBy })
+    ? isNonEmptyString({ name: 'sortBy', param: query.sortBy })
     : undefined
 
   const page = 'page' in query
@@ -1198,15 +1199,15 @@ export const checkOrderFilters = ({ query }: Request): OrdersFiltersInput => {
     : undefined
 
   const orderStatuses = 'orderStatuses' in query
-    ? isString({ name: 'orderStatuses', param: query.orderStatuses })
+    ? isNonEmptyString({ name: 'orderStatuses', param: query.orderStatuses })
     : undefined
 
   const shippingMethods = 'shippingMethods' in query
-    ? isString({ name: 'shippingMethods', param: query.shippingMethods })
+    ? isNonEmptyString({ name: 'shippingMethods', param: query.shippingMethods })
     : undefined
 
   const userEmail = 'userEmail' in query
-    ? isString({ name: 'userEmail', param: query.userEmail })
+    ? isNonEmptyString({ name: 'userEmail', param: query.userEmail })
     : undefined
 
   return {
@@ -1224,11 +1225,11 @@ export const checkOrderFilters = ({ query }: Request): OrdersFiltersInput => {
 
 export const checkVendorFilters = ({ query }: Request): VendorsFiltersInput => {
   const q = 'q' in query
-    ? isString({ name: 'q', param: query.q })
+    ? isNonEmptyString({ name: 'q', param: query.q })
     : undefined
 
   const sortBy = 'sortBy' in query
-    ? isString({ name: 'sortBy', param: query.sortBy })
+    ? isNonEmptyString({ name: 'sortBy', param: query.sortBy })
     : undefined
 
   const page = 'page' in query
@@ -1247,11 +1248,11 @@ export const checkVendorFilters = ({ query }: Request): VendorsFiltersInput => {
 
 export const checkCategoryFilters = ({ query }: Request): CategoriesFiltersInput => {
   const q = 'q' in query
-    ? isString({ name: 'q', param: query.q })
+    ? isNonEmptyString({ name: 'q', param: query.q })
     : undefined
 
   const sortBy = 'sortBy' in query
-    ? isString({ name: 'sortBy', param: query.sortBy })
+    ? isNonEmptyString({ name: 'sortBy', param: query.sortBy })
     : undefined
 
   const page = 'page' in query
@@ -1270,7 +1271,7 @@ export const checkCategoryFilters = ({ query }: Request): CategoriesFiltersInput
 
 export const checkUserFilters = ({ query }: Request): UsersFiltersInput => {
   const roles = 'roles' in query
-    ? isString({ name: 'roles', param: query.roles })
+    ? isNonEmptyString({ name: 'roles', param: query.roles })
     : undefined
 
   const createdFrom = 'createdFrom' in query
@@ -1282,7 +1283,7 @@ export const checkUserFilters = ({ query }: Request): UsersFiltersInput => {
     : undefined
 
   const sortBy = 'sortBy' in query
-    ? isString({ name: 'sortBy', param: query.sortBy })
+    ? isNonEmptyString({ name: 'sortBy', param: query.sortBy })
     : undefined
 
   const page = 'page' in query
@@ -1317,7 +1318,7 @@ export const checkUserFilters = ({ query }: Request): UsersFiltersInput => {
     : undefined
 
   const email = 'email' in query
-    ? isString({ name: 'email', param: query.email })
+    ? isNonEmptyString({ name: 'email', param: query.email })
     : undefined
 
   return {
@@ -1338,11 +1339,11 @@ export const checkUserFilters = ({ query }: Request): UsersFiltersInput => {
 
 export const checkFeedFilters = ({ query }: Request): FeedFiltersInput => {
   const q = 'q' in query
-    ? isString({ name: 'q', param: query.q })
+    ? isNonEmptyString({ name: 'q', param: query.q })
     : undefined
 
   const sortBy = 'sortBy' in query
-    ? isString({ name: 'sortBy', param: query.sortBy })
+    ? isNonEmptyString({ name: 'sortBy', param: query.sortBy })
     : undefined
 
   const groupID = 'groupID' in query
@@ -1357,11 +1358,11 @@ export const checkFeedFilters = ({ query }: Request): FeedFiltersInput => {
     : undefined
 
   const types = 'types' in query
-    ? isString({ name: 'types', param: query.types })
+    ? isNonEmptyString({ name: 'types', param: query.types })
     : undefined
 
   const moderationStatuses = 'moderationStatuses' in query
-    ? isString({ name: 'moderationStatuses', param: query.moderationStatuses })
+    ? isNonEmptyString({ name: 'moderationStatuses', param: query.moderationStatuses })
     : undefined
 
   const createdFrom = 'createdFrom' in query
@@ -1373,7 +1374,7 @@ export const checkFeedFilters = ({ query }: Request): FeedFiltersInput => {
     : undefined
 
   const userEmail = 'userEmail' in query
-    ? isString({ name: 'userEmail', param: query.userEmail })
+    ? isNonEmptyString({ name: 'userEmail', param: query.userEmail })
     : undefined
 
   return {
@@ -1395,7 +1396,7 @@ export const checkProductFilters = ({ query }: Request): ProductsFiltersInput =>
     : undefined
 
   const sortBy = 'sortBy' in query
-    ? isString({ name: 'sortBy', param: query.sortBy })
+    ? isNonEmptyString({ name: 'sortBy', param: query.sortBy })
     : undefined
 
   const page = 'page' in query
@@ -1406,7 +1407,7 @@ export const checkProductFilters = ({ query }: Request): ProductsFiltersInput =>
     : undefined
 
   const title = 'title' in query
-    ? isString({ name: 'title', param: query.title })
+    ? isNonEmptyString({ name: 'title', param: query.title })
     : undefined
 
   const priceMin = 'priceMin' in query
@@ -1418,11 +1419,11 @@ export const checkProductFilters = ({ query }: Request): ProductsFiltersInput =>
     : undefined
 
   const categoryName = 'categoryName' in query
-    ? isString({ name: 'categoryName', param: query.categoryName })
+    ? isNonEmptyString({ name: 'categoryName', param: query.categoryName })
     : undefined
 
   const vendorName = 'vendorName' in query
-    ? isString({ name: 'vendorName', param: query.vendorName })
+    ? isNonEmptyString({ name: 'vendorName', param: query.vendorName })
     : undefined
 
   const stockMin = 'stockMin' in query
@@ -1474,7 +1475,7 @@ export const checkProductFilters = ({ query }: Request): ProductsFiltersInput =>
 
 export const checkProductMinFilters = ({ query }: Request): ProductsFiltersInput => {
   const title = 'title' in query
-    ? isString({ name: 'title', param: query.title })
+    ? isNonEmptyString({ name: 'title', param: query.title })
     : undefined
 
   return { title: title?.param }
@@ -1508,7 +1509,7 @@ export const checkImagesDelete = ({ body }: Request): ImagesDeleteInput => {
 
 export const checkReviewFilters = ({ query }: Request): ReviewsFiltersInput => {
   const q = 'q' in query
-    ? isString({ name: 'q', param: query.q })
+    ? isNonEmptyString({ name: 'q', param: query.q })
     : undefined
 
   const limit = 'limit' in query
@@ -1520,11 +1521,11 @@ export const checkReviewFilters = ({ query }: Request): ReviewsFiltersInput => {
     : undefined
 
   const sortBy = 'sortBy' in query
-    ? isString({ name: 'sortBy', param: query.sortBy })
+    ? isNonEmptyString({ name: 'sortBy', param: query.sortBy })
     : undefined
 
   const variation = 'variation' in query
-    ? isString({ name: 'variation', param: query.variation })
+    ? isNonEmptyString({ name: 'variation', param: query.variation })
     : undefined
 
   const page = 'page' in query
@@ -1535,11 +1536,11 @@ export const checkReviewFilters = ({ query }: Request): ReviewsFiltersInput => {
     : undefined
 
   const userEmail = 'userEmail' in query
-    ? isString({ name: 'userEmail', param: query.userEmail })
+    ? isNonEmptyString({ name: 'userEmail', param: query.userEmail })
     : undefined
 
   const moderationStatuses = 'moderationStatuses' in query
-    ? isString({ name: 'moderationStatuses', param: query.moderationStatuses })
+    ? isNonEmptyString({ name: 'moderationStatuses', param: query.moderationStatuses })
     : undefined
 
   const isVerified = 'isVerified' in query
@@ -1646,7 +1647,7 @@ export const checkVoteFilters = ({ query }: Request): VotesFiltersInput => {
 export const checkAskFilters = ({ query }: Request): AskFiltersInput => {
   const q = pipe(
     isProvided,
-    isString
+    isNonEmptyString
   )({ name: 'q', param: query.q })
 
   return { q: q.param }
