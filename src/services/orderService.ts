@@ -1,8 +1,8 @@
 import { Request } from 'express'
 import Knex from 'knex'
 import { omit, sum } from 'ramda'
-import { Address, Invoice, Order, OrderCreateInput, OrderFullData, OrderProduct, OrderProductFullData, OrdersFiltersInput, OrderUpdateInput, OrderWithUser } from '../types'
-import { defaultLimit } from '../utils/constants'
+import { Address, BatchWithCursor, Invoice, Order, OrderCreateInput, OrderFullData, OrderProduct, OrderProductFullData, OrdersFiltersInput, OrderUpdateInput, OrderWithUser } from '../types'
+import { defaultLimit, smallLimit } from '../utils/constants'
 import { db, dbTrans } from '../utils/db'
 import sortItems from '../utils/sortItems'
 import StatusError from '../utils/StatusError'
@@ -74,7 +74,7 @@ const addOrder = async (orderInput: OrderCreateInput, req: Request): Promise<Ord
   })
 }
 
-const getOrders = async (ordersFiltersinput: OrdersFiltersInput): Promise<{ batch: (OrderWithUser & Invoice & { address: Address })[]; totalCount: number }> => {
+const getOrders = async (ordersFiltersinput: OrdersFiltersInput, req: Request): Promise<BatchWithCursor<OrderWithUser & Invoice & { address: Address }>> => {
   const {
     page = 1,
     sortBy = 'createdAt_desc',
@@ -87,6 +87,12 @@ const getOrders = async (ordersFiltersinput: OrdersFiltersInput): Promise<{ batc
     userEmail,
     userID
   } = ordersFiltersinput
+
+  if (![ 'ROOT', 'ADMIN' ].includes(req.session?.role)) {
+    if (userID === undefined || req.session?.userID !== userID) {
+      throw new StatusError(403, 'Forbidden')
+    }
+  }
 
   let orders: (Order & Invoice & { avatar: boolean; userName: string; userEmail: string })[] = await db('orders as o')
     .select(
@@ -153,7 +159,10 @@ const getOrders = async (ordersFiltersinput: OrdersFiltersInput): Promise<{ batc
 
   const ordersSorted = sortItems(orders, sortBy)
 
-  const batch = ordersSorted.slice((page - 1) * defaultLimit, (page - 1) * defaultLimit + defaultLimit)
+  const totalCount = orders.length
+  const end = (page - 1) * smallLimit + smallLimit
+
+  const batch = ordersSorted.slice((page - 1) * smallLimit, end)
 
   const orderIDs = batch.map((o) => o.orderID)
   const addressIDs = batch.map((o) => o.addressID)
@@ -200,7 +209,8 @@ const getOrders = async (ordersFiltersinput: OrdersFiltersInput): Promise<{ batc
 
   return {
     batch: _batch.map((o) => ({ ...o, address: o.address as Address })),
-    totalCount: orders.length
+    totalCount: orders.length,
+    hasNextPage: end < totalCount
   }
 }
 

@@ -34,7 +34,7 @@ const getInvoices = async (invoicesFiltersinput: InvoicesFiltersInput): Promise<
     userEmail
   } = invoicesFiltersinput
 
-  let invoices: Invoice[] = await db('invoices as i')
+  let invoices: (Invoice & { avatar: boolean; userName: string; userEmail: string })[] = await db('invoices as i')
     .select(
       'i.invoiceID',
       'i.amount',

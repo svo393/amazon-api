@@ -3,13 +3,13 @@ import invoiceService from '../services/invoiceService'
 import orderProductService from '../services/orderProductService'
 import orderService from '../services/orderService'
 import { checkNewInvoice, checkNewOrderProduct, checkOrderFilters, checkOrderProductUpdate, checkOrderUpdate } from '../utils/inputValidator'
-import { requireAdmin, requireCreatorOrAdmin } from '../utils/middleware'
+import { requireAdmin, requireAuth, requireCreatorOrAdmin } from '../utils/middleware'
 
 const router = Router()
 
-router.get('/', requireAdmin, async (req, res) => {
+router.get('/', requireAuth, async (req, res) => {
   const ordersFiltersinput = checkOrderFilters(req)
-  const orders = await orderService.getOrders(ordersFiltersinput)
+  const orders = await orderService.getOrders(ordersFiltersinput, req)
   res.json(orders)
 })
 
