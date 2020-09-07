@@ -176,10 +176,10 @@ export type ModerationStatus = { moderationStatusName: string }
 export type Order = {
   orderID: number;
   addressID: number;
-  userEmail: string | null;
   createdAt: Date;
   updatedAt: Date;
-  userID: number | null;
+  shippedAt: Date | null;
+  userID: number;
   orderStatus: string;
   shippingMethod: string;
   amount: number;
@@ -201,7 +201,6 @@ export type Invoice = {
   details: string;
   createdAt: Date;
   updatedAt: Date;
-  userEmail: string | null;
   orderID: number;
   userID: number | null;
   invoiceStatus: string;
@@ -423,6 +422,7 @@ export type OrdersFiltersInput = {
   orderStatuses?: string;
   shippingMethods?: string;
   userEmail?: string;
+  userID?: number;
 }
 
 export type OrderProductInput = Omit<OrderProduct, | 'orderID' | 'productID'>
@@ -558,6 +558,9 @@ export type OrderProductFullData = Pick<Product,
 > & { imageID: number }
 
 export type OrderFullData = Order & { orderProducts: OrderProductFullData[]}
+export type OrderWithUser = OrderFullData & {
+  user: Pick<User, 'name' | 'userID' | 'avatar'> & { email?: string };
+}
 
 export type ImagesUpdateInput = { imageID: number; index: number }[]
 

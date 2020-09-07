@@ -112,12 +112,6 @@ router.delete('/:userID/cartProducts/:productID', requireSameUserOrAdmin('params
   res.json(deletedCartProduct)
 })
 
-// TODO remove redundant routes
-router.get('/:userID/orders', requireSameUserOrAdmin('params'), async (req, res) => {
-  const orders = await orderService.getOrdersByUser(req)
-  res.json(orders)
-})
-
 router.get('/:userID/invoices', requireSameUserOrAdmin('params'), async (req, res) => {
   const invoices = await invoiceService.getInvoicesByUser(req)
   res.json(invoices)

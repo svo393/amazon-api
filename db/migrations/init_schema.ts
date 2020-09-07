@@ -424,6 +424,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.increments('orderID')
       t.dateTime('createdAt').notNullable()
       t.dateTime('updatedAt').notNullable()
+      t.dateTime('shippedAt')
 
       t
         .integer('userID')

@@ -1210,6 +1210,10 @@ export const checkOrderFilters = ({ query }: Request): OrdersFiltersInput => {
     ? isNonEmptyString({ name: 'userEmail', param: query.userEmail })
     : undefined
 
+  const userID = 'userID' in query
+    ? canBeNumber({ name: 'userID', param: query.userID })
+    : undefined
+
   return {
     sortBy: sortBy?.param,
     page: page?.param,
@@ -1219,7 +1223,8 @@ export const checkOrderFilters = ({ query }: Request): OrdersFiltersInput => {
     createdTo: createdTo?.param,
     orderStatuses: orderStatuses?.param,
     shippingMethods: shippingMethods?.param,
-    userEmail: userEmail?.param
+    userEmail: userEmail?.param,
+    userID: userID?.param
   }
 }
 

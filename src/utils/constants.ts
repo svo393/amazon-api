@@ -11,8 +11,8 @@ export const addressTypes = [
 ]
 
 export const moderationStatuses = [ 'NEW', 'APPROVED', 'REJECTED' ]
-export const orderStatuses = [ 'DONE', 'PROCESSING', 'NEW', 'CANCELED' ]
-export const invoiceStatuses = [ 'DONE', 'PROCESSING', 'NEW', 'CANCELED' ]
+export const orderStatuses = [ 'DONE', 'SHIPPED', 'NEW', 'CANCELED' ]
+export const invoiceStatuses = [ 'DONE', 'NEW', 'CANCELED' ]
 
 export const imagesBasePath = './public/media'
 
