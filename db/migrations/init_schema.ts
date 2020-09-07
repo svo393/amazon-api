@@ -475,6 +475,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.string('details', 65535).notNullable()
       t.dateTime('createdAt').notNullable()
       t.dateTime('updatedAt').notNullable()
+      t.integer('shippingCost').notNullable()
 
       t
         .integer('userID')

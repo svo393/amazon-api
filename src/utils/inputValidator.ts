@@ -973,6 +973,11 @@ export const checkNewOrder = ({ body }: Request): OrderCreateInput => {
     canBeNumber
   )({ name: 'addressID', param: body.addressID })
 
+  const shippingCost = pipe(
+    isProvided,
+    canBeNumber
+  )({ name: 'shippingCost', param: body.shippingCost })
+
   const shippingMethod = pipe(
     isProvided,
     isNonEmptyString
@@ -1001,6 +1006,7 @@ export const checkNewOrder = ({ body }: Request): OrderCreateInput => {
 
   return {
     addressID: addressID.param,
+    shippingCost: shippingCost.param,
     shippingMethod: shippingMethod.param,
     details: details.param,
     paymentMethod: paymentMethod.param,

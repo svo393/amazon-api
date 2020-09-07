@@ -205,6 +205,7 @@ export type Invoice = {
   userID: number | null;
   invoiceStatus: string;
   paymentMethod: string;
+  shippingCost: number;
 }
 
 export type ProductSize = { name: string; qty: number; productID: number }
@@ -404,6 +405,7 @@ export type OrderCreateInput = Pick<Order,
   paymentMethod: string;
   cart: CartProduct[];
   promo?: string;
+  shippingCost: number;
 }
 
 export type OrderUpdateInput = Partial<Pick<Order,

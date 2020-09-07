@@ -46,4 +46,4 @@ export const apiURLs = {
 }
 
 export const defaultLimit = 15
-export const smallLimit = 5
+export const smallLimit = 3

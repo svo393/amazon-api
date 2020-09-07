@@ -1,8 +1,8 @@
 import { Request } from 'express'
 import Knex from 'knex'
 import { omit, sum } from 'ramda'
-import { Address, BatchWithCursor, Invoice, Order, OrderCreateInput, OrderFullData, OrderProduct, OrderProductFullData, OrdersFiltersInput, OrderUpdateInput, OrderWithUser } from '../types'
-import { defaultLimit, smallLimit } from '../utils/constants'
+import { Address, BatchWithCursor, Invoice, Order, OrderCreateInput, OrderFullData, OrderProduct, OrderProductFullData, OrdersFiltersInput, OrderUpdateInput, OrderWithUser, Product } from '../types'
+import { smallLimit } from '../utils/constants'
 import { db, dbTrans } from '../utils/db'
 import sortItems from '../utils/sortItems'
 import StatusError from '../utils/StatusError'
@@ -16,7 +16,7 @@ const addOrder = async (orderInput: OrderCreateInput, req: Request): Promise<Ord
 
     const [ addedOrder ]: Order[] = await trx('orders')
       .insert({
-        ...omit([ 'cart', 'details', 'paymentMethod' ], orderInput),
+        ...omit([ 'cart', 'details', 'paymentMethod', 'shippingCost' ], orderInput),
         orderStatus: 'NEW',
         createdAt: now,
         updatedAt: now,
@@ -43,9 +43,20 @@ const addOrder = async (orderInput: OrderCreateInput, req: Request): Promise<Ord
     const addedOrderProducts: OrderProduct[] = await trx('orderProducts')
       .insert(newOrderProducts, [ '*' ])
 
+    await Promise.all(newOrderProducts.map(async (op) => {
+      const product = await trx('products')
+        .first('stock')
+        .where('productID', op.productID)
+
+      await trx('products')
+        .where('productID', op.productID)
+        .update({ stock: product.stock - op.qty })
+    }))
+
     const [ addedInvoice ]: Invoice[] = await trx('invoices')
       .insert({
-        amount: sum(addedOrderProducts.map((op) => op.qty * op.price)) / 100,
+        amount: (sum(addedOrderProducts.map((op) => op.qty * op.price)) + orderInput.shippingCost * 100),
+        shippingCost: orderInput.shippingCost * 100,
         details: orderInput.details,
         orderID: addedOrder.orderID,
         userID,
@@ -68,6 +79,8 @@ const addOrder = async (orderInput: OrderCreateInput, req: Request): Promise<Ord
     return {
       ...addedInvoice,
       ...addedOrder,
+      amount: addedInvoice.amount / 100,
+      shippingCost: addedInvoice.shippingCost / 100,
       orderProducts: addedOrderProducts,
       address
     }
@@ -105,6 +118,7 @@ const getOrders = async (ordersFiltersinput: OrdersFiltersInput, req: Request): 
       'o.shippingMethod',
       'i.invoiceID',
       'i.amount',
+      'i.shippingCost',
       'i.details',
       'i.invoiceStatus',
       'i.paymentMethod',
@@ -115,7 +129,11 @@ const getOrders = async (ordersFiltersinput: OrdersFiltersInput, req: Request): 
     .join('invoices as i', 'o.orderID', 'i.orderID')
     .join('users as u', 'o.userID', 'u.userID')
 
-  orders = orders.map((o) => ({ ...o, amount: o.amount / 100 }))
+  orders = orders.map((o) => ({
+    ...o,
+    amount: o.amount / 100,
+    shippingCost: o.shippingCost / 100
+  }))
 
   if (orderStatuses !== undefined) {
     orders = orders
@@ -263,6 +281,7 @@ const getOrderByID = async (req: Request): Promise<OrderWithUser & Invoice & { a
     ...invoice,
     ...(omit([ 'userName', 'userEmail', 'avatar' ], order)),
     amount: invoice.amount / 100,
+    shippingCost: invoice.shippingCost / 100,
     orderProducts: orderProducts.map((op) => ({
       ...op,
       price: op.price / 100
