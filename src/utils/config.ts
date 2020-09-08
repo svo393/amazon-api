@@ -30,7 +30,12 @@ const envVars: Config = pickAll([
 
 envVars.BASE_URLS = process.env.NODE_ENV === 'production'
   ? [ process.env.PROD_URL1, process.env.PROD_URL2 ]
-  : [ process.env.DEV_URL1, process.env.DEV_URL2 ]
+  : [
+    process.env.DEV_URL1,
+    process.env.DEV_URL2,
+    process.env.DEV_URL3,
+    process.env.DEV_URL4
+  ]
 
 export const UPLOAD_TIMEOUT = 20000
 

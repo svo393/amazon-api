@@ -7,7 +7,7 @@ import { db, dbTrans } from '../utils/db'
 import sortItems from '../utils/sortItems'
 import StatusError from '../utils/StatusError'
 
-const addOrder = async (orderInput: OrderCreateInput, req: Request): Promise<OrderFullData & Invoice> => {
+const addOrder = async (orderInput: OrderCreateInput, req: Request): Promise<OrderFullData & Invoice & { invoiceCreatedAt: Date; invoiceUpdatedAt: Date }> => {
   const { cart, addressID } = orderInput
   const now = new Date()
 
@@ -82,6 +82,8 @@ const addOrder = async (orderInput: OrderCreateInput, req: Request): Promise<Ord
     return {
       ...addedInvoice,
       ...addedOrder,
+      invoiceCreatedAt: addedInvoice.createdAt,
+      invoiceUpdatedAt: addedInvoice.updatedAt,
       amount: addedInvoice.amount / 100,
       shippingCost: addedInvoice.shippingCost / 100,
       orderProducts: addedOrderProducts
@@ -89,7 +91,7 @@ const addOrder = async (orderInput: OrderCreateInput, req: Request): Promise<Ord
   })
 }
 
-const getOrders = async (ordersFiltersinput: OrdersFiltersInput, req: Request): Promise<BatchWithCursor<OrderWithUser & Invoice>> => {
+const getOrders = async (ordersFiltersinput: OrdersFiltersInput, req: Request): Promise<BatchWithCursor<OrderWithUser & Invoice & { invoiceCreatedAt: Date; invoiceUpdatedAt: Date }>> => {
   const {
     page = 1,
     sortBy = 'createdAt_desc',
@@ -109,12 +111,14 @@ const getOrders = async (ordersFiltersinput: OrdersFiltersInput, req: Request): 
     }
   }
 
-  let orders: (Order & Invoice & { avatar: boolean; userName: string; userEmail: string })[] = await db('orders as o')
+  let orders: (Order & Invoice & { invoiceCreatedAt: Date; invoiceUpdatedAt: Date; avatar: boolean; userName: string; userEmail: string })[] = await db('orders as o')
     .select(
       'o.orderID',
       'o.address',
       'o.createdAt',
       'o.updatedAt',
+      'i.createdAt as invoiceCreatedAt',
+      'i.updatedAt as invoiceUpdatedAt',
       'o.userID',
       'o.orderStatus',
       'o.shippingMethod',
@@ -227,15 +231,17 @@ const getOrders = async (ordersFiltersinput: OrdersFiltersInput, req: Request): 
   }
 }
 
-const getOrderByID = async (req: Request): Promise<OrderWithUser & Invoice> => {
+const getOrderByID = async (req: Request): Promise<OrderWithUser & Invoice & { invoiceCreatedAt: Date; invoiceUpdatedAt: Date }> => {
   const { orderID } = req.params
 
-  const order: Order & { avatar: boolean; userName: string; userEmail: string } = await db('orders as o')
+  const order: Order & { invoiceCreatedAt: Date; invoiceUpdatedAt: Date; avatar: boolean; userName: string; userEmail: string } = await db('orders as o')
     .first(
       'o.orderID',
       'o.address',
       'o.createdAt',
       'o.updatedAt',
+      'i.createdAt as invoiceCreatedAt',
+      'i.updatedAt as invoiceUpdatedAt',
       'o.userID',
       'o.orderStatus',
       'o.shippingMethod',
@@ -244,6 +250,7 @@ const getOrderByID = async (req: Request): Promise<OrderWithUser & Invoice> => {
       'u.email as userEmail'
     )
     .joinRaw('JOIN users as u USING ("userID")')
+    .joinRaw('JOIN invoices as i USING ("orderID")')
     .where('orderID', orderID)
 
   const invoice = await db<Invoice>('invoices')
@@ -266,7 +273,7 @@ const getOrderByID = async (req: Request): Promise<OrderWithUser & Invoice> => {
 
   if (order === undefined || invoice === undefined) throw new StatusError(404, 'Not Found')
 
-  const _order: OrderWithUser & Invoice = {
+  const _order: OrderWithUser & Invoice & { invoiceCreatedAt: Date; invoiceUpdatedAt: Date } = {
     ...invoice,
     ...(omit([ 'userName', 'userEmail', 'avatar' ], order)),
     amount: invoice.amount / 100,
