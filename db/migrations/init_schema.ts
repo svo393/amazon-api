@@ -425,6 +425,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.dateTime('createdAt').notNullable()
       t.dateTime('updatedAt').notNullable()
       t.dateTime('shippedAt')
+      t.jsonb('address').notNullable()
 
       t
         .integer('userID')
@@ -439,11 +440,6 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t
         .string('shippingMethod')
         .references('shippingMethods.shippingMethodName')
-        .notNullable()
-
-      t
-        .integer('addressID')
-        .references('addresses.addressID')
         .notNullable()
     })
 

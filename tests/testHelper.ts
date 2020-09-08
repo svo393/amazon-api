@@ -1,6 +1,6 @@
 import supertest from 'supertest'
 import app from '../src/app'
-import { Address, AddressCreateInput, AddressType, AddressTypeInput, Answer, AnswerCreateInput, CartProduct, Category, CategoryCreateInput, Follower, Group, GroupVariation, GroupVariationCreateInput, Invoice, InvoiceCreateInput, InvoiceStatus, List, ListCreateInput, ListProduct, Order, OrderCreateInput, OrderProduct, OrderProductInput, OrderStatus, Parameter, ParameterInput, PaymentMethod, Product, ProductParameter, ProductPublicData, Question, QuestionCreateInput, Review, ReviewComment, ReviewCommentCreateInput, ReviewCreateInput, Role, ShippingMethod, ShippingMethodInput, User, UserAddress, Vendor, VendorInput, ModerationStatus } from '../src/types'
+import { Address, AddressCreateInput, AddressType, AddressTypeInput, Answer, AnswerCreateInput, CartProduct, Category, CategoryCreateInput, Follower, Group, GroupVariation, GroupVariationCreateInput, Invoice, InvoiceCreateInput, InvoiceStatus, List, ListCreateInput, ListProduct, ModerationStatus, Order, OrderCreateInput, OrderProduct, OrderProductInput, OrderStatus, Parameter, ParameterInput, PaymentMethod, Product, ProductParameter, ProductPublicData, Question, QuestionCreateInput, Review, ReviewComment, ReviewCommentCreateInput, ReviewCreateInput, Role, ShippingMethod, ShippingMethodInput, User, UserAddress, Vendor, VendorInput } from '../src/types'
 import { apiURLs } from '../src/utils/constants'
 import { db } from '../src/utils/db'
 import { products } from './testProductData'
@@ -279,6 +279,7 @@ export const newAddress = async (): Promise<AddressCreateInput> => {
     fullName: `New Address ${(new Date().getTime()).toString()}`,
     streetAddressLine1: `New Address ${(new Date().getTime()).toString()}`,
     city: `New Address ${(new Date().getTime()).toString()}`,
+    region: `New Address ${(new Date().getTime()).toString()}`,
     postalCode: new Date().getTime(),
     phoneNumber: `New Address ${(new Date().getTime()).toString()}`,
     addressType: addedAddressType.addressTypeName,
@@ -569,7 +570,8 @@ export const newOrder = (addressID: number, shippingMethod: string, cart: CartPr
   details: 'Card 4242 4242 4242 4242',
   paymentMethod,
   shippingMethod,
-  cart
+  cart,
+  shippingCost: 4.99
 })
 
 export const createOneOrder = async (role: string): Promise<{ addedOrder: Order; sessionID: string }> => {
@@ -619,6 +621,6 @@ export const createOneInvoice = async (role: string): Promise<{ addedInvoice: In
   const { body }: { body: Invoice } = await api
     .post(apiURLs.invoices)
     .set('Cookie', `sessionID=${sessionID}`)
-    .send(newInvoice(addedOrder.orderID, addedPaymentMethod.paymentMethodName, addedOrder.userID as number))
+    .send(newInvoice(addedOrder.orderID, addedPaymentMethod.paymentMethodName, addedOrder.userID))
   return { addedInvoice: body, sessionID }
 }

@@ -175,7 +175,7 @@ export type ModerationStatus = { moderationStatusName: string }
 
 export type Order = {
   orderID: number;
-  addressID: number;
+  address: Address;
   createdAt: Date;
   updatedAt: Date;
   shippedAt: Date | null;
@@ -398,9 +398,9 @@ export type LocalCart = {
 }[]
 
 export type OrderCreateInput = Pick<Order,
-  | 'addressID'
   | 'shippingMethod'
 > & {
+  addressID: number;
   details: string;
   paymentMethod: string;
   cart: CartProduct[];
@@ -409,10 +409,9 @@ export type OrderCreateInput = Pick<Order,
 }
 
 export type OrderUpdateInput = Partial<Pick<Order,
-| 'addressID'
 | 'orderStatus'
 | 'shippingMethod'
->>
+> & { addressID: number }>
 
 export type OrdersFiltersInput = {
   amountMin?: number;

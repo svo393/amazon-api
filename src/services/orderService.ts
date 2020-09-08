@@ -1,22 +1,29 @@
 import { Request } from 'express'
 import Knex from 'knex'
 import { omit, sum } from 'ramda'
-import { Address, BatchWithCursor, Invoice, Order, OrderCreateInput, OrderFullData, OrderProduct, OrderProductFullData, OrdersFiltersInput, OrderUpdateInput, OrderWithUser, Product } from '../types'
+import { Address, BatchWithCursor, Invoice, Order, OrderCreateInput, OrderFullData, OrderProduct, OrderProductFullData, OrdersFiltersInput, OrderUpdateInput, OrderWithUser } from '../types'
 import { smallLimit } from '../utils/constants'
 import { db, dbTrans } from '../utils/db'
 import sortItems from '../utils/sortItems'
 import StatusError from '../utils/StatusError'
 
-const addOrder = async (orderInput: OrderCreateInput, req: Request): Promise<OrderFullData & Invoice & { address: Address }> => {
+const addOrder = async (orderInput: OrderCreateInput, req: Request): Promise<OrderFullData & Invoice> => {
   const { cart, addressID } = orderInput
   const now = new Date()
 
   return await dbTrans(async (trx: Knex.Transaction) => {
     const userID = req.session?.userID
 
+    const address = await trx<Address>('addresses')
+      .first()
+      .where('addressID', addressID)
+
+    if (address === undefined) throw new StatusError()
+
     const [ addedOrder ]: Order[] = await trx('orders')
       .insert({
-        ...omit([ 'cart', 'details', 'paymentMethod', 'shippingCost' ], orderInput),
+        ...omit([ 'cart', 'details', 'paymentMethod', 'shippingCost', 'addressID' ], orderInput),
+        address,
         orderStatus: 'NEW',
         createdAt: now,
         updatedAt: now,
@@ -72,22 +79,17 @@ const addOrder = async (orderInput: OrderCreateInput, req: Request): Promise<Ord
 
     if (deleteCount === 0) throw new StatusError()
 
-    const address = await trx<Address>('addresses')
-      .first()
-      .where('addressID', addressID)
-
     return {
       ...addedInvoice,
       ...addedOrder,
       amount: addedInvoice.amount / 100,
       shippingCost: addedInvoice.shippingCost / 100,
-      orderProducts: addedOrderProducts,
-      address
+      orderProducts: addedOrderProducts
     }
   })
 }
 
-const getOrders = async (ordersFiltersinput: OrdersFiltersInput, req: Request): Promise<BatchWithCursor<OrderWithUser & Invoice & { address: Address }>> => {
+const getOrders = async (ordersFiltersinput: OrdersFiltersInput, req: Request): Promise<BatchWithCursor<OrderWithUser & Invoice>> => {
   const {
     page = 1,
     sortBy = 'createdAt_desc',
@@ -110,7 +112,7 @@ const getOrders = async (ordersFiltersinput: OrdersFiltersInput, req: Request): 
   let orders: (Order & Invoice & { avatar: boolean; userName: string; userEmail: string })[] = await db('orders as o')
     .select(
       'o.orderID',
-      'o.addressID',
+      'o.address',
       'o.createdAt',
       'o.updatedAt',
       'o.userID',
@@ -183,7 +185,6 @@ const getOrders = async (ordersFiltersinput: OrdersFiltersInput, req: Request): 
   const batch = ordersSorted.slice((page - 1) * smallLimit, end)
 
   const orderIDs = batch.map((o) => o.orderID)
-  const addressIDs = batch.map((o) => o.addressID)
 
   const orderProducts: OrderProductFullData[] = await db('orderProducts as op')
     .select(
@@ -199,9 +200,6 @@ const getOrders = async (ordersFiltersinput: OrdersFiltersInput, req: Request): 
     .join('images as i', 'p.productID', 'i.productID')
     .where('i.index', 0)
 
-  const addresses = await db<Address>('addresses')
-    .whereIn('addressID', addressIDs)
-
   const _batch = batch.map((o) => ({
     ...(omit([ 'userName', 'userEmail', 'avatar' ], o)),
     orderProducts: orderProducts
@@ -210,7 +208,6 @@ const getOrders = async (ordersFiltersinput: OrdersFiltersInput, req: Request): 
         ...op,
         price: op.price / 100
       })),
-    address: addresses.find((a) => a.addressID === o.addressID),
     user: {
       avatar: o.avatar,
       name: o.userName,
@@ -220,25 +217,23 @@ const getOrders = async (ordersFiltersinput: OrdersFiltersInput, req: Request): 
   }))
 
   _batch.forEach((o) => {
-    if (o.orderProducts.length === 0 || o.address === undefined) {
-      throw new StatusError()
-    }
+    if (o.orderProducts.length === 0) { throw new StatusError() }
   })
 
   return {
-    batch: _batch.map((o) => ({ ...o, address: o.address as Address })),
+    batch: _batch,
     totalCount: orders.length,
     hasNextPage: end < totalCount
   }
 }
 
-const getOrderByID = async (req: Request): Promise<OrderWithUser & Invoice & { address: Address }> => {
+const getOrderByID = async (req: Request): Promise<OrderWithUser & Invoice> => {
   const { orderID } = req.params
 
   const order: Order & { avatar: boolean; userName: string; userEmail: string } = await db('orders as o')
     .first(
       'o.orderID',
-      'o.addressID',
+      'o.address',
       'o.createdAt',
       'o.updatedAt',
       'o.userID',
@@ -271,13 +266,7 @@ const getOrderByID = async (req: Request): Promise<OrderWithUser & Invoice & { a
 
   if (order === undefined || invoice === undefined) throw new StatusError(404, 'Not Found')
 
-  const address = await db<Address>('addresses')
-    .first()
-    .where('addressID', order.addressID)
-
-  if (address === undefined) throw new StatusError()
-
-  const _order: OrderWithUser & Invoice & { address: Address } = {
+  const _order: OrderWithUser & Invoice = {
     ...invoice,
     ...(omit([ 'userName', 'userEmail', 'avatar' ], order)),
     amount: invoice.amount / 100,
@@ -286,7 +275,6 @@ const getOrderByID = async (req: Request): Promise<OrderWithUser & Invoice & { a
       ...op,
       price: op.price / 100
     })),
-    address,
     user: {
       avatar: order.avatar,
       name: order.userName,

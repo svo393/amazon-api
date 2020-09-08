@@ -318,6 +318,7 @@ const seed = async (): Promise<void> => {
         addressID: (addresses.find((a) => a.userID === users[0].userID))?.addressID,
         details: 'Card 4242 4242 4242 4242',
         shippingMethod: 'DOOR',
+        shippingCost: 4.99,
         paymentMethod: 'CARD',
         cart: [ cartProduct1.body.cart[0] ]
       })
@@ -347,6 +348,7 @@ const seed = async (): Promise<void> => {
         addressID: (addresses.find((a) => a.userID === users[2].userID))?.addressID,
         details: 'Take my money',
         shippingMethod: 'LOCKER',
+        shippingCost: 4.99,
         paymentMethod: 'CASH',
         cart: [ cartProduct2.body.cart[0] ]
       })
