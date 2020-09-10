@@ -1,11 +1,11 @@
 import { Request } from 'express'
 import Knex from 'knex'
-import { CartProduct, CartProductInput, Image, LocalCart, Product } from '../types'
+import { CartProduct, CartProductInput, Image, LocalCart, Product, ProductSize } from '../types'
 import { db, dbTrans } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
 type Cart = {
-  products: (Pick<Product, 'productID' |'title' |'price' |'stock' |'isAvailable'> & { images: Image[] })[];
+  products: (Pick<Product, 'productID' |'title' |'price' |'stock' |'isAvailable'> & { images: Image[]; productSizes: ProductSize[] })[];
   cart: CartProduct[];
 }
 
@@ -83,12 +83,16 @@ const getCartProductsByUser = async (localCart: LocalCart, req: Request): Promis
       .select('productID', 'title', 'price', 'stock', 'isAvailable')
       .whereIn('productID', productIDs)
 
+    const productSizes = await db<ProductSize>('productSizes')
+      .whereIn('productID', productIDs)
+
     const images = await trx<Image>('images')
       .whereIn('productID', productIDs)
 
     return {
       products: products.map((p) => ({
         ...p,
+        productSizes,
         price: p.price / 100,
         images: images.filter((i) => i.productID === p.productID)
       })),
@@ -104,12 +108,16 @@ const getProductsForLocalCart = async (localCart: LocalCart): Promise<Pick<Cart,
     .select('productID', 'title', 'price', 'stock', 'isAvailable')
     .whereIn('productID', productIDs)
 
+  const productSizes = await db<ProductSize>('productSizes')
+    .whereIn('productID', productIDs)
+
   const images = await db<Image>('images')
     .whereIn('productID', productIDs)
 
   return {
     products: products.map((p) => ({
       ...p,
+      productSizes,
       price: p.price / 100,
       images: images.filter((i) => i.productID === p.productID)
     }))

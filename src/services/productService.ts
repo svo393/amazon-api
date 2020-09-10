@@ -1,7 +1,7 @@
 import { Request } from 'express'
 import Knex from 'knex'
-import { flatten, omit } from 'ramda'
-import { GroupVariation, Image, Product, ProductCreateInput, ProductData, ProductParameter, ProductsFiltersInput, ProductSize, ProductsMinFiltersInput, ProductUpdateInput, Question, User } from '../types'
+import { flatten, omit, sum } from 'ramda'
+import { GroupVariation, Image, Product, ProductCreateInput, ProductData, ProductParameter, ProductsFiltersInput, ProductSize, ProductsMinFiltersInput, ProductUpdateInput, User } from '../types'
 import { defaultLimit, imagesBasePath } from '../utils/constants'
 import { db, dbTrans } from '../utils/db'
 import fuseIndexes from '../utils/fuseIndexes'
@@ -120,6 +120,7 @@ type ProductListData = Omit<ProductListRawData, 'stars' | 'reviewCount'> & {
     imageID: number;
     index: number;
   }[];
+  productSizes: ProductSize[];
   productSizesSum: number | null;
 }
 
@@ -144,6 +145,8 @@ const getProducts = async (productsFiltersInput: ProductsFiltersInput): Promise<
 
   // TODO refactor reusable queries
   const rawProducts: ProductListRawData[] = await getProductsQuery.clone()
+  const productIDs = rawProducts.map(({ productID }) => productID)
+
   let groupVariations: GroupVariation[]
 
   const images = await db<Image>('images')
@@ -151,15 +154,16 @@ const getProducts = async (productsFiltersInput: ProductsFiltersInput): Promise<
 
   let ratingStats: { stars: number; count: string }[]
 
-  const productSizes: { productID: number; sum: string }[] = await db('productSizes')
-    .select('productID')
-    .sum('qty')
-    .groupBy('productID')
+  const productSizes = await db<ProductSize>('productSizes')
+    .whereIn('productID', productIDs)
 
   let products: Omit<ProductListData, 'images'>[]
 
   products = await Promise.all(rawProducts.map(async (p) => {
-    const sizes = productSizes.find((ps) => ps.productID === p.productID)
+    const sizesSum = sum(productSizes
+      .filter((ps) => ps.productID === p.productID)
+      .map(({ qty }) => qty)
+    )
 
     const [ { reviewCount } ] = await db('reviews')
       .count('reviewID as reviewCount')
@@ -171,7 +175,8 @@ const getProducts = async (productsFiltersInput: ProductsFiltersInput): Promise<
       price: p.price / 100,
       stars: parseFloat(p.stars),
       reviewCount: parseInt(reviewCount as string),
-      productSizesSum: sizes !== undefined ? parseInt(sizes.sum) : null
+      productSizes,
+      productSizesSum: sizesSum || null
     }
   }))
 

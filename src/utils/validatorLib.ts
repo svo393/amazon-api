@@ -93,6 +93,13 @@ export const isNumber: CP = ({ name, param }) => {
   return { name, param }
 }
 
+export const isIntegerOrObject: CP = ({ name, param }) => {
+  if (!Number.isInteger(param) && Object.prototype.toString.call(param) !== '[object Object]') {
+    throw new StatusError(400, `Incorrect ${name}: ${param}`)
+  }
+  return { name, param }
+}
+
 export const canBeNumber: CP = ({ name, param }) => {
   if (param !== undefined && !/^\d+(?:\.\d{1,2})?$/.test(param)) {
     throw new StatusError(400, `Incorrect ${name}: ${param}`)

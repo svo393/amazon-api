@@ -402,6 +402,11 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.integer('qty').notNullable().unsigned()
 
       t
+        .string('size', 50)
+        .references('productSizes.name')
+        .onDelete('CASCADE')
+
+      t
         .integer('userID')
         .references('users.userID')
         .notNullable()
