@@ -25,11 +25,13 @@ const addOrderProduct = async (orderProductInput: OrderProductInput, req: Reques
 }
 
 const updateOrderProduct = async (orderProductInput: OrderProductInput, req: Request): Promise<OrderProduct> => {
+  const { qty, size, price } = orderProductInput
   return await dbTrans(async (trx: Knex.Transaction) => {
     const [ updatedOrderProduct ]: OrderProduct[] = await trx('orderProducts')
-      .update(orderProductInput, [ '*' ])
+      .update({ qty, price }, [ '*' ])
       .where('productID', req.params.productID)
       .andWhere('orderID', req.params.orderID)
+      .andWhere('size', size)
 
     if (updatedOrderProduct === undefined) throw new StatusError(404, 'Not Found')
 

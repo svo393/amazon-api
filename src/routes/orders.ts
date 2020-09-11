@@ -1,8 +1,7 @@
 import Router from 'express'
-import invoiceService from '../services/invoiceService'
 import orderProductService from '../services/orderProductService'
 import orderService from '../services/orderService'
-import { checkNewInvoice, checkNewOrderProduct, checkOrderFilters, checkOrderProductUpdate, checkOrderUpdate } from '../utils/inputValidator'
+import { checkOrderProduct, checkOrderFilters, checkOrderUpdate } from '../utils/inputValidator'
 import { requireAdmin, requireAuth, requireCreatorOrAdmin } from '../utils/middleware'
 
 const router = Router()
@@ -25,13 +24,13 @@ router.put('/:orderID', requireAdmin, async (req, res) => {
 })
 
 router.post('/:orderID/products/:productID', requireAdmin, async (req, res) => {
-  const orderProductCreateInput = checkNewOrderProduct(req)
+  const orderProductCreateInput = checkOrderProduct(req)
   const addedOrderProduct = await orderProductService.addOrderProduct(orderProductCreateInput, req)
   res.status(201).json(addedOrderProduct)
 })
 
 router.put('/:orderID/products/:productID', requireAdmin, async (req, res) => {
-  const orderProductUpdateInput = checkOrderProductUpdate(req)
+  const orderProductUpdateInput = checkOrderProduct(req)
   const updatedOrderProduct = await orderProductService.updateOrderProduct(orderProductUpdateInput, req)
   res.status(200).json(updatedOrderProduct)
 })

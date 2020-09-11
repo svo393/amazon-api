@@ -447,6 +447,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
     .createTable('orderProducts', (t) => {
       t.integer('price').notNullable().unsigned()
       t.integer('qty').notNullable().unsigned()
+      t.string('size', 50).notNullable()
 
       t
         .integer('orderID')
@@ -459,7 +460,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .notNullable()
     })
     .alterTable('orderProducts', (t) => {
-      t.primary([ 'orderID', 'productID' ])
+      t.primary([ 'orderID', 'productID', 'size' ])
     })
 
     .createTable('invoiceStatuses', (t) => {

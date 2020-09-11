@@ -1011,24 +1011,12 @@ export const checkNewOrder = ({ body }: Request): OrderCreateInput => {
     isNonEmptyString
   )({ name: 'paymentMethod', param: body.paymentMethod })
 
-  const cart = pipe(
-    isProvided,
-    isArray
-  )({ name: 'cart', param: body.cart })
-
-  cart.param.map((cp: any) => {
-    canBeNumber({ name: 'productID', param: cp.productID })
-    canBeNumber({ name: 'userID', param: cp.userID })
-    canBeNumber({ name: 'qty', param: cp.qty })
-  })
-
   return {
     addressID: addressID.param,
     shippingCost: shippingCost.param,
     shippingMethod: shippingMethod.param,
     details: details.param,
-    paymentMethod: paymentMethod.param,
-    cart: cart.param
+    paymentMethod: paymentMethod.param
   }
 }
 
@@ -1052,33 +1040,27 @@ export const checkOrderUpdate = ({ body }: Request): OrderUpdateInput => {
   })
 }
 
-export const checkNewOrderProduct = ({ body }: Request): OrderProductInput => {
+export const checkOrderProduct = ({ body }: Request): OrderProductInput => {
   const qty = pipe(
     isProvided,
     canBeNumber
   )({ name: 'qty', param: body.qty })
+
+  const size = pipe(
+    isProvided,
+    isString
+  )({ name: 'size', param: body.size })
 
   const price = pipe(
     isProvided,
     canBeNumber
   )({ name: 'price', param: body.price })
 
-  return { qty: qty.param, price: price.param }
-}
-
-export const checkOrderProductUpdate = ({ body }: Request): OrderProductInput => {
-  const qty = 'qty' in body
-    ? canBeNumber({ name: 'qty', param: body.qty })
-    : undefined
-
-  const price = 'price' in body
-    ? canBeNumber({ name: 'price', param: body.price })
-    : undefined
-
-  return hasDefinedProps<OrderProductInput>({
-    qty: qty?.param,
-    price: price?.param
-  })
+  return {
+    qty: qty.param,
+    price: price.param,
+    size: size.param
+  }
 }
 
 export const checkNewInvoice = ({ body }: Request): InvoiceCreateInput => {

@@ -8,7 +8,6 @@ import sortItems from '../utils/sortItems'
 import StatusError from '../utils/StatusError'
 
 const addOrder = async (orderInput: OrderCreateInput, req: Request): Promise<OrderFullData & Invoice & { invoiceCreatedAt: Date; invoiceUpdatedAt: Date }> => {
-  const { cart, addressID } = orderInput
   const now = new Date()
 
   return await dbTrans(async (trx: Knex.Transaction) => {
@@ -16,7 +15,7 @@ const addOrder = async (orderInput: OrderCreateInput, req: Request): Promise<Ord
 
     const address = await trx<Address>('addresses')
       .first()
-      .where('addressID', addressID)
+      .where('addressID', orderInput.addressID)
 
     if (address === undefined) throw new StatusError()
 
@@ -34,30 +33,43 @@ const addOrder = async (orderInput: OrderCreateInput, req: Request): Promise<Ord
       productID: number;
       price: number;
       qty: number;
+      size: string;
     }[] = await trx('cartProducts as cp')
-      .select('p.productID', 'p.price', 'cp.qty')
+      .select('p.productID', 'p.price', 'cp.qty', 'cp.size')
       .where('cp.userID', userID)
-      .andWhere('cp.productID', 'in', cart.map((cp) => cp.productID))
       .joinRaw('JOIN products as p USING ("productID")')
 
     const newOrderProducts = cartProducts.map((cp) => ({
       orderID: addedOrder.orderID,
       productID: cp.productID,
       price: cp.price,
-      qty: cp.qty
+      qty: cp.qty,
+      size: cp.size
     }))
 
     const addedOrderProducts: OrderProduct[] = await trx('orderProducts')
       .insert(newOrderProducts, [ '*' ])
 
     await Promise.all(newOrderProducts.map(async (op) => {
-      const product = await trx('products')
-        .first('stock')
-        .where('productID', op.productID)
+      if (op.size === 'stock') {
+        const product = await trx('products')
+          .first('stock')
+          .where('productID', op.productID)
 
-      await trx('products')
-        .where('productID', op.productID)
-        .update({ stock: product.stock - op.qty })
+        await trx('products')
+          .where('productID', op.productID)
+          .update({ stock: product.stock - op.qty })
+      } else {
+        const productSize = await trx('productSizes')
+          .first('qty')
+          .where('productID', op.productID)
+          .andWhere('name', op.size)
+
+        await trx('productSizes')
+          .where('productID', op.productID)
+          .andWhere('name', op.size)
+          .update({ qty: productSize.qty - op.qty })
+      }
     }))
 
     const [ addedInvoice ]: Invoice[] = await trx('invoices')
@@ -194,6 +206,7 @@ const getOrders = async (ordersFiltersinput: OrdersFiltersInput, req: Request): 
     .select(
       'op.price',
       'op.qty',
+      'op.size',
       'op.productID',
       'op.orderID',
       'p.title',
@@ -261,6 +274,7 @@ const getOrderByID = async (req: Request): Promise<OrderWithUser & Invoice & { i
     .select(
       'op.price',
       'op.qty',
+      'op.size',
       'op.productID',
       'op.orderID',
       'p.title',

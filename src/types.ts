@@ -192,6 +192,7 @@ export type OrderProduct = {
   qty: number;
   orderID: number;
   productID: number;
+  size: string;
 }
 
 export type InvoiceStatus = { invoiceStatusName: string }
@@ -402,7 +403,6 @@ export type OrderCreateInput = Pick<Order,
   addressID: number;
   details: string;
   paymentMethod: string;
-  cart: CartProduct[];
   promo?: string;
   shippingCost: number;
 }
@@ -555,6 +555,7 @@ export type OrderProductFullData = Pick<Product,
   | 'orderID'
   | 'price'
   | 'qty'
+  | 'size'
 > & { imageID: number }
 
 export type OrderFullData = Order & { orderProducts: OrderProductFullData[]}
