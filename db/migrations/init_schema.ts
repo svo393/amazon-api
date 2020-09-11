@@ -400,11 +400,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
 
     .createTable('cartProducts', (t) => {
       t.integer('qty').notNullable().unsigned()
-
-      t
-        .string('size', 50)
-        .references('productSizes.name')
-        .onDelete('CASCADE')
+      t.string('size', 50).notNullable()
 
       t
         .integer('userID')
@@ -418,7 +414,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .notNullable()
     })
     .alterTable('cartProducts', (t) => {
-      t.primary([ 'userID', 'productID' ])
+      t.primary([ 'userID', 'productID', 'size' ])
     })
 
     .createTable('orderStatuses', (t) => {

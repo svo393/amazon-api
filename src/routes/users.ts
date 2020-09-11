@@ -9,7 +9,7 @@ import questionService from '../services/questionService'
 import userAddressService from '../services/userAddressService'
 import userService from '../services/userService'
 import { UPLOAD_TIMEOUT } from '../utils/config'
-import { checkCartProductUpdate, checkLocalCart, checkNewCartProduct, checkNewOrder, checkSingleMediaUpload, checkUserAddressesUpdate, checkUserFilters, checkUserUpdate } from '../utils/inputValidator'
+import { checkCartProduct, checkCartProductDelete, checkLocalCart, checkNewOrder, checkSingleMediaUpload, checkUserAddressesUpdate, checkUserFilters, checkUserUpdate } from '../utils/inputValidator'
 import { multerUpload, requireAdmin, requireSameUser, requireSameUserOrAdmin } from '../utils/middleware'
 
 const router = Router()
@@ -85,7 +85,7 @@ router.delete('/:userID/follows/:anotherUserID', requireSameUser('params'), asyn
 })
 
 router.post('/:userID/cartProducts/:productID', requireSameUserOrAdmin('params'), async (req, res) => {
-  const cartProductCreateInput = checkNewCartProduct(req)
+  const cartProductCreateInput = checkCartProduct(req)
   const addedCartProduct = await cartProductService.addCartProduct(cartProductCreateInput, req)
   res.status(201).json(addedCartProduct)
 })
@@ -102,13 +102,14 @@ router.get('/:userID/cartProducts/:productID', requireSameUserOrAdmin('params'),
 })
 
 router.put('/:userID/cartProducts/:productID', requireSameUserOrAdmin('params'), async (req, res) => {
-  const cartProductUpdateInput = checkCartProductUpdate(req)
+  const cartProductUpdateInput = checkCartProduct(req)
   const updatedCartProduct = await cartProductService.updateCartProduct(cartProductUpdateInput, req)
   res.json(updatedCartProduct)
 })
 
 router.delete('/:userID/cartProducts/:productID', requireSameUserOrAdmin('params'), async (req, res) => {
-  const deletedCartProduct = await cartProductService.deleteCartProduct(req)
+  const cartProductDeleteInput = checkCartProductDelete(req)
+  const deletedCartProduct = await cartProductService.deleteCartProduct(cartProductDeleteInput, req)
   res.json(deletedCartProduct)
 })
 

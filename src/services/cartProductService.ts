@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import Knex from 'knex'
-import { CartProduct, CartProductInput, Image, LocalCart, Product, ProductSize } from '../types'
+import { CartProduct, CartProductDeleteInput, CartProductInput, Image, LocalCart, Product, ProductSize } from '../types'
 import { db, dbTrans } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
@@ -13,10 +13,10 @@ const addCartProduct = async (cartProductInput: CartProductInput, req: Request):
   return await dbTrans(async (trx: Knex.Transaction) => {
     const { rows: [ addedCP ] }: { rows: CartProduct[] } = await trx.raw(
     `
-    ? ON CONFLICT ("userID", "productID")
-      DO UPDATE SET
-      "qty" = EXCLUDED."qty"
-      RETURNING *;
+    ? ON CONFLICT ("userID", "productID", "size")
+    DO UPDATE SET
+    "qty" = EXCLUDED."qty"
+    RETURNING *;
     `,
     [ trx('cartProducts').insert({
       ...cartProductInput,
@@ -63,15 +63,17 @@ const getCartProductsByUser = async (localCart: LocalCart, req: Request): Promis
     const existingProductIDs = existingProducts.map((p) => p.productID)
 
     await Promise.all(localCart.map(async (cp) => {
-      existingProductIDs.includes(cp.productID) && await trx.raw(
-        `
-        ? ON CONFLICT ("userID", "productID")
+      if (existingProductIDs.includes(cp.productID)) {
+        existingProductIDs.includes(cp.productID) && await trx.raw(
+          `
+          ? ON CONFLICT ("userID", "productID", "size")
           DO UPDATE SET
           "qty" = EXCLUDED."qty"
           RETURNING *;
-        `,
-        [ trx('cartProducts').insert({ ...cp, userID }) ]
-      )
+          `,
+          [ trx('cartProducts').insert({ ...cp, userID }) ]
+        )
+      }
     }))
 
     const cart = await trx<CartProduct>('cartProducts')
@@ -92,7 +94,7 @@ const getCartProductsByUser = async (localCart: LocalCart, req: Request): Promis
     return {
       products: products.map((p) => ({
         ...p,
-        productSizes,
+        productSizes: productSizes.filter((ps) => ps.productID === p.productID),
         price: p.price / 100,
         images: images.filter((i) => i.productID === p.productID)
       })),
@@ -117,7 +119,7 @@ const getProductsForLocalCart = async (localCart: LocalCart): Promise<Pick<Cart,
   return {
     products: products.map((p) => ({
       ...p,
-      productSizes,
+      productSizes: productSizes.filter((ps) => ps.productID === p.productID),
       price: p.price / 100,
       images: images.filter((i) => i.productID === p.productID)
     }))
@@ -126,20 +128,22 @@ const getProductsForLocalCart = async (localCart: LocalCart): Promise<Pick<Cart,
 
 const updateCartProduct = async (cartProductInput: CartProductInput, req: Request): Promise<CartProduct> => {
   const [ updatedCP ]: CartProduct[] = await db('cartProducts')
-    .update(cartProductInput, [ '*' ])
+    .update({ qty: cartProductInput.qty }, [ '*' ])
     .where('userID', req.params.userID)
     .andWhere('productID', req.params.productID)
+    .andWhere('size', cartProductInput.size)
 
   if (updatedCP === undefined) throw new StatusError(404, 'Not Found')
   return updatedCP
 }
 
-const deleteCartProduct = async (req: Request): Promise<CartProduct> => {
+const deleteCartProduct = async (cartProductInput: CartProductDeleteInput, req: Request): Promise<CartProduct> => {
   return await dbTrans(async (trx: Knex.Transaction) => {
     const cartProduct = await trx<CartProduct>('cartProducts')
-      .first('productID')
+      .first('productID', 'size')
       .where('userID', req.params.userID)
       .andWhere('productID', req.params.productID)
+      .andWhere('size', cartProductInput.size)
 
     const deleteCount = await trx('cartProducts')
       .del()

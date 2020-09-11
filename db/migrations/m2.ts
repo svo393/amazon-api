@@ -3,11 +3,13 @@ import Knex from 'knex'
 export const up = (knex: Knex): Knex.SchemaBuilder =>
   knex.schema
     .alterTable('cartProducts', (t) => {
-      t.string('size', 50).notNullable()
+      t.dropPrimary()
+      t.primary([ 'userID', 'productID', 'size' ])
     })
 
 export const down = (knex: Knex): Knex.SchemaBuilder =>
   knex.schema
     .alterTable('cartProducts', (t) => {
-      t.dropColumn('size')
+      t.dropPrimary()
+      t.primary([ 'userID', 'productID' ])
     })

@@ -165,7 +165,7 @@ export type ProductParameter = {
 
 export type CartProduct = {
   qty: number;
-  size?: string;
+  size: string;
   userID: number;
   productID: number;
 }
@@ -391,12 +391,10 @@ export type ParameterInput = Pick<Parameter, 'name'>
 
 export type ProductParametersInput = Pick<ProductParameter, 'value' | 'parameterID'>[]
 
-export type CartProductInput = Pick<CartProduct, 'qty'>
+export type CartProductInput = Pick<CartProduct, 'qty' | 'size'>
+export type CartProductDeleteInput = Pick<CartProduct, 'size'>
 
-export type LocalCart = {
-  qty: number | { [ k: string ]: number };
-  productID: number;
-}[]
+export type LocalCart = Omit<CartProduct, 'userID'>[]
 
 export type OrderCreateInput = Pick<Order,
   | 'shippingMethod'

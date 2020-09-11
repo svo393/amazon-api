@@ -93,11 +93,13 @@ export const isNumber: CP = ({ name, param }) => {
   return { name, param }
 }
 
-export const isIntegerOrObject: CP = ({ name, param }) => {
-  if (!Number.isInteger(param) && Object.prototype.toString.call(param) !== '[object Object]') {
+export const canBeIntegerOrObject: CP = ({ name, param }) => {
+  const canBeInteger = Number.isInteger(Number(param))
+
+  if (!canBeInteger && Object.prototype.toString.call(param) !== '[object Object]') {
     throw new StatusError(400, `Incorrect ${name}: ${param}`)
   }
-  return { name, param }
+  return { name, param: canBeInteger ? Number(param) : param }
 }
 
 export const canBeNumber: CP = ({ name, param }) => {

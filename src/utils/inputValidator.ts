@@ -1,7 +1,7 @@
 import { Request } from 'express'
 import { pipe } from 'ramda'
-import { AddressCreateInput, AddressTypeInput, AddressUpdateInput, AnswerCreateInput, AnswerUpdateInput, AskFiltersInput, CartProductInput, CategoriesFiltersInput, CategoryCreateInput, CategoryUpdateInput, CursorInput, FeedFiltersInput, GroupVariationCreateInput, GroupVariationDeleteInput, GroupVariationUpdateInput, ImagesDeleteInput, ImagesFiltersInput, ImagesUpdateInput, InvoiceCreateInput, InvoicesFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, LocalCart, ModerationStatus, ObjIndexed, OrderCreateInput, OrderProductInput, OrdersFiltersInput, OrderStatus, OrderUpdateInput, ParameterInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionCursorInput, QuestionUpdateInput, ReviewCommentCreateInput, ReviewCommentUpdateInput, ReviewCreateInput, ReviewsFiltersInput, ReviewUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorInput, VendorsFiltersInput, VotesCreateInput, VotesFiltersInput } from '../types'
-import { canBeBoolean, canBeNumber, hasDefinedProps, isArray, isDate, isEmail, isInputProvided, isIntegerOrObject, isNonEmptyString, isObject, isPasswordValid, isPositiveNumber, isProvided, isSomeProvided, isString } from './validatorLib'
+import { AddressCreateInput, AddressTypeInput, AddressUpdateInput, AnswerCreateInput, AnswerUpdateInput, AskFiltersInput, CartProduct, CartProductDeleteInput, CartProductInput, CategoriesFiltersInput, CategoryCreateInput, CategoryUpdateInput, CursorInput, FeedFiltersInput, GroupVariationCreateInput, GroupVariationDeleteInput, GroupVariationUpdateInput, ImagesDeleteInput, ImagesFiltersInput, ImagesUpdateInput, InvoiceCreateInput, InvoicesFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, LocalCart, ModerationStatus, ObjIndexed, OrderCreateInput, OrderProductInput, OrdersFiltersInput, OrderStatus, OrderUpdateInput, ParameterInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionCursorInput, QuestionUpdateInput, ReviewCommentCreateInput, ReviewCommentUpdateInput, ReviewCreateInput, ReviewsFiltersInput, ReviewUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorInput, VendorsFiltersInput, VotesCreateInput, VotesFiltersInput } from '../types'
+import { canBeBoolean, canBeIntegerOrObject, canBeNumber, hasDefinedProps, isArray, isDate, isEmail, isInputProvided, isNonEmptyString, isObject, isPasswordValid, isPositiveNumber, isProvided, isSomeProvided, isString } from './validatorLib'
 
 export const checkNewUser = ({ body }: Request): UserSignupInput => {
   const email = pipe(
@@ -518,40 +518,52 @@ export const checkAddressType = ({ body }: Request): AddressTypeInput => {
 }
 
 export const checkLocalCart = ({ body }: Request): LocalCart => {
-  const localCart: any[] = body ?? []
-  return localCart.map(({ qty, productID }) => {
-    pipe(
+  isArray({ name: 'body', param: body })
+  return body.map((cp: Omit<CartProduct, 'userID'>) => {
+    const qty = pipe(
       isProvided,
-      isIntegerOrObject
-    )({ name: 'qty', param: qty })
+      canBeNumber
+    )({ name: 'qty', param: cp.qty })
+
+    const size = pipe(
+      isProvided,
+      isString
+    )({ name: 'size', param: cp.size })
+
+    const productID = pipe(
+      isProvided,
+      canBeNumber
+    )({ name: 'productID', param: cp.productID })
 
     return {
-      qty: typeof (qty) === 'number'
-        ? qty
-        : Object.values(qty as ObjIndexed)[0],
-      productID: pipe(
-        isProvided,
-        canBeNumber
-      )({ name: 'productID', param: productID }).param
+      qty: qty.param,
+      size: size.param,
+      productID: productID.param
     }
   })
 }
 
-export const checkNewCartProduct = ({ body }: Request): CartProductInput => {
+export const checkCartProduct = ({ body }: Request): CartProductInput => {
   const qty = pipe(
     isProvided,
     canBeNumber
   )({ name: 'qty', param: body.qty })
 
-  return { qty: qty.param }
+  const size = pipe(
+    isProvided,
+    isString
+  )({ name: 'size', param: body.size })
+
+  return { qty: qty.param, size: size.param }
 }
 
-export const checkCartProductUpdate = ({ body }: Request): CartProductInput => {
-  const qty = pipe(
+export const checkCartProductDelete = ({ body }: Request): CartProductDeleteInput => {
+  const size = pipe(
     isProvided,
-    canBeNumber
-  )({ name: 'qty', param: body.qty })
-  return { qty: qty.param }
+    isString
+  )({ name: 'size', param: body.size })
+
+  return { size: size.param }
 }
 
 export const checkPaymentMethod = ({ body }: Request): PaymentMethod => {
