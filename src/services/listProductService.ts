@@ -1,7 +1,8 @@
 import { Request } from 'express'
 import { ListProduct } from '../types'
-import { db } from '../utils/db'
+import { db, dbTrans } from '../utils/db'
 import StatusError from '../utils/StatusError'
+import Knex from 'knex'
 
 const addListProduct = async (req: Request): Promise<ListProduct> => {
   const { rows: [ addedUA ] }: { rows: ListProduct[] } = await db.raw(
@@ -22,13 +23,22 @@ const addListProduct = async (req: Request): Promise<ListProduct> => {
   return addedUA
 }
 
-const deleteListProduct = async (req: Request): Promise<void> => {
-  const deleteCount = await db('listProducts')
-    .del()
-    .where('productID', req.params.productID)
-    .andWhere('listID', req.params.listID)
+const deleteListProduct = async (req: Request): Promise<ListProduct> => {
+  return await dbTrans(async (trx: Knex.Transaction) => {
+    const listProduct = await trx<ListProduct>('listProducts')
+      .first()
+      .where('productID', req.params.productID)
+      .andWhere('listID', req.params.listID)
 
-  if (deleteCount === 0) throw new StatusError(404, 'Not Found')
+    const deleteCount = await trx('listProducts')
+      .del()
+      .where('productID', req.params.productID)
+      .andWhere('listID', req.params.listID)
+
+    if (deleteCount === 0) throw new StatusError(404, 'Not Found')
+    
+    return listProduct
+  })
 }
 
 export default {
