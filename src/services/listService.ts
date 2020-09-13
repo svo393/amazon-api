@@ -1,11 +1,11 @@
 import { Request } from 'express'
 import Knex from 'knex'
 import { omit } from 'ramda'
-import { List, ListCreateInput, ListProduct } from '../types'
+import { List, ListCreateInput, ListProduct, ListUpdateInput } from '../types'
 import { db, dbTrans } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
-const addList = async (listInput: ListCreateInput, req: Request): Promise<List & { listProducts: number[] }> => {
+const addList = async (listInput: ListCreateInput, req: Request): Promise<List> => {
   return await dbTrans(async (trx: Knex.Transaction) => {
     const { rows: [ addedList ] }: { rows: List[] } = await trx.raw(
     `
@@ -39,7 +39,7 @@ const addList = async (listInput: ListCreateInput, req: Request): Promise<List &
       throw new StatusError(409, 'This product is already added to the list')
     }
 
-    return { ...addedList, listProducts: [ addedLP.productID ] }
+    return addedList
   })
 }
 
@@ -57,7 +57,7 @@ const getListByID = async (req: Request): Promise<List> => {
   return list
 }
 
-const updateList = async (listInput: ListCreateInput, req: Request): Promise<List> => {
+const updateList = async (listInput: ListUpdateInput, req: Request): Promise<List> => {
   const [ updatedList ]: List[] = await db('lists')
     .update(listInput, [ '*' ])
     .where('listID', req.params.listID)
