@@ -274,7 +274,8 @@ export type CategoryUpdateInput = Partial<CategoryCreateInput>
 
 export type VendorInput = Pick<Vendor, 'name'>
 
-export type ListCreateInput = Pick<List, 'name'>
+export type ListCreateInput = Pick<List, 'name'> & { productID: number }
+export type ListUpdateInput = Pick<List, 'name'>
 
 export type ListFetchInput = Pick<List, 'userID'>
 

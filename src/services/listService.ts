@@ -1,22 +1,46 @@
 import { Request } from 'express'
-import { List, ListCreateInput } from '../types'
-import { db } from '../utils/db'
+import Knex from 'knex'
+import { omit } from 'ramda'
+import { List, ListCreateInput, ListProduct } from '../types'
+import { db, dbTrans } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
-const addList = async (listInput: ListCreateInput, req: Request): Promise<List> => {
-  const { rows: [ addedList ] }: { rows: List[] } = await db.raw(
+const addList = async (listInput: ListCreateInput, req: Request): Promise<List & { listProducts: number[] }> => {
+  return await dbTrans(async (trx: Knex.Transaction) => {
+    const { rows: [ addedList ] }: { rows: List[] } = await trx.raw(
     `
     ? ON CONFLICT
       DO NOTHING
       RETURNING *;
     `,
-    [ db('lists').insert({ ...listInput, userID: req.session?.userID }) ]
-  )
+    [ trx('lists').insert({
+      ...omit([ 'productID' ], listInput),
+      userID: req.session?.userID
+    }) ]
+    )
 
-  if (addedList === undefined) {
-    throw new StatusError(409, `List with name "${listInput.name}" already exists`)
-  }
-  return addedList
+    if (addedList === undefined) {
+      throw new StatusError(409, `List with name "${listInput.name}" already exists`)
+    }
+
+    const { rows: [ addedLP ] }: { rows: ListProduct[] } = await trx.raw(
+      `
+      ? ON CONFLICT
+        DO NOTHING
+        RETURNING *;
+      `,
+      [ trx('listProducts').insert({
+        listID: addedList.listID,
+        productID: listInput.productID
+      }) ]
+    )
+
+    if (addedLP === undefined) {
+      throw new StatusError(409, 'This product is already added to the list')
+    }
+
+    return { ...addedList, listProducts: [ addedLP.productID ] }
+  })
 }
 
 const getListsByUser = async (req: Request): Promise<List[]> => {

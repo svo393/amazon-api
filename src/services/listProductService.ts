@@ -5,7 +5,7 @@ import StatusError from '../utils/StatusError'
 import Knex from 'knex'
 
 const addListProduct = async (req: Request): Promise<ListProduct> => {
-  const { rows: [ addedUA ] }: { rows: ListProduct[] } = await db.raw(
+  const { rows: [ addedLP ] }: { rows: ListProduct[] } = await db.raw(
     `
     ? ON CONFLICT
       DO NOTHING
@@ -17,10 +17,11 @@ const addListProduct = async (req: Request): Promise<ListProduct> => {
     }) ]
   )
 
-  if (addedUA === undefined) {
+  if (addedLP === undefined) {
     throw new StatusError(409, 'This product is already added to the list')
   }
-  return addedUA
+
+  return addedLP
 }
 
 const deleteListProduct = async (req: Request): Promise<ListProduct> => {
@@ -36,7 +37,7 @@ const deleteListProduct = async (req: Request): Promise<ListProduct> => {
       .andWhere('listID', req.params.listID)
 
     if (deleteCount === 0) throw new StatusError(404, 'Not Found')
-    
+
     return listProduct
   })
 }

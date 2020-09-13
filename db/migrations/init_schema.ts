@@ -168,6 +168,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
         .integer('productID')
         .references('products.productID')
         .notNullable()
+        .onDelete('CASCADE')
     })
     .alterTable('productSizes', (t) => {
       t.primary([ 'name', 'productID' ])
