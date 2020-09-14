@@ -24,8 +24,8 @@ router.put('/:listID', requireCreator('lists', 'listID', 'params'), async (req, 
 })
 
 router.delete('/:listID', requireCreator('lists', 'listID', 'params'), async (req, res) => {
-  await listService.deleteList(req)
-  res.status(204).end()
+  const deletedList = await listService.deleteList(req)
+  res.json(deletedList)
 })
 
 router.post('/:listID/products/:productID', requireCreator('lists', 'listID', 'params'), async (req, res) => {
@@ -34,8 +34,8 @@ router.post('/:listID/products/:productID', requireCreator('lists', 'listID', 'p
 })
 
 router.delete('/:listID/products/:productID', requireCreator('lists', 'listID', 'params'), async (req, res) => {
-  await listProductsService.deleteListProduct(req)
-  res.status(204).end()
+  const deletedListProduct = await listProductsService.deleteListProduct(req)
+  res.json(deletedListProduct)
 })
 
 export default router

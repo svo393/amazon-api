@@ -48,13 +48,32 @@ const getListsByUser = async (req: Request): Promise<List[]> => {
     .where('userID', req.params.userID)
 }
 
-const getListByID = async (req: Request): Promise<List> => {
+const getListByID = async (req: Request): Promise<List & { listProducts: number[] }> => {
+  const { listID } = req.params
+
   const list = await db<List>('lists')
     .first()
-    .where('listID', req.params.listID)
+    .where('listID', listID)
+
+  const listProducts = await db<ListProduct>('listProducts as lp')
+    .select(
+      'lp.productID',
+      'p.price',
+      'i.imageID'
+    )
+    .where('lp.listID', listID)
+    .where('i.index', 0)
+    .leftJoin('products as p', 'lp.productID', 'p.productID')
+    .leftJoin('images as i', 'lp.productID', 'i.productID')
 
   if (list === undefined) throw new StatusError(404, 'Not Found')
-  return list
+  return {
+    ...list,
+    listProducts: listProducts.map((lp) => ({
+      ...lp,
+      price: lp.price / 100
+    }))
+  }
 }
 
 const updateList = async (listInput: ListUpdateInput, req: Request): Promise<List> => {
@@ -66,12 +85,20 @@ const updateList = async (listInput: ListUpdateInput, req: Request): Promise<Lis
   return updatedList
 }
 
-const deleteList = async (req: Request): Promise<void> => {
-  const deleteCount = await db('lists')
-    .del()
-    .where('listID', req.params.listID)
+const deleteList = async (req: Request): Promise<List> => {
+  return await dbTrans(async (trx: Knex.Transaction) => {
+    const list = await trx<List>('lists')
+      .first()
+      .where('listID', req.params.listID)
 
-  if (deleteCount === 0) throw new StatusError(404, 'Not Found')
+    const deleteCount = await trx('lists')
+      .del()
+      .where('listID', req.params.listID)
+
+    if (deleteCount === 0) throw new StatusError(404, 'Not Found')
+
+    return list
+  })
 }
 
 export default {
