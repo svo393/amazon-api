@@ -50,7 +50,7 @@ const addCartProduct = async (cartProductInput: CartProductInput, req: Request):
     const [ addedCP ]: CartProduct[] = newQty !== undefined
       ? await trx('cartProducts')
         .first()
-        .update({ qty: cartProductInput.qty }, [ '*' ])
+        .update({ qty: newQty }, [ '*' ])
         .where('productID', productID)
         .andWhere('userID', userID)
         .andWhere('size', size)
@@ -99,7 +99,14 @@ const getCartProductsByUser = async (localCart: LocalCart, req: Request): Promis
     const cart = await trx<CartProduct>('cartProducts')
       .where('userID', userID)
 
-    await Promise.all(localCart.concat(cart).map(async (cp) => {
+    const mergedCart = cart.map((cp) => {
+      const item = localCart
+        .find((lcp) => lcp.productID === cp.productID && lcp.size === cp.size)
+
+      return item ?? cp
+    })
+
+    await Promise.all(mergedCart.map(async (cp) => {
       if (existingProductIDs.includes(cp.productID)) {
         const _stock = cp.size === 'stock'
           ? existingProducts.find((ep) => ep.productID === cp.productID)?.stock
@@ -110,15 +117,14 @@ const getCartProductsByUser = async (localCart: LocalCart, req: Request): Promis
         let newQty
 
         if (cartProduct !== undefined) {
-          newQty = _stock as number < cartProduct.qty + cp.qty
+          newQty = _stock as number < cp.qty
             ? _stock as number
-            : cartProduct.qty + cp.qty
+            : cp.qty
         }
 
         newQty !== undefined
           ? await trx('cartProducts')
-            .first()
-            .update({ qty: cp.qty }, [ '*' ])
+            .update({ qty: newQty }, [ '*' ])
             .where('productID', cp.productID)
             .andWhere('userID', userID)
             .andWhere('size', cp.size)
