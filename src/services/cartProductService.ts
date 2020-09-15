@@ -190,14 +190,39 @@ const getProductsForLocalCart = async (localCart: LocalCart): Promise<Pick<Cart,
 }
 
 const updateCartProduct = async (cartProductInput: CartProductInput, req: Request): Promise<CartProduct> => {
-  const [ updatedCP ]: CartProduct[] = await db('cartProducts')
-    .update({ qty: cartProductInput.qty }, [ '*' ])
-    .where('userID', req.params.userID)
-    .andWhere('productID', req.params.productID)
-    .andWhere('size', cartProductInput.size)
+  const { userID, productID } = req.params
+  const { size, qty } = cartProductInput
 
-  if (updatedCP === undefined) throw new StatusError(404, 'Not Found')
-  return updatedCP
+  return await dbTrans(async (trx: Knex.Transaction) => {
+    const product = await trx<Product>('products')
+      .first(
+        'productID',
+        'title',
+        'price',
+        'stock',
+        'isAvailable'
+      )
+      .where('productID', productID)
+
+    if (product === undefined) throw new StatusError()
+
+    const productSizes = await trx<ProductSize>('productSizes')
+      .where('productID', productID)
+
+    const _stock = size === 'stock'
+      ? product.stock
+      : productSizes.find((ps) => ps.productID === Number(productID) && ps.name === size)?.qty
+
+    const newQty = _stock as number < qty ? _stock as number : qty
+
+    const [ updatedCP ]: CartProduct[] = await trx('cartProducts')
+      .update({ qty: newQty }, [ '*' ])
+      .where('userID', userID)
+      .andWhere('productID', productID)
+      .andWhere('size', size)
+
+    return updatedCP
+  })
 }
 
 const deleteCartProduct = async (cartProductInput: CartProductDeleteInput, req: Request): Promise<CartProduct> => {
