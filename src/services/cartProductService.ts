@@ -10,26 +10,56 @@ type Cart = {
 }
 
 const addCartProduct = async (cartProductInput: CartProductInput, req: Request): Promise<Cart> => {
-  return await dbTrans(async (trx: Knex.Transaction) => {
-    const { rows: [ addedCP ] }: { rows: CartProduct[] } = await trx.raw(
-    `
-    ? ON CONFLICT ("userID", "productID", "size")
-    DO UPDATE SET
-    "qty" = "cartProducts"."qty" + EXCLUDED."qty"
-    RETURNING *;
-    `,
-    [ trx('cartProducts').insert({
-      ...cartProductInput,
-      userID: req.params.userID,
-      productID: req.params.productID
-    }) ]
-    )
+  const { userID, productID } = req.params
+  const { size, qty } = cartProductInput
 
+  return await dbTrans(async (trx: Knex.Transaction) => {
     const product = await trx<Product>('products')
-      .first('productID', 'title', 'price', 'stock', 'isAvailable')
-      .where('productID', addedCP.productID)
+      .first(
+        'productID',
+        'title',
+        'price',
+        'stock',
+        'isAvailable'
+      )
+      .where('productID', productID)
 
     if (product === undefined) throw new StatusError()
+
+    const productSizes = await trx<ProductSize>('productSizes')
+      .where('productID', productID)
+
+    const _stock = size === 'stock'
+      ? product.stock
+      : productSizes.find((ps) => ps.productID === Number(productID) && ps.name === size)?.qty
+
+    const cartProduct = await trx<CartProduct>('cartProducts')
+      .first()
+      .where('productID', productID)
+      .andWhere('userID', userID)
+      .andWhere('size', size)
+
+    let newQty
+
+    if (cartProduct !== undefined) {
+      newQty = _stock as number < cartProduct.qty + qty
+        ? _stock as number
+        : cartProduct.qty + qty
+    }
+
+    const [ addedCP ]: CartProduct[] = newQty !== undefined
+      ? await trx('cartProducts')
+        .first()
+        .update({ qty: cartProductInput.qty }, [ '*' ])
+        .where('productID', productID)
+        .andWhere('userID', userID)
+        .andWhere('size', size)
+      : await trx('cartProducts')
+        .insert({
+          ...cartProductInput,
+          userID,
+          productID
+        }, [ '*' ])
 
     const images = await trx<Image>('images')
       .where('productID', addedCP.productID)
@@ -58,35 +88,61 @@ const getCartProductsByUser = async (localCart: LocalCart, req: Request): Promis
 
   return await dbTrans(async (trx: Knex.Transaction) => {
     const existingProducts = await trx<Product>('products')
-      .select('productID')
+      .select('productID', 'stock')
+      .whereIn('productID', localCartProductIDs)
+
+    const productSizes = await trx<ProductSize>('productSizes')
       .whereIn('productID', localCartProductIDs)
 
     const existingProductIDs = existingProducts.map((p) => p.productID)
 
-    await Promise.all(localCart.map(async (cp) => {
-      if (existingProductIDs.includes(cp.productID)) {
-        existingProductIDs.includes(cp.productID) && await trx.raw(
-          `
-          ? ON CONFLICT ("userID", "productID", "size")
-          DO UPDATE SET
-          "qty" = "cartProducts"."qty" + EXCLUDED."qty"
-          RETURNING *;
-          `,
-          [ trx('cartProducts').insert({ ...cp, userID }) ]
-        )
-      }
-    }))
-
     const cart = await trx<CartProduct>('cartProducts')
       .where('userID', userID)
 
-    const productIDs = cart.map((cp) => cp.productID)
+    await Promise.all(localCart.concat(cart).map(async (cp) => {
+      if (existingProductIDs.includes(cp.productID)) {
+        const _stock = cp.size === 'stock'
+          ? existingProducts.find((ep) => ep.productID === cp.productID)?.stock
+          : productSizes.find((ps) => ps.productID === cp.productID && ps.name === cp.size)?.qty
+
+        const cartProduct = cart.find((i) => i.productID === cp.productID && i.size === cp.size)
+
+        let newQty
+
+        if (cartProduct !== undefined) {
+          newQty = _stock as number < cartProduct.qty + cp.qty
+            ? _stock as number
+            : cartProduct.qty + cp.qty
+        }
+
+        newQty !== undefined
+          ? await trx('cartProducts')
+            .first()
+            .update({ qty: cp.qty }, [ '*' ])
+            .where('productID', cp.productID)
+            .andWhere('userID', userID)
+            .andWhere('size', cp.size)
+          : await trx('cartProducts')
+            .insert({
+              ...cp,
+              userID
+            }, [ '*' ])
+      }
+    }))
+
+    const updatedCart = await trx<CartProduct>('cartProducts')
+      .where('userID', userID)
+
+    const productIDs = updatedCart.map((cp) => cp.productID)
 
     const products = await trx<Product>('products')
-      .select('productID', 'title', 'price', 'stock', 'isAvailable')
-      .whereIn('productID', productIDs)
-
-    const productSizes = await db<ProductSize>('productSizes')
+      .select(
+        'productID',
+        'title',
+        'price',
+        'stock',
+        'isAvailable'
+      )
       .whereIn('productID', productIDs)
 
     const images = await trx<Image>('images')
@@ -99,7 +155,7 @@ const getCartProductsByUser = async (localCart: LocalCart, req: Request): Promis
         price: p.price / 100,
         images: images.filter((i) => i.productID === p.productID)
       })),
-      cart
+      cart: updatedCart
     }
   })
 }
