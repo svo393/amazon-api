@@ -15,7 +15,7 @@ const addCartProduct = async (cartProductInput: CartProductInput, req: Request):
     `
     ? ON CONFLICT ("userID", "productID", "size")
     DO UPDATE SET
-    "qty" = EXCLUDED."qty"
+    "qty" = "cartProducts"."qty" + EXCLUDED."qty"
     RETURNING *;
     `,
     [ trx('cartProducts').insert({
@@ -55,6 +55,7 @@ const getCartProductByID = async (req: Request): Promise<CartProduct> => {
 const getCartProductsByUser = async (localCart: LocalCart, req: Request): Promise<Cart> => {
   const userID = req.params.userID
   const localCartProductIDs = localCart.map((cp) => cp.productID)
+
   return await dbTrans(async (trx: Knex.Transaction) => {
     const existingProducts = await trx<Product>('products')
       .select('productID')
@@ -68,7 +69,7 @@ const getCartProductsByUser = async (localCart: LocalCart, req: Request): Promis
           `
           ? ON CONFLICT ("userID", "productID", "size")
           DO UPDATE SET
-          "qty" = EXCLUDED."qty"
+          "qty" = "cartProducts"."qty" + EXCLUDED."qty"
           RETURNING *;
           `,
           [ trx('cartProducts').insert({ ...cp, userID }) ]

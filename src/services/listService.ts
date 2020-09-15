@@ -1,7 +1,7 @@
 import { Request } from 'express'
 import Knex from 'knex'
 import { omit } from 'ramda'
-import { List, ListCreateInput, ListProduct, ListUpdateInput } from '../types'
+import { Image, List, ListCreateInput, ListProduct, ListUpdateInput, Product, ProductSize } from '../types'
 import { db, dbTrans } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
@@ -48,30 +48,45 @@ const getListsByUser = async (req: Request): Promise<List[]> => {
     .where('userID', req.params.userID)
 }
 
-const getListByID = async (req: Request): Promise<List & { listProducts: number[] }> => {
+type ListProductData = Pick<Product, 'productID' | 'price'> & {
+  productSizes: ProductSize[];
+  images: Image[];
+}
+
+const getListByID = async (req: Request): Promise<List & { products: ListProductData[] }> => {
   const { listID } = req.params
 
   const list = await db<List>('lists')
     .first()
     .where('listID', listID)
 
-  const listProducts = await db<ListProduct>('listProducts as lp')
+  const listProducts: Pick<Product, 'productID' | 'price' | 'isAvailable' | 'stock'>[] = await db('listProducts as lp')
     .select(
       'lp.productID',
       'p.price',
-      'i.imageID'
+      'p.isAvailable',
+      'p.stock'
     )
     .where('lp.listID', listID)
-    .where('i.index', 0)
     .leftJoin('products as p', 'lp.productID', 'p.productID')
-    .leftJoin('images as i', 'lp.productID', 'i.productID')
+
+  const productIDs = listProducts.map((lp) => lp.productID)
+
+  const images = await db<Image>('images')
+    .whereIn('productID', productIDs)
+    .andWhere('index', 0)
+
+  const productSizes = await db<ProductSize>('productSizes')
+    .whereIn('productID', productIDs)
 
   if (list === undefined) throw new StatusError(404, 'Not Found')
   return {
     ...list,
-    listProducts: listProducts.map((lp) => ({
+    products: listProducts.map((lp) => ({
       ...lp,
-      price: lp.price / 100
+      price: lp.price / 100,
+      productSizes: productSizes.filter((ps) => ps.productID === lp.productID),
+      images: images.filter((i) => i.productID === lp.productID)
     }))
   }
 }
