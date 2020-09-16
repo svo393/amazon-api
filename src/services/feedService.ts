@@ -1,7 +1,9 @@
-import { Answer, Feed, FeedFiltersInput, Question, ReviewComment } from '../types'
+import { Request } from 'express'
+import { Answer, Feed, FeedFiltersInput, Question, Review, ReviewComment, UserFeed, UserFeedFiltersInput } from '../types'
 import { defaultLimit } from '../utils/constants'
 import { db } from '../utils/db'
 import fuseIndexes from '../utils/fuseIndexes'
+import getCursor from '../utils/getCursor'
 import sortItems from '../utils/sortItems'
 
 const getFeed = async (feedFiltersinput: FeedFiltersInput): Promise<{ batch: Feed; totalCount: number }> => {
@@ -109,4 +111,50 @@ const getFeed = async (feedFiltersinput: FeedFiltersInput): Promise<{ batch: Fee
   }
 }
 
-export default { getFeed }
+const getUserFeed = async (feedFiltersinput: UserFeedFiltersInput, req: Request): Promise<{ batch: UserFeed; totalCount: number }> => {
+  const { userID } = req.params
+
+  const {
+    startCursor,
+    types
+  } = feedFiltersinput
+
+  const reviews: Review[] = await db('reviews')
+    .where('userID', userID)
+
+  const reviewComments: ReviewComment[] = await db('reviewComments')
+    .where('userID', userID)
+
+  const answers: Answer[] = await db('answers')
+    .where('userID', userID)
+
+  let feed: UserFeed = [
+    ...reviewComments.map((rc) => ({ ...rc, type: 'reviewComment' })),
+    ...reviews.map((r) => ({ ...r, type: 'review' })),
+    ...answers.map((a) => ({ ...a, type: 'answer' }))
+  ]
+
+  if (types !== undefined) {
+    feed = feed
+      .filter((a) => types.split(',').includes(a.type))
+  }
+
+  const feedSorted = sortItems(feed, 'createdAt_desc')
+
+  const feedWithCursor = getCursor({
+    startCursor,
+    limit: 10,
+    idProps: [ 'questionID', 'reviewID', 'answerID' ],
+    data: feedSorted
+  })
+
+  return {
+    batch: feedSorted.slice((page - 1) * defaultLimit, (page - 1) * defaultLimit + defaultLimit),
+    totalCount: feed.length
+  }
+}
+
+export default {
+  getFeed,
+  getUserFeed
+}

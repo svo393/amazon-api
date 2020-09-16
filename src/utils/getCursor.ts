@@ -3,7 +3,8 @@ import StatusError from './StatusError'
 type Props = {
   startCursor?: number;
   limit?: number;
-  idProp: string;
+  idProp?: string;
+  idProps?: string[];
   data: any[];
 }
 

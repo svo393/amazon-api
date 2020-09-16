@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
 import multer from 'multer'
-import env from './config'
 import { db } from './db'
 import logger from './logger'
 import StatusError from './StatusError'

@@ -31,10 +31,17 @@ router.put('/:userID', requireSameUser('params'), async (req, res) => {
   res.json(updatedUser)
 })
 
-router.post('/:userID/upload', requireSameUser('params'), multerUpload.single('userAvatar'), (req, res) => {
+router.post('/:userID/upload-avatar', requireSameUser('params'), multerUpload.single('userAvatar'), (req, res) => {
   req.socket.setTimeout(UPLOAD_TIMEOUT)
   const userMedia = checkSingleMediaUpload(req)
   userService.uploadUserAvatar(userMedia, req)
+  res.status(204).end()
+})
+
+router.post('/:userID/upload-cover', requireSameUser('params'), multerUpload.single('userCover'), (req, res) => {
+  req.socket.setTimeout(UPLOAD_TIMEOUT)
+  const userMedia = checkSingleMediaUpload(req)
+  userService.uploadUserCover(userMedia, req)
   res.status(204).end()
 })
 

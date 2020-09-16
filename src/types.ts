@@ -37,6 +37,7 @@ export type User = {
   email: string;
   password: string;
   avatar: boolean;
+  cover: boolean;
   createdAt: Date;
   resetToken?: string | null;
   resetTokenCreatedAt?: Date | null;
@@ -235,6 +236,11 @@ type Activity = (
 ) & { type: string; userEmail: string }
 
 export type Feed = Activity[]
+export type UserFeed = ((
+  ReviewComment |
+  Review |
+  Answer
+) & { type: string })[]
 
 export type QuestionWithUser = Question & {
   votes: number;
@@ -465,6 +471,11 @@ export type CategoriesFiltersInput = {
   q?: string;
   page?: number;
   sortBy?: string;
+}
+
+export type UserFeedFiltersInput = {
+  startCursor: number;
+  types?: string;
 }
 
 export type FeedFiltersInput = {

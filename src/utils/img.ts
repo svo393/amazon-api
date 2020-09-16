@@ -9,8 +9,8 @@ type UploadConfig = {
   maxHeight: number;
   previewWidth?: number;
   previewHeight?: number;
-  thumbWidth: number;
-  thumbHeight: number;
+  thumbWidth?: number;
+  thumbHeight?: number;
   addWebp?: boolean;
 }
 
@@ -74,19 +74,21 @@ export const uploadImages = (files: Express.Multer.File[], {
         )
     }
 
-    await image
-      .resize(thumbWidth, thumbHeight, { fit: 'inside' })
-      .jpeg({ progressive: true })
-      .toFile(
-        path.resolve(imagesPath, `${fileName}_${thumbWidth}.jpg`)
-      )
+    if (thumbWidth !== undefined && thumbHeight !== undefined) {
+      await image
+        .resize(thumbWidth, thumbHeight, { fit: 'inside' })
+        .jpeg({ progressive: true })
+        .toFile(
+          path.resolve(imagesPath, `${fileName}_${thumbWidth}.jpg`)
+        )
 
-    addWebp && await image
-      .resize(thumbWidth, thumbHeight, { fit: 'inside' })
-      .webp()
-      .toFile(
-        path.resolve(imagesPath, `${fileName}_${thumbWidth}.webp`)
-      )
+      addWebp && await image
+        .resize(thumbWidth, thumbHeight, { fit: 'inside' })
+        .webp()
+        .toFile(
+          path.resolve(imagesPath, `${fileName}_${thumbWidth}.webp`)
+        )
+    }
 
     // TODO try async rather than sync
     fs.unlinkSync(file.path)

@@ -49,6 +49,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.string('email').unique().notNullable()
       t.string('password').notNullable()
       t.boolean('avatar').defaultTo(false).notNullable()
+      t.boolean('cover').defaultTo(false).notNullable()
       t.dateTime('createdAt').notNullable()
       t.string('resetToken', 50)
       t.dateTime('resetTokenCreatedAt')

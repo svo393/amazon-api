@@ -14,6 +14,7 @@ const getUsersQuery: any = db('users as u')
     'u.name',
     'u.info',
     'u.avatar',
+    'u.cover',
     'u.createdAt',
     'u.userID',
     'u.role'
@@ -57,7 +58,9 @@ type UserData = Omit<UserRawData,
   | 'questionCount'
   | 'answerCount'
 > & {
-  activityCount: number;
+  questionCount: number;
+  answerCount: number;
+  reviewCommentCount: number;
   orderCount: number;
   reviewCount: number;
 }
@@ -84,19 +87,10 @@ const getUsers = async (usersFiltersinput: UsersFiltersInput): Promise<{ batch: 
     .map((u) => ({
       ...u,
       orderCount: parseInt(u.orderCount),
-      reviewCount: parseInt(u.reviewCount)
-    }))
-    .map((u) => ({
-      ...omit([
-        'reviewCommentCount',
-        'questionCount',
-        'answerCount'
-      ], u),
-      activityCount: [
-        parseInt(u.reviewCommentCount),
-        parseInt(u.questionCount),
-        parseInt(u.answerCount)
-      ].reduce((acc, cur) => acc + cur, 0)
+      reviewCount: parseInt(u.reviewCount),
+      reviewCommentCount: parseInt(u.reviewCommentCount),
+      questionCount: parseInt(u.questionCount),
+      answerCount: parseInt(u.answerCount)
     }))
 
   if (roles !== undefined) {
@@ -136,12 +130,12 @@ const getUsers = async (usersFiltersinput: UsersFiltersInput): Promise<{ batch: 
 
   if (activityCountMin !== undefined) {
     users = users
-      .filter((u) => u.activityCount >= activityCountMin)
+      .filter((u) => u.reviewCommentCount + u.questionCount + u.answerCount >= activityCountMin)
   }
 
   if (activityCountMax !== undefined) {
     users = users
-      .filter((u) => u.activityCount <= activityCountMax)
+      .filter((u) => u.reviewCommentCount + u.questionCount + u.answerCount <= activityCountMax)
   }
 
   if (email !== undefined) {
@@ -162,28 +156,40 @@ type UserPublicData = Omit<UserData,
   | 'createdAt'
   | 'orders'
   | 'role'
+  | 'orderCount'
+  | 'questionCount'
 >
 
 const getUserByID = async (req: Request): Promise<UserData | UserPublicData> => {
+  const { userID } = req.params
+
   const rawUser: UserRawData = await getUsersQuery.clone()
     .first()
-    .where('u.userID', req.params.userID)
+    .where('u.userID', userID)
 
   if (rawUser === undefined) { throw new StatusError(404, 'Not Found') }
 
+  const [ { count: helpfulVotes } ] = await db('votes as v')
+    .count('v.vote')
+    .where('v.vote', true)
+    .where((builder) => {
+      builder
+        .where('a.userID', userID)
+        .orWhere('q.userID', userID)
+        .orWhere('r.userID', userID)
+    })
+    .leftJoin('answers as a', 'v.answerID', 'a.answerID')
+    .leftJoin('questions as q', 'v.questionID', 'q.questionID')
+    .leftJoin('reviews as r', 'v.reviewID', 'r.reviewID')
+
   const user = {
-    ...omit([
-      'reviewCommentCount',
-      'questionCount',
-      'answerCount'
-    ], rawUser),
-    activityCount: [
-      parseInt(rawUser.reviewCommentCount),
-      parseInt(rawUser.questionCount),
-      parseInt(rawUser.answerCount)
-    ].reduce((acc, cur) => acc + cur, 0),
+    ...rawUser,
+    reviewCommentCount: parseInt(rawUser.reviewCommentCount),
+    questionCount: parseInt(rawUser.questionCount),
+    answerCount: parseInt(rawUser.answerCount),
     orderCount: parseInt(rawUser.orderCount),
-    reviewCount: parseInt(rawUser.reviewCount)
+    reviewCount: parseInt(rawUser.reviewCount),
+    helpfulVotes: parseInt(helpfulVotes as string)
   }
 
   const hasPermission = [ 'ROOT', 'ADMIN' ].includes(req.session?.role)
@@ -194,6 +200,8 @@ const getUserByID = async (req: Request): Promise<UserData | UserPublicData> => 
       'email',
       'createdAt',
       'orders',
+      'questionCount',
+      'orderCount',
       'role'
     ], user)
 }
@@ -224,9 +232,20 @@ const uploadUserAvatar = (file: Express.Multer.File, req: Request): void => {
   uploadImages([ file ], uploadConfig)
 }
 
+const uploadUserCover = (file: Express.Multer.File, req: Request): void => {
+  const uploadConfig = {
+    fileNames: [ req.session?.userID ],
+    imagesPath: `${imagesBasePath}/covers`,
+    maxWidth: 1000,
+    maxHeight: 320
+  }
+  uploadImages([ file ], uploadConfig)
+}
+
 export default {
   getUsers,
   getUserByID,
   updateUser,
-  uploadUserAvatar
+  uploadUserAvatar,
+  uploadUserCover
 }
