@@ -122,12 +122,31 @@ const getUserFeed = async (feedFiltersinput: UserFeedFiltersInput, req: Request)
 
   const reviews: Review[] = await db('reviews')
     .where('userID', userID)
+    .andWhere('moderationStatus', 'APPROVED')
+
+  const groupIDs = reviews.map((r) => r.groupID)
+
+  const groupVariations = await db('groupVariations')
+    .whereIn('groupID', groupIDs)
+
+  console.info('groupVariations', groupVariations)
+
+  // groupVariationElements
+  // .map(([ name, product ]) => [ name, Object.entries(product)
+  //   .reduce((acc, [ id, value ]) => {
+  //     const curVariations = groupVariationElements
+  //       .reduce((acc, [ name, variations ]) => {
+  //         acc[name] = variations[Number(id)]
+  //         return acc
+  //       }, {} as ObjIndexed)
 
   const reviewComments: ReviewComment[] = await db('reviewComments')
     .where('userID', userID)
+    .andWhere('moderationStatus', 'APPROVED')
 
   const answers: Answer[] = await db('answers')
     .where('userID', userID)
+    .andWhere('moderationStatus', 'APPROVED')
 
   let feed: UserFeed = [
     ...reviewComments.map((rc) => ({ ...rc, type: 'reviewComment' })),
