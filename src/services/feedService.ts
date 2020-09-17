@@ -116,6 +116,7 @@ const getUserFeed = async (feedFiltersinput: UserFeedFiltersInput, req: Request)
 
   const {
     startCursor,
+    startCursorType,
     types
   } = feedFiltersinput
 
@@ -141,17 +142,13 @@ const getUserFeed = async (feedFiltersinput: UserFeedFiltersInput, req: Request)
 
   const feedSorted = sortItems(feed, 'createdAt_desc')
 
-  const feedWithCursor = getCursor({
+  return getCursor({
     startCursor,
+    startCursorType,
     limit: 10,
-    idProps: [ 'questionID', 'reviewID', 'answerID' ],
+    idTypes: [ 'answer', 'reviewComment', 'review' ],
     data: feedSorted
   })
-
-  return {
-    batch: feedSorted.slice((page - 1) * defaultLimit, (page - 1) * defaultLimit + defaultLimit),
-    totalCount: feed.length
-  }
 }
 
 export default {

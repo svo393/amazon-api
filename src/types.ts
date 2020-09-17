@@ -474,7 +474,8 @@ export type CategoriesFiltersInput = {
 }
 
 export type UserFeedFiltersInput = {
-  startCursor: number;
+  startCursor?: number;
+  startCursorType?: string;
   types?: string;
 }
 

@@ -1,6 +1,7 @@
 import Router from 'express'
 import addressService from '../services/addressService'
 import cartProductService from '../services/cartProductService'
+import feedService from '../services/feedService'
 import followerService from '../services/followerService'
 import invoiceService from '../services/invoiceService'
 import listService from '../services/listService'
@@ -9,7 +10,7 @@ import questionService from '../services/questionService'
 import userAddressService from '../services/userAddressService'
 import userService from '../services/userService'
 import { UPLOAD_TIMEOUT } from '../utils/config'
-import { checkCartProduct, checkCartProductDelete, checkLocalCart, checkNewOrder, checkSingleMediaUpload, checkUserAddressesUpdate, checkUserFilters, checkUserUpdate } from '../utils/inputValidator'
+import { checkCartProduct, checkCartProductDelete, checkLocalCart, checkNewOrder, checkSingleMediaUpload, checkUserAddressesUpdate, checkUserFeedFilters, checkUserFilters, checkUserUpdate } from '../utils/inputValidator'
 import { multerUpload, requireAdmin, requireSameUser, requireSameUserOrAdmin } from '../utils/middleware'
 
 const router = Router()
@@ -123,6 +124,12 @@ router.delete('/:userID/cartProducts/:productID', requireSameUserOrAdmin('params
 router.get('/:userID/invoices', requireSameUserOrAdmin('params'), async (req, res) => {
   const invoices = await invoiceService.getInvoicesByUser(req)
   res.json(invoices)
+})
+
+router.get('/:userID/feed', async (req, res) => {
+  const userFeedFiltersInput = checkUserFeedFilters(req)
+  const userFeed = await feedService.getUserFeed(userFeedFiltersInput, req)
+  res.json(userFeed)
 })
 
 router.post('/:userID/orders', requireSameUser('params'), async (req, res) => {
