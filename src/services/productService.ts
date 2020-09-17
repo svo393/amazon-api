@@ -151,6 +151,7 @@ const getProducts = async (productsFiltersInput: ProductsFiltersInput): Promise<
 
   const images = await db<Image>('images')
     .whereNotNull('productID')
+    .andWhere('index', 0)
 
   let ratingStats: { stars: number; count: string }[]
 
@@ -277,7 +278,7 @@ const getProducts = async (productsFiltersInput: ProductsFiltersInput): Promise<
     .slice((page - 1) * defaultLimit, (page - 1) * defaultLimit + defaultLimit)
 
   const batch = productsSorted.map((p) => {
-    const image = images.find((i) => i.productID === p.productID && i.index === 0)
+    const image = images.find((i) => i.productID === p.productID)
     return {
       ...p,
       images: image !== undefined

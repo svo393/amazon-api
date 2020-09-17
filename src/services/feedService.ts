@@ -1,5 +1,5 @@
 import { Request } from 'express'
-import { Answer, Feed, FeedFiltersInput, Question, Review, ReviewComment, UserFeed, UserFeedFiltersInput } from '../types'
+import { Answer, Feed, FeedFiltersInput, GroupVariation, Question, Review, ReviewComment, UserFeed, UserFeedFiltersInput, Product, Image } from '../types'
 import { defaultLimit } from '../utils/constants'
 import { db } from '../utils/db'
 import fuseIndexes from '../utils/fuseIndexes'
@@ -117,34 +117,83 @@ const getUserFeed = async (feedFiltersinput: UserFeedFiltersInput, req: Request)
   const {
     startCursor,
     startCursorType,
-    types
+    types = 'review,answer,reviewComment'
   } = feedFiltersinput
 
-  const reviews: Review[] = await db('reviews')
+  let reviews: Review[] = []
+  let reviewComments: ReviewComment[] = []
+  let answers: Answer[] = []
+
+  const _types = types.split(',')
+
+  if (_types.includes('review')) {
+    let _reviews = await db<Review & { productID?: number }>('reviews')
+      .where('userID', userID)
+      .andWhere('moderationStatus', 'APPROVED')
+
+    const groupIDs = _reviews.map((r) => r.groupID)
+
+    const groupVariations = await db<GroupVariation>('groupVariations')
+      .whereIn('groupID', groupIDs)
+
+    _reviews = _reviews.map((r) => {
+      const [ name, value ] = Object.entries(r.variation)[0]
+
+      const productID = groupVariations
+        .find((gv) => gv.name === name && gv.value === value)?.productID as number
+
+      return { ...r, productID }
+    })
+
+    const productIDs = _reviews.map((r) => r.productID as number)
+
+    let products: (Product & { stars: string | number })[] = await db('products as p')
+      .select(
+        'p.productID',
+        'p.title',
+        'p.groupID'
+      )
+      .avg('stars as stars')
+      .whereIn('p.productID', productIDs)
+      .leftJoin('reviews as r', 'p.groupID', 'r.groupID')
+      .groupBy('p.productID')
+
+    products = await Promise.all(products.map(async (p) => {
+      const [ { reviewCount } ] = await db('reviews')
+        .count('reviewID as reviewCount')
+        .where('moderationStatus', 'APPROVED')
+        .andWhere('groupID', p.groupID)
+
+      return {
+        ...p,
+        stars: parseFloat(p.stars as string),
+        reviewCount: parseInt(reviewCount as string)
+      }
+    }))
+
+    const images = await db<Image>('images')
+      .whereIn('productID', productIDs)
+      .andWhere('index', 0)
+
+    reviews = _reviews.map((r) => {
+      const image = images.find((i) => i.productID === r.productID)
+      const product = products.find((p) => p.productID === r.productID)
+
+      delete r.productID
+
+      return {
+        ...r,
+        images: [ image ],
+        product
+      }
+    })
+  }
+
+  reviewComments = await db('reviewComments')
     .where('userID', userID)
     .andWhere('moderationStatus', 'APPROVED')
 
-  const groupIDs = reviews.map((r) => r.groupID)
-
-  const groupVariations = await db('groupVariations')
-    .whereIn('groupID', groupIDs)
-
-  console.info('groupVariations', groupVariations)
-
-  // groupVariationElements
-  // .map(([ name, product ]) => [ name, Object.entries(product)
-  //   .reduce((acc, [ id, value ]) => {
-  //     const curVariations = groupVariationElements
-  //       .reduce((acc, [ name, variations ]) => {
-  //         acc[name] = variations[Number(id)]
-  //         return acc
-  //       }, {} as ObjIndexed)
-
-  const reviewComments: ReviewComment[] = await db('reviewComments')
-    .where('userID', userID)
-    .andWhere('moderationStatus', 'APPROVED')
-
-  const answers: Answer[] = await db('answers')
+  answers = await db('answers')
     .where('userID', userID)
     .andWhere('moderationStatus', 'APPROVED')
 
@@ -153,11 +202,6 @@ const getUserFeed = async (feedFiltersinput: UserFeedFiltersInput, req: Request)
     ...reviews.map((r) => ({ ...r, type: 'review' })),
     ...answers.map((a) => ({ ...a, type: 'answer' }))
   ]
-
-  if (types !== undefined) {
-    feed = feed
-      .filter((a) => types.split(',').includes(a.type))
-  }
 
   const feedSorted = sortItems(feed, 'createdAt_desc')
 
