@@ -160,7 +160,7 @@ type UserPublicData = Omit<UserData,
   | 'questionCount'
 >
 
-const getUserByID = async (req: Request): Promise<UserData | UserPublicData> => {
+const getUserByID = async (req: Request): Promise<(UserData | UserPublicData) & { followersCount: number }> => {
   const { userID } = req.params
 
   const rawUser: UserRawData = await getUsersQuery.clone()
@@ -168,6 +168,10 @@ const getUserByID = async (req: Request): Promise<UserData | UserPublicData> => 
     .where('u.userID', userID)
 
   if (rawUser === undefined) { throw new StatusError(404, 'Not Found') }
+
+  const [ { count: followersCount } ] = await db('followers as f')
+    .count('f.follows')
+    .where('f.follows', userID)
 
   const [ { count: helpfulVotes } ] = await db('votes as v')
     .count('v.vote')
@@ -184,13 +188,16 @@ const getUserByID = async (req: Request): Promise<UserData | UserPublicData> => 
 
   const user = {
     ...rawUser,
-    reviewCommentCount: parseInt(rawUser.reviewCommentCount),
-    questionCount: parseInt(rawUser.questionCount),
-    answerCount: parseInt(rawUser.answerCount),
-    orderCount: parseInt(rawUser.orderCount),
-    reviewCount: parseInt(rawUser.reviewCount),
+    followersCount: parseInt(followersCount as string ?? '0'),
+    reviewCommentCount: parseInt(rawUser.reviewCommentCount ?? '0'),
+    questionCount: parseInt(rawUser.questionCount ?? '0'),
+    answerCount: parseInt(rawUser.answerCount ?? '0'),
+    orderCount: parseInt(rawUser.orderCount ?? '0'),
+    reviewCount: parseInt(rawUser.reviewCount ?? '0'),
     helpfulVotes: parseInt(helpfulVotes as string)
   }
+
+  console.info('user', user)
 
   const hasPermission = [ 'ROOT', 'ADMIN' ].includes(req.session?.role)
 
