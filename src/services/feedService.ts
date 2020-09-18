@@ -1,5 +1,6 @@
 import { Request } from 'express'
-import { Answer, Feed, FeedFiltersInput, GroupVariation, Question, Review, ReviewComment, UserFeed, UserFeedFiltersInput, Product, Image } from '../types'
+import { omit } from 'ramda'
+import { Answer, Feed, FeedFiltersInput, GroupVariation, Question, Review, ReviewComment, UserFeed, UserFeedFiltersInput, Product, Image, User } from '../types'
 import { defaultLimit } from '../utils/constants'
 import { db } from '../utils/db'
 import fuseIndexes from '../utils/fuseIndexes'
@@ -121,8 +122,13 @@ const getUserFeed = async (feedFiltersinput: UserFeedFiltersInput, req: Request)
   } = feedFiltersinput
 
   let reviews: Review[] = []
-  let reviewComments: ReviewComment[] = []
-  let answers: Answer[] = []
+
+  let reviewComments: (ReviewComment & {
+    review:
+      Pick<Review, 'title' | 'stars' | 'reviewID'>
+      & { author: Pick<User, 'userID' | 'name'> };
+ })[] = []
+  let answers: (Answer & { question: { questionID: number; content: string; author: { name: string; userID: number } } })[] = []
 
   const _types = types.split(',')
 
@@ -184,18 +190,71 @@ const getUserFeed = async (feedFiltersinput: UserFeedFiltersInput, req: Request)
       return {
         ...r,
         images: [ image ],
-        product
+        product,
+        author: { userID: r.userID }
       }
     })
   }
 
-  reviewComments = await db('reviewComments')
-    .where('userID', userID)
-    .andWhere('moderationStatus', 'APPROVED')
+  if (_types.includes('answer')) {
+    let _answers: (Answer & { questionContent: string; userName: string })[] = await db('answers as a')
+      .select(
+        'a.questionID',
+        'a.answerID',
+        'a.content',
+        'a.createdAt',
+        'q.content as questionContent',
+        'q.userID',
+        'u.name as userName'
+      )
+      .where('a.userID', userID)
+      .andWhere('a.moderationStatus', 'APPROVED')
+      .leftJoin('questions as q', 'a.questionID', 'q.questionID')
+      .leftJoin('users as u', 'a.userID', 'u.userID')
 
-  answers = await db('answers')
-    .where('userID', userID)
-    .andWhere('moderationStatus', 'APPROVED')
+    answers = _answers.map((a) => ({
+      ...omit([ 'questionContent', 'userName' ], a),
+      question: {
+        questionID: a.questionID,
+        content: a.questionContent,
+        author: {
+          name: a.userName,
+          userID: a.userID
+        }
+      }
+    }))
+  }
+
+  if (_types.includes('reviewComment')) {
+    let _reviewComments: (ReviewComment & { title: string; stars: number; userName: string })[] = await db('reviewComments as rc')
+      .select(
+        'rc.reviewCommentID',
+        'rc.reviewID',
+        'rc.content',
+        'rc.createdAt',
+        'r.title',
+        'r.stars',
+        'r.userID',
+        'u.name as userName'
+      )
+      .where('rc.userID', userID)
+      .andWhere('rc.moderationStatus', 'APPROVED')
+      .leftJoin('reviews as r', 'rc.reviewID', 'r.reviewID')
+      .leftJoin('users as u', 'r.userID', 'u.userID')
+
+    reviewComments = _reviewComments.map((rc) => ({
+      ...omit([ 'title', 'stars', 'userName' ], rc),
+      review: {
+        title: rc.title,
+        stars: rc.stars,
+        reviewID: rc.reviewID,
+        author: {
+          name: rc.userName,
+          userID: rc.userID
+        }
+      }
+    }))
+  }
 
   let feed: UserFeed = [
     ...reviewComments.map((rc) => ({ ...rc, type: 'reviewComment' })),
