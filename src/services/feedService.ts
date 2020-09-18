@@ -267,7 +267,7 @@ const getUserFeed = async (feedFiltersinput: UserFeedFiltersInput, req: Request)
   return getCursor({
     startCursor,
     startCursorType,
-    limit: 10,
+    limit: 5,
     idTypes: [ 'answer', 'reviewComment', 'review' ],
     data: feedSorted
   })
