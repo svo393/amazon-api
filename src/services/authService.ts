@@ -3,7 +3,7 @@ import { randomBytes } from 'crypto'
 import { Request } from 'express'
 import { omit } from 'ramda'
 import { promisify } from 'util'
-import { PasswordRequestInput, PasswordResetInput, User, UserLoginInput, UserSafeData, UserSignupInput } from '../types'
+import { PasswordRequestInput, PasswordResetInput, User, UserLoginInput, UserSafeData, UserSignupInput, UserUpdateInput } from '../types'
 import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
 // import { makeANiceEmail, transport } from '../utils/mail'
@@ -78,15 +78,24 @@ const loginUser = async (userInput: UserLoginInput, req: Request, requiresAdmin 
   ], existingUser)
 }
 
-type UserInfo = { userID: number; role: string; avatar: boolean; name: string }
+type UserInfo = Pick<User, 'userID' | 'role' | 'avatar' | 'name' | 'cover'>
 
 const checkInUser = async (req: Request): Promise<UserInfo> => {
   const user = await db<User>('users')
     .where('userID', req.session?.userID)
-    .first('userID', 'role', 'avatar', 'name')
+    .first('userID', 'role', 'avatar', 'name', 'cover')
 
   if (user === undefined) { throw new StatusError(401, 'Unauthorized') }
   return user
+}
+
+const updateUser = async (userInput: UserUpdateInput, req: Request): Promise<UserInfo> => {
+  const [ updatedUser ]: User[] = await db('users')
+    .update(userInput, [ 'userID', 'role', 'avatar', 'name', 'cover' ])
+    .where('userID', req.params.userID)
+
+  if (updatedUser === undefined) { throw new StatusError(404, 'Not Found') }
+  return updatedUser
 }
 
 const deleteUser = async (req: Request): Promise<void> => {
@@ -163,6 +172,7 @@ export default {
   signupUser,
   loginUser,
   checkInUser,
+  updateUser,
   deleteUser,
   sendPasswordReset,
   resetPassword

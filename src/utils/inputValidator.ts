@@ -81,6 +81,10 @@ export const checkUserUpdate = ({ body }: Request): UserUpdateInput => {
     ? canBeBoolean({ name: 'avatar', param: body.avatar })
     : undefined
 
+  const cover = 'cover' in body
+    ? canBeBoolean({ name: 'cover', param: body.cover })
+    : undefined
+
   const role = 'role' in body
     ? isNonEmptyString({ name: 'role', param: body.role })
     : undefined
@@ -91,6 +95,7 @@ export const checkUserUpdate = ({ body }: Request): UserUpdateInput => {
     email: email?.param.toLowerCase(),
     password: password?.param,
     avatar: avatar?.param,
+    cover: cover?.param,
     role: role?.param
   })
 }

@@ -1,5 +1,5 @@
 import { Request } from 'express'
-import { Follower } from '../types'
+import { Follower, User } from '../types'
 import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
@@ -27,9 +27,19 @@ const getFollowersByUser = async (req: Request): Promise<Follower[]> => {
     .where('follows', req.params.userID)
 }
 
-const getFollowedByUser = async (req: Request): Promise<Follower[]> => {
-  return await db('followers')
-    .where('userID', req.params.userID)
+const getFollowedByUser = async (req: Request): Promise<{ userID: number; follows: Pick<User, 'userID' | 'avatar' | 'name'>[] }> => {
+  const { userID } = req.params
+
+  const users: Pick<User, 'userID' | 'avatar' | 'name'>[] = await db('followers as f')
+    .select(
+      'u.userID',
+      'u.avatar',
+      'u.name'
+    )
+    .where('f.userID', userID)
+    .join('users as u', 'f.follows', 'u.userID')
+
+  return { userID: Number(userID), follows: users }
 }
 
 const deleteFollower = async (req: Request): Promise<void> => {

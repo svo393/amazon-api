@@ -11,7 +11,7 @@ import userAddressService from '../services/userAddressService'
 import userService from '../services/userService'
 import { UPLOAD_TIMEOUT } from '../utils/config'
 import { checkCartProduct, checkCartProductDelete, checkLocalCart, checkNewOrder, checkSingleMediaUpload, checkUserAddressesUpdate, checkUserFeedFilters, checkUserFilters, checkUserUpdate } from '../utils/inputValidator'
-import { multerUpload, requireAdmin, requireSameUser, requireSameUserOrAdmin } from '../utils/middleware'
+import { multerUpload, requireAdmin, requireRoot, requireSameUser, requireSameUserOrAdmin } from '../utils/middleware'
 
 const router = Router()
 
@@ -26,7 +26,7 @@ router.get('/:userID', async (req, res) => {
   res.json(user)
 })
 
-router.put('/:userID', requireSameUser('params'), async (req, res) => {
+router.put('/:userID', requireRoot, async (req, res) => {
   const userUpdateInput = checkUserUpdate(req)
   const updatedUser = await userService.updateUser(userUpdateInput, res, req)
   res.json(updatedUser)

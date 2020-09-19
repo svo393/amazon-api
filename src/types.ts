@@ -267,6 +267,7 @@ export type UserUpdateInput = Partial<Pick<User,
   | 'email'
   | 'password'
   | 'avatar'
+  | 'cover'
   | 'role'
 >>
 

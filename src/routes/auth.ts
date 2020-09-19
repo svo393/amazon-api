@@ -1,6 +1,6 @@
 import Router from 'express'
 import authService from '../services/authService'
-import { checkNewUser, checkUserLogin, checkUserResetRequest, checkUserResetToken } from '../utils/inputValidator'
+import { checkNewUser, checkUserLogin, checkUserResetRequest, checkUserResetToken, checkUserUpdate } from '../utils/inputValidator'
 import { requireAdmin, requireAuth, requireSameUser } from '../utils/middleware'
 import StatusError from '../utils/StatusError'
 
@@ -29,6 +29,12 @@ router.post('/logout', requireAuth, (req, res) => {
     if (err) throw new StatusError(400, 'There was a problem logging out')
   })
   res.json(null)
+})
+
+router.put('/:userID', requireSameUser('params'), async (req, res) => {
+  const userUpdateInput = checkUserUpdate(req)
+  const updatedUser = await authService.updateUser(userUpdateInput, req)
+  res.json(updatedUser)
 })
 
 // router.get('/csrf-token', (req, res) => {
