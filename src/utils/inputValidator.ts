@@ -1700,7 +1700,7 @@ export const checkAskFilters = ({ query }: Request): AskFiltersInput => {
   return { q: q.param }
 }
 
-export const checkFollowers = ({ query }: Request): Pick<CursorInput, 'startCursor'> => {
+export const checkFollows = ({ query }: Request): Pick<CursorInput, 'startCursor'> => {
   const startCursor = 'startCursor' in query
     ? canBeNumber({ name: 'startCursor', param: query.startCursor })
     : undefined

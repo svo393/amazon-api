@@ -10,7 +10,7 @@ import questionService from '../services/questionService'
 import userAddressService from '../services/userAddressService'
 import userService from '../services/userService'
 import { UPLOAD_TIMEOUT } from '../utils/config'
-import { checkCartProduct, checkCartProductDelete, checkFollowers, checkLocalCart, checkNewOrder, checkSingleMediaUpload, checkUserAddressesUpdate, checkUserFeedFilters, checkUserFilters, checkUserUpdate } from '../utils/inputValidator'
+import { checkCartProduct, checkCartProductDelete, checkFollows, checkLocalCart, checkNewOrder, checkSingleMediaUpload, checkUserAddressesUpdate, checkUserFeedFilters, checkUserFilters, checkUserUpdate } from '../utils/inputValidator'
 import { multerUpload, requireAdmin, requireRoot, requireSameUser, requireSameUserOrAdmin } from '../utils/middleware'
 
 const router = Router()
@@ -83,9 +83,15 @@ router.get('/:userID/followers', async (req, res) => {
 })
 
 router.get('/:userID/follows', async (req, res) => {
-  const followersInput = checkFollowers(req)
-  const followeres = await followerService.getFollowedByUser(followersInput, req)
-  res.json(followeres)
+  const followsInput = checkFollows(req)
+  const follows = await followerService.getFollowedByUser(followsInput, req)
+  res.json(follows)
+})
+
+router.get('/:userID/follows-feed', async (req, res) => {
+  const followsFeedInput = checkUserFeedFilters(req)
+  const followsFeed = await feedService.getFollowsFeed(followsFeedInput, req)
+  res.json(followsFeed)
 })
 
 router.delete('/:userID/follows/:anotherUserID', requireSameUser('params'), async (req, res) => {
