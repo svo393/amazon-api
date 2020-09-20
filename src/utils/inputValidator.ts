@@ -1,7 +1,7 @@
 import { Express, Request } from 'express'
 import { pipe } from 'ramda'
-import { AddressCreateInput, AddressTypeInput, AddressUpdateInput, AnswerCreateInput, AnswerUpdateInput, AskFiltersInput, CartProduct, CartProductDeleteInput, CartProductInput, CategoriesFiltersInput, CategoryCreateInput, CategoryUpdateInput, CursorInput, FeedFiltersInput, GroupVariationCreateInput, GroupVariationDeleteInput, GroupVariationUpdateInput, ImagesDeleteInput, ImagesFiltersInput, ImagesUpdateInput, InvoiceCreateInput, InvoicesFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ListUpdateInput, LocalCart, ModerationStatus, ObjIndexed, OrderCreateInput, OrderProductInput, OrdersFiltersInput, OrderStatus, OrderUpdateInput, ParameterInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionCursorInput, QuestionUpdateInput, ReviewCommentCreateInput, ReviewCommentUpdateInput, ReviewCreateInput, ReviewsFiltersInput, ReviewUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserFeedFiltersInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorInput, VendorsFiltersInput, VotesCreateInput, VotesFiltersInput } from '../types'
-import { canBeBoolean, canBeIntegerOrObject, canBeNumber, hasDefinedProps, isArray, isDate, isEmail, isInputProvided, isNonEmptyString, isObject, isPasswordValid, isPositiveNumber, isProvided, isSomeProvided, isString } from './validatorLib'
+import { AddressCreateInput, AddressTypeInput, AddressUpdateInput, AnswerCreateInput, AnswerUpdateInput, AskFiltersInput, CartProduct, CartProductDeleteInput, CartProductInput, CategoriesFiltersInput, CategoryCreateInput, CategoryUpdateInput, CursorInput, FeedFiltersInput, GroupVariationCreateInput, GroupVariationDeleteInput, GroupVariationUpdateInput, ImagesDeleteInput, ImagesFiltersInput, ImagesUpdateInput, InvoiceCreateInput, InvoicesFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ListUpdateInput, LocalCart, ModerationStatus, OrderCreateInput, OrderProductInput, OrdersFiltersInput, OrderStatus, OrderUpdateInput, ParameterInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionCursorInput, QuestionUpdateInput, ReviewCommentCreateInput, ReviewCommentUpdateInput, ReviewCreateInput, ReviewsFiltersInput, ReviewUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserFeedFiltersInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorInput, VendorsFiltersInput, VotesCreateInput, VotesFiltersInput } from '../types'
+import { canBeBoolean, canBeNumber, hasDefinedProps, isArray, isDate, isEmail, isInputProvided, isNonEmptyString, isNonEmptyStringOrNull, isObject, isPasswordValid, isPositiveNumber, isProvided, isSomeProvided, isString } from './validatorLib'
 
 export const checkNewUser = ({ body }: Request): UserSignupInput => {
   const email = pipe(
@@ -74,7 +74,7 @@ export const checkUserUpdate = ({ body }: Request): UserUpdateInput => {
     : undefined
 
   const info = 'info' in body
-    ? isNonEmptyString({ name: 'info', param: body.info })
+    ? isNonEmptyStringOrNull({ name: 'info', param: body.info })
     : undefined
 
   const avatar = 'avatar' in body
@@ -162,6 +162,7 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
 
   productSizes = {
     ...productSizes,
+    name: 'productSizes',
     param: productSizes?.param.map((pp: any) => ({
       name: pipe(
         isProvided,
@@ -204,6 +205,7 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
 
   groupVariations = {
     ...groupVariations,
+    name: 'groupVariations',
     param: groupVariations?.param.map((gv: any) => ({
       name: pipe(
         isProvided,
@@ -222,6 +224,7 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
 
   productParameters = {
     ...productParameters,
+    name: 'productParameters',
     param: productParameters?.param.map((pp: any) => ({
       parameterID: pipe(
         isProvided,
@@ -286,6 +289,7 @@ export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
 
   productSizes = {
     ...productSizes,
+    name: 'productSizes',
     param: productSizes?.param.map((pp: any) => ({
       name: pipe(
         isProvided,
@@ -329,6 +333,7 @@ export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
 
   groupVariations = {
     ...groupVariations,
+    name: 'groupVariations',
     param: groupVariations?.param.map((gv: any) => ({
       name: pipe(
         isProvided,
@@ -347,6 +352,7 @@ export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
 
   productParameters = {
     ...productParameters,
+    name: 'productParameters',
     param: productParameters?.param.map((pp: any) => ({
       parameterID: pipe(
         isProvided,

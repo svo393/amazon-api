@@ -50,7 +50,7 @@ const getFollowedByUser = async (cursorInput: Pick<CursorInput, 'startCursor'>, 
     userID: Number(userID),
     follows: getCursor({
       startCursor,
-      limit: 5,
+      limit: 2,
       idProp: 'follows',
       data: users
     })

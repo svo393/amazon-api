@@ -28,7 +28,7 @@ router.get('/:userID', async (req, res) => {
 
 router.put('/:userID', requireRoot, async (req, res) => {
   const userUpdateInput = checkUserUpdate(req)
-  const updatedUser = await userService.updateUser(userUpdateInput, res, req)
+  const updatedUser = await userService.updateUser(userUpdateInput, req)
   res.json(updatedUser)
 })
 

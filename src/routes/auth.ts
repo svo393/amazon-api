@@ -33,7 +33,7 @@ router.post('/logout', requireAuth, (req, res) => {
 
 router.put('/:userID', requireSameUser('params'), async (req, res) => {
   const userUpdateInput = checkUserUpdate(req)
-  const updatedUser = await authService.updateUser(userUpdateInput, req)
+  const updatedUser = await authService.updateProfile(userUpdateInput, req)
   res.json(updatedUser)
 })
 

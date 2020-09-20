@@ -33,7 +33,7 @@ export type AddressUpdateInput = Partial<AddressCreateInput>
 export type User = {
   userID: number;
   name: string;
-  info?: string;
+  info?: string | null;
   email: string;
   password: string;
   avatar: boolean;
@@ -263,13 +263,12 @@ export type UserLoginInput = Pick<User, 'email' | 'password'> & { remember: bool
 
 export type UserUpdateInput = Partial<Pick<User,
   | 'name'
-  | 'info'
   | 'email'
   | 'password'
   | 'avatar'
   | 'cover'
   | 'role'
->>
+>> & { info?: string | null }
 
 export type PasswordRequestInput = Pick<User, 'email'>
 

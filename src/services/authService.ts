@@ -8,7 +8,7 @@ import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
 // import { makeANiceEmail, transport } from '../utils/mail'
 
-type UserBaseData = Omit<UserSafeData, | 'role'> & { follows: number[] }
+type UserBaseData = Omit<UserSafeData, | 'role'> & { following: number[] }
 
 const signupUser = async (userInput: UserSignupInput, req: Request): Promise<UserBaseData> => {
   const { email, password, name } = userInput
@@ -44,7 +44,7 @@ const signupUser = async (userInput: UserSignupInput, req: Request): Promise<Use
       'resetToken',
       'resetTokenCreatedAt'
     ], addedUser),
-    follows: []
+    following: []
   }
 }
 
@@ -84,11 +84,11 @@ const loginUser = async (userInput: UserLoginInput, req: Request, requiresAdmin 
       'resetToken',
       'resetTokenCreatedAt'
     ], existingUser),
-    follows: users.map((u) => u.follows)
+    following: users.map((u) => u.follows)
   }
 }
 
-type UserInfo = Pick<User, 'userID' | 'role' | 'avatar' | 'name' | 'cover'> & { follows: number[] }
+type UserInfo = Pick<User, 'userID' | 'role' | 'avatar' | 'name' | 'cover'> & { following: number[] }
 
 const checkInUser = async (req: Request): Promise<UserInfo> => {
   const user = await db<User>('users')
@@ -101,21 +101,17 @@ const checkInUser = async (req: Request): Promise<UserInfo> => {
     .select('follows')
     .where('userID', user.userID)
 
-  return { ...user, follows: users.map((u) => u.follows) }
+  return { ...user, following: users.map((u) => u.follows) }
 }
 
-const updateUser = async (userInput: UserUpdateInput, req: Request): Promise<UserInfo> => {
-  const [ updatedUser ]: User[] = await db('users')
-    .update(userInput, [ 'userID', 'role', 'avatar', 'name', 'cover' ])
+const updateProfile = async (userInput: UserUpdateInput, req: Request): Promise<Omit<UserInfo, 'following'>> => {
+  const [ updatedUser ]: Pick<User, 'userID' | 'role' | 'avatar' | 'name' | 'cover' | 'info'>[] = await db('users')
+    .update(userInput, [ 'userID', 'role', 'avatar', 'name', 'cover', 'info' ])
     .where('userID', req.params.userID)
 
   if (updatedUser === undefined) { throw new StatusError(404, 'Not Found') }
 
-  const users: Pick<Follower, 'userID'>[] = await db('followers')
-    .select('userID')
-    .where('userID', updatedUser.userID)
-
-  return { ...updatedUser, follows: users.map((u) => u.userID) }
+  return updatedUser
 }
 
 const deleteUser = async (req: Request): Promise<void> => {
@@ -162,7 +158,7 @@ const sendPasswordReset = async (userInput: PasswordRequestInput): Promise<void>
   // }
 }
 
-const resetPassword = async ({ password, resetToken }: PasswordResetInput): Promise<UserBaseData> => {
+const resetPassword = async ({ password, resetToken }: PasswordResetInput): Promise<Omit<UserBaseData, 'following'>> => {
   const user = await db<User>('users')
     .first('userID', 'resetTokenCreatedAt')
     .where('resetToken', resetToken)
@@ -181,25 +177,18 @@ const resetPassword = async ({ password, resetToken }: PasswordResetInput): Prom
     }, [ '*' ])
     .where('userID', user.userID)
 
-  const users: Pick<Follower, 'follows'>[] = await db('followers')
-    .select('follows')
-    .where('userID', updatedUser.userID)
-
-  return {
-    ...omit([
-      'password',
-      'resetToken',
-      'resetTokenCreatedAt'
-    ], updatedUser),
-    follows: users.map((u) => u.follows)
-  }
+  return omit([
+    'password',
+    'resetToken',
+    'resetTokenCreatedAt'
+  ], updatedUser)
 }
 
 export default {
   signupUser,
   loginUser,
   checkInUser,
-  updateUser,
+  updateProfile,
   deleteUser,
   sendPasswordReset,
   resetPassword
