@@ -65,7 +65,7 @@ const loginUser = async (userInput: UserLoginInput, req: Request, requiresAdmin 
 
   const users: Pick<Follower, 'userID'>[] = await db('followers')
     .select('userID')
-    .where('f.userID', existingUser.userID)
+    .where('userID', existingUser.userID)
 
   const isPasswordValid = await bcrypt.compare(password, existingUser.password)
 
@@ -99,7 +99,7 @@ const checkInUser = async (req: Request): Promise<UserInfo> => {
 
   const users: Pick<Follower, 'userID'>[] = await db('followers')
     .select('userID')
-    .where('f.userID', user.userID)
+    .where('userID', user.userID)
 
   return { ...user, follows: users.map((u) => u.userID) }
 }
@@ -113,7 +113,7 @@ const updateUser = async (userInput: UserUpdateInput, req: Request): Promise<Use
 
   const users: Pick<Follower, 'userID'>[] = await db('followers')
     .select('userID')
-    .where('f.userID', updatedUser.userID)
+    .where('userID', updatedUser.userID)
 
   return { ...updatedUser, follows: users.map((u) => u.userID) }
 }
@@ -183,7 +183,7 @@ const resetPassword = async ({ password, resetToken }: PasswordResetInput): Prom
 
   const users: Pick<Follower, 'userID'>[] = await db('followers')
     .select('userID')
-    .where('f.userID', updatedUser.userID)
+    .where('userID', updatedUser.userID)
 
   return {
     ...omit([
