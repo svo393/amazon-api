@@ -1,6 +1,9 @@
 import { Request } from 'express'
-import { Follower, User } from '../types'
-import { db } from '../utils/db'
+import Knex from 'knex'
+import { BatchWithCursor, CursorInput, Follower, User } from '../types'
+import { db, dbTrans } from '../utils/db'
+import getCursor from '../utils/getCursor'
+import sortItems from '../utils/sortItems'
 import StatusError from '../utils/StatusError'
 
 const addFollower = async (req: Request): Promise<Follower> => {
@@ -27,10 +30,11 @@ const getFollowersByUser = async (req: Request): Promise<Follower[]> => {
     .where('follows', req.params.userID)
 }
 
-const getFollowedByUser = async (req: Request): Promise<{ userID: number; follows: Pick<User, 'userID' | 'avatar' | 'name'>[] }> => {
+const getFollowedByUser = async (cursorInput: Pick<CursorInput, 'startCursor'>, req: Request): Promise<{ userID: number; follows: BatchWithCursor<Pick<User, 'userID' | 'avatar' | 'name'>> }> => {
+  const { startCursor } = cursorInput
   const { userID } = req.params
 
-  const users: Pick<User, 'userID' | 'avatar' | 'name'>[] = await db('followers as f')
+  let users: Pick<User, 'userID' | 'avatar' | 'name'>[] = await db('followers as f')
     .select(
       'u.userID',
       'u.avatar',
@@ -39,16 +43,35 @@ const getFollowedByUser = async (req: Request): Promise<{ userID: number; follow
     .where('f.userID', userID)
     .join('users as u', 'f.follows', 'u.userID')
 
-  return { userID: Number(userID), follows: users }
+  users = sortItems(users, 'name')
+
+  return {
+    userID: Number(userID),
+    follows: getCursor({
+      startCursor,
+      limit: 2,
+      idProp: 'answerID',
+      data: users
+    })
+  }
 }
 
-const deleteFollower = async (req: Request): Promise<void> => {
-  const deleteCount = await db('followers')
-    .del()
-    .where('userID', req.params.userID)
-    .andWhere('follows', req.params.anotherUserID)
+const deleteFollower = async (req: Request): Promise<Follower> => {
+  return await dbTrans(async (trx: Knex.Transaction) => {
+    const follower = await trx<Follower>('followers')
+      .first()
+      .where('userID', req.params.userID)
+      .andWhere('follows', req.params.anotherUserID)
 
-  if (deleteCount === 0) throw new StatusError(404, 'Not Found')
+    const deleteCount = await trx('followers')
+      .del()
+      .where('userID', req.params.userID)
+      .andWhere('follows', req.params.anotherUserID)
+
+    if (deleteCount === 0) throw new StatusError(404, 'Not Found')
+
+    return follower
+  })
 }
 
 export default {

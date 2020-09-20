@@ -1,4 +1,4 @@
-import { Request, Response } from 'express'
+import { Express, Request, Response } from 'express'
 import { omit } from 'ramda'
 import { User, UserSafeData, UsersFiltersInput, UserUpdateInput } from '../types'
 import { defaultLimit, imagesBasePath } from '../utils/constants'

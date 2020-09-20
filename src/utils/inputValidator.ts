@@ -1,4 +1,4 @@
-import { Request } from 'express'
+import { Express, Request } from 'express'
 import { pipe } from 'ramda'
 import { AddressCreateInput, AddressTypeInput, AddressUpdateInput, AnswerCreateInput, AnswerUpdateInput, AskFiltersInput, CartProduct, CartProductDeleteInput, CartProductInput, CategoriesFiltersInput, CategoryCreateInput, CategoryUpdateInput, CursorInput, FeedFiltersInput, GroupVariationCreateInput, GroupVariationDeleteInput, GroupVariationUpdateInput, ImagesDeleteInput, ImagesFiltersInput, ImagesUpdateInput, InvoiceCreateInput, InvoicesFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ListUpdateInput, LocalCart, ModerationStatus, ObjIndexed, OrderCreateInput, OrderProductInput, OrdersFiltersInput, OrderStatus, OrderUpdateInput, ParameterInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionCursorInput, QuestionUpdateInput, ReviewCommentCreateInput, ReviewCommentUpdateInput, ReviewCreateInput, ReviewsFiltersInput, ReviewUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserFeedFiltersInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorInput, VendorsFiltersInput, VotesCreateInput, VotesFiltersInput } from '../types'
 import { canBeBoolean, canBeIntegerOrObject, canBeNumber, hasDefinedProps, isArray, isDate, isEmail, isInputProvided, isNonEmptyString, isObject, isPasswordValid, isPositiveNumber, isProvided, isSomeProvided, isString } from './validatorLib'
@@ -1692,4 +1692,12 @@ export const checkAskFilters = ({ query }: Request): AskFiltersInput => {
   )({ name: 'q', param: query.q })
 
   return { q: q.param }
+}
+
+export const checkFollowers = ({ query }: Request): Pick<CursorInput, 'startCursor'> => {
+  const startCursor = 'startCursor' in query
+    ? canBeNumber({ name: 'startCursor', param: query.startCursor })
+    : undefined
+
+  return { startCursor: startCursor?.param }
 }

@@ -63,8 +63,8 @@ const loginUser = async (userInput: UserLoginInput, req: Request, requiresAdmin 
     throw new StatusError(403, 'Forbidden')
   }
 
-  const users: Pick<Follower, 'userID'>[] = await db('followers')
-    .select('userID')
+  const users: Pick<Follower, 'follows'>[] = await db('followers')
+    .select('follows')
     .where('userID', existingUser.userID)
 
   const isPasswordValid = await bcrypt.compare(password, existingUser.password)
@@ -84,7 +84,7 @@ const loginUser = async (userInput: UserLoginInput, req: Request, requiresAdmin 
       'resetToken',
       'resetTokenCreatedAt'
     ], existingUser),
-    follows: users.map((u) => u.userID)
+    follows: users.map((u) => u.follows)
   }
 }
 
@@ -97,11 +97,11 @@ const checkInUser = async (req: Request): Promise<UserInfo> => {
 
   if (user === undefined) { throw new StatusError(401, 'Unauthorized') }
 
-  const users: Pick<Follower, 'userID'>[] = await db('followers')
-    .select('userID')
+  const users: Pick<Follower, 'follows'>[] = await db('followers')
+    .select('follows')
     .where('userID', user.userID)
 
-  return { ...user, follows: users.map((u) => u.userID) }
+  return { ...user, follows: users.map((u) => u.follows) }
 }
 
 const updateUser = async (userInput: UserUpdateInput, req: Request): Promise<UserInfo> => {
@@ -181,8 +181,8 @@ const resetPassword = async ({ password, resetToken }: PasswordResetInput): Prom
     }, [ '*' ])
     .where('userID', user.userID)
 
-  const users: Pick<Follower, 'userID'>[] = await db('followers')
-    .select('userID')
+  const users: Pick<Follower, 'follows'>[] = await db('followers')
+    .select('follows')
     .where('userID', updatedUser.userID)
 
   return {
@@ -191,7 +191,7 @@ const resetPassword = async ({ password, resetToken }: PasswordResetInput): Prom
       'resetToken',
       'resetTokenCreatedAt'
     ], updatedUser),
-    follows: users.map((u) => u.userID)
+    follows: users.map((u) => u.follows)
   }
 }
 
