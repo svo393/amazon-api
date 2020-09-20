@@ -38,6 +38,7 @@ const getFollowedByUser = async (cursorInput: Pick<CursorInput, 'startCursor'>, 
     .select(
       'u.userID',
       'u.avatar',
+      'f.follows',
       'u.name'
     )
     .where('f.userID', userID)
@@ -49,8 +50,8 @@ const getFollowedByUser = async (cursorInput: Pick<CursorInput, 'startCursor'>, 
     userID: Number(userID),
     follows: getCursor({
       startCursor,
-      limit: 2,
-      idProp: 'answerID',
+      limit: 5,
+      idProp: 'follows',
       data: users
     })
   }
