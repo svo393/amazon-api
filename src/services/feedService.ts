@@ -128,7 +128,7 @@ const getUserFeed = async (feedFiltersinput: UserFeedFiltersInput, req: Request)
       Pick<Review, 'title' | 'stars' | 'reviewID'>
       & { author: Pick<User, 'userID' | 'name'> };
  })[] = []
-  let answers: (Answer & { question: { questionID: number; content: string; author: { name: string; userID: number } } })[] = []
+  let answers: (Answer & { question: { questionID: number; content: string; } })[] = []
 
   const _types = types.split(',')
 
@@ -204,7 +204,7 @@ const getUserFeed = async (feedFiltersinput: UserFeedFiltersInput, req: Request)
         'a.content',
         'a.createdAt',
         'q.content as questionContent',
-        'q.userID',
+        'a.userID',
         'u.name as userName'
       )
       .where('a.userID', userID)
@@ -214,19 +214,16 @@ const getUserFeed = async (feedFiltersinput: UserFeedFiltersInput, req: Request)
 
     answers = _answers.map((a) => ({
       ...omit([ 'questionContent', 'userName' ], a),
+      author: { userID: a.userID },
       question: {
         questionID: a.questionID,
-        content: a.questionContent,
-        author: {
-          name: a.userName,
-          userID: a.userID
-        }
+        content: a.questionContent
       }
     }))
   }
 
   if (_types.includes('reviewComment')) {
-    let _reviewComments: (ReviewComment & { title: string; stars: number; userName: string })[] = await db('reviewComments as rc')
+    let _reviewComments: (ReviewComment & { title: string; stars: number; reviewUserID: number; userName: string })[] = await db('reviewComments as rc')
       .select(
         'rc.reviewCommentID',
         'rc.reviewID',
@@ -234,7 +231,8 @@ const getUserFeed = async (feedFiltersinput: UserFeedFiltersInput, req: Request)
         'rc.createdAt',
         'r.title',
         'r.stars',
-        'r.userID',
+        'rc.userID',
+        'r.userID as reviewUserID',
         'u.name as userName'
       )
       .where('rc.userID', userID)
@@ -243,14 +241,15 @@ const getUserFeed = async (feedFiltersinput: UserFeedFiltersInput, req: Request)
       .leftJoin('users as u', 'r.userID', 'u.userID')
 
     reviewComments = _reviewComments.map((rc) => ({
-      ...omit([ 'title', 'stars', 'userName' ], rc),
+      ...omit([ 'title', 'stars', 'reviewUserID', 'userName' ], rc),
+      author: { userID: rc.userID },
       review: {
         title: rc.title,
         stars: rc.stars,
         reviewID: rc.reviewID,
         author: {
           name: rc.userName,
-          userID: rc.userID
+          userID: rc.reviewUserID
         }
       }
     }))
