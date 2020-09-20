@@ -3,12 +3,12 @@ import { randomBytes } from 'crypto'
 import { Request } from 'express'
 import { omit } from 'ramda'
 import { promisify } from 'util'
-import { PasswordRequestInput, PasswordResetInput, User, UserLoginInput, UserSafeData, UserSignupInput, UserUpdateInput } from '../types'
+import { Follower, PasswordRequestInput, PasswordResetInput, User, UserLoginInput, UserSafeData, UserSignupInput, UserUpdateInput } from '../types'
 import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
 // import { makeANiceEmail, transport } from '../utils/mail'
 
-type UserBaseData = Omit<UserSafeData, | 'role'>
+type UserBaseData = Omit<UserSafeData, | 'role'> & { follows: number[] }
 
 const signupUser = async (userInput: UserSignupInput, req: Request): Promise<UserBaseData> => {
   const { email, password, name } = userInput
@@ -38,11 +38,14 @@ const signupUser = async (userInput: UserSignupInput, req: Request): Promise<Use
     req.session.userID = addedUser.userID
     req.session.role = addedUser.role
   }
-  return omit([
-    'password',
-    'resetToken',
-    'resetTokenCreatedAt'
-  ], addedUser)
+  return {
+    ...omit([
+      'password',
+      'resetToken',
+      'resetTokenCreatedAt'
+    ], addedUser),
+    follows: []
+  }
 }
 
 const loginUser = async (userInput: UserLoginInput, req: Request, requiresAdmin = false): Promise<UserBaseData> => {
@@ -60,6 +63,10 @@ const loginUser = async (userInput: UserLoginInput, req: Request, requiresAdmin 
     throw new StatusError(403, 'Forbidden')
   }
 
+  const users: Pick<Follower, 'userID'>[] = await db('followers')
+    .select('userID')
+    .where('f.userID', existingUser.userID)
+
   const isPasswordValid = await bcrypt.compare(password, existingUser.password)
 
   if (!isPasswordValid) {
@@ -71,14 +78,17 @@ const loginUser = async (userInput: UserLoginInput, req: Request, requiresAdmin 
     req.session.role = existingUser.role
   }
 
-  return omit([
-    'password',
-    'resetToken',
-    'resetTokenCreatedAt'
-  ], existingUser)
+  return {
+    ...omit([
+      'password',
+      'resetToken',
+      'resetTokenCreatedAt'
+    ], existingUser),
+    follows: users.map((u) => u.userID)
+  }
 }
 
-type UserInfo = Pick<User, 'userID' | 'role' | 'avatar' | 'name' | 'cover'>
+type UserInfo = Pick<User, 'userID' | 'role' | 'avatar' | 'name' | 'cover'> & { follows: number[] }
 
 const checkInUser = async (req: Request): Promise<UserInfo> => {
   const user = await db<User>('users')
@@ -86,7 +96,12 @@ const checkInUser = async (req: Request): Promise<UserInfo> => {
     .first('userID', 'role', 'avatar', 'name', 'cover')
 
   if (user === undefined) { throw new StatusError(401, 'Unauthorized') }
-  return user
+
+  const users: Pick<Follower, 'userID'>[] = await db('followers')
+    .select('userID')
+    .where('f.userID', user.userID)
+
+  return { ...user, follows: users.map((u) => u.userID) }
 }
 
 const updateUser = async (userInput: UserUpdateInput, req: Request): Promise<UserInfo> => {
@@ -95,7 +110,12 @@ const updateUser = async (userInput: UserUpdateInput, req: Request): Promise<Use
     .where('userID', req.params.userID)
 
   if (updatedUser === undefined) { throw new StatusError(404, 'Not Found') }
-  return updatedUser
+
+  const users: Pick<Follower, 'userID'>[] = await db('followers')
+    .select('userID')
+    .where('f.userID', updatedUser.userID)
+
+  return { ...updatedUser, follows: users.map((u) => u.userID) }
 }
 
 const deleteUser = async (req: Request): Promise<void> => {
@@ -161,11 +181,18 @@ const resetPassword = async ({ password, resetToken }: PasswordResetInput): Prom
     }, [ '*' ])
     .where('userID', user.userID)
 
-  return omit([
-    'password',
-    'resetToken',
-    'resetTokenCreatedAt'
-  ], updatedUser)
+  const users: Pick<Follower, 'userID'>[] = await db('followers')
+    .select('userID')
+    .where('f.userID', updatedUser.userID)
+
+  return {
+    ...omit([
+      'password',
+      'resetToken',
+      'resetTokenCreatedAt'
+    ], updatedUser),
+    follows: users.map((u) => u.userID)
+  }
 }
 
 export default {
