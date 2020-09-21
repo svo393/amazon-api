@@ -3,7 +3,7 @@ import { randomBytes } from 'crypto'
 import { Request } from 'express'
 import { omit } from 'ramda'
 import { promisify } from 'util'
-import { Follower, PasswordRequestInput, PasswordResetInput, User, UserLoginInput, UserSafeData, UserSignupInput, UserUpdateInput } from '../types'
+import { Follower, PasswordRequestInput, PasswordResetInput, User, UserLoginInput, UserPasswordUpdateInput, UserSafeData, UserSignupInput, UserUpdateInput } from '../types'
 import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
 // import { makeANiceEmail, transport } from '../utils/mail'
@@ -114,6 +114,29 @@ const updateProfile = async (userInput: UserUpdateInput, req: Request): Promise<
   return updatedUser
 }
 
+const updatePassword = async (userInput: UserPasswordUpdateInput, req: Request): Promise<Omit<UserInfo, 'following' | 'cover' | 'role'>> => {
+  const { curPassword, newPassword } = userInput
+
+  const user = await db<User>('users')
+    .first()
+    .where('userID', req.session?.userID)
+
+  if (user === undefined) { throw new StatusError(404, 'Not Found') }
+
+  const isPasswordValid = await bcrypt.compare(curPassword, user.password)
+  if (!isPasswordValid) { throw new StatusError(401, 'Invalid Password') }
+
+  const passwordHash = await bcrypt.hash(newPassword, 10)
+
+  const [ updatedUser ]: Pick<User, 'userID' | 'avatar' | 'name' | 'info'>[] = await db('users')
+    .update({ password: passwordHash }, [ 'userID', 'avatar', 'name', 'info' ])
+    .where('userID', req.params.userID)
+
+  if (updatedUser === undefined) { throw new StatusError() }
+
+  return updatedUser
+}
+
 const deleteUser = async (req: Request): Promise<void> => {
   if ([ 'ROOT', 'ADMIN' ].includes(req.session?.role)) {
     throw new StatusError(451, 'Not gonna happen')
@@ -189,6 +212,7 @@ export default {
   loginUser,
   checkInUser,
   updateProfile,
+  updatePassword,
   deleteUser,
   sendPasswordReset,
   resetPassword

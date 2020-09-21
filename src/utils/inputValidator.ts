@@ -1,6 +1,6 @@
 import { Express, Request } from 'express'
 import { pipe } from 'ramda'
-import { AddressCreateInput, AddressTypeInput, AddressUpdateInput, AnswerCreateInput, AnswerUpdateInput, AskFiltersInput, CartProduct, CartProductDeleteInput, CartProductInput, CategoriesFiltersInput, CategoryCreateInput, CategoryUpdateInput, CursorInput, FeedFiltersInput, GroupVariationCreateInput, GroupVariationDeleteInput, GroupVariationUpdateInput, ImagesDeleteInput, ImagesFiltersInput, ImagesUpdateInput, InvoiceCreateInput, InvoicesFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ListUpdateInput, LocalCart, ModerationStatus, OrderCreateInput, OrderProductInput, OrdersFiltersInput, OrderStatus, OrderUpdateInput, ParameterInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionCursorInput, QuestionUpdateInput, ReviewCommentCreateInput, ReviewCommentUpdateInput, ReviewCreateInput, ReviewsFiltersInput, ReviewUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserFeedFiltersInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorInput, VendorsFiltersInput, VotesCreateInput, VotesFiltersInput } from '../types'
+import { AddressCreateInput, AddressTypeInput, AddressUpdateInput, AnswerCreateInput, AnswerUpdateInput, AskFiltersInput, CartProduct, CartProductDeleteInput, CartProductInput, CategoriesFiltersInput, CategoryCreateInput, CategoryUpdateInput, CursorInput, FeedFiltersInput, GroupVariationCreateInput, GroupVariationDeleteInput, GroupVariationUpdateInput, ImagesDeleteInput, ImagesFiltersInput, ImagesUpdateInput, InvoiceCreateInput, InvoicesFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ListUpdateInput, LocalCart, ModerationStatus, OrderCreateInput, OrderProductInput, OrdersFiltersInput, OrderStatus, OrderUpdateInput, ParameterInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionCursorInput, QuestionUpdateInput, ReviewCommentCreateInput, ReviewCommentUpdateInput, ReviewCreateInput, ReviewsFiltersInput, ReviewUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserFeedFiltersInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorInput, VendorsFiltersInput, VotesCreateInput, VotesFiltersInput, UserPasswordUpdateInput, UserRoleUpdateInput } from '../types'
 import { canBeBoolean, canBeNumber, hasDefinedProps, isArray, isDate, isEmail, isInputProvided, isNonEmptyString, isNonEmptyStringOrNull, isObject, isPasswordValid, isPositiveNumber, isProvided, isSomeProvided, isString } from './validatorLib'
 
 export const checkNewUser = ({ body }: Request): UserSignupInput => {
@@ -53,13 +53,6 @@ export const checkUserLogin = ({ body }: Request): UserLoginInput => {
 }
 
 export const checkUserUpdate = ({ body }: Request): UserUpdateInput => {
-  const password = 'password' in body
-    ? pipe(
-      isNonEmptyString,
-      isPasswordValid
-    )({ name: 'password', param: body.password })
-    : undefined
-
   const email = 'email' in body
     ? pipe(
       isNonEmptyString,
@@ -85,19 +78,36 @@ export const checkUserUpdate = ({ body }: Request): UserUpdateInput => {
     ? canBeBoolean({ name: 'cover', param: body.cover })
     : undefined
 
-  const role = 'role' in body
-    ? isNonEmptyString({ name: 'role', param: body.role })
-    : undefined
-
   return hasDefinedProps<UserUpdateInput>({
     name: name?.param,
     info: info?.param,
     email: email?.param.toLowerCase(),
-    password: password?.param,
     avatar: avatar?.param,
-    cover: cover?.param,
-    role: role?.param
+    cover: cover?.param
   })
+}
+
+export const checkUserRoleUpdate = ({ body }: Request): UserRoleUpdateInput => {
+  const role = isNonEmptyString(
+    { name: 'role', param: body.role }
+  )
+
+  return { role: role.param }
+}
+
+export const checkUserPasswordUpdate = ({ body }: Request): UserPasswordUpdateInput => {
+  console.info('body', body)
+
+  const curPassword = isNonEmptyString(
+    { name: 'curPassword', param: body.curPassword }
+  )
+
+  const newPassword = pipe(
+    isNonEmptyString,
+    isPasswordValid
+  )({ name: 'newPassword', param: body.newPassword })
+
+  return { curPassword: curPassword.param, newPassword: newPassword.param }
 }
 
 export const checkUserResetRequest = ({ body }: Request): PasswordRequestInput => {

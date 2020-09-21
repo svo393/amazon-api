@@ -10,7 +10,7 @@ import questionService from '../services/questionService'
 import userAddressService from '../services/userAddressService'
 import userService from '../services/userService'
 import { UPLOAD_TIMEOUT } from '../utils/config'
-import { checkCartProduct, checkCartProductDelete, checkFollows, checkLocalCart, checkNewOrder, checkSingleMediaUpload, checkUserAddressesUpdate, checkUserFeedFilters, checkUserFilters, checkUserUpdate } from '../utils/inputValidator'
+import { checkCartProduct, checkCartProductDelete, checkFollows, checkLocalCart, checkNewOrder, checkSingleMediaUpload, checkUserAddressesUpdate, checkUserFeedFilters, checkUserFilters, checkUserRoleUpdate, checkUserUpdate } from '../utils/inputValidator'
 import { multerUpload, requireAdmin, requireRoot, requireSameUser, requireSameUserOrAdmin } from '../utils/middleware'
 
 const router = Router()
@@ -27,8 +27,8 @@ router.get('/:userID', async (req, res) => {
 })
 
 router.put('/:userID', requireRoot, async (req, res) => {
-  const userUpdateInput = checkUserUpdate(req)
-  const updatedUser = await userService.updateUser(userUpdateInput, req)
+  const userRoleUpdateInput = checkUserRoleUpdate(req)
+  const updatedUser = await userService.updateUserRole(userRoleUpdateInput, req)
   res.json(updatedUser)
 })
 

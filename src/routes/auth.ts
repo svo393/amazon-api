@@ -1,6 +1,6 @@
 import Router from 'express'
 import authService from '../services/authService'
-import { checkNewUser, checkUserLogin, checkUserResetRequest, checkUserResetToken, checkUserUpdate } from '../utils/inputValidator'
+import { checkNewUser, checkUserLogin, checkUserPasswordUpdate, checkUserResetRequest, checkUserResetToken, checkUserUpdate } from '../utils/inputValidator'
 import { requireAdmin, requireAuth, requireSameUser } from '../utils/middleware'
 import StatusError from '../utils/StatusError'
 
@@ -34,6 +34,12 @@ router.post('/logout', requireAuth, (req, res) => {
 router.put('/:userID', requireSameUser('params'), async (req, res) => {
   const userUpdateInput = checkUserUpdate(req)
   const updatedUser = await authService.updateProfile(userUpdateInput, req)
+  res.json(updatedUser)
+})
+
+router.put('/:userID/password', requireSameUser('params'), async (req, res) => {
+  const userPasswordUpdateInput = checkUserPasswordUpdate(req)
+  const updatedUser = await authService.updatePassword(userPasswordUpdateInput, req)
   res.json(updatedUser)
 })
 

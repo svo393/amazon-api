@@ -261,14 +261,16 @@ export type UserSignupInput = Pick<User, 'email' | 'password' | 'name'>
 
 export type UserLoginInput = Pick<User, 'email' | 'password'> & { remember: boolean } // TODO remember option
 
+export type UserRoleUpdateInput = { role: string }
+
 export type UserUpdateInput = Partial<Pick<User,
   | 'name'
   | 'email'
-  | 'password'
   | 'avatar'
   | 'cover'
-  | 'role'
 >> & { info?: string | null }
+
+export type UserPasswordUpdateInput = { curPassword: string; newPassword: string }
 
 export type PasswordRequestInput = Pick<User, 'email'>
 

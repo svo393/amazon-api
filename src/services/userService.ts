@@ -1,6 +1,6 @@
-import { Express, Request } from 'express'
+import { Request } from 'express'
 import { omit } from 'ramda'
-import { User, UserSafeData, UsersFiltersInput, UserUpdateInput } from '../types'
+import { User, UserRoleUpdateInput, UserSafeData, UsersFiltersInput } from '../types'
 import { defaultLimit, imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
 import { uploadImages } from '../utils/img'
@@ -211,7 +211,7 @@ const getUserByID = async (req: Request): Promise<(UserData | UserPublicData) & 
     ], user)
 }
 
-const updateUser = async (userInput: UserUpdateInput, req: Request): Promise<UserSafeData> => {
+const updateUserRole = async (userInput: UserRoleUpdateInput, req: Request): Promise<UserSafeData> => {
   const [ updatedUser ]: User[] = await db('users')
     .update(userInput, [ '*' ])
     .where('userID', req.params.userID)
@@ -250,7 +250,7 @@ const uploadUserCover = (file: Express.Multer.File, req: Request): void => {
 export default {
   getUsers,
   getUserByID,
-  updateUser,
+  updateUserRole,
   uploadUserAvatar,
   uploadUserCover
 }
