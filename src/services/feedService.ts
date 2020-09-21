@@ -336,6 +336,10 @@ const getFollowsFeed = async (feedFiltersInput: UserFeedFiltersInput, req: Reque
 
     const productIDs = _reviews.map((r) => r.productID as number)
 
+    const images = await db<Image>('images')
+      .whereIn('productID', productIDs)
+      .andWhere('index', 0)
+
     let products: (Product & { stars: string | number })[] = await db('products as p')
       .select(
         'p.productID',
@@ -356,23 +360,18 @@ const getFollowsFeed = async (feedFiltersInput: UserFeedFiltersInput, req: Reque
       return {
         ...p,
         stars: parseFloat(p.stars as string),
+        images: [ images.find((i) => i.productID === p.productID) ],
         reviewCount: parseInt(reviewCount as string)
       }
     }))
 
-    const images = await db<Image>('images')
-      .whereIn('productID', productIDs)
-      .andWhere('index', 0)
-
     reviews = _reviews.map((r) => {
-      const image = images.find((i) => i.productID === r.productID)
       const product = products.find((p) => p.productID === r.productID)
 
       delete r.productID
 
       return {
         ...omit([ 'userName', 'userEmail', 'avatar' ], r) as Review,
-        images: [ image ],
         product,
         author: { avatar: r.avatar, name: r.userName, userID: r.userID }
       }
