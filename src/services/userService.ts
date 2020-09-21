@@ -197,7 +197,7 @@ const getUserByID = async (req: Request): Promise<(UserData | UserPublicData) & 
     helpfulVotes: parseInt(helpfulVotes as string)
   }
 
-  const hasPermission = [ 'ROOT', 'ADMIN' ].includes(req.session?.role)
+  const hasPermission = [ 'ROOT', 'ADMIN' ].includes(req.session?.role) || req.session?.userID === user.userID
 
   return hasPermission
     ? user
