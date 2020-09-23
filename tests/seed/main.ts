@@ -81,7 +81,7 @@ const seed = async (): Promise<void> => {
 
     const allProductParameterNames = new Set<string>()
 
-    Object.entries(initialProducts.Desktops.Acer[0])
+    Object.entries(initialProducts['All-in-Ones Computers'].Acer[0])
       .forEach((ip) => ip[1].productParameters
         .forEach((pp) => allProductParameterNames.add(pp.name)))
 

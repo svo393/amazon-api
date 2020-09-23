@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import { equals, flatten, omit } from 'ramda'
-import { BatchWithCursor, Image, Matches, Review, ReviewComment, ReviewCreateInput, ReviewsFiltersInput, ReviewUpdateInput, ReviewWithUser, Vote } from '../types'
+import { BatchWithCursor, Image, Matches, Review, ReviewCreateInput, ReviewsFiltersInput, ReviewUpdateInput, ReviewWithUser, Vote } from '../types'
 import { defaultLimit, imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
 import fuseMatches from '../utils/fuseMatches'
