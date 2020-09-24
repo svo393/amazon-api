@@ -741,6 +741,323 @@ export const initialProducts = {
             ]
           }
         ]
+      },
+      {
+        questions: [
+          {
+            author: 'todo',
+            content: 'Can i install google play games on this pc? buying for my father and trying to see if golf master 3d can be put on it for him.',
+            answers: [
+              {
+                author: 'todo',
+                content: 'You cannot install games from the Google Play Store on this computer. This computer has Windows 10 Home. You may want to look at an HP Chromebook. The most current HP Chromebooks do have the Google Play Store installed.'
+              },
+              {
+                author: 'todo',
+                content: `I think any video game will play as long as the video card is powerful enough.
+                this computer is not a gaming computer but a simple and cheap web surfing and office software computer.`
+              },
+              {
+                author: 'todo',
+                content: 'On the bottom of the screen left side. Is a spot where you can write questions in. I asked and the answers come up with instructions. How do I install it ..........'
+              }
+            ]
+          },
+          {
+            author: 'todo',
+            content: 'Has anyone used this pc for streaming movies & tv show’s ?.',
+            answers: [
+              {
+                author: 'todo',
+                content: 'I’ve watched Netflix on it and my son watches YouTube videos on it all the time. Works great. Never had any issues.'
+              },
+              {
+                author: 'todo',
+                content: ' no '
+              }
+            ]
+          },
+          {
+            author: 'todo',
+            content: 'im looking for a computer to use for work as i am currently looking for work at home jobs. Does this support most softwares?',
+            answers: [
+              {
+                author: 'todo',
+                content: 'This is a basic computer which can handle basic duties like surfing the internet. A computer with the Intel i5 or Ryzen 5 processor or better with 8 gigabytes of RAM can handle more programs.'
+              },
+              {
+                author: 'todo',
+                content: `Yes this computer is more than I expected
+                It's a lot easier to get used to an its faster, than my other computer`
+              }
+            ]
+          },
+          {
+            author: 'todo',
+            content: 'Does it come with adobe flash?',
+            answers: [
+              {
+                author: 'todo',
+                content: 'Adobe Flash can be downloaded for free.'
+              },
+              {
+                author: 'todo',
+                content: 'No'
+              }
+            ]
+          },
+          {
+            author: 'todo',
+            content: 'Is it touchscrean',
+            answers: [
+              {
+                author: 'todo',
+                content: 'It is not.'
+              },
+              {
+                author: 'todo',
+                content: 'Unfortunately, it is not.'
+              }
+            ]
+          },
+          {
+            author: 'todo',
+            content: 'I’m not seeing an option for a warranty. Is there one available?',
+            answers: [
+              {
+                author: 'todo',
+                content: 'not sure'
+              }
+            ]
+          },
+          {
+            author: 'todo',
+            content: 'How wide or big is the stand?',
+            answers: [
+              {
+                author: 'todo',
+                content: 'The stand is actually just two thick, bent, wires so the footprint is not much thicker than the computer itself.'
+              }
+            ]
+          },
+          {
+            author: 'todo',
+            content: 'looking for a power cord',
+            answers: [
+              {
+                author: 'todo',
+                content: 'If you need a replacement AC adapter, here is the part number: L56998-800 and for the power cord: 213349-009. You should have gotten one in the box.'
+              },
+              {
+                author: 'todo',
+                content: 'The power cord was in the box'
+              }
+            ]
+          }
+        ],
+        products: [
+          {
+            title: 'HP 21.5-Inch All-in-One Computer, AMD A4-9125, 4GB RAM, 1TB Hard Drive, Windows 10 (22-c0010, White)',
+            price: 400.15,
+            bullets: `The essential home computer: With an AMD processor and 4 GB of RAM, your family can seamlessly go from sending work emails to uploading vacation photos with ease
+            A centerpiece for the home: This all-in-one PC displays more with an ultra-thin bezel and has an adjustable tilt stand allowing you to work from multiple perspectives and is designed to brighten any room
+            Integrated FHD monitor and audio: 21.5 Inches diagonal widescreen FHD (1920 x 1080) IPS WLED-backlit micro edge monitor and front-facing speakers
+            AMD A4 processor: 7th generation AMD A4-9125 processor, dual-core, 2.30 GHz
+            Hard drive, memory, optical drive: 1 TB 7200RPM SATA hard drive, 4 GB DDR4-2133 SDRAM (upgradable to 16 GB), DVD-Writer
+            HP HD privacy camera: This innovative webcam has a switch designed to cover the camera and disable video when not in use, keeping you safe online
+            Keyboard and mouse: HP white wired keyboard with volume control and white wired optical mouse
+        
+            Operating system: Windows 10 Home. Audio features: Dual 2 W speakers.
+            Ports: Headphone/Microphone Combo, 2 USB 3.1 Gen 1, 2 USB 2.0 (rear), HDMI Out (rear), 10/100/1000 Base-T Network, and an HP 3-in-1 Media Card Reader
+            Warranty: One-year limited warranty with 24-hour, 7 days a week web support when shipped from and sold by Amazon.com and not a third party seller`,
+            description: 'With an AMD processor and 4 GB of RAM, seamlessly go from sending work emails to uploading vacation photos. This all-in-one PC displays more with an ultra-thin bezel and has an adjustable tilt stand, allowing you to work from multiple perspectives. This PC includes an HD camera with a slide switch for privacy, Plus built-in speakers and easy Wi-Fi connectivity. Now, you can stay in touch with family and friends while maintaining Peace of mind. Audio features: Dual 2 W speakers.',
+            stock: 3,
+            media: 7,
+            isAvailable: true,
+            groupVariations: [
+              { name: 'Style', value: '22-c0010' }
+            ],
+            productParameters: [
+              { name: 'Standing screen display size', value: '21.5 Inches' },
+              { name: 'Screen Resolution', value: '1920 x 1080' },
+              { name: 'Max Screen Resolution', value: '1920 x 1080 Pixels' },
+              { name: 'Graphics Coprocessor', value: 'AMD Radeon R3' },
+              { name: 'Chipset Brand', value: 'AMD' },
+              { name: 'Card Description', value: 'Integrated' },
+              { name: 'Number of USB 2.0 Ports', value: '2' },
+              { name: 'Brand', value: 'HP' },
+              { name: 'Series', value: '5QB04AA#ABA' },
+              { name: 'Item model number', value: '22-c0010' },
+              { name: 'Hardware Platform', value: 'PC' },
+              { name: 'Operating System', value: 'Windows 10 Home' },
+              { name: 'Item Weight', value: '11.9 pounds' },
+              { name: 'Product Dimensions', value: '23.55 x 9.77 x 19.02 inches' },
+              { name: 'Item Dimensions LxWxH', value: '23.55 x 9.77 x 19.02 inches' },
+              { name: 'Processor Brand', value: 'AMD' },
+              { name: 'Processor Count', value: '2' },
+              { name: 'Computer Memory Type', value: 'DDR4 SDRAM' },
+              { name: 'Flash Memory Size', value: '1' },
+              { name: 'Hard Drive Interface', value: 'Serial ATA' },
+              { name: 'Hard Drive Rotational Speed', value: '7200 RPM' },
+              { name: 'Optical Drive Type', value: 'DVD-RW ' }
+            ],
+            reviews: [
+              {
+                author: 'todo',
+                stars: 5,
+                isVerified: true,
+                title: 'Better than Expected.........',
+                content: `I got this computer on May 11, 2020, after ordering on May 3, 2020. I hesitated because of all of the reviews about the speed and the noise, slow processor, and the click sound from the keyboard. Right out the box, I did one thing that I believe will help everyone. Connect directly to the WiFi via ethernet cable. There is speed you just have to connect properly. My husband bought this for me as a birthday present. I have always used a Surface and did not want to pay a whopping $1300 for a Surface Desktop. Let me admit I am getting older and the small screen of the Surface is not good but also who needs a $1300 computer? Not me. Yes, the fan is loud but so is my daily life since COVID-19. I just went into the Microsoft store and downloaded all of my apps and decided which ones were necessary and which were not. I don't mind the clicking of the keyboard keys. It's better than PlayStation all day. As always I will keep the boxes for 30 days to make sure I have them if I have to send it back. But so far out the box, it is a good buy. I even went back to Amazon to see how much it would cost to get another one for my sister but she likes the HP laptop and the price of this one has almost tripled. Which brings me to the cost issue with Amazon. They are letting other sellers sell it for triple the price. That is just crazy. I will update my review with pictures and with any issues in 30 days. It is not a touch screen, it comes with enough memory and I have a 1 Tb external drive, it comes with the keyboard, it comes with Office for Home I just downloaded my Office 365 that I got from school. But for now, this is just what I needed to work from home and organize daily life.
+                Update 1 week WOW!!!!!!
+                I have had no issues with this computer, No fan noise, Not slow, No multiple tab issues with the internet. As you can see from the picture. I set it up on my desk, using the keyboard drawer. I am recovering from major rotator cuff surgery in the middle of this Covid-19. Working from home could not use my surface comfortably. Thank you Honey, this is just what this old girl needed to work from home and be comfortable. No more squinting, no more resting my bad arm uncomfortably. It connected wirelessly to my printer. It is connected directly to my high speed internet via cable and BAM!!!!!!! Lighting fast. I will continue use and update but I really don't understand the complaints.
+                Update 5/28/2020.....I have added pictures of my set up as well as the back of the computer with connections. I have it connected directly to the internet via ethernet cable and it is fast. I also hooked up my speakers with my microphone it plays my music much louder(Amazon Music) and my Microsoft teams meeting are better as well. I have nothing bad to say yet and I will continue to update till I have had it 60 days.
+                Update June 6,2020. WOW STILL!!
+                Had my first team meeting with work and everyone had computer issues except me. They kept dropping the meeting and stayed on through the whole meeting. I am working for a large Healthcare system and this is just what I needed the screen is perfect size and I still don't mind the keyboard sound and the fan noise is not there at all. I have one wish..... that you could add an additional monitor (that is how I work in the office). Otherwise this is my final review up date. Feel free to contact me and ask questions I will be happy to respond.
+                Sept 4, 2020...WOW!!! Still without question the desktop of my dreams. I have been working from home since March 15, 2020 and this computer is a workhorse. Thank you Honey. It is the best computer and Birthday gift ever. Still connected via ethernet cable it is just AMAZING!!!!!!!! `,
+                media: 4,
+                comments: [
+                  {
+                    author: 'todo',
+                    content: 'So just hooking it up to ethernet made things better? I\'m on the hunt for a new computer and use multiple tabs constantly so this might be worth a try since I did notice slightly faster speeds hooking ethernet up to my laptop '
+                  },
+                  {
+                    author: 'todo',
+                    content: 'Have you tried it without being hooked up directly to the ethernet? I have high speed wireless, and I\'m a little hesitant to get this if I\'m not going to hook it up directly. I\'d love to hear your thoughts. '
+                  },
+                  {
+                    author: 'todo',
+                    content: 'Thanks for the detailed review! Loved the picture from Belem in Portugal. I visited there last year and it brought back fond memories!'
+                  },
+                  {
+                    author: 'todo',
+                    content: 'i think this is a great computer also...i didnt order it from amazon i got it from wal-mart for $399 and i\'m looking into getting another one for my son , we are tired of laptops LOL....i\'m really enjoying this'
+                  }
+                ]
+              },
+              {
+                author: 'todo',
+                stars: 1,
+                isVerified: false,
+                title: 'SLOW!!',
+                content: 'Nice looking machine, but sooooo slow!!! Takes many, many minutes to load a page, unacceptable for a brand new computer. Not happy with it at all.',
+                media: 1
+              },
+              {
+                author: 'todo',
+                stars: 3,
+                isVerified: false,
+                title: 'Very Stylish but Slow',
+                content: 'I have been using this all-in-one computer for a few days now. It arrived perfectly in the box and setup was extremely easy. The computer itself is beautifully designed and stylish and the white color fits in very well. The screen is sleek and thin. The keyboard is wired and the keys are clunky and loud. I\'ll be purchasing a wireless soft/quiet key keyboard since I don\'t want everyone in the room hearing when I\'m typing. The downside to this computer is it is slow even for basic tasks. I\'m impatient and expect computers now to be responsive and not lag when multi-tasking. This computer does not multitask well even after uninstalling unnecessary programs. I have to End Task on several things that run in the background to help speed up the computer. It\'s a huge annoyance since even basic tasks like opening the email app and Google Chrome lag and going between apps there is a lag and programs are slow to open. If you\'re used to responsive computers, this one will test your patience, literally. If you\'re one who isn\'t impatient and doesn\'t mind waiting 30 seconds to a minute for things to open and run then this is a great computer that meets the basic needs. I love the design and how nicely it blends in with my home decor and doesn\'t stand out at all and isn\'t obtrusive and fits very nicely on my desk.',
+                media: 1
+              },
+              {
+                author: 'todo',
+                stars: 4,
+                isVerified: true,
+                title: 'Home Office or Student is ok',
+                content: 'It is a bit slow and you cannot have many open tabs,.',
+                media: 0,
+                comments: [
+                  {
+                    author: 'todo',
+                    content: 'yah, windows 10 needs at least 8gigs or ram to run normal, having only 4 is like two flat tires.'
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            title: 'HP 22-inch All-in-One Desktop Computer, AMD Athlon Silver 3050U Processor, 4 GB RAM, 256 GB SSD, Windows 10 Home (22-dd0010, White), Snow White',
+            price: 429.99,
+            bullets: `Windows 10 Home: Do great things confidently with the familiar feel of Windows – only better
+            Fast processor: AMD Athlon Silver 3050U Processor, Dual-Core, 2.30 GHz
+            Memory and internal storage: 4 GB DDR4-2400 SDRAM (upgradable to 16 GB), 256 GB PCIe NVMe M.2 Solid State Drive
+            Environmentally conscious: Low halogen, mercury-free display backlights, arsenic-free display glass
+            Integrated display: 21.5" diagonal widescreen FHD (1920 x 1080) VA ZBD anti-glare WLED-backlit three-sided micro-edge monitor
+            Stereo speakers: Pump up the volume to your favorite music, movie or game
+            HP Privacy Camera: The pop-up webcam is only enabled when in use, securing your privacy
+        
+            Mouse and keyboard: USB white wired keyboard and mouse combo
+            USB ports: 4 (2 USB 3.2 Gen 1, 2 USB 2.0)
+            Warranty: One-year limited warranty`,
+            description: 'With an AMD processor and up to 4 GB of RAM, seamlessly go from sending work emails to uploading vacation photos. This All-in-One PC displays more with a three-sided micro-edge display and has an adjustable tilt stand, allowing you to work from multiple perspectives. This PC includes an HD camera with a slide switch for privacy, plus built-in speakers and easy Wi-Fi connectivity. Now, you can stay in touch with family and friends while maintaining peace of mind.',
+            stock: 5,
+            media: 7,
+            isAvailable: true,
+            groupVariations: [
+              { name: 'Style', value: '22-dd0010' }
+            ],
+            productParameters: [
+              { name: 'Standing screen display size', value: '21.5 Inches' },
+              { name: 'Screen Resolution', value: '1920 x 1080' },
+              { name: 'Max Screen Resolution', value: '1920 x 1080 Pixels' },
+              { name: 'Chipset Brand', value: 'AMD Radeon' },
+              { name: 'Card Description', value: 'Integrated' },
+              { name: 'Graphics Card Ram Size', value: '4 GB' },
+              { name: 'Wireless Type', value: 'Bluetooth, 802.11ac' },
+              { name: 'Number of USB 2.0 Ports', value: '2' },
+              { name: 'Number of USB 3.0 Ports', value: '2' },
+              { name: 'Brand', value: 'HP' },
+              { name: 'Series', value: '9ED50AA#ABA' },
+              { name: 'Item model number', value: '22-dd0010' },
+              { name: 'Hardware Platform', value: 'PC' },
+              { name: 'Operating System', value: 'Windows 10 Home' },
+              { name: 'Item Weight', value: '16.17 pounds' },
+              { name: 'Product Dimensions', value: '19.3 x 14.99 x 8.05 inches' },
+              { name: 'Item Dimensions LxWxH', value: '19.3 x 14.99 x 8.05 inches' },
+              { name: 'Color', value: 'Snow White' },
+              { name: 'Processor Brand', value: 'AMD' },
+              { name: 'Processor Count', value: '2' },
+              { name: 'Computer Memory Type', value: 'DDR4 SDRAM' },
+              { name: 'Flash Memory Size', value: '256' },
+              { name: 'Hard Drive Interface', value: 'Solid State' },
+              { name: 'Hard Drive Rotational Speed', value: '0.01 RPM' },
+              { name: 'Optical Drive Type', value: 'DVD+RW ' }
+            ],
+            reviews: [
+              {
+                author: 'todo',
+                stars: 5,
+                isVerified: true,
+                title: 'Perfect!',
+                content: 'Love this all in one. Easy to set up and use. Camera and audio is great. Got it to work from home and I’m very pleased.',
+                media: 0
+              },
+              {
+                author: 'todo',
+                stars: 5,
+                isVerified: true,
+                title: 'All-in-one compactness.',
+                content: 'I am not computer smart, so I got my computer man to set-up and program whatever I needed, he was extremely complimentary.',
+                media: 0
+              },
+              {
+                author: 'todo',
+                stars: 5,
+                isVerified: true,
+                title: 'Great PC gift for my mother',
+                content: 'My mother mainly uses for Facebook, e-mails and some minor web searching',
+                media: 0
+              },
+              {
+                author: 'todo',
+                stars: 5,
+                isVerified: true,
+                title: 'Great Gaming and Everyday Use.',
+                content: 'Great product. I bought it for school and regular use. Good for everyday and gaming uses. Worth my money and is lasting long and still going fast.',
+                media: 0
+              },
+              {
+                author: 'todo',
+                stars: 4,
+                isVerified: true,
+                title: 'So far So good',
+                content: 'It’s looking good！',
+                media: 0
+              }
+            ]
+          }
+        ]
       }
     ]
   }
