@@ -1060,5 +1060,437 @@ export const initialProducts = {
         ]
       }
     ]
+  },
+  'Slow Cookers': {
+    'Instant Pot': [
+      {
+        questions: [
+          {
+            author: 'todo',
+            content: 'Can it be used for home canning? If so, how many quart mason jars fit in the 6 Quart?',
+            answers: [
+              {
+                author: 'todo',
+                content: 'I don’t know but Facebook has a group called Pressure Luck. It’s a friendly group, post your question there. Good luck.'
+              },
+              {
+                author: 'todo',
+                content: 'I understand it has been done, but that it isn’t suggested..'
+              }
+            ]
+          },
+          {
+            author: 'todo',
+            content: 'My cord to plug in my pot is missing. Anyone else have this problem?',
+            answers: [
+              {
+                author: 'todo',
+                content: 'No, my cord was included in the package. You could reorder from Amazon and return the one you have that is missing the cord.'
+              },
+              {
+                author: 'todo',
+                content: 'I didn’t have an issue with my Instant Pot.'
+              },
+              {
+                author: 'todo',
+                content: 'No.'
+              }
+            ]
+          },
+          {
+            author: 'todo',
+            content: 'Can you make cake? Is it more difficult if you don\'t have a cake button? Thank you',
+            answers: [
+              {
+                author: 'todo',
+                content: 'Yes you can make cake I suggest getting a pan that fits in the instant pot I think usually a 7 inch pan works but there are a lot of them on Amazon.com for sale'
+              },
+              {
+                author: 'todo',
+                content: 'I boughtbit as a gift i. Elementi my daughter has base a cake in it'
+              }
+            ]
+          }
+        ],
+        products: [
+          {
+            title: 'Instant Pot Duo 7-in-1 Electric Pressure Cooker, Slow Cooker, Rice Cooker, Steamer, Saute, Yogurt Maker, and Warmer, 6 Quart, Red, 14 One-Touch Programs',
+            price: 99.99,
+            bullets: `Most popular size: serves up to 6 people and perfect for everyday meals.
+            Replaces up to 7 Appliances: combines 7 kitchen Appliances in 1 to save you space, including: pressure cooker, slow cooker, rice cooker, steamer, saute, yogurt maker, and warmer.
+            Consistently great results: monitors pressure, temperature, keeps time, and adjusts heating intensity and duration to achieve your desired results every time.
+            Accessories include – 1000+ recipe app, 250+ recipe and how-to online videos, 18/18 stainless steel inner pot, sealing ring, steam rack, Soup Spoon, rice paddle and lid holder. Accessories are dish washer safe.
+            Easy to clean: fingerprint-resistant stainless steel body and components and accessories that are dishwasher safe: inner pot with 3-ply bottom for even cooking, steam rack with handles, serving Spoon, Soup Spoon, and measuring cup.
+            Safety: 10 safety mechanisms for peace of mind
+            Power supply 120V – 60Hz – Please check your voltage if not in North America.`,
+            description: 'Instant Pot Duo 6 qt 7-in-1 multi-use programmable pressure cooker, slow cooker, rice cooker, steamer, sauté, yogurt maker and warmer, stainless steel and Red',
+            stock: 2,
+            media: 5,
+            isAvailable: true,
+            groupVariations: [
+              { name: 'Color', value: 'Red' }
+            ],
+            productParameters: [
+              { name: 'Product Dimensions', value: '13.39 x 12.2 x 12.48 inches' },
+              { name: 'Item Weight', value: '14.57 pounds' },
+              { name: 'Manufacturer', value: 'Instant Pot' },
+              { name: 'Item model number', value: 'Duo Red 60               ' }
+            ],
+            reviews: [
+              {
+                author: 'todo',
+                stars: 5,
+                isVerified: true,
+                title: 'Why don’t you have one of these yet?',
+                content: `Absolutely LOVE this product. I’ve used it several times and have been happy with the results. I’ve never had a lot of luck with roasts & ribs - but the IP has changed all that. The meat literally falls apart and is so easy to chew-& is ready in 1/2 the time.
+                Highly recommend this - particularly if you hate to cook as much as I do.`,
+                media: 1,
+                comments: [
+                  {
+                    author: 'todo',
+                    content: 'great'
+                  }
+                ]
+              },
+              {
+                author: 'todo',
+                stars: 1,
+                isVerified: true,
+                title: 'Broken and unusable.',
+                content: 'Purchased and didn’t unbox right away. Received all smashed up. Can’t use and can’t return. Learned my lesson, won’t be purchasing an appliance again. Very upset.',
+                media: 1,
+                comments: [
+                  {
+                    author: 'todo',
+                    content: 'Really? The lesson you took away was "don\'t purchase an appliance?" Not, perhaps, "don\'t wait months to open a package?"'
+                  },
+                  {
+                    author: 'todo',
+                    content: 'Why couldn’t you return it?'
+                  },
+                  {
+                    author: 'todo',
+                    content: 'What was the reason you could not return it?'
+                  },
+                  {
+                    author: 'todo',
+                    content: 'What was the reason you could not return it?'
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            title: 'Instant Pot Duo 7-in-1 Electric Pressure Cooker, Slow Cooker, Rice Cooker, Steamer, Saute, Yogurt Maker, and Warmer, 6 Quart, Teal, 14 One-Touch Programs',
+            price: 77.34,
+            bullets: `Most popular size: serves up to 6 people and perfect for everyday meals.
+            Replaces up to 7 Appliances: combines 7 kitchen Appliances in 1 to save you space, including: pressure cooker, slow cooker, rice cooker, steamer, saute, yogurt maker, and warmer.
+            Consistently great results: monitors pressure, temperature, keeps time, and adjusts heating intensity and duration to achieve your desired results every time.When opening the lid, the inner pot may adhere to the lid. This is caused by vacuum due to cooling. To release the vacuum, move the stream release handle to the Venting position
+            Accessories include – 1000+ recipe app, 250+ recipe and how-to online videos, 18/18 stainless steel inner pot, sealing ring, steam rack, Soup Spoon, rice paddle and lid holder. Accessories are dish washer safe.
+            Easy to clean: fingerprint-resistant stainless steel body and components and accessories that are dishwasher safe: inner pot with 3-ply bottom for even cooking, steam rack with handles, serving Spoon, Soup Spoon, and measuring cup.
+            Safety: 10 safety mechanisms for peace of mind
+            Power supply 120V – 60Hz – Please check your voltage if not in North America.`,
+            description: 'Instant Pot Duo 6 qt 7-in-1 multi-use programmable pressure cooker, slow cooker, rice cooker, steamer, sauté, yogurt maker and warmer, stainless steel and Teal. The cooking programs have been lab-tested for optimal effect. These greatly improve cooking result and maintain consistence. Instant Pot is carefully designed to eliminate many common errors that may cause harm or spoil food. It passed the stringent UL certification giving you uncompromised safety and peace of mind and protects you with 10 proven safety mechanisms and patented technologies.',
+            stock: 1,
+            media: 6,
+            isAvailable: true,
+            groupVariations: [
+              { name: 'Color', value: 'Teal' }
+            ],
+            productParameters: [
+              { name: 'Product Dimensions', value: '13 x 12.6 x 12.2 inches' },
+              { name: 'Item Weight', value: '14.27 pounds' },
+              { name: 'Manufacturer', value: 'Instant Pot' },
+              { name: 'Item model number', value: 'IP-DUO60TEAL' }
+            ],
+            reviews: [
+              {
+                author: 'todo',
+                stars: 5,
+                isVerified: true,
+                title: 'Amazing (as always) and cute!',
+                content: 'I want to quickly post this because there aren\'t currently any other photos of this color. I\'ve had a black Intstant Pot Duo for years and love it. I could go on and on about everything I use it for. I also have a mini that works just as well as the 6qt but for smaller tasks. When I saw this new color was available I knew I needed it. I\'ll be passing along my black one as they are identical and I have no need for two regular size ones (especially with pot in pot cooking), plus it would never get used because I\'d always want to pull this one out! ',
+                media: 0,
+                comments: [
+                  {
+                    author: 'todo',
+                    content: 'Is there anything you can\'t do on this one that you could on your other instant pot?'
+                  }
+                ]
+              },
+              {
+                author: 'todo',
+                stars: 3,
+                isVerified: true,
+                title: 'Just okay',
+                content: 'Not so instant instant pot. I’m keeping mine because of beans. You can cook beans in 60 minutes start to finish. No soaking overnight! Everything I’ve made in mine takes 40-60 minutes start to finish. I made risotto in 65 minutes start to finish and it was okay. Same time to cook normally on a stove. I’ve tried 15 different recipes and beans are the best thing so far. ',
+                media: 0
+              }
+            ]
+          },
+          {
+            title: 'Instant Pot Duo 7-in-1 Electric Pressure Cooker, Slow Cooker, Rice Cooker, Steamer, Saute, Yogurt Maker, and Warmer, 6 Quart, White, 14 One-Touch Programs',
+            price: 85.94,
+            bullets: `Most popular size: serves up to 6 people and perfect for everyday meals.
+            Replaces up to 7 Appliances: combines 7 kitchen Appliances in 1 to save you space, including: pressure cooker, slow cooker, rice cooker, steamer, saute, yogurt maker, and warmer.
+            Consistently great results: monitors pressure, temperature, keeps time, and adjusts heating intensity and duration to achieve your desired results every time. A 24-hour delay start allows for delayed cooking
+            Accessories include – 1000+ recipe app, 250+ recipe and how-to online videos, 18/18 stainless steel inner pot, sealing ring, steam rack, Soup Spoon, rice paddle and lid holder. Accessories are dish washer safe.
+            Easy to clean: fingerprint-resistant stainless steel body and components and accessories that are dishwasher safe: inner pot with 3-ply bottom for even cooking, steam rack with handles, serving Spoon, Soup Spoon, and measuring cup.
+            Safety: 10 safety mechanisms for peace of mind
+            Power supply 120V – 60Hz – Please check your voltage if not in North America.`,
+            description: 'Instant Pot Duo 6 qt 7-in-1 multi-use programmable pressure cooker, slow cooker, rice cooker, steamer, sauté, yogurt maker and warmer, stainless steel and White ',
+            stock: 0,
+            media: 6,
+            isAvailable: true,
+            groupVariations: [
+              { name: 'Color', value: 'White' }
+            ],
+            productParameters: [
+              { name: 'Product Dimensions', value: '13.39 x 12.2 x 12.48 inches' },
+              { name: 'Item Weight', value: '14.32 pounds' },
+              { name: 'Manufacturer', value: 'Instant Pot' },
+              { name: 'Item model number', value: 'IP-DUO60WHITE ' }
+            ],
+            reviews: [
+              {
+                author: 'todo',
+                stars: 4,
+                isVerified: true,
+                title: 'Be sure to add plenty of liquid',
+                content: 'The other thing to be aware of is that at least on mine, the cord detaches from the pot rather easily',
+                media: 0
+              },
+              {
+                author: 'todo',
+                stars: 4,
+                isVerified: true,
+                title: `I like the white. Takes a long time to heat up however and my beans are never cooked properly. Rice cooks well. Veggies great.
+
+                The metal cooking pot is already quite tarnished and I havent had it for too long. Not too pleased with that.
+                
+                Biggest complaint is the there is already bubbling of the plastic in certain areas on the key pad. I hate when this happens. If I spend good money on something I expect some quality in the buttons. I have used it for a few months now, occasionally and I am quite surprised at the bubbling. Irritating.
+                
+                ** edit: the bubbling is on the "+" and "-" buttons the "cancel" button and the "start delay" button plus just below the delay start button. I hadnt added pictures. This was noticed on the first few uses and not after 6 months of use or anything.`,
+                media: 5
+              },
+              {
+                author: 'todo',
+                stars: 1,
+                isVerified: false,
+                title: 'Base is not stable',
+                content: 'It has a defect. The base of the pot is not stable. It can wiggle pretty significantly.',
+                media: 0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        questions: [
+          {
+            author: 'todo',
+            content: 'Can the Instant Pot be used for canning?',
+            answers: [
+              {
+                author: 'todo',
+                content: `The Instant Pot operates at 11.6 psi (about 242°F), whereas other pressure cookers tend to operate at a higher 15 psi (about 250°F). So when you're adjusting for a recipe that says 15 psi, just try cooking for a few extra minutes.
+                Since Instant Pot reaches 242 degrees it is safe for canning per the USDA.
+                https://nchfp.uga.edu/publications/usda/INTRO_HomeCanrev0715.pdf`
+              },
+              {
+                author: 'todo',
+                content: `There are two types of canning: boiling-water canning at 100°C/212°F (for acid fruits, tomatoes, pickles and jellied products) and pressure canning at 115~121°C/240~250°F (for low acid vegetables, meat and poultry). Please refer to "USDA Complete Guide to Home Canning" for more details.
+                Instant Pot can be used for boiling-water canning. However, Instant Pot has not been tested for food safety in pressure canning by USDA. Due to the fact that programs in Instant Pot IP-CSG, IP-LUX and IP-DUO series are regulated by a pressure sensor instead of a thermometer, the elevation of your location may affect the actual cooking temperature. For now, we wouldn't recommend using Instant Pot for pressure canning purpose. Please note this correction to our early inaccurate information.`
+              },
+              {
+                author: 'todo',
+                content: `ABSOLUTELY NOT. It does not reach high enough pressure for it to be safe to follow the USDA tested recommendations for pressure canning. If you want to can, buy a REAL pressure canner. I've been canning for 56 years as of 2019. I won't even can with a boiling water bath anymore and haven't for years. Tomatoes were the only thing I ever canned that way and the vast majority of modern breeds are not naturally acidic enough for it to be safe. IMNSHO tomatoes were the ONLY thing that was ever safe to put in a boiling water bath. PRESSURE CANNERS MADE FOR THE PURPOSE ONLY.
+
+                I used to seal jelly jars with a layer of paraffin wax and I don't do THAT anymore either.
+                
+                Be safe and Do It Right. This is a great kitchen tool for cooking. DO NOT EVEN THINK about trying to can in it. It is WAY too small for one thing, and it isn't safe (the more important reason NOT TO DO IT) for another.`
+              },
+              {
+                author: 'todo',
+                content: 'Please, please. please, do NOT try canning meats, fish, or low acid fruits and vegetables in an electric pressure cooker!!! As far as I know, none of the electric pressure cookers now on the American market can attain 15 p.s.i. pressure, which is needed to raise the temperature inside to 240°F, which is needed to kill botulism spores. Longer processing time at lower temperatures WILL NOT RELIABLY kill these spores! Don\'t take the chance! Even with modern medical procedures and a nearby emergency room, you may not survive botulism poisoning!'
+              }
+            ]
+          },
+          {
+            author: 'todo',
+            content: 'To those with 3qt size, are you happy with that size or would you have preferred the 6 qt size?',
+            answers: [
+              {
+                author: 'todo',
+                content: 'We\'re a family of two adults. I have both the 3qt and 6 qt. I had the 6qt for 2 years before the Mini came out, and thought I\'d use the Mini mostly for rice and potatoes. But now the 3qt is my mainstay, my workhorse. I\'ll use the big one when I want to batch cook something, like potatoes, stock, beans or a big pot of soup, but otherwise I rely almost entirely on the 3qt.'
+              },
+              {
+                author: 'todo',
+                content: 'Like others, I got the 6 quart, but found it kind of cumbersome, especially for my size kitchen and the fact that I only cook for 1 or 2 people, and even then not that often (microwave time!). The 3 quart size does the same things as the bigger ones, and is much more convenient. I gave the 6 quart one to a family of four that does a lot more cooking than I do.'
+              },
+              {
+                author: 'todo',
+                content: 'I have used my 6 qt Duo for over a year, and loved it. I wanted a smaller one and passed on the Mini 3 qt and bought a 2 qt Cosori, since IP does not make a 2 qt; which I also loved and used a lot. I now plan to purchase the IP Mini 3 qt. I am just one adult. There is a use for all three sizes as long as you can afford to own more than one. One thing to consider is that there are way more accessories to fit the 3 qt than there is for the 2 qt. What\'s not to love? Buy them both!'
+              },
+              {
+                author: 'todo',
+                content: 'I have both the 3 qt and the 6 quart. There are 3 of us. I use the 6 qt the most and tend to use the 3 qt for side dishes or if the 6 qt is tied up making yogurt. If I could only have 1 it would be the 6 qt. When making soups or stews, the 3 qt isn\'t quit big enough.'
+              },
+              {
+                author: 'todo',
+                content: `I bought both the 3 qt. and 6 qt. "Smart Pots" to try... and the 3 qt. is the clear winner!!! I come from a long line of pressure cooking women... that is how I came to own both 6 qt. and 8 qt. traditional stainless steel pressure cookers. I tend to use my 3 qt. Mini Smart Pot a LOT... and store it in a place where it's handy to grab (often). I like the mini b/c it is small and I like the convenience of the timer for most of the day-to-day things I do. And I agree with what everybody else here already stated... I also found the overall size of the 6 qt. Smart Pot TOO BIG… so I sold my 6 quart Smart Pot.
+
+                When I need to cook something in larger portions, I always use my 8 qt. traditional pressure cooker (which isn't that often b/c I usually freeze the extra food into future mini-meals). A traditional pressure cooker PRESSURE COOKS THE SAME as a "Smart Pot" (minus the "timer"), but takes up a LOT LESS STORAGE SPACE -- that why I kept my 8 qt. traditional stainless steel pressure cooker. Yes, it is a pretty darn big pot, but it uses so little storage space (as compared to the larger "Smart Pots"). I also kept my 6 qt. traditional pressure cooker too, simply b/c it nests (stores) nicely inside my 8 qt. pot and does not take up any extra space.
+                
+                I should also mention that I only use my 3 qt. Smart Pot Mini Duo for pressure cooking. I was really excited about the idea that I could use one appliance for both pressuring cooking AND slow cooking. THAT is the primary reason why I tried the Smart Pot in the first place. However, I was really disappointed with the Smart Pot slow cooker feature, which does not do as good a job as a traditional slow cooker (b/c the Smart Pot has a small base and is tall vs. the slow cooker which has a very wide base/cooking surface).
+                
+                What do I cook in my Smart Pot 3 qt. mini? I frequently cook a 4 lb. whole chicken (or more, if the chicken is cut up), make bone broth, rice or hard boiled eggs. Otherwise, I make anything that you would make with the larger models… I just cut the ingredient list down to fit my smaller machine. Note – personally, I think a traditional rice cooker, hands down makes better rice than a Smart Pot, but when making rice, just for me, I like the convenience of the Smart Pot. However, if I were making rice for company, I definitely use my rice cooker.
+                
+                I LOVE my Smart Pot 3 qt. mini – it is small and convenient to use. But the truth about this appliance is (as is also true for ANY size Smart Pot) that, if you are only going to use the pressure cooker feature (which is all I use), the only real difference in function vs. a traditional pressure cooker is “the timer”. And that is, I gotta admit, a nice feature. And that is also why I love my Mini… but it is not enough of a benefit for me to trade-off much needed kitchen space for any of the larger 6 or 8 qt. Smart Pot models which take up a BIGGER amount of space. It’s a tradeoff. And that is also why I am super happy with my Smart Pot 3 qt. Mini and use a traditional 8 qt. pressure cooker when I need to cook MORE.
+                
+                I highly recommend the following book whether you are considering purchasing a multicooker or even if you already have one and just want to understand it better: Multicooker Perfection: Cook it Fast or Cook it Slow – You Decide by America’s Test Kitchen (Cooks Illustrated). The book was well organized and a simple read, yet loaded with detailed testing of different Multicooker models, as well as the “pros and cons” of each multicooker feature, along with the even more important “how and why” explanation of their opinion. I got this book at my library, but found it to be so fundamentally valuable that I still went out and bought a copy to own.`
+              },
+              {
+                author: 'todo',
+                content: `The thing is this....
+                You can make 6 qts in the 6 qt Instant
+                You can make 3 qts in the 6 qt.
+                You can’t make 6 qts in the 3 qt.
+                Buy what you can afford. It is worth it. I hope this helped.`
+              }
+            ]
+          },
+          {
+            author: 'todo',
+            content: 'How to make rice? there is no water marking for rice in the pot..',
+            answers: [
+              {
+                author: 'todo',
+                content: 'The older IPs have water markings for rice cooking like a rice cooker (mine for instance does - bought in 2016), the newer ones don\'t because people got confused about it and didn\'t know what it was supposed to be. So IP did away with the markings. ItThe Instant Pot still works very well for cooking rice, though - you will have to find out about time and rice to water ratio yourself, because not everybody likes his rice the same way. For measuring rice and water use the small plastic cup that comes with the IP (same type that comes with rice cookers). With white rice you can use the "rice" setting, with all types of brown rice use the "pressure cook" setting. I like my rice moist and soft so I use 1 cup of rice to two cups of water for brown rice and cook for 22 min.'
+              }
+            ]
+          },
+          {
+            author: 'todo',
+            content: 'how much can the 3 Quart Hold? I am single and cooking for one..',
+            answers: [
+              {
+                author: 'todo',
+                content: 'We (2, plus occasional grown kids and small grandkids = 7) started with a 6 quart, and always had too many leftovers to want to eat the same thing every night for a week. Plus it took up a lot of counter space. We got a 3 quart and it\'s great - not too intrusive on the countertop, and we cook plenty for the two of us and the occasional invasion of grown kids/grandkids, even leftovers, but we\'re not drowning in leftovers now'
+              },
+              {
+                author: 'todo',
+                content: 'I have both, cooking for one. I use the 6 mostly but the 3 is great for sides.'
+              }
+            ]
+          },
+          {
+            author: 'todo',
+            content: 'How much meat can fit into the 8 quart Instant Pot? Looking to understand how many pounds of common meats like, chicken,pork,or a chuck roast will fit',
+            answers: [
+              {
+                author: 'todo',
+                content: 'I haven\'t cooked any roasts in mine, yet. I have been cooking all kinds of stews, curries, rice dishes, pastas, etc. I will say, my instant pot would easily hold a 5 lb roast. The roast may need to be trimmed a tad bit to accommodate the shape of the Instant Pot, since it is not oval like many crock pots. I made a stew last night made with 12 chicken drumsticks last night with 10 cups of vegetable broth, potatoes, carrots, and mushrooms.'
+              },
+              {
+                author: 'todo',
+                content: 'I cooked a 7.75 pound turkey breast in my six quart with the trivet in place for Thanksgiving. It was thoroughly thawed. I put 12 ounces of chicken broth in the pot and rubbed the turkey with a packet of onion soup mix. Cooked at high pressure for 30 minutes and let it release pressure naturally for 30 minutes. Absolutely the moistest turkey I’ve ever made and great flavor.'
+              },
+              {
+                author: 'todo',
+                content: 'I have the 8 qt. I have never tried to measure it poundage wise. I have jammed large roasts in it that were 5 our six pounds and could probably do 8 or ten. The problem is when you do a frozen roast and it is really tall. A thawed roast can be folded. But, I have had to saw a really long frozen roast to get it to fit. Frozen doesn\'t really seem to add a lot of time if it is short enough to fit.'
+              }
+            ]
+          }
+        ],
+        products: [
+          {
+            title: 'Instant Pot Duo 7-in-1 Electric Pressure Cooker, Sterilizer, Slow Cooker, Rice Cooker, Steamer, Saute, Yogurt Maker, and Warmer, 8 Quart, 14 One-Touch Programs',
+            price: 99,
+            bullets: `Best selling model: America’s most loved multi cooker, built with the latest 3rd generation technology, the microprocessor monitors pressure, temperature, keeps time, and adjusts heating intensity and duration to achieve desired results every time
+            Cooks fast and saves time: The Instant Pot Duo multi-cooker combines 7 appliances in one: pressure cooker, slow cooker, rice cooker, steamer, saute pan, yogurt maker and warmer – and cooks up to 70% faster
+            Consistently delicious: 14 one-touch smart programs put cooking ribs, soups, beans, rice, poultry, yogurt, desserts and more on autopilot – with tasty results
+            Easy to clean: Fingerprint-resistant stainless steel lid and components and accessories are dishwasher safe
+            Plenty of recipes: Free Instant Pot app on iOS and Android devices is, loaded with hundreds of recipes for any cuisine to get you started on your culinary adventure. Millions of users provide support and guidance in the many Instant Pot online communities
+            Advanced safety protection: The 10+ built-in safety features, including overheat protection, safety lock and more to ensure safe pressure cooking
+            Largest size capacity: 8-quart large capacity cooks for up to 8 people – perfect for families, and also great for meal prepping and batch cooking for singles and smaller households
+            Stainless steel inner pot: The instant pot stainless steel inner pot is made with a 3-ply bottom for durability and is healthy and dishwasher-safe`,
+            description: 'Instant Pot is a smart Electric Pressure Cooker designed by Canadians aiming to be safe, convenient and dependable. It speeds up cooking by 2-6 times using up to 70% less energy and, above all, produces nutritious healthy food in a convenient and consistent fashion. Instant Pot Duo 8 Quart is a 7-in-1 programmable cooker, it replaces 7 kitchen appliances as it has the functions of a pressure cooker, slow cooker, rice cooker, steamer, saute, yogurt maker & warmer. 14 built-in smart programs (Soup, Meat/Stew, Bean/Chili, Poultry, saute, Steam, Rice, Porridge, Multigrain, Slow Cook, Keep-Warm, Yogurt, Pasteurize & Jiu Niang) cook your favorite dishes with the press of a button. A 24-hour timer allows for delayed cooking. Automatic keep-warm holds the temperature of the food until you serve it. Instant Pot generates almost no noise and leaks no steam. It traps all the aromas in the food without heating up the kitchen. The 3-ply bottom stainless steel inner pot is extremely durable and leaves no health concerns associated with non-stick coatings. The slim body design has lid holders for both left and right handed users. The brushed stainless steel exterior is finger print resistant. Its elegant and durable design makes it easy to clean and pleasurable to use for the years to come. Instant Pot Duo 8 Quart uses the latest 3rd generation technology with an embedded microprocessor, which monitors the pressure and temperature, keeps time and adjusts heating intensity. The cooking programs have been lab-tested hundreds of times for optimal effect. These greatly improve cooking result and maintain consistence. Instant Pot is carefully designed to eliminate many common errors that could cause harm or spoil food. It passed the stringent UL certification giving you uncompromised safety and peace of mind and protects you with 10 proven safety mechanisms and patented technologies. NOTE: This product is 110v and for use in North America, if you live in Europe or other 220-240v territories this product will not operate. Position the steam release handle to the venting position to release the internal pressure. Open the lid after the pressure is completely released. Power supply: 120V – 60Hz, Power: 1200 watts.',
+            stock: 47,
+            media: 6,
+            isAvailable: true,
+            groupVariations: [
+              { name: 'Size', value: '8-QT' },
+              { name: 'Duo', value: 'Duo' }
+            ],
+            productParameters: [
+              { name: 'Product Dimensions', value: '14.8 x 13.18 x 10.4 inches' },
+              { name: 'Item Weight', value: '10.14 pounds' },
+              { name: 'Department', value: 'Unisex-adult' },
+              { name: 'Manufacturer', value: 'Instant Pot' },
+              { name: 'Item model number', value: 'IP-DUO80 ' }
+            ],
+            reviews: [
+              {
+                author: 'todo',
+                stars: 1,
+                isVerified: true,
+                title: 'Bad customer service!',
+                content: `I was loving my instant pot, bragging to all about it. Making my dogs food was so easy! I put in the food and the water, pressed pressure cook and like magic it was just done when it beeped. Getting used to the pressurization wasn't hard at all. It wasn't really difficult to use.
+
+                Until last week... My pot just didn't turn on! I tried other outlets and other electronics so it was not the outlet. I moved the pot to a different outlet, nothing. It was the pot. The manual gave explicit troubleshooting directions based on what is wrong. Not turning on meant that the circuit board blew and it advised to call support, which I did. When you call, an automated message tells you to go online and put in a ticket- because this is clearly a company that doesn't want to be bothered 'talking' to their customers. So I do this. A day later no response! So I email again asking for help. This time I email them the same information. Didn't hear from them until Friday! I needed my pot fixed on Tuesday.... On Thursday though I had had enough and called Amazon who thankfully knows how to treat customers and were able to refund me the product and I shipped it back to them. The pot was less than a year of purchase and within warranty after all! Even Amazon tried getting ahold of the company and they couldn't get a response!
+                
+                Beware of this brand! I would look for another pressure cooker because when it breaks, and it likely will, you won't be getting help for days....
+                
+                My first attempt to post this review Amazon blocked for an unknown reason. It should be posted though people should know what kind of company this is...`,
+                media: 0,
+                comments: [
+                  {
+                    author: 'todo',
+                    content: 'I have had a complete different experience from Instant Pot. Their customer service is amazing, my pot had a slight damage and when I approached them within the warranty period, they replaced it with a new one. Of course it takes time to follow up and everything but let\'s accept the fact that I am not the only customer for Instant Pot. This is a MUST HAVE IN THE KITCHEN PRODUCT.'
+                  },
+                  {
+                    author: 'todo',
+                    content: 'What on earth does this have to do with the Air Fryer lid? You had a problem with the Instant Pot itself, not this product.'
+                  },
+                  {
+                    author: 'todo',
+                    content: 'I like this product very much. I use it every day. I love the  Kitchen Wall Paper Oil Proof Sticker . It is easy to operate, fashionable and generous, and it goes well with the overall style of my room My friends all say that I have good taste'
+                  },
+                  {
+                    author: 'todo',
+                    content: `Things don't just happen immediately because you think they should. Waiting a few days for help with something won't kill you, and isn't unreasonable. What do you expect? Someone from Insta-Pot personally drives to your house 5 minutes after you email to fix it for you?
+
+                    If you're going to get this upset because you couldn't get your Insta-Pot fixed in a couple days, that's a reflection of you - not Insta-Pot.
+                    
+                    (Not an employee, just a consumer who thinks this review is full of absurd expectations)`
+                  },
+                  {
+                    author: 'todo',
+                    content: 'You both work for engineering companies, but you can\'t figure out why they are not compatible. Please post the name of the companies so I will know to avoid.'
+                  },
+                  {
+                    author: 'todo',
+                    content: 'lmao',
+                    replyTo: 4
+                  },
+                  {
+                    author: 'todo',
+                    content: `I'm getting the same run-around from their customer service. No return messages. I bought the Instant Pot Max for my wife then she told me she had heard of the Air Fryer that sits on top & wanted that as well. So I just ordered it. We love both the products.
+
+                    However, I recently noticed the Air Fryer is not compatible with the Instant Pot MAX. I sent them 2 messages just asking why are they not compatible. It's not like I'm even planning to return the Air Fryer. It's working great with our MAX. But I want to know why they are not compatible. It could be a fire issue, it could be it causes one or the other to fail an early life, I don't know. But I don't want to burn our house down.
+                    
+                    A simple response from the customer service as to why they are not compatible is all I need. If it's a fire issue we'll quit using them together. If it is a "early failure" by using them together then we'll decide if it's worth it.
+                    
+                    The products are great but they need to do something about the customer service. If & when they respond they'll probably use the Corona Virus as the excuse. My wife & I both work for engineering companies & we are responding to customer questions from home every day. Go figure why Instant Pot can't do the same.`
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
   }
+
 }
