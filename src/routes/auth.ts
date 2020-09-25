@@ -47,7 +47,7 @@ router.put('/:userID/password', requireSameUser('params'), async (req, res) => {
 //   res.json({ csrfToken: req.csrfToken() })
 // })
 
-router.get('/check-in', requireAuth, async (req, res) => {
+router.get('/check-in', async (req, res) => {
   const user = await authService.checkInUser(req)
   res.json(user)
 })

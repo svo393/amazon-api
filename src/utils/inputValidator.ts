@@ -96,8 +96,6 @@ export const checkUserRoleUpdate = ({ body }: Request): UserRoleUpdateInput => {
 }
 
 export const checkUserPasswordUpdate = ({ body }: Request): UserPasswordUpdateInput => {
-  console.info('body', body)
-
   const curPassword = isNonEmptyString(
     { name: 'curPassword', param: body.curPassword }
   )

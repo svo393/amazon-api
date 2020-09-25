@@ -90,18 +90,28 @@ const loginUser = async (userInput: UserLoginInput, req: Request, requiresAdmin 
 
 type UserInfo = Pick<User, 'userID' | 'role' | 'avatar' | 'name' | 'cover'> & { following: number[] }
 
-const checkInUser = async (req: Request): Promise<UserInfo> => {
+const checkInUser = async (req: Request): Promise<Partial<UserInfo> & { countryFromIP: string }> => {
+  if (req.session?.userID === undefined) {
+    return { countryFromIP: 'anywhere*' }
+  }
+
   const user = await db<User>('users')
     .where('userID', req.session?.userID)
     .first('userID', 'role', 'avatar', 'name', 'cover')
 
-  if (user === undefined) { throw new StatusError(401, 'Unauthorized') }
+  if (user === undefined) {
+    throw new StatusError(401, 'Unauthorized')
+  }
 
   const users: Pick<Follower, 'follows'>[] = await db('followers')
     .select('follows')
     .where('userID', user.userID)
 
-  return { ...user, following: users.map((u) => u.follows) }
+  return {
+    ...user,
+    following: users.map((u) => u.follows),
+    countryFromIP: 'anywhere*' // TODO implement country check
+  }
 }
 
 const updateProfile = async (userInput: UserUpdateInput, req: Request): Promise<Omit<UserInfo, 'following'>> => {
