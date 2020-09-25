@@ -1421,7 +1421,7 @@ export const initialProducts = {
             isAvailable: true,
             groupVariations: [
               { name: 'Size', value: '8-QT' },
-              { name: 'Duo', value: 'Duo' }
+              { name: 'Style', value: 'Duo' }
             ],
             productParameters: [
               { name: 'Product Dimensions', value: '14.8 x 13.18 x 10.4 inches' },
@@ -1485,6 +1485,547 @@ export const initialProducts = {
                     The products are great but they need to do something about the customer service. If & when they respond they'll probably use the Corona Virus as the excuse. My wife & I both work for engineering companies & we are responding to customer questions from home every day. Go figure why Instant Pot can't do the same.`
                   }
                 ]
+              }
+            ]
+          },
+          {
+            title: 'Instant Pot Duo Nova Pressure Cooker 7 in 1, 10 Qt, Best for Beginners',
+            price: 149.99,
+            bullets: `The largest Instant Pot: An upgrade to the all-time bestseller Instant Pot Duo series, the Duo Nova combines 7 appliances in 1: Pressure cooker, slow cooker, rice cooker, steamer, Saute pan, food warmer, and yogurt maker. Clear the clutter from your counter and do it all with just one tool
+            Bigger, healthier family meals fast: This massive 10 Quart Duo Nova is Instant Pot’s largest pressure cooker yet. With more cooking capacity than ever before, it is perfect for preparing larger meals up to 10 servings, ideal for feeding a roomful of guests or prepping meals for the entire week. And it cooks food up to 70% faster than other methods
+            Smart lid: The new easy seal lid gives you one less thing to worry about because it automatically seals your Instant Pot. Steam release is also a breeze with a fast, safe push of the quick release button. And it even comes with a bonus sealing ring
+            Worry-free cooking: 10+ safety features with UL certification let you “set it and forget it. ” You’re free to do other things while the Duo Nova cooks your dinner safely and quickly, with minimal mess and easy clean up. The Duo Nova’s food-grade stainless steel 304 (18/8) cooking pot is dishwasher-safe and durable, with no chemical coating
+            Clear, simple controls: Elegant blue LCD intuitively indicates the cooking process of the multicooker. Convenient one-touch control of 13 programs can be customized to remember the way you like to cook.Power:1440W
+            Plenty of recipes: The free Instant Pot recipes app on iOS and Android devices has 1000+ recipes to get you started on your culinary adventure. Join the millions of other Instant Pot users who share support, guidance, and the joy of cooking in the many Instant Pot online communities
+            A name you can trust: The Instant Pot Duo Nova family shares the most trusted name in cookers, bringing all the quality and convenience you’ve come to expect from Instant Pot`,
+            description: `The Instant Pot Duo Nova is the updated Duo. Duo Nova upgrades include the EasySeal Lid to automatically seal when pressure cooking and a cooking progress indicator, so you know when cooking begins. Plus, Duo Nova includes a bonus sealing ring.
+
+            The Instant Pot Duo Nova 7-in-1, One-Touch multi-tasking, space-saving, time-saving appliance that pressure cooks, Sautes, steams, slow cooks, warms, and makes delicious meats, eggs, rice, soup, yogurt and more — all in one healthy, dishwasher safe, stainless steel pot. With 12 Smart Programs — ranging from meats, soup, stew, beans, chili, poultry, rice and yogurt, to multigrain, porridge and slow cook — it puts cooking on autopilot.
+            
+            The Poultry Smart Program cooks moist and tender chicken, turkey and other poultry, even from frozen. The Bean/Chili Program takes dried, unsoaked beans to flavorful cooked beans in no time.
+            
+            The Meat/Stew Smart Program cooks beef and pork anywhere from rare to fall-off-the-bone. Three customizable temperature settings across each Smart Program let you program your Duo Nova to your preferences. For example, with the Saute function, you can set to simmer, sear or thicken pressure cook your dish to completion — all in one easy-to-clean pot.
+            
+            Make your favorite slow cooker recipes in your Instant Pot. With the Slow Cook function with three settings (low, medium and high heat), you no longer need an extra slow cooker.
+            
+            Easy-to-use controls and new easy-to-read icons that indicate cooking progress make selecting Smart Programs and making adjustments simple — even during cooking. The Duo Nova is equipped with dual-pressure settings, giving you the option to cook at Low or High pressure. High pressure can reduce the cooking time by 2 to 6 times, while Low pressure prevents delicate foods from overcooking. It also has both automatic and manual Keep Warm programming to ensure that dishes are kept at ready-to-eat temperatures.
+            
+            A free Instant Pot app is available on iOS and Android mobiles, loaded with hundreds of easy recipes for almost all cuisines with plenty of great ideas to start your culinary venture.`,
+            stock: 37,
+            media: 6,
+            isAvailable: true,
+            groupVariations: [
+              { name: 'Size', value: '10-QT' },
+              { name: 'Style', value: 'Duo nova' }
+            ],
+            productParameters: [
+              { name: 'Product Dimensions', value: '16.8 x 15.31 x 16.34 inches' },
+              { name: 'Item Weight', value: '28 pounds' },
+              { name: 'Manufacturer', value: 'Instant Pot' },
+              { name: 'Item model number', value: 'Duo Nova ' }
+            ],
+            reviews: [
+              {
+                author: 'todo',
+                stars: 4,
+                isVerified: false,
+                title: 'Feed the team!',
+                content: `I got the 10 qt and was delighted by the size. It is quite large, which is great when you need to cook for a large group. The inner pot is 6.5" deep (which isn't much difference from a smaller unit) however it is 11" wide on the interior and 12" across on the exterior lip of the stainless pot. Without the lid on the unit it around 10.5" tall, and with the lid it is somewhere between 13-14".
+
+                In regards to features it has plenty, however I was a bit sad it doesn't have the egg feature. But given how many times I have used the function on my smaller Instant Pot, I know it is just 5 minutes high pressure and 5 minutes until I release the pressure.
+                
+                I love the new pressure valve. Now I don't have to turn it and make sure it is set properly for the pressure to build. The whole unit is great BUT, the trivet! Seriously the trivet is the same size that comes with the 6qt and comes nowhere close to covering the bottom of the unit. They clearly should have designed a trivet to fit this very large unit. I'm docking one star for that because I find it to be annoying.
+                
+                Overall, I'm pleased with this unit and think it is great size that offers a lot of flexibility.`,
+                media: 6
+              },
+              {
+                author: 'todo',
+                stars: 3,
+                isVerified: false,
+                title: 'Very few accessories for the 10 quart model.',
+                content: `I bought the 10 quart model. I like to cook ribs in the pot and the 6 quart is a little tight with 2 racks of ribs. The 10 quart has plenty of room. The reason I gave this 3 stars instead of 5 is due to the lack of accessories for the pot.
+
+                The rack that comes with the pot is the same size as the one that comes with the 6 quart model. If they’re going to make a bigger pot, they should make accessories to match instead of just sending the same accessories.
+                
+                With the 6 quart model I was able to purchase a glass lid in order to use it as a slow cooker. I didn’t find a glass lid on the instant pot site for the 10 quart model.`,
+                media: 0
+              }
+            ]
+          },
+          {
+            title: 'Instant Pot Duo Mini 7-in-1 Electric Pressure Cooker, Sterilizer, Slow Cooker, Rice Cooker, Steamer, Saute, Yogurt Maker, and Warmer, 3 Quart, 11 One-Touch Programs',
+            listPrice: 79.95,
+            price: 59.99,
+            bullets: `Compact size: Great size for small households and side dishes, or anywhere space is limited. Has all the features of the Duo60 in a compact size.
+            Replaces up to 7 appliances: combines 7 kitchen appliances in 1 to save you space, including: pressure cooker, slow cooker, rice cooker, steamer, saute, yogurt maker, and warmer.
+            14 one touch cooking presets for quicker cooking: soup/broth, meat/stew, bean/chili, poultry, saute/searing, steam, rice, porridge, steam, slow cook, keep Warm, yogurt, manual, and pressure cook.
+            Best selling model: monitors pressure, temperature, keeps time, and adjusts heating intensity and duration to achieve your desired results every time. Prepare dishes up to 70% faster.
+            Easy to clean: fingerprint-resistant stainless steel lid and components and accessories that are dishwasher safe.`,
+            description: 'Instant Pot Duo Mini is the ideal companion to the Duo 6 Quart, 7-in-1 programmable multi-cooker replaces 7 kitchen appliances, combines the functions of a Rice Cooker, Pressure Cooker, Slow Cooker, Steamer, saute, Yogurt Maker, and Warmer. 11 smart built-in programs – Rice, Soup/Broth, Meat/Stew, Bean/Chili, saute, Steam, Porridge, Yogurt, Slow Cook, and Keep Warm, your favorite dishes are as easy as pressing a button. The Instant Pot Duo Mini Rice Cooker Function cooks up to 6 cups of uncooked rice (12 cups cooked rice), the rice cooker function can cook all types of rice including white rice, brown rice, wild rice, sushi rice, risotto rice and more. Accessories include a stainless steel steam rack with handles and condensation collector. The Duo Mini is versatile it can be used at home to make a small dish for two, side dish or while traveling such as camping, traveling by RV, boating, sailing, hotel excursions etc.. A 24-hour delay start timer for delayed cooking is great for busy families allowing you to have your food ready when you get home from a busy day at work. Automatic keep warm holds the temperature of the dish until you serve. NOTE: This product is 110v and for use in North America, if you live in Europe or other 220-240v territories this product will not operate. When installing the sealing ring, make sure the sealing ring rack is completely set in the groove on the inside of the sealing ring.',
+            stock: 5,
+            media: 6,
+            isAvailable: true,
+            groupVariations: [
+              { name: 'Size', value: '3-QT' },
+              { name: 'Style', value: 'Duo' }
+            ],
+            productParameters: [
+              { name: 'Product Dimensions', value: '11.81 x 10.51 x 10.98 inches' },
+              { name: 'Item Weight', value: '8.65 pounds' },
+              { name: 'Manufacturer', value: 'Instant Pot' },
+              { name: 'Item model number', value: 'Duo Mini' }
+            ],
+            reviews: [
+              {
+                author: 'todo',
+                stars: 5,
+                isVerified: true,
+                title: 'Perfect Tiny Living appliance',
+                content: `I use this for everything! How did I live without this before???
+
+                I live in a Sprinter van full-time and was using an induction burner for cooking, but since I've gotten this little gem, I haven't used the induction burner once!
+                
+                This is so easy to use, and it's the perfect size for one or two people. I've been making a lot of stews, and I'll saute the onions, carrots, and meat (if I'm using meat) then add everything else, seal it, and set it for 7 minutes on high pressure. I let it release naturally and have a perfectly cooked, tasty meal every time. This gives me enough for 4 or 5 servings.
+                
+                I also quick soaked beans the other day by covering them with water, hitting pressure for 5 min. then letting it release naturally and let it sit (not on keep warm) for a couple of hours.
+                
+                I'll often make dinner right after I reheat my lunch, and make sure the keep warm function is on. I'm able to drive with it in my sink and have a hot, healthy, delicious meal waiting for me when I'm done driving.
+                
+                I've even baked banana bread in it!!! So exciting, because I don't have an oven. It turned out SO good! I used one of the containers and the lid from my To-Go Ware stainless steel lunch container to bake it in on the rack.
+                
+                Because this cooks so quickly, it is very easy on my solar system. I can reheat leftovers on saute in 4 minutes, and it's only drawing 67a while it's on.
+                
+                I did have a VitaClay, that I absolutely loved for making beans, and especially bone broth, but it takes much longer to cook and is heavier. So, more battery drain, more storage space, and more weight as compared to the Instant Pot Mini and the Mini wins on each count!`,
+                media: 1,
+                comments: [
+                  {
+                    author: 'todo',
+                    content: 'Very good, I very like it, this is a great value product, I also bought the Silicone Ice Cube Tray to make ice cube for keeping my drinks chilled, They are all great works and practical.'
+                  },
+                  {
+                    author: 'todo',
+                    content: 'Hi, I\'m curious what solar/power system you have in your van to power this. I have 500w solar and a 200Ah battery in mine and there\'s no way I could power this cooker. Thanks!'
+                  },
+                  {
+                    author: 'todo',
+                    content: 'Exactly my thoughts. I live part time in a Sprinter van as well, and have a robust solar/battery system that would never be able to support, well....anything that draws 67 amps. Requesting The Galavan to clarify his amp draw post...',
+                    replyTo: 1
+                  },
+                  {
+                    author: 'todo',
+                    content: 'I got this at Costco, very handy, easy to use. '
+                  },
+                  {
+                    author: 'todo',
+                    content: 'Good review'
+                  }
+                ]
+              },
+              {
+                author: 'todo',
+                stars: 2,
+                isVerified: true,
+                title: 'Float valve doesn\'t pop up on its own.',
+                content: `We're using this pot to cook for two and it does a great job, save for one problem--the little float valve in the lid does not pop up on its own.
+
+                In order to get the float valve to pop up, I have to tap on it or grab the lid and press down on it once enough pressure has been built up inside the pot.
+                
+                I can't tell if this is a design flaw or a fault of the valve--it's a pretty basic little thing and unless the valve is catching on a rough bore in the lid or something, I don't see why it won't raise up on its own. Once I get it to pop up, the unit works like a charm.
+                
+                I was hoping it was user error, but after four months of using the pot almost weekly and experimenting with advice from online, I'm pretty sure this isn't right. Maybe I should contact the manufacturer, because right now, I have to watch the pot to ensure it will build pressure.`,
+                media: 0
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    'Hamilton Beach': [
+      {
+        questions: [
+          {
+            author: 'todo',
+            content: 'Product description is for a proctor silex waffle baker???',
+            answers: [
+              {
+                author: 'todo',
+                content: 'I ordered this straight off the screen and received the Slow Cooker - not a waffle baker.'
+              },
+              {
+                author: 'todo',
+                content: 'Yes, I also noticed that. Seems to be a mistake by Amazon. Not very helpful.'
+              },
+              {
+                author: 'todo',
+                content: 'No'
+              }
+            ]
+          },
+          {
+            author: 'todo',
+            content: 'Does the lid have a rubber gasket ( seal)around it?',
+            answers: [
+              {
+                author: 'todo',
+                content: 'The rubber gasket on the lid is this removable?'
+              },
+              {
+                author: 'todo',
+                content: 'no'
+              }
+            ]
+          }
+        ],
+        products: [
+          {
+            title: 'Hamilton Beach 4-Quart Slow Cooker with Dishwasher-Safe Stoneware Crock & Lid, Stainless Steel (33140V)',
+            listPrice: 39.76,
+            price: 26.99,
+            bullets: `Dishwasher safe stoneware & lid for fast, easy cleanup
+            4 settings include off, low, high & warm
+            Perfect size for a 4 lb chicken or two 2 lb roasts
+            Stoneware is stainproof and removable for tabletop serving
+            Stoneware is suitable for refrigerator storage`,
+            description: 'Hamilton Beach 4-Quart Slow Cooker with Dishwasher-Safe Stoneware Crock & Lid Stoneware is stainproof and removable for tabletop serving or refrigerator storage',
+            stock: 7,
+            media: 4,
+            isAvailable: true,
+            productParameters: [
+              { name: 'Product Dimensions', value: '12.2 x 9.4 x 12.4 inches' },
+              { name: 'Item Weight', value: '9.25 pounds' },
+              { name: 'Department', value: 'Kitchen Appliances' },
+              { name: 'Manufacturer', value: 'Hamilton Beach' },
+              { name: 'Item model number', value: '33140V ' }
+            ],
+            reviews: [
+              {
+                author: 'todo',
+                stars: 1,
+                isVerified: false,
+                title: 'Don\'t buy cheap product.',
+                content: 'This crock pot leaked the first and only time I used it. I suspect it was not properly packed. Although the ceramic pot looked fine when I started using it to cook my black eyed peas for my New Year\'s dinner, by the time they were done pot was cracked. I didn\'t want to believe it, but tried it again a month later with just water to confirm the leak. I guess I was amazed because my previous crock pot last me over 30 years and multiple moves. I guess they just don\'t make products like they used to. I added pictures of the crack and of the pot so you can see that the pot has not been used (or abused). ',
+                media: 2,
+                comments: [
+                  {
+                    author: 'todo',
+                    content: 'What brand was the one that you had for 30 years?'
+                  }
+                ]
+              },
+              {
+                author: 'todo',
+                stars: 5,
+                isVerified: true,
+                title: 'Bachelor guidance',
+                content: `My ex couldn't make a roast to save her life. I don't know why I thought I could, but it turns out I can roast up some bliss...
+
+                For frame of reference (and to learn from my experiences) here's what you'll probably care about. When you buy a 4 quart slow cooker, that's good for about a 4 pound roast. You could maybe fit a 4.5 pounder in there, but it'll be mighty snug and may not work as well as you'd like. I have kids with hollow legs, and think I'll soon be looking for a 6 quart slow cooker. Also- if you're doing a roast, put it on the low heat and give it 8 hours. Yes, sure- you could use the higher heat and get the interior to 160F and eat it, but it won't be the same. Trust me on this. I've taken notes.
+                
+                As far as the cooker goes, I like it a lot- easy to clean, convenient size, and versatile. The only thing I'd ask Hamilton Beach to change is to add a power LED or something that will make it clear from across the room if it's on.`,
+                media: 0,
+                comments: [
+                  {
+                    author: 'todo',
+                    content: 'Others do want to know more details, Marie, no need to be rude.'
+                  },
+                  {
+                    author: 'todo',
+                    content: 'I only wanted to know about the crock pot - not his life story! But good advice on temperature control'
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        questions: [
+          {
+            author: 'todo',
+            content: 'does this cooker auto switch to warm when food is done?',
+            answers: [
+              {
+                author: 'todo',
+                content: 'No it does not. The temperature setting (HIGH, LOW and WARM) are a manual dial that you must physically turn to change.'
+              },
+              {
+                author: 'todo',
+                content: 'as far as I know it does not maybe I didn\'t read enough about the poduct'
+              },
+              {
+                author: 'todo',
+                content: 'No it does not.'
+              },
+              {
+                author: 'todo',
+                content: ' No '
+              }
+            ]
+          },
+          {
+            author: 'todo',
+            content: 'can we cook rice and beans on this?',
+            answers: [
+              {
+                author: 'todo',
+                content: 'I have done beans but not rice and it was good. I did bean soup.'
+              }
+            ]
+          },
+          {
+            author: 'todo',
+            content: 'Does the plug have 3 prongs?',
+            answers: [
+              {
+                author: 'todo',
+                content: 'No it is only a 2 prong.'
+              },
+              {
+                author: 'todo',
+                content: 'no it\'s a 2 prong plug'
+              },
+              {
+                author: 'todo',
+                content: 'No'
+              }
+            ]
+          },
+          {
+            author: 'todo',
+            content: 'Are there heating elements on the sides as well as the bottom? ',
+            answers: [
+              {
+                author: 'todo',
+                content: 'Yes. I think so'
+              }
+            ]
+          }
+        ],
+        products: [
+          {
+            title: 'Hamilton Beach Extra-Large Stay or Go Portable 10-Quart Slow Cooker With Lid Lock, Dishwasher-Safe Crock, Black (33195)',
+            listPrice: 59.99,
+            price: 49.99,
+            bullets: `Extra-Large Capacity. 10 Quart Capacity Fits a 10 Pounds Turkey or 12 Pounds Roast
+            3 Temperature Settings. Cook on Low or High and Then Switch to Warm When Your Meal Is Done Cooking
+            Clip-Tight Sealed Lid. the Tight Seal Helps Prevent Messy Spills on the Way to a Potluck or Tailgate
+            Full-Grip Handles. Thoughtful Handle Design Makes for Easy Carrying
+            Simple to Clean. Stoneware Crock & Glass Lid Are Dishwasher Safe`,
+            description: 'Dinner for the whole family doesn\'t have to be a chore. With the Hamilton Beach 10 quart slow cooker, It can be as easy as putting a few ingredients in the Crock before work and turning it on. By the time you come home, a warm, delicious, home-cooked meal will be waiting.',
+            stock: 25,
+            media: 7,
+            isAvailable: true,
+            productParameters: [
+              { name: 'Product Dimensions', value: '12.5 x 15.75 x 11.5 inches' },
+              { name: 'Item Weight', value: '16.91 pounds' },
+              { name: 'Manufacturer', value: 'Hamilton Beach' },
+              { name: 'Item model number', value: '33195 ' }
+            ],
+            reviews: [
+              {
+                author: 'todo',
+                stars: 5,
+                isVerified: true,
+                title: 'Great for Slow Cocking Turkey!',
+                content: 'This size crockpot fitted my 12lbs perfectly with some room for vegetables too! Love it!',
+                media: 1,
+                comments: [
+                  {
+                    author: 'todo',
+                    content: 'I would not cook in plastic! That puts plastic in your food!'
+                  },
+                  {
+                    author: 'todo',
+                    content: 'Well, who doesn\'t love a slow cocked turkey!!! OMG! LOL!'
+                  }
+                ]
+              },
+              {
+                author: 'todo',
+                stars: 1,
+                isVerified: true,
+                title: 'Major Disappointment',
+                content: `UPDATED REVIEW:
+                I returned the first crock (because of the problems listed below) but was so in love with the size (large family here) that I decided to give a replacement another try. This one still has gaps in the lid. All I can imagine is that this will increase cooking times significantly! Also, there are pitting in the second crock (see photos). When I contacted Hamilton Beach about this problem, they informed me that it was a "normal" part of the process and that the crock would perform just fine. I have had many crocks over the years (mainly Crock Pot brand) and never have they had this pitting. Hamilton Beach refused to do anything about this pitting problem. Their customer service is pathetic! Unhappy to say the least! Please do NOT purchase this crockpot/slow cooker. You will be disappointed.
+                ~~~~~~~~~~~~~~~~~~~~~
+                The lid does not fit the crock. On both ends, there is air space of approx 1/4" to 1/2" where the lid does not lie flat on the crock. Instructions say don't cook with lid locked but the air space unlocked will cause the cooking time to increase dramatically. Very poor quality! I'm going to return it.`,
+                media: 2
+              },
+              {
+                author: 'todo',
+                stars: 3,
+                isVerified: true,
+                title: 'Not 10 quart capacity',
+                content: 'This is very nice but it is only 8 quarts. It states that it is 10 quarts on the Amazon website & on the packing box, model #33195. We measured the capacity and when filled with 8 quarts of water, the water level was at the maximum fill line. Adding the 9th quart of water caused it to almost spill over the top. It is also advertised as a 10 quart model on the Hamilton Beach website and there is another 10-quart model advertised on the Hamilton Beach website Model # 33191. I\'m reluctant to order the #33191 as it may not have a 10 quart capacity either ',
+                media: 0,
+                comments: [
+                  {
+                    author: 'todo',
+                    content: 'Always, for any receptacle that will hold liquids, the capacity is given with consideration that there must be a safe space to avoid spilling. I always count on leaving 2" - 3" minimum from the top for cold liquids, 4" - 6" for hot liquids and/or for cooking. Capacity for solids is exact.'
+                  },
+                  {
+                    author: 'todo',
+                    content: 'Sad to hear that, still thank you so much for your sharing. Oh, I also bought the Privacy Window Film , which provides TWO Way Privacy but allows plenty of natural light to filter through, easy to install, works very well. I\'ll buy more! Highly recommend!'
+                  },
+                  {
+                    author: 'todo',
+                    content: 'Thanks for your post. I\'m comparing the dimensions to the 7 qt. model and was wondering how they could be so close in size.'
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        questions: [
+          {
+            author: 'todo',
+            content: 'Does the hole for the probe in this crockpot really not cause any problems while cooking? I was always under the impression any leaks/holes are bad',
+            answers: [
+              {
+                author: 'todo',
+                content: 'Look at other slow cookers, not many have what you\'d call a tight-fitting lid. It\'s usually just a thin glass lid that can rattle a bit when cooking on Highl. I have an earlier HB Stay or Go non-programmable model with a hole, no probe, no problems. There\'s no stream of steam that escapes, nothing seems to come out of it, even cooking on High.'
+              },
+              {
+                author: 'todo',
+                content: `I have been using this crock pot for several months now, both with and without the temperature probe inserted. I have not had a problem either way. There are two (2) tiny vent holes where the handle attaches anyway -- if you didn't have those the lid would pop up when steam/heat pressure built up. Some people have complained that too much steam/heat escapes when the probe is not in use; you can resolve that (if it bothers you) with a small piece of aluminum foil rolled into a plug.
+                This is a GREAT crock pot. I make everything from whole chicken, baby back ribs, chicken soup, and pasta sauce in it. I can't say enough good things about it. (Except the cord is about 4 inches too short. LOL I fixed that with a 6 inch extension cord -- works great!)`
+              },
+              {
+                author: 'todo',
+                content: `I owned this Crick pot for years and used it several times a week , it finally died after my kitchen suffered electrical issues and surges .
+                I've never had a problem with the tiny vent hole , quite the oposite , I always found this model to cook far better than any other I've used before or since .
+                I'm reordering this one now`
+              },
+              {
+                author: 'todo',
+                content: 'Ive had mine for at least 3 years now and I rarely use the probe, I\'ve never had any issues with the hole. This is the best crockpot I\'ve ever owned.'
+              }
+            ]
+          },
+          {
+            author: 'todo',
+            content: 'does that have a delay start feature',
+            answers: [
+              {
+                author: 'todo',
+                content: 'Sorry Kim, but you can\'t set this cooker to turn on later in the day. For the meals that I cook in this unit that\'s never been a problem--for example, a pot roast that requires a 6-hour cooking time on the low setting will still be perfect after 8 or 10 hours because there\'s simply no evaporation to allow the food to dry out. If you\'re making a casserole that only needs to "bake" for a couple hours, and you want to serve after an 8-hour workday, you\'ll need to use the timed feature on your regular oven. I\'m not aware of any slow cookers that have a delayed start feature for that very reason; they simply don\'t allow food to dry out. So as long as you cook your food for the minimum required time, extending the length of cooking time for hours, even, is never a problem. This slow cooker will automatically switch to the warm setting after the cook time that you programmed has elapsed, or the probe registers that the food is cooked. I\'ve used quite a few different slow cookers, and this one (and its\' smaller cousin) are by far my favorites. If you spent 10 times the amount of money, this would still be the best slow cooker of all, in my opinion.'
+              }
+            ]
+          },
+          {
+            author: 'todo',
+            content: 'Can the interior pan be removed for easier cleaning, or for serving/',
+            answers: [
+              {
+                author: 'todo',
+                content: 'If your talking about the "ceramic crock" that you place your food in then yes, its removable. It is also microwave-safe and oven proof.'
+              }
+            ]
+          }
+        ],
+        products: [
+          {
+            title: 'Hamilton Beach Portable 6-Quart Digital Programmable Slow Cooker With Temp Tracking Temperature Probe to Braise, Sous Vide, Make Fondue & Yogurt, Lid Lock, Black Stainless (33866)',
+            price: 69.99,
+            bullets: `Integrated Temperature Probe: Track Your Food’s Temperature With the Probe, Minimizing the Chances of Overcooking and Helping to Ensure Food Safety When Cooking Beef, Pork & Poultry
+            Multiple Cooking Functions: Cook on Low, Medium or High With or Without the Probe; When the Food Is Ready, the Slow Cooker Shifts to Keep Warm or Holds It at the Selected Temperature
+            Expand Your Cooking Options: Hold Temperature Function Lets You Sous Vide, Prepare Yogurt, Poach, Simmer, Braise, Make Fondue & More
+            Digital Display: Countdown Timer Displays Remaining Cooking Time and Toggles Between the Selected Food Temperature and a Current Internal Temperature When the Probe Is in Use
+            6 Quart Capacity: Perfect Size for a 6 LB. Chicken or 4 LB. Roast`,
+            description: 'Hamilton Beach slow cookers take the convenience of slow-cooked dishes A giant step further. Even if you typically use your slow cooker at home, you\'ll be impressed by the attractive design, easy-to-use features and simple Dishwasher cleanup that a Hamilton Beach slow cooker offers you.',
+            stock: 13,
+            media: 7,
+            isAvailable: true,
+            productParameters: [
+              { name: 'Product Dimensions', value: '12 x 17 x 11.87 inches' },
+              { name: 'Item Weight', value: '13.05 pounds' },
+              { name: 'Manufacturer', value: 'Hamilton Beach' },
+              { name: 'Item model number', value: '33866 ' }
+            ],
+            reviews: [
+              {
+                author: 'todo',
+                stars: 5,
+                isVerified: true,
+                title: 'Best slow cooker.',
+                content: 'Love it. The temperature probe works wonderfully. Cleans up easily.',
+                media: 1
+              },
+              {
+                author: 'todo',
+                stars: 1,
+                isVerified: false,
+                title: 'It\'s not all that.',
+                content: `I use my slow cooker all the time, so when it finally conked out, it was almost like losing a best friend. After many hours of research and reading reviews, I finally settled on this model due to the temp probe. Awesome idea, and that feature does work. However, there were a number of issues that had me packing this puppy up and shipping it back.
+
+                1. Yes, the lid does smell like the food you cooked. I read that in the other reviews, and at first I'm like, so what? If I had a guest that was sniffing the lid, I'd politely escort them out the door and they'd be a guest no more, right? Well, I get it now. I keep my cooker in a cabinet, and when I opened the cabinet to take it out, the odor just wafted out. Yuck.
+                2. I don't know if it's a defect or maybe it was operator error, but I couldn't change the temp during the cook. The first meal I cooked was a large batch of 15 bean soup with ham hocks. I started it on Hi with Hold Temp on and set to 180, as that's what the chart says is "Simmer". Okay. At 109 degrees my soup was boiling and I tried to turn it to Low and it wouldn't let me. So I had to cancel the cook and reprogram it. Really? (Glad I was home to catch it.) I set it to Low without Hold Temp, then the soup wasn't bubbling at all. Now I'm frustrated. Why oh why did my old cooker have to die??
+                3. The backlit display turns off, and you can't really see the status of your cook. I was afraid to touch the dial for fear of cancelling it. It's a small matter, I know. But still, slow cooking should be a stress free experience.
+                4. The glass lid would be awesome to peek at how your cook is going, if you could see through it. The condensation gets so bad you can't see through it. I even tried tapping on the lid to knock some of the moisture off, but it made little difference. Grrr...
+                5. As you may be able to tell in the pics, the crock discolored after my second cook. I hand washed and dried both the lid and the crock, so I'm not sure why it became so cloudy.
+                6. The metal hinges you use to lock down the lid for transport are pretty flimsy.
+                
+                Too many little things were enough to have me saying "sayonara" Hamilton Beach and "hello" Aicok.`,
+                media: 3,
+                comments: [
+                  {
+                    author: 'todo',
+                    content: 'wwwwww'
+                  }
+                ]
+              },
+              {
+                author: 'todo',
+                stars: 5,
+                isVerified: false,
+                title: 'Awesome Slow Cooker',
+                content: 'This cooker is awesome! I love to cook and this makes it so easy. The temperature probe allows you to select your final temperature, when your meal reaches set point temperature you have the option to have your meal stay at that temperature or keep it warm. You can even set how long to keep it warm or at set point temperature. It is also fast, put a roast in and in a few hours it’s done. The display also tell you the current temperature. If your looking for a cooker this is it and for a few dollars more you get it all. I included a few photos of delicious meals made in this slow cooker.',
+                media: 2
+              },
+              {
+                author: 'todo',
+                stars: 2,
+                isVerified: true,
+                title: 'Strong on bells & whistles, weak on basic cooking',
+                content: 'We bought this crockpot with hopes it would replace our very old classic crockpot. The locking lid and built-in thermometer are great feature additions. But, I\'m sorry to say it hasn\'t replaced our classic crockpot. The \'low\' setting boils meals just like \'high\' does. The timer function is both good and bad. We cook some things for 2-3 days (broth), and have to remember to reset the timer every day or this unit will shut off. And now the "cancel\' button text has come off after 2 months of use. Quality, performance, and attention to detail on this crockpot are sub-par. ',
+                media: 1
+              },
+              {
+                author: 'todo',
+                stars: 1,
+                isVerified: false,
+                title: 'Worst Product',
+                content: 'Bought in September new. Lasted till January. Worst quality. Digital controls a hazard and does not work half the time. Too late to return. We should have returned when we saw the controls were confusing and would not work. Do not buy. Hamilton Beach crockpots are the worst. This is the second one I went thru in 2 years. Customer service the worst and arrogant. Told me they could repair or replace for more money than I paid for it. Done with Hamilton Beach. Be prepared for 1 hour hold times on customer service. They even say its 5o minutes at beginning of hold. Very poor.',
+                media: 0
+              },
+              {
+                author: 'todo',
+                stars: 5,
+                isVerified: true,
+                title: 'Wedding gift for son and my new daughter',
+                content: 'Purchased in June 2019 as a wedding gift. My son and his wife are very busy (as most folks these days) and use this slow cooker at least 4 times a week. They love it! My wife and I have the same brand, albeit 10 years older, and have had no issues. My new daughter is always telling us how it\'s the best gift they received. They have cooked small whole turkeys, too Irish stew, to chili, to chicken n dumplings, and all the normal type of stuff. Would recommend to anyone needing to have good, healthy, fresh meals ready when coming home from a long days work.',
+                media: 0
+              },
+              {
+                author: 'todo',
+                stars: 2,
+                isVerified: true,
+                title: 'I will get my old one out of the attic!',
+                content: `The control knobs, setting etc. are almost impossible to just turn to low, med or high.
+                Hate those lock down things, the temp probe, all make it more difficult to clean and store.
+                Seriously I have an old one with a slight crack in the crock. I will get it out of the attic and try to send this back. Bad recommendation from HotWire`,
+                media: 0
+              },
+              {
+                author: 'todo',
+                stars: 3,
+                isVerified: true,
+                title: 'Cooks too hot!',
+                content: 'I bought this because the crock in my old crock pot kept cracking. I have not really liked it at all. It cooks extremely hot leaving food dry and/or burnt. The shell is really flimsy and will dent with the lightest touch. I’d rather purchase my old crock pot and just buy a new one every few years than stick with this one.',
+                media: 0
               }
             ]
           }
