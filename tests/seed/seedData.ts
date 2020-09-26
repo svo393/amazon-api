@@ -2483,46 +2483,117 @@ export const initialProducts = {
         questions: [
           {
             author: 'todo',
-            content: 'wwwwww',
+            content: 'Im 5\'2 and weigh about 116 what size should I get?',
             answers: [
               {
                 author: 'todo',
-                content: 'wwwwww'
+                content: 'It runs big. I would consider an extra small if I were you.'
+              }
+            ]
+          },
+          {
+            author: 'todo',
+            content: 'Is this dress available in plus sizes?',
+            answers: [
+              {
+                author: 'todo',
+                content: 'We have XL size and it is the largest size for the dress. Thanks.'
+              }
+            ]
+          },
+          {
+            author: 'todo',
+            content: 'I am a size 2/4 and run between an xs and s. would you recommend the small or extra small? chest is 34d. thanks!',
+            answers: [
+              {
+                author: 'todo',
+                content: 'I am a 34 G and got a L, which fit perfect...the medium was a little too tight across the chest and just a tad too short for my liking and the large fixes both these issues with out getting too much bigger anywhere else. So I’d say go with a medium!'
+              },
+              {
+                author: 'todo',
+                content: 'sorry can\'t help bought it as a gift .'
               }
             ]
           }
         ],
         products: [
           {
-            title: 'wwwwww',
-            listPrice: 111,
-            price: 100,
-            bullets: 'wwwwww',
-            description: 'wwwwww',
-            stock: 999,
-            media: 999,
+            title: 'SheIn Women\'s Crochet Pom-pom Sheer Lace Bell Sleeve Dress',
+            price: 43.99,
+            bullets: `Materials: 100% Nylon; Fabric has no stretch. White one would be a little see through.
+            Hollow out, long sleeve, see through, round neck
+            Shift, keyhole back, casual, elegant, boho
+            Soft and comfortable; suitable for wearing in Spring, Fall or Winter
+            Model Measurement: Height: 175cm/5'9", Bust: 85cm/33", Waist: 61cm/24", Hip: 93cm/37", Wear: S"; Please refer to the size measurement below. Length of dress would be a little short.`,
+            productSizes: [
+              { name: 'X-Small', qty: 7 },
+              { name: 'Small', qty: 3 },
+              { name: 'Medium', qty: 1 },
+              { name: 'Large', qty: 2 },
+              { name: 'X-Large', qty: 5 },
+              { name: 'XX-Large', qty: 3 }
+            ],
+            media: 6,
             isAvailable: true,
             groupVariations: [
-              { name: 'wwwwww', value: 'wwwwww' },
-              { name: 'wwwwww', value: 'wwwwww' }
+              { name: 'Color', value: 'Off White' }
             ],
-            productParameters: [
-              { name: 'wwwwww', value: 'wwwwww' }
+            reviews: [
+              {
+                author: 'todo',
+                stars: 5,
+                isVerified: false,
+                title: 'Sized up for the win',
+                content: 'This dress was perfect for my fiesta bridal shower! I originally ordered a medium but found it to be a little tight through the chest area so I ordered a large which fit much better (not tight and a little longer). I am 5’4 155lbs and a 32G. Dress is fairly see through, So I wore a slip under mine. Overall very happy with this purchase!',
+                media: 1
+              },
+              {
+                author: 'todo',
+                stars: 5,
+                isVerified: false,
+                title: 'White party success!!',
+                content: 'My boss told me last min I was going to the annual realtor white party so what do I do... go to my handy dandy amazon! I’m a shift dress girl and when I saw this I was like well let me give it a chance. I’m about 160 pds and 5’2 usually between M-L, I ordered the large to be on the safe side and felt it was a bit big but in a comfy still fitting way, as in if I ordered the M it would have been too small. I did wear a slip under it as well just in case the light shined to hard, it wasn’t see through but I did notice with just a nude bra and panties you could kind of see it. All in all, I got so many compliments!',
+                media: 1
+              }
+            ]
+          },
+          {
+            title: 'SheIn Women\'s Crochet Pom-pom Sheer Lace Bell Sleeve Dress',
+            price: 43.99,
+            bullets: `Materials: 100% Nylon; Fabric has no stretch. White one would be a little see through.
+            Hollow out, long sleeve, see through, round neck
+            Shift, keyhole back, casual, elegant, boho
+            Soft and comfortable; suitable for wearing in Spring, Fall or Winter
+            Model Measurement: Height: 175cm/5'9", Bust: 85cm/33", Waist: 61cm/24", Hip: 93cm/37", Wear: S"; Please refer to the size measurement below. Length of dress would be a little short.`,
+            productSizes: [
+              { name: 'X-Small', qty: 1 },
+              { name: 'Small', qty: 3 },
+              { name: 'Medium', qty: 1 },
+              { name: 'Large', qty: 2 },
+              { name: 'X-Large', qty: 0 },
+              { name: 'XX-Large', qty: 0 }
+            ],
+            media: 6,
+            isAvailable: true,
+            groupVariations: [
+              { name: 'Color', value: 'Black' }
             ],
             reviews: [
               {
                 author: 'todo',
                 stars: 1,
-                isVerified: false,
-                title: 'wwwwww',
-                content: 'wwwwww',
-                media: 0,
-                comments: [
-                  {
-                    author: 'todo',
-                    content: 'wwwwww'
-                  }
-                ]
+                isVerified: true,
+                title: 'Fit is all over the place!',
+                content: 'I liked how the dress looked so I ordered an XS because that\'s what I usually wear and the dress had a great length but the shoulders were too tight, so I re-ordered one size larger, a small and it was HUGE! The length was too long and I swam in it. There shouldn\'t be that large of a difference between sizes. Save your money. ',
+                media: 0
+              },
+              {
+                author: 'todo',
+                stars: 5,
+                isVerified: true,
+                title: 'Adorable',
+                content: 'I purchased this dress to wear on vacation. It ended up being much colder than anticipated so I wasn\'t able to wear it however I am definitely excited to add it to my closet for the next time I need to dress up. This dress is comfortable and cute. It is very sheer but that\'s in the description so I can\'t take a star off for that. I would however recommend a thick slip with this dress. ',
+                media: 0
               }
             ]
           }
@@ -2532,46 +2603,162 @@ export const initialProducts = {
         questions: [
           {
             author: 'todo',
-            content: 'wwwwww',
+            content: 'Which of the three reds is a bright red? I am guessing Red#3 however I know shades sometimes look different in pictures.',
             answers: [
               {
                 author: 'todo',
-                content: 'wwwwww'
+                content: 'Red#3 is a bright red.'
+              }
+            ]
+          },
+          {
+            author: 'todo',
+            content: 'hi i’m 5’6 and a 36 B and i’m 150 what size would be best',
+            answers: [
+              {
+                author: 'todo',
+                content: 'I would say a large. I\'m 5\'2 and medium rests about 2-3 inches above the knee.'
+              }
+            ]
+          },
+          {
+            author: 'todo',
+            content: 'Hi! I’m 5’5 and weigh 145 lbs. what size do you think I should get?',
+            answers: [
+              {
+                author: 'todo',
+                content: 'We suggest M size.'
+              }
+            ]
+          },
+          {
+            author: 'todo',
+            content: 'I’m 5’3 and 125 what size do you suggest',
+            answers: [
+              {
+                author: 'todo',
+                content: 'My daughter is 5’5 125 and the medium fit her. It was pretty short and she ended up not wearing the dress.'
+              },
+              {
+                author: 'todo',
+                content: 'Small. I’m the same but with an athletic build. It is quite short though.'
+              },
+              {
+                author: 'todo',
+                content: 'Small'
+              }
+            ]
+          },
+          {
+            author: 'todo',
+            content: 'I’m 5’9” and 140 pounds what size would I get?',
+            answers: [
+              {
+                author: 'todo',
+                content: 'I got an extra large but I am 170 pounds and only 5 foot five. The material is somewhat stretchy. But it is going to be quite short on you. It’s pretty short on me. Like barely mid thigh.'
               }
             ]
           }
         ],
         products: [
           {
-            title: 'wwwwww',
-            listPrice: 111,
-            price: 100,
-            bullets: 'wwwwww',
-            description: 'wwwwww',
-            stock: 999,
-            media: 999,
+            title: 'SheIn Women\'s V Neck Adjustable Spaghetti Straps Sleeveless Sexy Backless Dress',
+            price: 27.99,
+            bullets: `95% polyester , 5% spandex
+            Wrap closure
+            95% Polyester, 5% Spandex, fabric has some stretch
+            Dress length(inch): XS-26.4, S-26.8, M-27.2, L-27.6, XL-28.0
+            Sleeveless, solid flared skater dress, wrap front dress, adjustble strappt, cami tank dress
+            Women sexy cami mini dress`,
+            productSizes: [
+              { name: 'X-Small', qty: 1 },
+              { name: 'Small', qty: 3 },
+              { name: 'Medium', qty: 1 },
+              { name: 'Large', qty: 2 },
+              { name: 'X-Large', qty: 5 }
+            ],
+            media: 4,
             isAvailable: true,
             groupVariations: [
-              { name: 'wwwwww', value: 'wwwwww' },
-              { name: 'wwwwww', value: 'wwwwww' }
+              { name: 'Color', value: 'Black' }
             ],
-            productParameters: [
-              { name: 'wwwwww', value: 'wwwwww' }
+            reviews: [
+              {
+                author: 'todo',
+                stars: 3,
+                isVerified: true,
+                title: 'Nice dress',
+                content: `I bought this to wear to a little black dress charity event. I thought i had a better photo of it on. It was a little big and i ended up getting another dress. I just had a baby so i didn’t know what size i needed for sure. I got a large due to my chest being a 34G currently. (40 inches). The waist was big.
+                My waist was 32in. I think i could have worn a medium easily. The material is stretchy. It’s a good dress for the price. Had i bought the right size i would have worn it.`,
+                media: 1,
+                comments: [
+                  {
+                    author: 'todo',
+                    content: 'wow!!!'
+                  },
+                  {
+                    author: 'todo',
+                    content: 'My waist is 33in, and my chest is a 36C, do you think I should get a medium or a large?'
+                  }
+                ]
+              },
+              {
+                author: 'todo',
+                stars: 5,
+                isVerified: true,
+                title: 'Perfect little black dress for the price',
+                content: 'Perfect little black dress. It\'s comfy too but fits just right. I\'m 5\'4" and float between 125-130 lbs (I am very active too, waist measures about 26.5" and stomach about 30"). It is short but that\'s what I was going for. Wore it out in Vegas to the club. Only complaint - straps to adjust are flimsy and hard to adjust. Luckily I didn\'t need to adjust it.',
+                media: 1,
+                comments: [
+                  {
+                    author: 'todo',
+                    content: 'Wow. It looks amazing on you and you look amazing in it. Please. Please. More reviews.;)'
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            title: 'SheIn Women\'s V Neck Adjustable Spaghetti Straps Sleeveless Sexy Backless Dress',
+            price: 27.99,
+            bullets: `95% polyester , 5% spandex
+            Wrap closure
+            95% Polyester, 5% Spandex, fabric has some stretch
+            Dress length(inch): XS-26.4, S-26.8, M-27.2, L-27.6, XL-28.0
+            Sleeveless, solid flared skater dress, wrap front dress, adjustble strappt, cami tank dress
+            Women sexy cami mini dress`,
+            productSizes: [
+              { name: 'X-Small', qty: 13 },
+              { name: 'Small', qty: 13 },
+              { name: 'Medium', qty: 21 },
+              { name: 'Large', qty: 8 },
+              { name: 'X-Large', qty: 1 }
+            ],
+            media: 5,
+            isAvailable: true,
+            groupVariations: [
+              { name: 'Color', value: 'Drak Red' }
             ],
             reviews: [
               {
                 author: 'todo',
                 stars: 1,
-                isVerified: false,
-                title: 'wwwwww',
-                content: 'wwwwww',
-                media: 0,
-                comments: [
-                  {
-                    author: 'todo',
-                    content: 'wwwwww'
-                  }
-                ]
+                isVerified: true,
+                title: 'Needs improvement',
+                content: `I knew this dress would be on the sexier side due to my larger bust. I ordered a medium thinking it would contain the girls. I was wrong. Should’ve sized up. Might have been able to make it work if the straps were more adjustable but they were not.
+
+                It’s also poor quality. The zipper kept getting stuck on the dress. It wasn’t because it was too tight. It was just because it was a cheap zipper.`,
+                media: 1
+              },
+              {
+                author: 'todo',
+                stars: 4,
+                isVerified: true,
+                title: 'Cute dress but color doesn’t match and shows lots of cleavage!',
+                content: `I ordered the red color and the photo looked a bit more purple-red which I would’ve preferred, the dress came more red red and it’s not bad just doesn’t match the pic! It is quite low cut so if you don’t like to show cleavage this is not the dress for you and the only bra I could wear with this is an adhesive strapless/backless bra.
+
+                The fit is good, I ordered an XL and I wear a size 12 jeans normally and I am 5’6 and the dress isn’t too short but not too long either it’s a great length on me`,
+                media: 1
               }
             ]
           }
