@@ -2036,49 +2036,102 @@ export const initialProducts = {
   Dresses: {
     'Calvin Klein': [
       {
-        questions: [
-          {
-            author: 'todo',
-            content: 'wwwwww',
-            answers: [
-              {
-                author: 'todo',
-                content: 'wwwwww'
-              }
-            ]
-          }
-        ],
         products: [
           {
-            title: 'wwwwww',
-            listPrice: 111,
-            price: 100,
-            bullets: 'wwwwww',
-            description: 'wwwwww',
-            stock: 999,
-            media: 999,
+            title: 'Calvin Klein Women\'s Short Shoulder Sheath with Flutter Sleeves',
+            price: 151.3,
+            bullets: `94% polyester, 6% spandex
+            Imported
+            Zipper closure
+            Dry Clean Only
+            Flattering fit
+            Zipper closure`,
+            description: 'A glamorous off-the-shoulder Dress that is perfect for a night out',
+            productSizes: [
+              { name: '2', qty: 3 },
+              { name: '4', qty: 2 },
+              { name: '6', qty: 0 },
+              { name: '8', qty: 8 },
+              { name: '10', qty: 1 },
+              { name: '12', qty: 8 },
+              { name: '14', qty: 3 },
+              { name: '16', qty: 4 }
+            ],
+            media: 4,
             isAvailable: true,
             groupVariations: [
-              { name: 'wwwwww', value: 'wwwwww' },
-              { name: 'wwwwww', value: 'wwwwww' }
-            ],
-            productParameters: [
-              { name: 'wwwwww', value: 'wwwwww' }
+              { name: 'Color', value: 'Black' }
             ],
             reviews: [
               {
                 author: 'todo',
-                stars: 1,
-                isVerified: false,
-                title: 'wwwwww',
-                content: 'wwwwww',
-                media: 0,
-                comments: [
-                  {
-                    author: 'todo',
-                    content: 'wwwwww'
-                  }
-                ]
+                stars: 5,
+                isVerified: true,
+                title: 'Love this dress',
+                content: 'Very nice dress! Fits perfect ',
+                media: 0
+              }
+            ]
+          },
+          {
+            title: 'Calvin Klein Women\'s Short Shoulder Sheath with Flutter Sleeves',
+            price: 157.3,
+            bullets: `94% polyester, 6% spandex
+            Imported
+            Zipper closure
+            Dry Clean Only
+            Flattering fit
+            Zipper closure`,
+            description: 'A glamorous off-the-shoulder Dress that is perfect for a night out',
+            productSizes: [
+              { name: '2', qty: 2 },
+              { name: '4', qty: 2 },
+              { name: '6', qty: 1 },
+              { name: '8', qty: 8 },
+              { name: '10', qty: 4 },
+              { name: '12', qty: 1 },
+              { name: '14', qty: 0 },
+              { name: '16', qty: 4 }
+            ],
+            media: 4,
+            isAvailable: true,
+            groupVariations: [
+              { name: 'Color', value: 'Aubergine' }
+            ]
+          },
+          {
+            title: 'Calvin Klein Women\'s Short Shoulder Sheath with Flutter Sleeves',
+            price: 158.3,
+            bullets: `94% polyester, 6% spandex
+            Imported
+            Zipper closure
+            Dry Clean Only
+            Flattering fit
+            Zipper closure`,
+            description: 'A glamorous off-the-shoulder Dress that is perfect for a night out',
+            productSizes: [
+              { name: '2', qty: 2 },
+              { name: '4', qty: 3 },
+              { name: '6', qty: 7 },
+              { name: '8', qty: 13 },
+              { name: '10', qty: 15 },
+              { name: '12', qty: 3 },
+              { name: '14', qty: 2 },
+              { name: '16', qty: 0 }
+            ],
+            media: 4,
+            isAvailable: true,
+            groupVariations: [
+              { name: 'Color', value: 'Jazzberry' }
+            ],
+            reviews: [
+              {
+                author: 'todo',
+                stars: 3,
+                isVerified: true,
+                title: 'Great dress, poor packaging',
+                content: 'This is a beautiful dress as expected by Calvin Klein. The color is fantastic and the designer dress is perfect for cocktails. I was extremely upset that when the dress arrived, I expected to be able to pull it out, put it on and go, like other clothing I’ve been able to do. Unfortunately this dress arrived extremely wrinkled while attached to the hanger which was broken in half. It appeared the dress was wadded up and thrown into the box. I needed to dry clean this dress before being able to wear it out. 2 stars deducted for poor packaging and the extra cost to clean it before wearing.',
+                media: 0
               }
             ]
           }
@@ -2088,46 +2141,169 @@ export const initialProducts = {
         questions: [
           {
             author: 'todo',
-            content: 'wwwwww',
+            content: 'What color is aubergine?',
             answers: [
               {
                 author: 'todo',
-                content: 'wwwwww'
+                content: 'Aubergine is deep purple'
+              },
+              {
+                author: 'todo',
+                content: 'Aubergine is lila'
+              }
+            ]
+          },
+          {
+            author: 'todo',
+            content: 'Im 5\'3, how far do you think the dress will come down to? ',
+            answers: [
+              {
+                author: 'todo',
+                content: 'Truly, It depends on your proportions. I am 5\'6" , have long legs and a shorter torso. My dress is a size 4. The skirt length, below the waist, which sits a tad higher than most, is 22" long and the bottom hits me mid-knee. It looks short on the photo model. It\'s a nice dress, try it. you can always return it if it doesn\'t hang right on you.'
+              },
+              {
+                author: 'todo',
+                content: 'My daughter is 5’6 Size 14 and it came to the knee so it would depend on the size of the dress but it would be below the knee for you'
+              },
+              {
+                author: 'todo',
+                content: `The dress will come just 3cm over the knee.
+                It is a wonderful dress and high quality`
+              },
+              {
+                author: 'todo',
+                content: 'I’m 5’4” and my dress comes to the top of my knee.'
+              },
+              {
+                author: 'todo',
+                content: 'Same as in photo'
+              }
+            ]
+          },
+          {
+            author: 'todo',
+            content: 'Which one is white? Cream or deep cream? ',
+            answers: [
+              {
+                author: 'todo',
+                content: 'White'
+              },
+              {
+                author: 'todo',
+                content: 'It\'s white.'
+              },
+              {
+                author: 'todo',
+                content: 'I got this in a different color. Sorry I can’t help.'
+              }
+            ]
+          },
+          {
+            author: 'todo',
+            content: 'How much does the dress weigh?',
+            answers: [
+              {
+                author: 'todo',
+                content: 'I don’t know exactly what you are asking but I would describe it is a medium thickness fabric and hangs nicely. It’s not light and flowy, blow away fabric.'
+              },
+              {
+                author: 'todo',
+                content: 'If you are asking for the shipping weight, my package was 2 pounds'
+              }
+            ]
+          },
+          {
+            author: 'todo',
+            content: 'Can it be shortened by having a tailor cut the bottom "sheer insert" off and re-hem if necessary?',
+            answers: [
+              {
+                author: 'todo',
+                content: 'I bought the regular size and the petite size to see which was better for me. I like the petite for me. I returned the regular size that didn\'t work- easy to do. I would not buy the dress to tailor it. The dress is beautiful as it is. Get regular and petite and see what you like on yourself.'
+              },
+              {
+                author: 'todo',
+                content: 'I am honestly not sure, but when I wore the dress it feel like the sheer part was a separate piece, so I think it might be possible.'
+              },
+              {
+                author: 'todo',
+                content: 'you\'ll love the dress- I do'
               }
             ]
           }
         ],
         products: [
           {
-            title: 'wwwwww',
-            listPrice: 111,
-            price: 100,
-            bullets: 'wwwwww',
-            description: 'wwwwww',
-            stock: 999,
-            media: 999,
+            title: 'Calvin Klein Women\'s Sleeveless Round Neck Fit and Flare Dress ',
+            listPrice: 89.98,
+            price: 77.13,
+            bullets: `94% Polyester, 6% Spandex
+            Imported
+            Zipper closure
+            Dry Clean Only
+            Flattering fit
+            Zipper closure`,
+            description: 'Sleeveless round neck fit and flare dress with sheer inserts at hem',
+            productSizes: [
+              { name: '2', qty: 3 },
+              { name: '4', qty: 2 },
+              { name: '6', qty: 4 },
+              { name: '8', qty: 8 },
+              { name: '10', qty: 3 },
+              { name: '12', qty: 2 },
+              { name: '14', qty: 1 },
+              { name: '16', qty: 0 }
+            ],
+            media: 3,
             isAvailable: true,
             groupVariations: [
-              { name: 'wwwwww', value: 'wwwwww' },
-              { name: 'wwwwww', value: 'wwwwww' }
-            ],
-            productParameters: [
-              { name: 'wwwwww', value: 'wwwwww' }
+              { name: 'Color', value: 'Cream' }
             ],
             reviews: [
               {
                 author: 'todo',
-                stars: 1,
-                isVerified: false,
-                title: 'wwwwww',
-                content: 'wwwwww',
-                media: 0,
-                comments: [
-                  {
-                    author: 'todo',
-                    content: 'wwwwww'
-                  }
-                ]
+                stars: 5,
+                isVerified: true,
+                title: 'Simple but chic',
+                content: 'Beautiful, high-quality, simple but chic dress that I wore for my city hall wedding. Very figure-flattering, stylish and modest.',
+                media: 0
+              }
+            ]
+          },
+          {
+            title: 'Calvin Klein Women\'s Sleeveless Round Neck Fit and Flare Dress ',
+            listPrice: 89.98,
+            price: 60,
+            bullets: `94% Polyester, 6% Spandex
+            Imported
+            Zipper closure
+            Dry Clean Only
+            Flattering fit
+            Zipper closure`,
+            description: 'Sleeveless round neck fit and flare dress with sheer inserts at hem',
+            productSizes: [
+              { name: '2', qty: 0 },
+              { name: '4', qty: 0 },
+              { name: '6', qty: 4 },
+              { name: '8', qty: 0 },
+              { name: '10', qty: 3 },
+              { name: '12', qty: 1 },
+              { name: '14', qty: 0 },
+              { name: '16', qty: 0 }
+            ],
+            media: 3,
+            isAvailable: true,
+            groupVariations: [
+              { name: 'Color', value: 'Indigo' }
+            ],
+            reviews: [
+              {
+                author: 'todo',
+                stars: 5,
+                isVerified: true,
+                title: `This dress looked bit plain to be honest online. I had recently lost a good deal of weight and wasnt sure what size to get. I had a dress from when I was heavier that was a 14 that was now quite big. So I ordered 3 different dresses, a 12, and two size 10's all Calvin Klein, but different styles. This was my "safe" dress.
+                I put this one on last, and instantly my husband who had really liked the first one was like, "that's the one." My friend said basically the same. It was so classy looking, the navy just enough to give it a pop of suprise, so it was more than just a plain little black dress. I wore it to a wedding, where I saw people who I hadn't seen in months. The dress highlighted my weight loss and I recieved so many compliments on that, and the dress, and those who disnt know me before complimented the dress itself.
+                I paired it with nude heels and a nude purse and honestly I felt great. This is truly a beautiful dress. Excellent quality, simple but the color and sheer detail at the hem give it just enough to be special. I highly recommend it.`,
+                media: 2
               }
             ]
           }
@@ -2139,6 +2315,30 @@ export const initialProducts = {
         questions: [
           {
             author: 'todo',
+            content: 'im 5\'3 and 99 lbs, what size should i get?',
+            answers: [
+              {
+                author: 'todo',
+                content: 'I would guess an extra small.'
+              }
+            ]
+          },
+          {
+            author: 'todo',
+            content: 'I\'m 5\'9" and 140lbs, what size would you recommend? i usually wear a us size 4-6, but sometimes dresses don\'t have the length i need.',
+            answers: [
+              {
+                author: 'todo',
+                content: 'I’m 5’0. And I had about 4 inches off the bottom and wore 6 inch heels so I think you’ll be fine for length. I would suggest either small or extra small. I got an extra small and it fit perfectly.'
+              },
+              {
+                author: 'todo',
+                content: 'To be honest, i bought a xs and it\'s perfect for me (5\' and 130lbs)'
+              }
+            ]
+          },
+          {
+            author: 'todo',
             content: 'wwwwww',
             answers: [
               {
@@ -2146,37 +2346,132 @@ export const initialProducts = {
                 content: 'wwwwww'
               }
             ]
+          },
+          {
+            author: 'todo',
+            content: 'I’m 6 ft, how can I make the length longer',
+            answers: [
+              {
+                author: 'todo',
+                content: 'If you don’t mind the top of the dress being a little lower the length can be adjusted slightly with the top strings'
+              }
+            ]
+          },
+          {
+            author: 'todo',
+            content: 'Hi. i’m a breastfeeding mother and i need a dress where my breasts are easily available. would i be able to pop a titty out real quick?',
+            answers: [
+              {
+                author: 'todo',
+                content: 'Yes ! Lol this will work make sure you have good padding in case of leakage because the material will def show if it’s wet.'
+              },
+              {
+                author: 'todo',
+                content: 'yes'
+              }
+            ]
           }
         ],
         products: [
           {
-            title: 'wwwwww',
-            listPrice: 111,
-            price: 100,
-            bullets: 'wwwwww',
-            description: 'wwwwww',
-            stock: 999,
-            media: 999,
+            title: 'SheIn Women\'s Sexy Satin Deep V Neck Backless Maxi Party Evening Dress',
+            price: 28.99,
+            bullets: `Material:100% Polyster. The material is very soft and smooth, Size runs large, P.S. Please check the SIZE CHART before your purchase.
+            Plunge neck, spaghetti strap, side slit, maxi evening gown. The halter strings can be circled for one or more circles around the waist.
+            Sexy, formal, vintage.Great for party, cocktail, wedding, club, homecoming, prom.
+            It is recommended to iron the dress before you wear it.
+            Please refer to the size measurement below.`,
+            productSizes: [
+              { name: 'X-Small', qty: 3 },
+              { name: 'Small', qty: 6 },
+              { name: 'Medium', qty: 2 },
+              { name: 'Large', qty: 3 },
+              { name: 'X-Large', qty: 1 },
+              { name: 'XX-Large', qty: 0 }
+            ],
+            media: 5,
             isAvailable: true,
             groupVariations: [
-              { name: 'wwwwww', value: 'wwwwww' },
-              { name: 'wwwwww', value: 'wwwwww' }
-            ],
-            productParameters: [
-              { name: 'wwwwww', value: 'wwwwww' }
+              { name: 'Color', value: 'Dark Green' }
             ],
             reviews: [
               {
                 author: 'todo',
-                stars: 1,
-                isVerified: false,
-                title: 'wwwwww',
-                content: 'wwwwww',
-                media: 0,
+                stars: 5,
+                isVerified: true,
+                title: 'STUNNING go one size smaller',
+                content: `You must buy!!! THIS DRESS IS STUNNING!!!! I got so many compliments on it for both men and women. The material is thin but not sheer. Go one size smaller than you would usually go. I read comments that suggested that and I was glad I followed them.
+                I bought a small but usually wear a medium.
+                5’9
+                145lbs
+                32B bust`,
+                media: 3
+              },
+              {
+                author: 'todo',
+                stars: 5,
+                isVerified: true,
+                title: 'An actual prom dress!',
+                content: 'My daughter decided she wanted to get this dress for Prom. I actually tried to talk her out of it- Prom is a big deal! I wanted to see her in a high quality dress. But she was determined, so we ordered it. It arrived quickly, and came just as described. The emerald color was stunning. She is not tall, about 5\'4", and with 2" heels the length was perfect. It was very wrinkly, but a steamer quickly took the wrinkles out. I wish she had done a better job of steaming it, there were a few left on the bottom of the dress that show up in this photo. The fit is loose and drapes. She did have one problem with the chest, it was cut way too low for her. She remedied this easily with some double sided tape and had no problems with it the entire night. Also, it did not look odd with the double sided tape. The only thing that really bothered me was that the tag is sewn into the leg slit, so when she walked or when it was breezy, the tag showed. It really is a very thin material. She took the tag out easily with some sewing scissors. Is it a cheap dress? Absolutely. But it was the look, color, and fit that she wanted. She did buy some silicone "nipple shields" but had no problems with these. This is probably not a dress you can wear a bra with unless you have a sticker bra. My daughter is very small so it wasn\'t a problem. This dress will show body flaws or underwear lines easily, so if there\'s something you\'re not comfortable with, just be aware of this. All things considered, it was a pretty great look on her. She was very happy with it and was super happy to save so much money. She looked and felt beautiful. I had my doubts but she was right!',
+                media: 2,
                 comments: [
                   {
                     author: 'todo',
-                    content: 'wwwwww'
+                    content: 'Wow excellent review!! Thank you for the details. I’m looking for a dress to wear to a wedding and you helped me decide to look for another.'
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            title: 'SheIn Women\'s Sexy Satin Deep V Neck Backless Maxi Party Evening Dress',
+            price: 28.99,
+            bullets: `Material:100% Polyster. The material is very soft and smooth, Size runs large, P.S. Please check the SIZE CHART before your purchase.
+            Plunge neck, spaghetti strap, side slit, maxi evening gown. The halter strings can be circled for one or more circles around the waist.
+            Sexy, formal, vintage.Great for party, cocktail, wedding, club, homecoming, prom.
+            It is recommended to iron the dress before you wear it.
+            Please refer to the size measurement below.`,
+            productSizes: [
+              { name: 'X-Small', qty: 4 },
+              { name: 'Small', qty: 1 },
+              { name: 'Medium', qty: 1 },
+              { name: 'Large', qty: 2 },
+              { name: 'X-Large', qty: 5 },
+              { name: 'XX-Large', qty: 0 }
+            ],
+            media: 5,
+            isAvailable: true,
+            groupVariations: [
+              { name: 'Color', value: 'Pink' }
+            ],
+            reviews: [
+              {
+                author: 'todo',
+                stars: 4,
+                isVerified: true,
+                title: 'Really loose',
+                content: `Ok I have no idea how anybody wore this outside without an entire chest balloon falling out but I’m still in love. It’s so dreamy you can help but love it. Just realize everyone at some point will see your nipples.
+                I’m actually using it as my wedding dress, but I’m going to buy another (two in total) and make a whole new top because my C cups don’t stay in. At all. In the pictures it doesn’t look so bad, but honey, it is. Try me.
+                The color is gorgeous and it’s not a cheap thin material that I expected. I got a blush color but it photographs in low light as a champagne so that’s fun.
+                I’m 5’5” and it has a few inches past my feet so you can wear heels and it will still be long. I would even hem it but I like when it drags on the floor. So pretty.
+                Love it even though it’s not even close to perfect.`,
+                media: 2
+              },
+              {
+                author: 'todo',
+                stars: 2,
+                isVerified: true,
+                title: 'Best for a larger chest',
+                content: 'This dress is probably best for someone with a larger chest. I\'m 5\'3", 145lbs, and 34B. The chest area seemed hopelessly baggy, no matter how many times I tried to tie and re-tie the strings. The slit was far too high and showed my underwear easily. The cut of the dress itself was a bit uneven. The material caught on literally everything and immediately started fuzzing / coming off from first contact with objects out of the bag it came in. I really wanted to like the dress and was hoping to wear it to a wedding, especially with the good reviews and how great everyone looked in it, but sadly it didn\'t seem to be the dress for me. ',
+                media: 1,
+                comments: [
+                  {
+                    author: 'todo',
+                    content: 'it sounds like you were just wearing it higher than the girls modeling it- could that be why?'
+                  },
+                  {
+                    author: 'todo',
+                    content: 'What size did you get ? I\'m around your size & height !'
                   }
                 ]
               }
