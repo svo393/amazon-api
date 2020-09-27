@@ -195,7 +195,7 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.increments('reviewID')
       t.dateTime('createdAt').notNullable()
       t.dateTime('updatedAt').notNullable()
-      t.string('title')
+      t.string('title').notNullable()
       t.string('content', 65535).notNullable()
       t.integer('stars').notNullable().unsigned()
       t.boolean('isVerified').defaultTo(false).notNullable()

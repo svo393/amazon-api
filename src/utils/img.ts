@@ -16,7 +16,7 @@ type UploadConfig = {
   addWebp?: boolean;
 }
 
-export const uploadImages = (files: Express.Multer.File[], {
+export const uploadImages = async (files: Express.Multer.File[], {
   fileNames,
   imagesPath,
   maxWidth,
@@ -26,8 +26,8 @@ export const uploadImages = (files: Express.Multer.File[], {
   thumbWidth,
   thumbHeight,
   addWebp = false
-}: UploadConfig): void => {
-  files.map(async (file, index) => {
+}: UploadConfig): Promise<void> => {
+  await Promise.all(files.map(async (file, index) => {
     const image = sharp(file.path)
     const info = await image.metadata()
     const fileName = fileNames[index]
@@ -91,8 +91,7 @@ export const uploadImages = (files: Express.Multer.File[], {
           path.resolve(imagesPath, `${fileName}_${thumbWidth}.webp`)
         )
     }
+  }))
 
-    // TODO try async rather than sync
-    fs.unlink(file.path, (err) => err && logger.error(err))
-  })
+  files.map((file) => { fs.unlink(file.path, (err) => err && logger.error(err)) })
 }

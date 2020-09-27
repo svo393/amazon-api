@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import { omit } from 'ramda'
-import { Answer, Feed, FeedFiltersInput, GroupVariation, Question, Review, ReviewComment, UserFeed, UserFeedFiltersInput, Product, Image, User, Follower } from '../types'
+import { Answer, Feed, FeedFiltersInput, Follower, GroupVariation, Image, Product, Question, Review, ReviewComment, User, UserFeed, UserFeedFiltersInput } from '../types'
 import { defaultLimit } from '../utils/constants'
 import { db } from '../utils/db'
 import fuseIndexes from '../utils/fuseIndexes'
@@ -137,21 +137,7 @@ const getUserFeed = async (feedFiltersInput: UserFeedFiltersInput, req: Request)
       .where('userID', userID)
       .andWhere('moderationStatus', 'APPROVED')
 
-    const groupIDs = _reviews.map((r) => r.groupID)
-
-    const groupVariations = await db<GroupVariation>('groupVariations')
-      .whereIn('groupID', groupIDs)
-
-    _reviews = _reviews.map((r) => {
-      const [ name, value ] = Object.entries(r.variation)[0]
-
-      const productID = groupVariations
-        .find((gv) => gv.name === name && gv.value === value)?.productID as number
-
-      return { ...r, productID }
-    })
-
-    const productIDs = _reviews.map((r) => r.productID as number)
+    const productIDs = _reviews.map((r) => r.productID)
 
     const images = await db<Image>('images')
       .whereIn('productID', productIDs)
@@ -184,8 +170,6 @@ const getUserFeed = async (feedFiltersInput: UserFeedFiltersInput, req: Request)
 
     reviews = _reviews.map((r) => {
       const product = products.find((p) => p.productID === r.productID)
-
-      delete r.productID
 
       return {
         ...r,

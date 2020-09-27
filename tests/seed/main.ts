@@ -280,21 +280,17 @@ const seed = async (): Promise<void> => {
             await Promise.all(p.reviews.map(async (r: any, reviewIndex: number) => {
               const sessionID = users[r.author].sessionID
 
-              const { body }: { body: Review } = await api
+              const { body: reviewBody }: { body: Review } = await api
                 .post(`${apiURLs.groups}/${groupID}/reviews`)
                 .set('Cookie', `sessionID=${sessionID}`)
                 .send({
                   ...omit([ 'author', 'comments' ], r),
-                  variation: p.groupVariations
-                    ?.reduce((acc: ObjIndexed, cur: ObjIndexed) => {
-                      acc[cur.name] = cur.value
-                      return acc
-                    }, {} as ObjIndexed)
+                  productID: body.productID
                 })
 
               if (r.media) {
                 const uploadAPI = api
-                  .post(`${apiURLs.reviews}/${body.reviewID}/upload`)
+                  .post(`${apiURLs.reviews}/${reviewBody.reviewID}/upload`)
                   .set('Cookie', `sessionID=${sessionID}`)
 
                 const mediaRange = [ ...Array(r.media).keys() ]
@@ -315,7 +311,7 @@ const seed = async (): Promise<void> => {
                   const sessionID = users[rc.author].sessionID
 
                   const reviewComment: { body: ReviewComment } = await api
-                    .post(`${apiURLs.reviews}/${body.reviewID}/comments`)
+                    .post(`${apiURLs.reviews}/${reviewBody.reviewID}/comments`)
                     .set('Cookie', `sessionID=${sessionID}`)
                     .send({
                       ...omit([ 'author' ], rc),

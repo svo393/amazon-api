@@ -1,7 +1,7 @@
 import { Express, Request } from 'express'
 import { pipe } from 'ramda'
-import { AddressCreateInput, AddressTypeInput, AddressUpdateInput, AnswerCreateInput, AnswerUpdateInput, AskFiltersInput, CartProduct, CartProductDeleteInput, CartProductInput, CategoriesFiltersInput, CategoryCreateInput, CategoryUpdateInput, CursorInput, FeedFiltersInput, GroupVariationCreateInput, GroupVariationDeleteInput, GroupVariationUpdateInput, ImagesDeleteInput, ImagesFiltersInput, ImagesUpdateInput, InvoiceCreateInput, InvoicesFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ListUpdateInput, LocalCart, ModerationStatus, OrderCreateInput, OrderProductInput, OrdersFiltersInput, OrderStatus, OrderUpdateInput, ParameterInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionCursorInput, QuestionUpdateInput, ReviewCommentCreateInput, ReviewCommentUpdateInput, ReviewCreateInput, ReviewsFiltersInput, ReviewUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserFeedFiltersInput, UserLoginInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorInput, VendorsFiltersInput, VotesCreateInput, VotesFiltersInput, UserPasswordUpdateInput, UserRoleUpdateInput } from '../types'
-import { canBeBoolean, canBeNumber, hasDefinedProps, isArray, isDate, isEmail, isInputProvided, isNonEmptyString, isNonEmptyStringOrNull, isObject, isPasswordValid, isPositiveNumber, isProvided, isSomeProvided, isString } from './validatorLib'
+import { AddressCreateInput, AddressTypeInput, AddressUpdateInput, AnswerCreateInput, AnswerUpdateInput, AskFiltersInput, CartProduct, CartProductDeleteInput, CartProductInput, CategoriesFiltersInput, CategoryCreateInput, CategoryUpdateInput, CursorInput, FeedFiltersInput, GroupVariationCreateInput, GroupVariationDeleteInput, GroupVariationUpdateInput, ImagesDeleteInput, ImagesFiltersInput, ImagesUpdateInput, InvoiceCreateInput, InvoicesFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ListUpdateInput, LocalCart, ModerationStatus, OrderCreateInput, OrderProductInput, OrdersFiltersInput, OrderStatus, OrderUpdateInput, ParameterInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionCursorInput, QuestionUpdateInput, ReviewCommentCreateInput, ReviewCommentUpdateInput, ReviewCreateInput, ReviewsFiltersInput, ReviewUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserFeedFiltersInput, UserLoginInput, UserPasswordUpdateInput, UserRoleUpdateInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorInput, VendorsFiltersInput, VotesCreateInput, VotesFiltersInput } from '../types'
+import { canBeBoolean, canBeNumber, hasDefinedProps, isArray, isDate, isEmail, isInputProvided, isNonEmptyString, isNonEmptyStringOrNull, isPasswordValid, isPositiveNumber, isProvided, isSomeProvided, isString } from './validatorLib'
 
 export const checkNewUser = ({ body }: Request): UserSignupInput => {
   const email = pipe(
@@ -753,18 +753,20 @@ export const checkListUpdate = ({ body }: Request): ListUpdateInput => {
 }
 
 export const checkNewReview = ({ body }: Request): ReviewCreateInput => {
-  const title = 'title' in body
-    ? isNonEmptyString({ name: 'title', param: body.title })
-    : undefined
+  const title = pipe(
+    isProvided,
+    isNonEmptyString
+  )({ name: 'title', param: body.title })
 
   const content = pipe(
     isProvided,
     isNonEmptyString
   )({ name: 'content', param: body.content })
 
-  const variation = 'title' in body
-    ? isObject({ name: 'variation', param: body.variation })
-    : undefined
+  const productID = pipe(
+    isProvided,
+    canBeNumber
+  )({ name: 'productID', param: body.productID })
 
   const stars = pipe(
     isProvided,
@@ -772,9 +774,9 @@ export const checkNewReview = ({ body }: Request): ReviewCreateInput => {
   )({ name: 'stars', param: body.stars })
 
   return {
-    title: title?.param,
+    title: title.param,
     content: content.param,
-    variation: variation?.param,
+    productID: productID.param,
     stars: stars.param
   }
 }
@@ -1578,8 +1580,8 @@ export const checkReviewFilters = ({ query }: Request): ReviewsFiltersInput => {
     ? isNonEmptyString({ name: 'sortBy', param: query.sortBy })
     : undefined
 
-  const variation = 'variation' in query
-    ? isNonEmptyString({ name: 'variation', param: query.variation })
+  const productID = 'productID' in query
+    ? canBeNumber({ name: 'productID', param: query.productID })
     : undefined
 
   const page = 'page' in query
@@ -1631,7 +1633,7 @@ export const checkReviewFilters = ({ query }: Request): ReviewsFiltersInput => {
     limit: limit?.param,
     q: q?.param,
     groupID: groupID?.param,
-    variation: variation?.param,
+    productID: productID?.param,
     userEmail: userEmail?.param,
     moderationStatuses: moderationStatuses?.param,
     isVerified: isVerified?.param,

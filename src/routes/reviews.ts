@@ -42,7 +42,7 @@ router.get('/:reviewID/comments', async (req, res) => {
   res.json(reviewComments)
 })
 
-router.post('/:reviewID/upload', requireCreator('reviews', 'reviewID', 'params'), multerUpload.array('reviewImages', 4), (req, res) => {
+router.post('/:reviewID/upload', requireCreator('reviews', 'reviewID', 'params'), multerUpload.array('reviewImages', 10), (req, res) => {
   req.socket.setTimeout(UPLOAD_TIMEOUT)
   const reviewImages = checkMediaUpload(req)
   reviewService.uploadReviewImages(reviewImages, req)

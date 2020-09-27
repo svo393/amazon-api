@@ -1,5 +1,5 @@
 import { Request } from 'express'
-import { equals, flatten, omit } from 'ramda'
+import { flatten, omit } from 'ramda'
 import { BatchWithCursor, Image, Matches, Review, ReviewCreateInput, ReviewsFiltersInput, ReviewUpdateInput, ReviewWithUser, Vote } from '../types'
 import { defaultLimit, imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
@@ -16,7 +16,7 @@ const addReview = async (reviewInput: ReviewCreateInput, req: Request): Promise<
     `
     ? ON CONFLICT
       DO NOTHING
-      RETURNING "reviewID";
+      RETURNING *;
     `,
     [ db('reviews').insert({
       ...reviewInput,
@@ -40,7 +40,7 @@ const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request
     sortBy = 'createdAt_desc',
     q,
     groupID,
-    variation,
+    productID,
     userEmail,
     moderationStatuses,
     isVerified,
@@ -60,7 +60,7 @@ const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request
       'r.createdAt',
       'r.updatedAt',
       'r.title',
-      'r.variation',
+      'r.productID',
       'r.content',
       'r.stars',
       'r.isVerified',
@@ -103,9 +103,9 @@ const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request
       .filter((r) => r.isVerified === isVerified)
   }
 
-  if (variation !== undefined) {
+  if (productID !== undefined) {
     reviews = reviews
-      .filter((r) => equals(r.variation, JSON.parse(variation)))
+      .filter((r) => r.productID === productID)
   }
 
   if (createdFrom !== undefined) {
@@ -237,7 +237,7 @@ const getReviewByID = async (req: Request): Promise<ReviewWithUser> => {
       'r.createdAt',
       'r.updatedAt',
       'r.title',
-      'r.variation',
+      'r.productID',
       'r.content',
       'r.stars',
       'r.isVerified',
