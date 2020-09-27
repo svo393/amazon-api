@@ -1,3 +1,4 @@
+import cuid from 'cuid'
 import { NextFunction, Request, Response } from 'express'
 import multer from 'multer'
 import { db } from './db'
@@ -150,7 +151,7 @@ export const errorHandler = (
 
 const storage = multer.diskStorage({
   destination: './tmp',
-  filename (_, file, cb) { cb(null, `${Date.now()}_${file.originalname}`) }
+  filename (_, __, cb) { cb(null, cuid()) }
 })
 
 export const multerUpload = multer({

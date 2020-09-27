@@ -228,7 +228,7 @@ const updateUserRole = async (userInput: UserRoleUpdateInput, req: Request): Pro
 const uploadUserAvatar = (file: Express.Multer.File, req: Request): void => {
   const uploadConfig = {
     fileNames: [ req.session?.userID ],
-    imagesPath: `${imagesBasePath}/avatars`,
+    imagesPath: `${imagesBasePath}/images/avatars`,
     maxWidth: 460,
     maxHeight: 460,
     thumbWidth: 48,
@@ -240,7 +240,7 @@ const uploadUserAvatar = (file: Express.Multer.File, req: Request): void => {
 const uploadUserCover = (file: Express.Multer.File, req: Request): void => {
   const uploadConfig = {
     fileNames: [ req.session?.userID ],
-    imagesPath: `${imagesBasePath}/covers`,
+    imagesPath: `${imagesBasePath}/images/covers`,
     maxWidth: 1000,
     maxHeight: 320
   }

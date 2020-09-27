@@ -20,6 +20,7 @@ export const initialUsers = [
     password: '0q7#Wy#WHyKX',
     name: 'Bob Smith',
     avatar: true,
+    cover: true,
     info: 'Work on electronics to maintain their electrical component. Enjoy testing the durability of items.',
     address: {
       country: 'United States',
@@ -83,6 +84,7 @@ export const initialUsers = [
     password: 'OI~lrGbu~R#g1A',
     name: 'osenger',
     avatar: true,
+    cover: true,
     info: 'I am professor emeritus at Western New England University in Springfield, MA where I have taught for 40 years. My thanks go to all those thoughtful people who write helpful reviews.',
     address: {
       country: 'United States',
@@ -132,6 +134,7 @@ export const initialUsers = [
     password: 'LxgM^O?ic>0s',
     name: 'Cruickshankkhalil',
     avatar: true,
+    cover: true,
     info: 'I\'m a shopaholic. I love to browse amazon product on my free time. I love food, beauty, fashion, and home décor. I\'m the type of person that read numerous reviews before making a purchase. So, I like to write review for the product I buy as well to help others.',
     address: {
       country: 'Afghanistan',
@@ -148,6 +151,7 @@ export const initialUsers = [
     password: '_4&XAA3',
     name: 'cade76',
     avatar: true,
+    cover: true,
     info: 'gamesmaster at heart most of the time, I do all types of reviews.',
     address: {
       country: 'Andorra',
