@@ -1,5 +1,21 @@
 export const initialUsers = [
   {
+    email: 'alice@example.com',
+    password: '8I&o9FSv%VrU',
+    name: 'Alice',
+    avatar: true,
+    info: 'Wife... & Mother of 3. Love Shopping ( mainly on Amazon!) and Crafting. Addicted to my Cricut, Home Renovation shows and my kiddos.',
+    address: {
+      country: 'United States',
+      fullName: 'Alice Dokubo',
+      streetAddressLine1: '507, Crown Dale',
+      city: 'Alabama',
+      region: 'Alabama',
+      postalCode: 5613,
+      phoneNumber: '56137755568'
+    }
+  },
+  {
     email: 'bob@example.com',
     password: '0q7#Wy#WHyKX',
     name: 'Bob Smith',
@@ -16,32 +32,132 @@ export const initialUsers = [
     }
   },
   {
-    email: 'alice@example.com',
-    password: '8I&o9FSv%VrU',
-    name: 'Alice',
+    email: 'mary@example.com',
+    password: 'p2&MR5w$Z7pF',
+    name: 'Marette',
     avatar: true,
-    info: 'Wife... & Mother of 3. Love Shopping ( mainly on Amazon!) and Crafting. Addicted to my Cricut, Home Renovation shows and my kiddos.'
+    info: 'I run a home-based business. I don\'t have time to go to the store all the time so I shop on amazon. We donate a lot to our local animal shelter and help with fundraisers, so we are always in need of giveaways. Amazon is always our go-to for all our home, office needs, donation needs. Please do not contact me for doing reviews. I do reviews on what I purchase already.',
+    address: {
+      country: 'Cyprus',
+      fullName: 'Marrette Jordan',
+      streetAddressLine1: '12XC2+MJ',
+      city: 'Piwn',
+      region: 'Aargau',
+      postalCode: 6342,
+      phoneNumber: '08987765468'
+    }
   },
   {
     email: 'john@example.com',
     password: 'VgJ48q&8%^Dm',
     name: 'Jools',
     address: {
-      country: 'United States',
+      country: 'Benin',
       fullName: 'Jools Willow',
       streetAddressLine1: '12XC2+MJ',
-      city: 'Jersey City',
-      region: 'New Jersey',
-      postalCode: 154898,
-      phoneNumber: '01487755568'
+      city: 'Piwn',
+      region: 'Verde',
+      postalCode: 84984,
+      phoneNumber: '08987765468'
     }
   },
   {
-    email: 'mary@example.com',
-    password: 'p2&MR5w$Z7pF',
-    name: 'Marette',
+    email: 'mckenna60@example.com',
+    password: 'oO}8R>"Lak',
+    name: 'Mckenna60',
     avatar: true,
-    info: 'I run a home-based business. I don\'t have time to go to the store all the time so I shop on amazon. We donate a lot to our local animal shelter and help with fundraisers, so we are always in need of giveaways. Amazon is always our go-to for all our home, office needs, donation needs. Please do not contact me for doing reviews. I do reviews on what I purchase already.'
+    cover: true,
+    info: '"Go the Extra Mile,It\'s Never Crowded"Partner-Mother-Sister-Hugger-Bestie-EQUALITY4ALL',
+    address: {
+      country: 'Austria',
+      fullName: 'Darcy Win',
+      streetAddressLine1: '471 Vienna International Centre',
+      city: 'Salzburg',
+      region: 'Salzburg',
+      postalCode: 1080,
+      phoneNumber: '972004010'
+    }
+  },
+  {
+    email: 'osenger@example.com',
+    password: 'OI~lrGbu~R#g1A',
+    name: 'osenger',
+    avatar: true,
+    info: 'I am professor emeritus at Western New England University in Springfield, MA where I have taught for 40 years. My thanks go to all those thoughtful people who write helpful reviews.',
+    address: {
+      country: 'United States',
+      fullName: 'Anadar Puerto',
+      streetAddressLine1: '504 St. Anne\'s Villas',
+      city: 'Alabama',
+      region: 'Alabama',
+      postalCode: 3591,
+      phoneNumber: '69993974611'
+    }
+  },
+  {
+    email: 'fbalistreri@example.com',
+    password: '&cRJ&D46aw~=',
+    name: 'Fbalistreri',
+    avatar: true,
+    cover: true,
+    address: {
+      country: 'United States',
+      fullName: 'Genivee Bird',
+      streetAddressLine1: '187 Beresford Street',
+      city: 'New York',
+      region: 'New York',
+      postalCode: 5399,
+      phoneNumber: '268907297'
+    }
+  },
+  {
+    email: 'mason42@example.com',
+    password: 'A15iC)XjPSRgGQ%UR',
+    name: 'Mason42',
+    avatar: true,
+    cover: true,
+    info: 'As an Amazon Influencer, I do Amazon Live Streaming and Youtube reviews (electronics and tools)',
+    address: {
+      country: 'Bangladesh',
+      fullName: 'Claennis Hagman',
+      streetAddressLine1: '482 Maijdi-Chandraganj Road',
+      city: 'Chittagong Division',
+      region: 'Chittagong Division',
+      postalCode: 2330,
+      phoneNumber: '862989586'
+    }
+  },
+  {
+    email: 'cruickshankkhalil@example.com',
+    password: 'LxgM^O?ic>0s',
+    name: 'Cruickshankkhalil',
+    avatar: true,
+    info: 'I\'m a shopaholic. I love to browse amazon product on my free time. I love food, beauty, fashion, and home décor. I\'m the type of person that read numerous reviews before making a purchase. So, I like to write review for the product I buy as well to help others.',
+    address: {
+      country: 'Afghanistan',
+      fullName: 'Cottus Cariaga',
+      streetAddressLine1: '154 Qara Bagh',
+      city: 'Samangan',
+      region: 'Samangan',
+      postalCode: 111111,
+      phoneNumber: '1052'
+    }
+  },
+  {
+    email: 'cade76@example.com',
+    password: '_4&XAA3',
+    name: 'cade76',
+    avatar: true,
+    info: 'gamesmaster at heart most of the time, I do all types of reviews.',
+    address: {
+      country: 'Andorra',
+      fullName: 'Fabio Srivastava',
+      streetAddressLine1: '407 Place Charles de Gaulle',
+      city: 'Andorra la Vella',
+      region: 'Andorra la Vella',
+      postalCode: 75019,
+      phoneNumber: '194687903'
+    }
   }
 ]
 
@@ -69,57 +185,57 @@ export const initialProducts = {
             ]
           },
           {
-            author: 'todo',
+            author: 3,
             content: 'Is this a good computer for working with Photoshop and Manga Studio?',
             answers: [
               {
-                author: 'todo',
+                author: 5,
                 content: 'I haven\'t used Manga Studio, but I use it with Photoshop CS and it works well. I\'m guessing, if it works with PS it should work with MS.'
               }
             ]
           },
           {
-            author: 'todo',
+            author: 7,
             content: 'Does the mouse comes with the receiver cant get it to work?',
             answers: [
               {
-                author: 'todo',
+                author: 5,
                 content: 'The dongle for the wireless mouse is located inside the battery compartment. If you still cannot locate the dongle, please contact Acer support at 866-695-2237.'
               },
               {
-                author: 'todo',
+                author: 1,
                 content: 'The mouse\'s receiver is actually inserted for you in the back. Just put in the batteries, turn the power bar over and you are good to go. There is a slot inside the mouse\'s cover to insert the receiver should you change mouses.'
               },
               {
-                author: 'todo',
+                author: 9,
                 content: 'The above English sentence makes no sense'
               },
               {
-                author: 'todo',
+                author: 4,
                 content: 'Do you actually expect someone to answer that question?? Correct English might get an answer.'
               }
             ]
           },
           {
-            author: 'todo',
+            author: 5,
             content: 'Would this be good for light gaming? like if i just wanted to play world of warcraft?',
             answers: [
               {
-                author: 'todo',
+                author: 6,
                 content: 'I play many games with ease. The colors are fabulous.'
               },
               {
-                author: 'todo',
+                author: 3,
                 content: 'It is very fast if you get the version with the electronic hard drive and screen is big and very bright'
               }
             ]
           },
           {
-            author: 'todo',
+            author: 4,
             content: 'Can more memory be added?',
             answers: [
               {
-                author: 'todo',
+                author: 7,
                 content: 'I\'ve read it\'s possible but it\'s a total pain as you have to pull the screen off.'
               }
             ]
@@ -204,13 +320,13 @@ export const initialProducts = {
                 media: 2,
                 comments: [
                   {
-                    author: 'todo',
+                    author: 1,
                     content: 'Does the HDMI-In works, if Z24 is turned off? I don\'t want to turn it on every time I want to use Fire stick! My old Acer Z3 615 can be used as monitor in offline mode. '
                   }
                 ]
               },
               {
-                author: 'todo',
+                author: 5,
                 stars: 4,
                 isVerified: true,
                 title: 'Large view, small footprint, great connectivity.',
@@ -252,7 +368,7 @@ export const initialProducts = {
             ],
             reviews: [
               {
-                author: 'todo',
+                author: 9,
                 stars: 1,
                 isVerified: true,
                 title: 'A genuine review.',
@@ -265,7 +381,7 @@ export const initialProducts = {
                 media: 2
               },
               {
-                author: 'todo',
+                author: 7,
                 stars: 3,
                 isVerified: true,
                 title: 'Terrible keyboard',
@@ -273,15 +389,15 @@ export const initialProducts = {
                 media: 0,
                 comments: [
                   {
-                    author: 'todo',
+                    author: 2,
                     content: 'how do you like the computer though?'
                   },
                   {
-                    author: 'todo',
+                    author: 5,
                     content: 'It came with a keyboard guy?'
                   },
                   {
-                    author: 'todo',
+                    author: 3,
                     content: 'I can\'t tell until I get a new keyboard. The keyboard is total junk & near impossible to use with the keys so close together.',
                     replyTo: 0
                   }
@@ -326,7 +442,7 @@ export const initialProducts = {
             ],
             reviews: [
               {
-                author: 'todo',
+                author: 2,
                 stars: 3,
                 isVerified: false,
                 title: 'Feeling Misled',
@@ -336,18 +452,18 @@ export const initialProducts = {
                 media: 0,
                 comments: [
                   {
-                    author: 'todo',
+                    author: 1,
                     content: 'does this tilt the screen? '
                   },
                   {
-                    author: 'todo',
+                    author: 9,
                     content: 'The screen tilts, but cannot swivel.',
                     replyTo: 0
                   }
                 ]
               },
               {
-                author: 'todo',
+                author: 7,
                 stars: 5,
                 isVerified: true,
                 title: 'Incredibly Easy to Multi-task, Visually Appealing, and Great Form Factor',
@@ -368,65 +484,65 @@ export const initialProducts = {
       {
         questions: [
           {
-            author: 'todo',
+            author: 6,
             content: 'cd/dvd? Sd card?',
             answers: [
               {
-                author: 'todo',
+                author: 111,
                 content: 'no'
               }
             ]
           },
           {
-            author: 'todo',
+            author: 3,
             content: 'does it have a camera?',
             answers: [
               {
-                author: 'todo',
+                author: 9,
                 content: 'Yes, it has a camera.'
               }
             ]
           },
           {
-            author: 'todo',
+            author: 4,
             content: 'can you add speakers if you want better sound ',
             answers: [
               {
-                author: 'todo',
+                author: 5,
                 content: 'Yes, i have a sound bar hooked up'
               }
             ]
           },
           {
-            author: 'todo',
+            author: 8,
             content: 'Does this have a glossy or matte screen? ',
             answers: [
               {
-                author: 'todo',
+                author: 7,
                 content: 'NO TOUCH SCREEN... I had to send back.. I felt like it was opened as well, it had Firefox loaded, which is NOT from Microsoft or Acer... I think it was Matte'
               },
               {
-                author: 'todo',
+                author: 5,
                 content: 'Matte screen.'
               }
             ]
           },
           {
-            author: 'todo',
+            author: 6,
             content: 'Does this have speakers?',
             answers: [
               {
-                author: 'todo',
+                author: 5,
                 content: 'You can hear sound but it’s minimal.'
               }
             ]
           },
           {
-            author: 'todo',
+            author: 9,
             content: 'Is this a touch screen?',
             answers: [
               {
-                author: 'todo',
+                author: 3,
                 content: ' No'
               }
             ]
@@ -465,7 +581,7 @@ export const initialProducts = {
             ],
             reviews: [
               {
-                author: 'todo',
+                author: 1,
                 stars: 5,
                 isVerified: false,
                 title: 'Excellent Fast All-in-One computer',
@@ -473,13 +589,13 @@ export const initialProducts = {
                 media: 0,
                 comments: [
                   {
-                    author: 'todo',
+                    author: 3,
                     content: 'does this tilt the screen?'
                   }
                 ]
               },
               {
-                author: 'todo',
+                author: 5,
                 stars: 5,
                 isVerified: true,
                 title: 'A good windows computer',
@@ -525,7 +641,7 @@ export const initialProducts = {
             ],
             reviews: [
               {
-                author: 'todo',
+                author: 9,
                 stars: 5,
                 isVerified: true,
                 title: 'Nice color and design, decent performance, current CPU and plenty fast.',
@@ -533,7 +649,7 @@ export const initialProducts = {
                 media: 1
               },
               {
-                author: 'todo',
+                author: 7,
                 stars: 1,
                 isVerified: true,
                 title: 'Sent wrong color',
@@ -541,7 +657,7 @@ export const initialProducts = {
                 media: 0
               },
               {
-                author: 'todo',
+                author: 5,
                 stars: 2,
                 isVerified: true,
                 title: 'Happy Customer for two months',
@@ -549,7 +665,7 @@ export const initialProducts = {
                 media: 0
               },
               {
-                author: 'todo',
+                author: 3,
                 stars: 1,
                 isVerified: true,
                 title: 'Customer service, and they sucked this time.',
@@ -557,7 +673,7 @@ export const initialProducts = {
                 media: 0
               },
               {
-                author: 'todo',
+                author: 6,
                 stars: 5,
                 isVerified: true,
                 title: 'Great looking and gets the job done!',
@@ -565,7 +681,7 @@ export const initialProducts = {
                 media: 0
               },
               {
-                author: 'todo',
+                author: 4,
                 stars: 4,
                 isVerified: true,
                 title: 'Wrong Color/picture on amazon',
@@ -573,7 +689,7 @@ export const initialProducts = {
                 media: 0
               },
               {
-                author: 'todo',
+                author: 8,
                 stars: 5,
                 isVerified: true,
                 title: 'Very nice',
@@ -581,7 +697,7 @@ export const initialProducts = {
                 media: 0
               },
               {
-                author: 'todo',
+                author: 0,
                 stars: 5,
                 isVerified: true,
                 title: 'Great Buy',
@@ -589,7 +705,7 @@ export const initialProducts = {
                 media: 0
               },
               {
-                author: 'todo',
+                author: 1,
                 stars: 3,
                 isVerified: true,
                 title: 'Screen',
@@ -597,15 +713,7 @@ export const initialProducts = {
                 media: 0
               },
               {
-                author: 'todo',
-                stars: 5,
-                isVerified: true,
-                title: 'Work good',
-                content: 'I live it is slow but overall great computer...',
-                media: 0
-              },
-              {
-                author: 'todo',
+                author: 2,
                 stars: 1,
                 isVerified: false,
                 title: 'Slower than molasses!',
@@ -619,63 +727,63 @@ export const initialProducts = {
       {
         questions: [
           {
-            author: 'todo',
+            author: 2,
             content: 'Does this have a dvd player in it?',
             answers: [
               {
-                author: 'todo',
+                author: 1,
                 content: 'Yes'
               }
             ]
           },
           {
-            author: 'todo',
+            author: 3,
             content: 'Is this pc strong enough to run Quickbooks?',
             answers: [
               {
-                author: 'todo',
+                author: 5,
                 content: 'Yes it is like many computers the more you add the slower it will get unless you add more RAM or buy a computer with faster processing. One user on quick books is fine 2 users you’ll need at least 2.5 Ghz.'
               }
             ]
           },
           {
-            author: 'todo',
+            author: 7,
             content: 'Can any printer be hooked up to this?',
             answers: [
               {
-                author: 'todo',
+                author: 9,
                 content: 'I believe any printer can be hooked up to any all in one, When you go to hook it up and search for your printer if it doesn’t come up you just type it in'
               }
             ]
           },
           {
-            author: 'todo',
+            author: 9,
             content: 'Does it have a built in webcam?',
             answers: [
               {
-                author: 'todo',
+                author: 5,
                 content: 'Yes. Worth to buy!'
               },
               {
-                author: 'todo',
+                author: 6,
                 content: 'Yes, it does'
               },
               {
-                author: 'todo',
+                author: 7,
                 content: 'Yes'
               }
             ]
           },
           {
-            author: 'todo',
+            author: 5,
             content: 'Does it need a computer tower?',
             answers: [
               {
-                author: 'todo',
+                author: 1,
                 content: 'No, everything is built into the monitor, including a disk drive.'
               },
               {
-                author: 'todo',
+                author: 5,
                 content: 'NO it is all in one'
               }
             ]
@@ -715,7 +823,7 @@ export const initialProducts = {
             ],
             reviews: [
               {
-                author: 'todo',
+                author: 1,
                 stars: 5,
                 isVerified: true,
                 title: 'Cool',
@@ -723,7 +831,7 @@ export const initialProducts = {
                 media: 1
               },
               {
-                author: 'todo',
+                author: 3,
                 stars: 5,
                 isVerified: true,
                 title: 'Happy customer',
@@ -731,7 +839,7 @@ export const initialProducts = {
                 media: 4
               },
               {
-                author: 'todo',
+                author: 5,
                 stars: 3,
                 isVerified: true,
                 title: 'Decent, but not great.',
@@ -745,111 +853,111 @@ export const initialProducts = {
       {
         questions: [
           {
-            author: 'todo',
+            author: 9,
             content: 'Can i install google play games on this pc? buying for my father and trying to see if golf master 3d can be put on it for him.',
             answers: [
               {
-                author: 'todo',
+                author: 7,
                 content: 'You cannot install games from the Google Play Store on this computer. This computer has Windows 10 Home. You may want to look at an HP Chromebook. The most current HP Chromebooks do have the Google Play Store installed.'
               },
               {
-                author: 'todo',
+                author: 3,
                 content: `I think any video game will play as long as the video card is powerful enough.
                 this computer is not a gaming computer but a simple and cheap web surfing and office software computer.`
               },
               {
-                author: 'todo',
+                author: 5,
                 content: 'On the bottom of the screen left side. Is a spot where you can write questions in. I asked and the answers come up with instructions. How do I install it ..........'
               }
             ]
           },
           {
-            author: 'todo',
+            author: 5,
             content: 'Has anyone used this pc for streaming movies & tv show’s ?.',
             answers: [
               {
-                author: 'todo',
+                author: 3,
                 content: 'I’ve watched Netflix on it and my son watches YouTube videos on it all the time. Works great. Never had any issues.'
               },
               {
-                author: 'todo',
-                content: ' no '
+                author: 2,
+                content: 'no'
               }
             ]
           },
           {
-            author: 'todo',
+            author: 5,
             content: 'im looking for a computer to use for work as i am currently looking for work at home jobs. Does this support most softwares?',
             answers: [
               {
-                author: 'todo',
+                author: 9,
                 content: 'This is a basic computer which can handle basic duties like surfing the internet. A computer with the Intel i5 or Ryzen 5 processor or better with 8 gigabytes of RAM can handle more programs.'
               },
               {
-                author: 'todo',
+                author: 7,
                 content: `Yes this computer is more than I expected
                 It's a lot easier to get used to an its faster, than my other computer`
               }
             ]
           },
           {
-            author: 'todo',
+            author: 6,
             content: 'Does it come with adobe flash?',
             answers: [
               {
-                author: 'todo',
+                author: 5,
                 content: 'Adobe Flash can be downloaded for free.'
               },
               {
-                author: 'todo',
+                author: 4,
                 content: 'No'
               }
             ]
           },
           {
-            author: 'todo',
+            author: 3,
             content: 'Is it touchscrean',
             answers: [
               {
-                author: 'todo',
+                author: 7,
                 content: 'It is not.'
               },
               {
-                author: 'todo',
+                author: 8,
                 content: 'Unfortunately, it is not.'
               }
             ]
           },
           {
-            author: 'todo',
+            author: 6,
             content: 'I’m not seeing an option for a warranty. Is there one available?',
             answers: [
               {
-                author: 'todo',
+                author: 1,
                 content: 'not sure'
               }
             ]
           },
           {
-            author: 'todo',
+            author: 8,
             content: 'How wide or big is the stand?',
             answers: [
               {
-                author: 'todo',
+                author: 4,
                 content: 'The stand is actually just two thick, bent, wires so the footprint is not much thicker than the computer itself.'
               }
             ]
           },
           {
-            author: 'todo',
+            author: 7,
             content: 'looking for a power cord',
             answers: [
               {
-                author: 'todo',
+                author: 9,
                 content: 'If you need a replacement AC adapter, here is the part number: L56998-800 and for the power cord: 213349-009. You should have gotten one in the box.'
               },
               {
-                author: 'todo',
+                author: 6,
                 content: 'The power cord was in the box'
               }
             ]
@@ -903,7 +1011,7 @@ export const initialProducts = {
             ],
             reviews: [
               {
-                author: 'todo',
+                author: 4,
                 stars: 5,
                 isVerified: true,
                 title: 'Better than Expected.........',
@@ -917,25 +1025,25 @@ export const initialProducts = {
                 media: 4,
                 comments: [
                   {
-                    author: 'todo',
+                    author: 1,
                     content: 'So just hooking it up to ethernet made things better? I\'m on the hunt for a new computer and use multiple tabs constantly so this might be worth a try since I did notice slightly faster speeds hooking ethernet up to my laptop '
                   },
                   {
-                    author: 'todo',
+                    author: 2,
                     content: 'Have you tried it without being hooked up directly to the ethernet? I have high speed wireless, and I\'m a little hesitant to get this if I\'m not going to hook it up directly. I\'d love to hear your thoughts. '
                   },
                   {
-                    author: 'todo',
+                    author: 3,
                     content: 'Thanks for the detailed review! Loved the picture from Belem in Portugal. I visited there last year and it brought back fond memories!'
                   },
                   {
-                    author: 'todo',
+                    author: 8,
                     content: 'i think this is a great computer also...i didnt order it from amazon i got it from wal-mart for $399 and i\'m looking into getting another one for my son , we are tired of laptops LOL....i\'m really enjoying this'
                   }
                 ]
               },
               {
-                author: 'todo',
+                author: 3,
                 stars: 1,
                 isVerified: false,
                 title: 'SLOW!!',
@@ -943,7 +1051,7 @@ export const initialProducts = {
                 media: 1
               },
               {
-                author: 'todo',
+                author: 5,
                 stars: 3,
                 isVerified: false,
                 title: 'Very Stylish but Slow',
@@ -951,7 +1059,7 @@ export const initialProducts = {
                 media: 1
               },
               {
-                author: 'todo',
+                author: 7,
                 stars: 4,
                 isVerified: true,
                 title: 'Home Office or Student is ok',
@@ -959,7 +1067,7 @@ export const initialProducts = {
                 media: 0,
                 comments: [
                   {
-                    author: 'todo',
+                    author: 8,
                     content: 'yah, windows 10 needs at least 8gigs or ram to run normal, having only 4 is like two flat tires.'
                   }
                 ]
@@ -1016,7 +1124,7 @@ export const initialProducts = {
             ],
             reviews: [
               {
-                author: 'todo',
+                author: 5,
                 stars: 5,
                 isVerified: true,
                 title: 'Perfect!',
@@ -1024,7 +1132,7 @@ export const initialProducts = {
                 media: 0
               },
               {
-                author: 'todo',
+                author: 9,
                 stars: 5,
                 isVerified: true,
                 title: 'All-in-one compactness.',
@@ -1032,7 +1140,7 @@ export const initialProducts = {
                 media: 0
               },
               {
-                author: 'todo',
+                author: 7,
                 stars: 5,
                 isVerified: true,
                 title: 'Great PC gift for my mother',
@@ -1040,7 +1148,7 @@ export const initialProducts = {
                 media: 0
               },
               {
-                author: 'todo',
+                author: 3,
                 stars: 5,
                 isVerified: true,
                 title: 'Great Gaming and Everyday Use.',
@@ -1048,7 +1156,7 @@ export const initialProducts = {
                 media: 0
               },
               {
-                author: 'todo',
+                author: 1,
                 stars: 4,
                 isVerified: true,
                 title: 'So far So good',
@@ -1066,47 +1174,47 @@ export const initialProducts = {
       {
         questions: [
           {
-            author: 'todo',
+            author: 0,
             content: 'Can it be used for home canning? If so, how many quart mason jars fit in the 6 Quart?',
             answers: [
               {
-                author: 'todo',
+                author: 2,
                 content: 'I don’t know but Facebook has a group called Pressure Luck. It’s a friendly group, post your question there. Good luck.'
               },
               {
-                author: 'todo',
+                author: 4,
                 content: 'I understand it has been done, but that it isn’t suggested..'
               }
             ]
           },
           {
-            author: 'todo',
+            author: 2,
             content: 'My cord to plug in my pot is missing. Anyone else have this problem?',
             answers: [
               {
-                author: 'todo',
+                author: 8,
                 content: 'No, my cord was included in the package. You could reorder from Amazon and return the one you have that is missing the cord.'
               },
               {
-                author: 'todo',
+                author: 6,
                 content: 'I didn’t have an issue with my Instant Pot.'
               },
               {
-                author: 'todo',
+                author: 4,
                 content: 'No.'
               }
             ]
           },
           {
-            author: 'todo',
+            author: 6,
             content: 'Can you make cake? Is it more difficult if you don\'t have a cake button? Thank you',
             answers: [
               {
-                author: 'todo',
+                author: 2,
                 content: 'Yes you can make cake I suggest getting a pan that fits in the instant pot I think usually a 7 inch pan works but there are a lot of them on Amazon.com for sale'
               },
               {
-                author: 'todo',
+                author: 8,
                 content: 'I boughtbit as a gift i. Elementi my daughter has base a cake in it'
               }
             ]
@@ -1138,7 +1246,7 @@ export const initialProducts = {
             ],
             reviews: [
               {
-                author: 'todo',
+                author: 6,
                 stars: 5,
                 isVerified: true,
                 title: 'Why don’t you have one of these yet?',
@@ -1147,13 +1255,13 @@ export const initialProducts = {
                 media: 1,
                 comments: [
                   {
-                    author: 'todo',
+                    author: 8,
                     content: 'great'
                   }
                 ]
               },
               {
-                author: 'todo',
+                author: 4,
                 stars: 1,
                 isVerified: true,
                 title: 'Broken and unusable.',
@@ -1161,19 +1269,19 @@ export const initialProducts = {
                 media: 1,
                 comments: [
                   {
-                    author: 'todo',
+                    author: 2,
                     content: 'Really? The lesson you took away was "don\'t purchase an appliance?" Not, perhaps, "don\'t wait months to open a package?"'
                   },
                   {
-                    author: 'todo',
+                    author: 8,
                     content: 'Why couldn’t you return it?'
                   },
                   {
-                    author: 'todo',
+                    author: 6,
                     content: 'What was the reason you could not return it?'
                   },
                   {
-                    author: 'todo',
+                    author: 5,
                     content: 'What was the reason you could not return it?'
                   }
                 ]
@@ -1205,7 +1313,7 @@ export const initialProducts = {
             ],
             reviews: [
               {
-                author: 'todo',
+                author: 4,
                 stars: 5,
                 isVerified: true,
                 title: 'Amazing (as always) and cute!',
@@ -1213,13 +1321,13 @@ export const initialProducts = {
                 media: 0,
                 comments: [
                   {
-                    author: 'todo',
+                    author: 2,
                     content: 'Is there anything you can\'t do on this one that you could on your other instant pot?'
                   }
                 ]
               },
               {
-                author: 'todo',
+                author: 6,
                 stars: 3,
                 isVerified: true,
                 title: 'Just okay',
@@ -1253,7 +1361,7 @@ export const initialProducts = {
             ],
             reviews: [
               {
-                author: 'todo',
+                author: 8,
                 stars: 4,
                 isVerified: true,
                 title: 'Be sure to add plenty of liquid',
@@ -1261,7 +1369,7 @@ export const initialProducts = {
                 media: 0
               },
               {
-                author: 'todo',
+                author: 4,
                 stars: 4,
                 isVerified: true,
                 title: `I like the white. Takes a long time to heat up however and my beans are never cooked properly. Rice cooks well. Veggies great.
@@ -1274,7 +1382,7 @@ export const initialProducts = {
                 media: 5
               },
               {
-                author: 'todo',
+                author: 2,
                 stars: 1,
                 isVerified: false,
                 title: 'Base is not stable',
@@ -1288,22 +1396,22 @@ export const initialProducts = {
       {
         questions: [
           {
-            author: 'todo',
+            author: 8,
             content: 'Can the Instant Pot be used for canning?',
             answers: [
               {
-                author: 'todo',
+                author: 1,
                 content: `The Instant Pot operates at 11.6 psi (about 242°F), whereas other pressure cookers tend to operate at a higher 15 psi (about 250°F). So when you're adjusting for a recipe that says 15 psi, just try cooking for a few extra minutes.
                 Since Instant Pot reaches 242 degrees it is safe for canning per the USDA.
                 https://nchfp.uga.edu/publications/usda/INTRO_HomeCanrev0715.pdf`
               },
               {
-                author: 'todo',
+                author: 4,
                 content: `There are two types of canning: boiling-water canning at 100°C/212°F (for acid fruits, tomatoes, pickles and jellied products) and pressure canning at 115~121°C/240~250°F (for low acid vegetables, meat and poultry). Please refer to "USDA Complete Guide to Home Canning" for more details.
                 Instant Pot can be used for boiling-water canning. However, Instant Pot has not been tested for food safety in pressure canning by USDA. Due to the fact that programs in Instant Pot IP-CSG, IP-LUX and IP-DUO series are regulated by a pressure sensor instead of a thermometer, the elevation of your location may affect the actual cooking temperature. For now, we wouldn't recommend using Instant Pot for pressure canning purpose. Please note this correction to our early inaccurate information.`
               },
               {
-                author: 'todo',
+                author: 6,
                 content: `ABSOLUTELY NOT. It does not reach high enough pressure for it to be safe to follow the USDA tested recommendations for pressure canning. If you want to can, buy a REAL pressure canner. I've been canning for 56 years as of 2019. I won't even can with a boiling water bath anymore and haven't for years. Tomatoes were the only thing I ever canned that way and the vast majority of modern breeds are not naturally acidic enough for it to be safe. IMNSHO tomatoes were the ONLY thing that was ever safe to put in a boiling water bath. PRESSURE CANNERS MADE FOR THE PURPOSE ONLY.
 
                 I used to seal jelly jars with a layer of paraffin wax and I don't do THAT anymore either.
@@ -1311,33 +1419,33 @@ export const initialProducts = {
                 Be safe and Do It Right. This is a great kitchen tool for cooking. DO NOT EVEN THINK about trying to can in it. It is WAY too small for one thing, and it isn't safe (the more important reason NOT TO DO IT) for another.`
               },
               {
-                author: 'todo',
+                author: 0,
                 content: 'Please, please. please, do NOT try canning meats, fish, or low acid fruits and vegetables in an electric pressure cooker!!! As far as I know, none of the electric pressure cookers now on the American market can attain 15 p.s.i. pressure, which is needed to raise the temperature inside to 240°F, which is needed to kill botulism spores. Longer processing time at lower temperatures WILL NOT RELIABLY kill these spores! Don\'t take the chance! Even with modern medical procedures and a nearby emergency room, you may not survive botulism poisoning!'
               }
             ]
           },
           {
-            author: 'todo',
+            author: 6,
             content: 'To those with 3qt size, are you happy with that size or would you have preferred the 6 qt size?',
             answers: [
               {
-                author: 'todo',
+                author: 2,
                 content: 'We\'re a family of two adults. I have both the 3qt and 6 qt. I had the 6qt for 2 years before the Mini came out, and thought I\'d use the Mini mostly for rice and potatoes. But now the 3qt is my mainstay, my workhorse. I\'ll use the big one when I want to batch cook something, like potatoes, stock, beans or a big pot of soup, but otherwise I rely almost entirely on the 3qt.'
               },
               {
-                author: 'todo',
+                author: 8,
                 content: 'Like others, I got the 6 quart, but found it kind of cumbersome, especially for my size kitchen and the fact that I only cook for 1 or 2 people, and even then not that often (microwave time!). The 3 quart size does the same things as the bigger ones, and is much more convenient. I gave the 6 quart one to a family of four that does a lot more cooking than I do.'
               },
               {
-                author: 'todo',
+                author: 4,
                 content: 'I have used my 6 qt Duo for over a year, and loved it. I wanted a smaller one and passed on the Mini 3 qt and bought a 2 qt Cosori, since IP does not make a 2 qt; which I also loved and used a lot. I now plan to purchase the IP Mini 3 qt. I am just one adult. There is a use for all three sizes as long as you can afford to own more than one. One thing to consider is that there are way more accessories to fit the 3 qt than there is for the 2 qt. What\'s not to love? Buy them both!'
               },
               {
-                author: 'todo',
+                author: 0,
                 content: 'I have both the 3 qt and the 6 quart. There are 3 of us. I use the 6 qt the most and tend to use the 3 qt for side dishes or if the 6 qt is tied up making yogurt. If I could only have 1 it would be the 6 qt. When making soups or stews, the 3 qt isn\'t quit big enough.'
               },
               {
-                author: 'todo',
+                author: 5,
                 content: `I bought both the 3 qt. and 6 qt. "Smart Pots" to try... and the 3 qt. is the clear winner!!! I come from a long line of pressure cooking women... that is how I came to own both 6 qt. and 8 qt. traditional stainless steel pressure cookers. I tend to use my 3 qt. Mini Smart Pot a LOT... and store it in a place where it's handy to grab (often). I like the mini b/c it is small and I like the convenience of the timer for most of the day-to-day things I do. And I agree with what everybody else here already stated... I also found the overall size of the 6 qt. Smart Pot TOO BIG… so I sold my 6 quart Smart Pot.
 
                 When I need to cook something in larger portions, I always use my 8 qt. traditional pressure cooker (which isn't that often b/c I usually freeze the extra food into future mini-meals). A traditional pressure cooker PRESSURE COOKS THE SAME as a "Smart Pot" (minus the "timer"), but takes up a LOT LESS STORAGE SPACE -- that why I kept my 8 qt. traditional stainless steel pressure cooker. Yes, it is a pretty darn big pot, but it uses so little storage space (as compared to the larger "Smart Pots"). I also kept my 6 qt. traditional pressure cooker too, simply b/c it nests (stores) nicely inside my 8 qt. pot and does not take up any extra space.
@@ -1351,7 +1459,7 @@ export const initialProducts = {
                 I highly recommend the following book whether you are considering purchasing a multicooker or even if you already have one and just want to understand it better: Multicooker Perfection: Cook it Fast or Cook it Slow – You Decide by America’s Test Kitchen (Cooks Illustrated). The book was well organized and a simple read, yet loaded with detailed testing of different Multicooker models, as well as the “pros and cons” of each multicooker feature, along with the even more important “how and why” explanation of their opinion. I got this book at my library, but found it to be so fundamentally valuable that I still went out and bought a copy to own.`
               },
               {
-                author: 'todo',
+                author: 7,
                 content: `The thing is this....
                 You can make 6 qts in the 6 qt Instant
                 You can make 3 qts in the 6 qt.
@@ -1361,43 +1469,43 @@ export const initialProducts = {
             ]
           },
           {
-            author: 'todo',
+            author: 4,
             content: 'How to make rice? there is no water marking for rice in the pot..',
             answers: [
               {
-                author: 'todo',
+                author: 0,
                 content: 'The older IPs have water markings for rice cooking like a rice cooker (mine for instance does - bought in 2016), the newer ones don\'t because people got confused about it and didn\'t know what it was supposed to be. So IP did away with the markings. ItThe Instant Pot still works very well for cooking rice, though - you will have to find out about time and rice to water ratio yourself, because not everybody likes his rice the same way. For measuring rice and water use the small plastic cup that comes with the IP (same type that comes with rice cookers). With white rice you can use the "rice" setting, with all types of brown rice use the "pressure cook" setting. I like my rice moist and soft so I use 1 cup of rice to two cups of water for brown rice and cook for 22 min.'
               }
             ]
           },
           {
-            author: 'todo',
+            author: 6,
             content: 'how much can the 3 Quart Hold? I am single and cooking for one..',
             answers: [
               {
-                author: 'todo',
+                author: 2,
                 content: 'We (2, plus occasional grown kids and small grandkids = 7) started with a 6 quart, and always had too many leftovers to want to eat the same thing every night for a week. Plus it took up a lot of counter space. We got a 3 quart and it\'s great - not too intrusive on the countertop, and we cook plenty for the two of us and the occasional invasion of grown kids/grandkids, even leftovers, but we\'re not drowning in leftovers now'
               },
               {
-                author: 'todo',
+                author: 0,
                 content: 'I have both, cooking for one. I use the 6 mostly but the 3 is great for sides.'
               }
             ]
           },
           {
-            author: 'todo',
+            author: 8,
             content: 'How much meat can fit into the 8 quart Instant Pot? Looking to understand how many pounds of common meats like, chicken,pork,or a chuck roast will fit',
             answers: [
               {
-                author: 'todo',
+                author: 6,
                 content: 'I haven\'t cooked any roasts in mine, yet. I have been cooking all kinds of stews, curries, rice dishes, pastas, etc. I will say, my instant pot would easily hold a 5 lb roast. The roast may need to be trimmed a tad bit to accommodate the shape of the Instant Pot, since it is not oval like many crock pots. I made a stew last night made with 12 chicken drumsticks last night with 10 cups of vegetable broth, potatoes, carrots, and mushrooms.'
               },
               {
-                author: 'todo',
+                author: 4,
                 content: 'I cooked a 7.75 pound turkey breast in my six quart with the trivet in place for Thanksgiving. It was thoroughly thawed. I put 12 ounces of chicken broth in the pot and rubbed the turkey with a packet of onion soup mix. Cooked at high pressure for 30 minutes and let it release pressure naturally for 30 minutes. Absolutely the moistest turkey I’ve ever made and great flavor.'
               },
               {
-                author: 'todo',
+                author: 0,
                 content: 'I have the 8 qt. I have never tried to measure it poundage wise. I have jammed large roasts in it that were 5 our six pounds and could probably do 8 or ten. The problem is when you do a frozen roast and it is really tall. A thawed roast can be folded. But, I have had to saw a really long frozen roast to get it to fit. Frozen doesn\'t really seem to add a lot of time if it is short enough to fit.'
               }
             ]
@@ -1432,7 +1540,7 @@ export const initialProducts = {
             ],
             reviews: [
               {
-                author: 'todo',
+                author: 2,
                 stars: 1,
                 isVerified: true,
                 title: 'Bad customer service!',
@@ -1446,19 +1554,19 @@ export const initialProducts = {
                 media: 0,
                 comments: [
                   {
-                    author: 'todo',
+                    author: 0,
                     content: 'I have had a complete different experience from Instant Pot. Their customer service is amazing, my pot had a slight damage and when I approached them within the warranty period, they replaced it with a new one. Of course it takes time to follow up and everything but let\'s accept the fact that I am not the only customer for Instant Pot. This is a MUST HAVE IN THE KITCHEN PRODUCT.'
                   },
                   {
-                    author: 'todo',
+                    author: 8,
                     content: 'What on earth does this have to do with the Air Fryer lid? You had a problem with the Instant Pot itself, not this product.'
                   },
                   {
-                    author: 'todo',
+                    author: 4,
                     content: 'I like this product very much. I use it every day. I love the  Kitchen Wall Paper Oil Proof Sticker . It is easy to operate, fashionable and generous, and it goes well with the overall style of my room My friends all say that I have good taste'
                   },
                   {
-                    author: 'todo',
+                    author: 6,
                     content: `Things don't just happen immediately because you think they should. Waiting a few days for help with something won't kill you, and isn't unreasonable. What do you expect? Someone from Insta-Pot personally drives to your house 5 minutes after you email to fix it for you?
 
                     If you're going to get this upset because you couldn't get your Insta-Pot fixed in a couple days, that's a reflection of you - not Insta-Pot.
@@ -1466,16 +1574,16 @@ export const initialProducts = {
                     (Not an employee, just a consumer who thinks this review is full of absurd expectations)`
                   },
                   {
-                    author: 'todo',
+                    author: 9,
                     content: 'You both work for engineering companies, but you can\'t figure out why they are not compatible. Please post the name of the companies so I will know to avoid.'
                   },
                   {
-                    author: 'todo',
+                    author: 7,
                     content: 'lmao',
                     replyTo: 4
                   },
                   {
-                    author: 'todo',
+                    author: 1,
                     content: `I'm getting the same run-around from their customer service. No return messages. I bought the Instant Pot Max for my wife then she told me she had heard of the Air Fryer that sits on top & wanted that as well. So I just ordered it. We love both the products.
 
                     However, I recently noticed the Air Fryer is not compatible with the Instant Pot MAX. I sent them 2 messages just asking why are they not compatible. It's not like I'm even planning to return the Air Fryer. It's working great with our MAX. But I want to know why they are not compatible. It could be a fire issue, it could be it causes one or the other to fail an early life, I don't know. But I don't want to burn our house down.
@@ -1526,7 +1634,7 @@ export const initialProducts = {
             ],
             reviews: [
               {
-                author: 'todo',
+                author: 6,
                 stars: 4,
                 isVerified: false,
                 title: 'Feed the team!',
@@ -1540,7 +1648,7 @@ export const initialProducts = {
                 media: 6
               },
               {
-                author: 'todo',
+                author: 2,
                 stars: 3,
                 isVerified: false,
                 title: 'Very few accessories for the 10 quart model.',
@@ -1578,7 +1686,7 @@ export const initialProducts = {
             ],
             reviews: [
               {
-                author: 'todo',
+                author: 4,
                 stars: 5,
                 isVerified: true,
                 title: 'Perfect Tiny Living appliance',
@@ -1600,30 +1708,30 @@ export const initialProducts = {
                 media: 1,
                 comments: [
                   {
-                    author: 'todo',
+                    author: 2,
                     content: 'Very good, I very like it, this is a great value product, I also bought the Silicone Ice Cube Tray to make ice cube for keeping my drinks chilled, They are all great works and practical.'
                   },
                   {
-                    author: 'todo',
+                    author: 0,
                     content: 'Hi, I\'m curious what solar/power system you have in your van to power this. I have 500w solar and a 200Ah battery in mine and there\'s no way I could power this cooker. Thanks!'
                   },
                   {
-                    author: 'todo',
+                    author: 6,
                     content: 'Exactly my thoughts. I live part time in a Sprinter van as well, and have a robust solar/battery system that would never be able to support, well....anything that draws 67 amps. Requesting The Galavan to clarify his amp draw post...',
                     replyTo: 1
                   },
                   {
-                    author: 'todo',
+                    author: 8,
                     content: 'I got this at Costco, very handy, easy to use. '
                   },
                   {
-                    author: 'todo',
+                    author: 3,
                     content: 'Good review'
                   }
                 ]
               },
               {
-                author: 'todo',
+                author: 2,
                 stars: 2,
                 isVerified: true,
                 title: 'Float valve doesn\'t pop up on its own.',
@@ -1645,33 +1753,33 @@ export const initialProducts = {
       {
         questions: [
           {
-            author: 'todo',
+            author: 0,
             content: 'Product description is for a proctor silex waffle baker???',
             answers: [
               {
-                author: 'todo',
+                author: 2,
                 content: 'I ordered this straight off the screen and received the Slow Cooker - not a waffle baker.'
               },
               {
-                author: 'todo',
+                author: 4,
                 content: 'Yes, I also noticed that. Seems to be a mistake by Amazon. Not very helpful.'
               },
               {
-                author: 'todo',
+                author: 6,
                 content: 'No'
               }
             ]
           },
           {
-            author: 'todo',
+            author: 2,
             content: 'Does the lid have a rubber gasket ( seal)around it?',
             answers: [
               {
-                author: 'todo',
+                author: 8,
                 content: 'The rubber gasket on the lid is this removable?'
               },
               {
-                author: 'todo',
+                author: 4,
                 content: 'no'
               }
             ]
@@ -1700,7 +1808,7 @@ export const initialProducts = {
             ],
             reviews: [
               {
-                author: 'todo',
+                author: 0,
                 stars: 1,
                 isVerified: false,
                 title: 'Don\'t buy cheap product.',
@@ -1708,13 +1816,13 @@ export const initialProducts = {
                 media: 2,
                 comments: [
                   {
-                    author: 'todo',
+                    author: 8,
                     content: 'What brand was the one that you had for 30 years?'
                   }
                 ]
               },
               {
-                author: 'todo',
+                author: 6,
                 stars: 5,
                 isVerified: true,
                 title: 'Bachelor guidance',
@@ -1726,11 +1834,11 @@ export const initialProducts = {
                 media: 0,
                 comments: [
                   {
-                    author: 'todo',
+                    author: 4,
                     content: 'Others do want to know more details, Marie, no need to be rude.'
                   },
                   {
-                    author: 'todo',
+                    author: 2,
                     content: 'I only wanted to know about the crock pot - not his life story! But good advice on temperature control'
                   }
                 ]
@@ -1742,61 +1850,61 @@ export const initialProducts = {
       {
         questions: [
           {
-            author: 'todo',
+            author: 4,
             content: 'does this cooker auto switch to warm when food is done?',
             answers: [
               {
-                author: 'todo',
+                author: 2,
                 content: 'No it does not. The temperature setting (HIGH, LOW and WARM) are a manual dial that you must physically turn to change.'
               },
               {
-                author: 'todo',
+                author: 0,
                 content: 'as far as I know it does not maybe I didn\'t read enough about the poduct'
               },
               {
-                author: 'todo',
+                author: 8,
                 content: 'No it does not.'
               },
               {
-                author: 'todo',
-                content: ' No '
-              }
-            ]
-          },
-          {
-            author: 'todo',
-            content: 'can we cook rice and beans on this?',
-            answers: [
-              {
-                author: 'todo',
-                content: 'I have done beans but not rice and it was good. I did bean soup.'
-              }
-            ]
-          },
-          {
-            author: 'todo',
-            content: 'Does the plug have 3 prongs?',
-            answers: [
-              {
-                author: 'todo',
-                content: 'No it is only a 2 prong.'
-              },
-              {
-                author: 'todo',
-                content: 'no it\'s a 2 prong plug'
-              },
-              {
-                author: 'todo',
+                author: 6,
                 content: 'No'
               }
             ]
           },
           {
-            author: 'todo',
+            author: 4,
+            content: 'can we cook rice and beans on this?',
+            answers: [
+              {
+                author: 2,
+                content: 'I have done beans but not rice and it was good. I did bean soup.'
+              }
+            ]
+          },
+          {
+            author: 6,
+            content: 'Does the plug have 3 prongs?',
+            answers: [
+              {
+                author: 8,
+                content: 'No it is only a 2 prong.'
+              },
+              {
+                author: 2,
+                content: 'no it\'s a 2 prong plug'
+              },
+              {
+                author: 0,
+                content: 'No'
+              }
+            ]
+          },
+          {
+            author: 4,
             content: 'Are there heating elements on the sides as well as the bottom? ',
             answers: [
               {
-                author: 'todo',
+                author: 0,
                 content: 'Yes. I think so'
               }
             ]
@@ -1824,7 +1932,7 @@ export const initialProducts = {
             ],
             reviews: [
               {
-                author: 'todo',
+                author: 4,
                 stars: 5,
                 isVerified: true,
                 title: 'Great for Slow Cocking Turkey!',
@@ -1832,17 +1940,17 @@ export const initialProducts = {
                 media: 1,
                 comments: [
                   {
-                    author: 'todo',
+                    author: 2,
                     content: 'I would not cook in plastic! That puts plastic in your food!'
                   },
                   {
-                    author: 'todo',
+                    author: 8,
                     content: 'Well, who doesn\'t love a slow cocked turkey!!! OMG! LOL!'
                   }
                 ]
               },
               {
-                author: 'todo',
+                author: 8,
                 stars: 1,
                 isVerified: true,
                 title: 'Major Disappointment',
@@ -1853,7 +1961,7 @@ export const initialProducts = {
                 media: 2
               },
               {
-                author: 'todo',
+                author: 6,
                 stars: 3,
                 isVerified: true,
                 title: 'Not 10 quart capacity',
@@ -1861,15 +1969,15 @@ export const initialProducts = {
                 media: 0,
                 comments: [
                   {
-                    author: 'todo',
+                    author: 2,
                     content: 'Always, for any receptacle that will hold liquids, the capacity is given with consideration that there must be a safe space to avoid spilling. I always count on leaving 2" - 3" minimum from the top for cold liquids, 4" - 6" for hot liquids and/or for cooking. Capacity for solids is exact.'
                   },
                   {
-                    author: 'todo',
+                    author: 0,
                     content: 'Sad to hear that, still thank you so much for your sharing. Oh, I also bought the Privacy Window Film , which provides TWO Way Privacy but allows plenty of natural light to filter through, easy to install, works very well. I\'ll buy more! Highly recommend!'
                   },
                   {
-                    author: 'todo',
+                    author: 4,
                     content: 'Thanks for your post. I\'m comparing the dimensions to the 7 qt. model and was wondering how they could be so close in size.'
                   }
                 ]
@@ -1881,46 +1989,46 @@ export const initialProducts = {
       {
         questions: [
           {
-            author: 'todo',
+            author: 0,
             content: 'Does the hole for the probe in this crockpot really not cause any problems while cooking? I was always under the impression any leaks/holes are bad',
             answers: [
               {
-                author: 'todo',
+                author: 2,
                 content: 'Look at other slow cookers, not many have what you\'d call a tight-fitting lid. It\'s usually just a thin glass lid that can rattle a bit when cooking on Highl. I have an earlier HB Stay or Go non-programmable model with a hole, no probe, no problems. There\'s no stream of steam that escapes, nothing seems to come out of it, even cooking on High.'
               },
               {
-                author: 'todo',
+                author: 6,
                 content: `I have been using this crock pot for several months now, both with and without the temperature probe inserted. I have not had a problem either way. There are two (2) tiny vent holes where the handle attaches anyway -- if you didn't have those the lid would pop up when steam/heat pressure built up. Some people have complained that too much steam/heat escapes when the probe is not in use; you can resolve that (if it bothers you) with a small piece of aluminum foil rolled into a plug.
                 This is a GREAT crock pot. I make everything from whole chicken, baby back ribs, chicken soup, and pasta sauce in it. I can't say enough good things about it. (Except the cord is about 4 inches too short. LOL I fixed that with a 6 inch extension cord -- works great!)`
               },
               {
-                author: 'todo',
+                author: 8,
                 content: `I owned this Crick pot for years and used it several times a week , it finally died after my kitchen suffered electrical issues and surges .
                 I've never had a problem with the tiny vent hole , quite the oposite , I always found this model to cook far better than any other I've used before or since .
                 I'm reordering this one now`
               },
               {
-                author: 'todo',
+                author: 4,
                 content: 'Ive had mine for at least 3 years now and I rarely use the probe, I\'ve never had any issues with the hole. This is the best crockpot I\'ve ever owned.'
               }
             ]
           },
           {
-            author: 'todo',
+            author: 8,
             content: 'does that have a delay start feature',
             answers: [
               {
-                author: 'todo',
+                author: 4,
                 content: 'Sorry Kim, but you can\'t set this cooker to turn on later in the day. For the meals that I cook in this unit that\'s never been a problem--for example, a pot roast that requires a 6-hour cooking time on the low setting will still be perfect after 8 or 10 hours because there\'s simply no evaporation to allow the food to dry out. If you\'re making a casserole that only needs to "bake" for a couple hours, and you want to serve after an 8-hour workday, you\'ll need to use the timed feature on your regular oven. I\'m not aware of any slow cookers that have a delayed start feature for that very reason; they simply don\'t allow food to dry out. So as long as you cook your food for the minimum required time, extending the length of cooking time for hours, even, is never a problem. This slow cooker will automatically switch to the warm setting after the cook time that you programmed has elapsed, or the probe registers that the food is cooked. I\'ve used quite a few different slow cookers, and this one (and its\' smaller cousin) are by far my favorites. If you spent 10 times the amount of money, this would still be the best slow cooker of all, in my opinion.'
               }
             ]
           },
           {
-            author: 'todo',
+            author: 6,
             content: 'Can the interior pan be removed for easier cleaning, or for serving/',
             answers: [
               {
-                author: 'todo',
+                author: 2,
                 content: 'If your talking about the "ceramic crock" that you place your food in then yes, its removable. It is also microwave-safe and oven proof.'
               }
             ]
@@ -1947,7 +2055,7 @@ export const initialProducts = {
             ],
             reviews: [
               {
-                author: 'todo',
+                author: 2,
                 stars: 5,
                 isVerified: true,
                 title: 'Best slow cooker.',
@@ -1955,7 +2063,7 @@ export const initialProducts = {
                 media: 1
               },
               {
-                author: 'todo',
+                author: 4,
                 stars: 1,
                 isVerified: false,
                 title: 'It\'s not all that.',
@@ -1969,16 +2077,10 @@ export const initialProducts = {
                 6. The metal hinges you use to lock down the lid for transport are pretty flimsy.
                 
                 Too many little things were enough to have me saying "sayonara" Hamilton Beach and "hello" Aicok.`,
-                media: 3,
-                comments: [
-                  {
-                    author: 'todo',
-                    content: 'wwwwww'
-                  }
-                ]
+                media: 3
               },
               {
-                author: 'todo',
+                author: 6,
                 stars: 5,
                 isVerified: false,
                 title: 'Awesome Slow Cooker',
@@ -1986,7 +2088,7 @@ export const initialProducts = {
                 media: 2
               },
               {
-                author: 'todo',
+                author: 8,
                 stars: 2,
                 isVerified: true,
                 title: 'Strong on bells & whistles, weak on basic cooking',
@@ -1994,7 +2096,7 @@ export const initialProducts = {
                 media: 1
               },
               {
-                author: 'todo',
+                author: 0,
                 stars: 1,
                 isVerified: false,
                 title: 'Worst Product',
@@ -2002,7 +2104,7 @@ export const initialProducts = {
                 media: 0
               },
               {
-                author: 'todo',
+                author: 3,
                 stars: 5,
                 isVerified: true,
                 title: 'Wedding gift for son and my new daughter',
@@ -2010,7 +2112,7 @@ export const initialProducts = {
                 media: 0
               },
               {
-                author: 'todo',
+                author: 1,
                 stars: 2,
                 isVerified: true,
                 title: 'I will get my old one out of the attic!',
@@ -2020,7 +2122,7 @@ export const initialProducts = {
                 media: 0
               },
               {
-                author: 'todo',
+                author: 5,
                 stars: 3,
                 isVerified: true,
                 title: 'Cooks too hot!',
@@ -2064,7 +2166,7 @@ export const initialProducts = {
             ],
             reviews: [
               {
-                author: 'todo',
+                author: 0,
                 stars: 5,
                 isVerified: true,
                 title: 'Love this dress',
@@ -2126,7 +2228,7 @@ export const initialProducts = {
             ],
             reviews: [
               {
-                author: 'todo',
+                author: 2,
                 stars: 3,
                 isVerified: true,
                 title: 'Great dress, poor packaging',
@@ -2140,92 +2242,92 @@ export const initialProducts = {
       {
         questions: [
           {
-            author: 'todo',
+            author: 4,
             content: 'What color is aubergine?',
             answers: [
               {
-                author: 'todo',
+                author: 6,
                 content: 'Aubergine is deep purple'
               },
               {
-                author: 'todo',
+                author: 8,
                 content: 'Aubergine is lila'
               }
             ]
           },
           {
-            author: 'todo',
+            author: 2,
             content: 'Im 5\'3, how far do you think the dress will come down to? ',
             answers: [
               {
-                author: 'todo',
+                author: 4,
                 content: 'Truly, It depends on your proportions. I am 5\'6" , have long legs and a shorter torso. My dress is a size 4. The skirt length, below the waist, which sits a tad higher than most, is 22" long and the bottom hits me mid-knee. It looks short on the photo model. It\'s a nice dress, try it. you can always return it if it doesn\'t hang right on you.'
               },
               {
-                author: 'todo',
+                author: 6,
                 content: 'My daughter is 5’6 Size 14 and it came to the knee so it would depend on the size of the dress but it would be below the knee for you'
               },
               {
-                author: 'todo',
+                author: 8,
                 content: `The dress will come just 3cm over the knee.
                 It is a wonderful dress and high quality`
               },
               {
-                author: 'todo',
+                author: 4,
                 content: 'I’m 5’4” and my dress comes to the top of my knee.'
               },
               {
-                author: 'todo',
+                author: 6,
                 content: 'Same as in photo'
               }
             ]
           },
           {
-            author: 'todo',
+            author: 4,
             content: 'Which one is white? Cream or deep cream? ',
             answers: [
               {
-                author: 'todo',
+                author: 3,
                 content: 'White'
               },
               {
-                author: 'todo',
+                author: 0,
                 content: 'It\'s white.'
               },
               {
-                author: 'todo',
+                author: 8,
                 content: 'I got this in a different color. Sorry I can’t help.'
               }
             ]
           },
           {
-            author: 'todo',
+            author: 8,
             content: 'How much does the dress weigh?',
             answers: [
               {
-                author: 'todo',
+                author: 6,
                 content: 'I don’t know exactly what you are asking but I would describe it is a medium thickness fabric and hangs nicely. It’s not light and flowy, blow away fabric.'
               },
               {
-                author: 'todo',
+                author: 2,
                 content: 'If you are asking for the shipping weight, my package was 2 pounds'
               }
             ]
           },
           {
-            author: 'todo',
+            author: 0,
             content: 'Can it be shortened by having a tailor cut the bottom "sheer insert" off and re-hem if necessary?',
             answers: [
               {
-                author: 'todo',
+                author: 4,
                 content: 'I bought the regular size and the petite size to see which was better for me. I like the petite for me. I returned the regular size that didn\'t work- easy to do. I would not buy the dress to tailor it. The dress is beautiful as it is. Get regular and petite and see what you like on yourself.'
               },
               {
-                author: 'todo',
+                author: 2,
                 content: 'I am honestly not sure, but when I wore the dress it feel like the sheer part was a separate piece, so I think it might be possible.'
               },
               {
-                author: 'todo',
+                author: 8,
                 content: 'you\'ll love the dress- I do'
               }
             ]
@@ -2260,7 +2362,7 @@ export const initialProducts = {
             ],
             reviews: [
               {
-                author: 'todo',
+                author: 2,
                 stars: 5,
                 isVerified: true,
                 title: 'Simple but chic',
@@ -2297,7 +2399,7 @@ export const initialProducts = {
             ],
             reviews: [
               {
-                author: 'todo',
+                author: 4,
                 stars: 5,
                 isVerified: true,
                 title: `This dress looked bit plain to be honest online. I had recently lost a good deal of weight and wasnt sure what size to get. I had a dress from when I was heavier that was a 14 that was now quite big. So I ordered 3 different dresses, a 12, and two size 10's all Calvin Klein, but different styles. This was my "safe" dress.
@@ -2314,59 +2416,49 @@ export const initialProducts = {
       {
         questions: [
           {
-            author: 'todo',
+            author: 2,
             content: 'im 5\'3 and 99 lbs, what size should i get?',
             answers: [
               {
-                author: 'todo',
+                author: 4,
                 content: 'I would guess an extra small.'
               }
             ]
           },
           {
-            author: 'todo',
+            author: 4,
             content: 'I\'m 5\'9" and 140lbs, what size would you recommend? i usually wear a us size 4-6, but sometimes dresses don\'t have the length i need.',
             answers: [
               {
-                author: 'todo',
+                author: 2,
                 content: 'I’m 5’0. And I had about 4 inches off the bottom and wore 6 inch heels so I think you’ll be fine for length. I would suggest either small or extra small. I got an extra small and it fit perfectly.'
               },
               {
-                author: 'todo',
+                author: 8,
                 content: 'To be honest, i bought a xs and it\'s perfect for me (5\' and 130lbs)'
               }
             ]
           },
           {
-            author: 'todo',
-            content: 'wwwwww',
-            answers: [
-              {
-                author: 'todo',
-                content: 'wwwwww'
-              }
-            ]
-          },
-          {
-            author: 'todo',
+            author: 8,
             content: 'I’m 6 ft, how can I make the length longer',
             answers: [
               {
-                author: 'todo',
+                author: 2,
                 content: 'If you don’t mind the top of the dress being a little lower the length can be adjusted slightly with the top strings'
               }
             ]
           },
           {
-            author: 'todo',
+            author: 4,
             content: 'Hi. i’m a breastfeeding mother and i need a dress where my breasts are easily available. would i be able to pop a titty out real quick?',
             answers: [
               {
-                author: 'todo',
+                author: 6,
                 content: 'Yes ! Lol this will work make sure you have good padding in case of leakage because the material will def show if it’s wet.'
               },
               {
-                author: 'todo',
+                author: 0,
                 content: 'yes'
               }
             ]
@@ -2396,7 +2488,7 @@ export const initialProducts = {
             ],
             reviews: [
               {
-                author: 'todo',
+                author: 8,
                 stars: 5,
                 isVerified: true,
                 title: 'STUNNING go one size smaller',
@@ -2408,7 +2500,7 @@ export const initialProducts = {
                 media: 3
               },
               {
-                author: 'todo',
+                author: 6,
                 stars: 5,
                 isVerified: true,
                 title: 'An actual prom dress!',
@@ -2416,7 +2508,7 @@ export const initialProducts = {
                 media: 2,
                 comments: [
                   {
-                    author: 'todo',
+                    author: 4,
                     content: 'Wow excellent review!! Thank you for the details. I’m looking for a dress to wear to a wedding and you helped me decide to look for another.'
                   }
                 ]
@@ -2446,7 +2538,7 @@ export const initialProducts = {
             ],
             reviews: [
               {
-                author: 'todo',
+                author: 6,
                 stars: 4,
                 isVerified: true,
                 title: 'Really loose',
@@ -2458,7 +2550,7 @@ export const initialProducts = {
                 media: 2
               },
               {
-                author: 'todo',
+                author: 0,
                 stars: 2,
                 isVerified: true,
                 title: 'Best for a larger chest',
@@ -2466,11 +2558,11 @@ export const initialProducts = {
                 media: 1,
                 comments: [
                   {
-                    author: 'todo',
+                    author: 2,
                     content: 'it sounds like you were just wearing it higher than the girls modeling it- could that be why?'
                   },
                   {
-                    author: 'todo',
+                    author: 4,
                     content: 'What size did you get ? I\'m around your size & height !'
                   }
                 ]
@@ -2482,35 +2574,35 @@ export const initialProducts = {
       {
         questions: [
           {
-            author: 'todo',
+            author: 4,
             content: 'Im 5\'2 and weigh about 116 what size should I get?',
             answers: [
               {
-                author: 'todo',
+                author: 6,
                 content: 'It runs big. I would consider an extra small if I were you.'
               }
             ]
           },
           {
-            author: 'todo',
+            author: 8,
             content: 'Is this dress available in plus sizes?',
             answers: [
               {
-                author: 'todo',
+                author: 2,
                 content: 'We have XL size and it is the largest size for the dress. Thanks.'
               }
             ]
           },
           {
-            author: 'todo',
+            author: 6,
             content: 'I am a size 2/4 and run between an xs and s. would you recommend the small or extra small? chest is 34d. thanks!',
             answers: [
               {
-                author: 'todo',
+                author: 4,
                 content: 'I am a 34 G and got a L, which fit perfect...the medium was a little too tight across the chest and just a tad too short for my liking and the large fixes both these issues with out getting too much bigger anywhere else. So I’d say go with a medium!'
               },
               {
-                author: 'todo',
+                author: 0,
                 content: 'sorry can\'t help bought it as a gift .'
               }
             ]
@@ -2540,7 +2632,7 @@ export const initialProducts = {
             ],
             reviews: [
               {
-                author: 'todo',
+                author: 0,
                 stars: 5,
                 isVerified: false,
                 title: 'Sized up for the win',
@@ -2548,7 +2640,7 @@ export const initialProducts = {
                 media: 1
               },
               {
-                author: 'todo',
+                author: 2,
                 stars: 5,
                 isVerified: false,
                 title: 'White party success!!',
@@ -2580,7 +2672,7 @@ export const initialProducts = {
             ],
             reviews: [
               {
-                author: 'todo',
+                author: 4,
                 stars: 1,
                 isVerified: true,
                 title: 'Fit is all over the place!',
@@ -2588,7 +2680,7 @@ export const initialProducts = {
                 media: 0
               },
               {
-                author: 'todo',
+                author: 6,
                 stars: 5,
                 isVerified: true,
                 title: 'Adorable',
@@ -2602,59 +2694,59 @@ export const initialProducts = {
       {
         questions: [
           {
-            author: 'todo',
+            author: 6,
             content: 'Which of the three reds is a bright red? I am guessing Red#3 however I know shades sometimes look different in pictures.',
             answers: [
               {
-                author: 'todo',
+                author: 8,
                 content: 'Red#3 is a bright red.'
               }
             ]
           },
           {
-            author: 'todo',
+            author: 4,
             content: 'hi i’m 5’6 and a 36 B and i’m 150 what size would be best',
             answers: [
               {
-                author: 'todo',
+                author: 2,
                 content: 'I would say a large. I\'m 5\'2 and medium rests about 2-3 inches above the knee.'
               }
             ]
           },
           {
-            author: 'todo',
+            author: 2,
             content: 'Hi! I’m 5’5 and weigh 145 lbs. what size do you think I should get?',
             answers: [
               {
-                author: 'todo',
+                author: 4,
                 content: 'We suggest M size.'
               }
             ]
           },
           {
-            author: 'todo',
+            author: 8,
             content: 'I’m 5’3 and 125 what size do you suggest',
             answers: [
               {
-                author: 'todo',
+                author: 6,
                 content: 'My daughter is 5’5 125 and the medium fit her. It was pretty short and she ended up not wearing the dress.'
               },
               {
-                author: 'todo',
+                author: 2,
                 content: 'Small. I’m the same but with an athletic build. It is quite short though.'
               },
               {
-                author: 'todo',
+                author: 4,
                 content: 'Small'
               }
             ]
           },
           {
-            author: 'todo',
+            author: 4,
             content: 'I’m 5’9” and 140 pounds what size would I get?',
             answers: [
               {
-                author: 'todo',
+                author: 6,
                 content: 'I got an extra large but I am 170 pounds and only 5 foot five. The material is somewhat stretchy. But it is going to be quite short on you. It’s pretty short on me. Like barely mid thigh.'
               }
             ]
@@ -2684,7 +2776,7 @@ export const initialProducts = {
             ],
             reviews: [
               {
-                author: 'todo',
+                author: 4,
                 stars: 3,
                 isVerified: true,
                 title: 'Nice dress',
@@ -2693,17 +2785,17 @@ export const initialProducts = {
                 media: 1,
                 comments: [
                   {
-                    author: 'todo',
+                    author: 2,
                     content: 'wow!!!'
                   },
                   {
-                    author: 'todo',
+                    author: 8,
                     content: 'My waist is 33in, and my chest is a 36C, do you think I should get a medium or a large?'
                   }
                 ]
               },
               {
-                author: 'todo',
+                author: 6,
                 stars: 5,
                 isVerified: true,
                 title: 'Perfect little black dress for the price',
@@ -2711,7 +2803,7 @@ export const initialProducts = {
                 media: 1,
                 comments: [
                   {
-                    author: 'todo',
+                    author: 2,
                     content: 'Wow. It looks amazing on you and you look amazing in it. Please. Please. More reviews.;)'
                   }
                 ]
@@ -2741,7 +2833,7 @@ export const initialProducts = {
             ],
             reviews: [
               {
-                author: 'todo',
+                author: 6,
                 stars: 1,
                 isVerified: true,
                 title: 'Needs improvement',
@@ -2751,7 +2843,7 @@ export const initialProducts = {
                 media: 1
               },
               {
-                author: 'todo',
+                author: 8,
                 stars: 4,
                 isVerified: true,
                 title: 'Cute dress but color doesn’t match and shows lots of cleavage!',
