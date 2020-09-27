@@ -108,7 +108,6 @@ export type Review = {
   reviewID: number;
   createdAt: Date;
   updatedAt: Date;
-  variation: { [ k: string ]: string };
   title: string;
   content: string;
   stars: number;
@@ -116,6 +115,7 @@ export type Review = {
   moderationStatus: string;
   userID: number;
   groupID: number;
+  productID: number;
 }
 
 export type ReviewComment = {
@@ -336,7 +336,7 @@ export type ProductPublicData = Omit<ProductData,
 export type ReviewCreateInput = Pick<Review,
   | 'title'
   | 'content'
-  | 'variation'
+  | 'productID'
   | 'stars'
 >
 
@@ -505,7 +505,7 @@ export type ReviewsFiltersInput = {
   moderationStatuses?: string;
   isVerified?: boolean;
   createdFrom?: string;
-  variation?: string;
+  productID?: number;
   createdTo?: string;
   starsMin?: number;
   starsMax?: number;

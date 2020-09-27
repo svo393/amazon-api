@@ -1,6 +1,8 @@
+import { Express } from 'express'
 import fs from 'fs'
 import path from 'path'
 import sharp from 'sharp'
+import logger from './logger'
 
 type UploadConfig = {
   fileNames: number[];
@@ -91,6 +93,6 @@ export const uploadImages = (files: Express.Multer.File[], {
     }
 
     // TODO try async rather than sync
-    fs.unlinkSync(file.path)
+    fs.unlink(file.path, (err) => err && logger.error(err))
   })
 }

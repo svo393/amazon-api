@@ -762,10 +762,9 @@ export const checkNewReview = ({ body }: Request): ReviewCreateInput => {
     isNonEmptyString
   )({ name: 'content', param: body.content })
 
-  const variation = pipe(
-    isProvided,
-    isObject
-  )({ name: 'variation', param: body.variation })
+  const variation = 'title' in body
+    ? isObject({ name: 'variation', param: body.variation })
+    : undefined
 
   const stars = pipe(
     isProvided,
@@ -775,7 +774,7 @@ export const checkNewReview = ({ body }: Request): ReviewCreateInput => {
   return {
     title: title?.param,
     content: content.param,
-    variation: variation.param,
+    variation: variation?.param,
     stars: stars.param
   }
 }

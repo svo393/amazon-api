@@ -44,9 +44,9 @@ const addProduct = async (productInput: ProductCreateInput, req: Request): Promi
       .insert({
         ...omit([ 'productParameters', 'groupVariations', 'productSizes' ], productInput),
         listPrice: listPrice !== undefined
-          ? listPrice * 100
+          ? Math.round(listPrice * 100)
           : undefined,
-        price: price * 100,
+        price: Math.round(price * 100),
         userID: req.session?.userID,
         createdAt: now,
         updatedAt: now,
@@ -451,10 +451,10 @@ const updateProduct = async (productInput: ProductUpdateInput, req: Request): Pr
       .update({
         ...omit([ 'productParameters', 'groupVariations', 'productSizes' ], productInput),
         price: price !== undefined
-          ? price * 100
+          ? Math.round(price * 100)
           : undefined,
         listPrice: listPrice !== undefined
-          ? listPrice * 100
+          ? Math.round(listPrice * 100)
           : undefined,
         updatedAt: new Date()
       }, [ '*' ])

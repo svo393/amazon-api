@@ -446,7 +446,7 @@ export const initialProducts = {
             ],
             reviews: [
               {
-                author: 2,
+                author: 3,
                 stars: 3,
                 isVerified: false,
                 title: 'Feeling Misled',
@@ -467,7 +467,7 @@ export const initialProducts = {
                 ]
               },
               {
-                author: 7,
+                author: 1,
                 stars: 5,
                 isVerified: true,
                 title: 'Incredibly Easy to Multi-task, Visually Appealing, and Great Form Factor',
@@ -848,7 +848,7 @@ export const initialProducts = {
                 isVerified: true,
                 title: 'Decent, but not great.',
                 content: 'The computer is very slow and doesn\'t have a touch screen. My son has been using it for school and games and is constantly frustrated with it. It looks beautiful and is mostly functional. I should have saved up more to buy a better computer.',
-                media: 4
+                media: 0
               }
             ]
           }
@@ -1060,7 +1060,7 @@ export const initialProducts = {
                 isVerified: false,
                 title: 'Very Stylish but Slow',
                 content: 'I have been using this all-in-one computer for a few days now. It arrived perfectly in the box and setup was extremely easy. The computer itself is beautifully designed and stylish and the white color fits in very well. The screen is sleek and thin. The keyboard is wired and the keys are clunky and loud. I\'ll be purchasing a wireless soft/quiet key keyboard since I don\'t want everyone in the room hearing when I\'m typing. The downside to this computer is it is slow even for basic tasks. I\'m impatient and expect computers now to be responsive and not lag when multi-tasking. This computer does not multitask well even after uninstalling unnecessary programs. I have to End Task on several things that run in the background to help speed up the computer. It\'s a huge annoyance since even basic tasks like opening the email app and Google Chrome lag and going between apps there is a lag and programs are slow to open. If you\'re used to responsive computers, this one will test your patience, literally. If you\'re one who isn\'t impatient and doesn\'t mind waiting 30 seconds to a minute for things to open and run then this is a great computer that meets the basic needs. I love the design and how nicely it blends in with my home decor and doesn\'t stand out at all and isn\'t obtrusive and fits very nicely on my desk.',
-                media: 1
+                media: 0
               },
               {
                 author: 7,
@@ -1128,7 +1128,7 @@ export const initialProducts = {
             ],
             reviews: [
               {
-                author: 5,
+                author: 0,
                 stars: 5,
                 isVerified: true,
                 title: 'Perfect!',
@@ -1136,7 +1136,7 @@ export const initialProducts = {
                 media: 0
               },
               {
-                author: 9,
+                author: 1,
                 stars: 5,
                 isVerified: true,
                 title: 'All-in-one compactness.',
@@ -1144,7 +1144,7 @@ export const initialProducts = {
                 media: 0
               },
               {
-                author: 7,
+                author: 2,
                 stars: 5,
                 isVerified: true,
                 title: 'Great PC gift for my mother',
@@ -1152,7 +1152,7 @@ export const initialProducts = {
                 media: 0
               },
               {
-                author: 3,
+                author: 6,
                 stars: 5,
                 isVerified: true,
                 title: 'Great Gaming and Everyday Use.',
@@ -1160,7 +1160,7 @@ export const initialProducts = {
                 media: 0
               },
               {
-                author: 1,
+                author: 8,
                 stars: 4,
                 isVerified: true,
                 title: 'So far So good',
@@ -1317,7 +1317,7 @@ export const initialProducts = {
             ],
             reviews: [
               {
-                author: 4,
+                author: 8,
                 stars: 5,
                 isVerified: true,
                 title: 'Amazing (as always) and cute!',
@@ -1331,7 +1331,7 @@ export const initialProducts = {
                 ]
               },
               {
-                author: 6,
+                author: 2,
                 stars: 3,
                 isVerified: true,
                 title: 'Just okay',
@@ -1365,7 +1365,7 @@ export const initialProducts = {
             ],
             reviews: [
               {
-                author: 8,
+                author: 7,
                 stars: 4,
                 isVerified: true,
                 title: 'Be sure to add plenty of liquid',
@@ -1373,10 +1373,11 @@ export const initialProducts = {
                 media: 0
               },
               {
-                author: 4,
+                author: 5,
                 stars: 4,
                 isVerified: true,
-                title: `I like the white. Takes a long time to heat up however and my beans are never cooked properly. Rice cooks well. Veggies great.
+                title: 'Bubbles under plastic button pad already',
+                content: `I like the white. Takes a long time to heat up however and my beans are never cooked properly. Rice cooks well. Veggies great.
 
                 The metal cooking pot is already quite tarnished and I havent had it for too long. Not too pleased with that.
                 
@@ -1386,7 +1387,7 @@ export const initialProducts = {
                 media: 5
               },
               {
-                author: 2,
+                author: 0,
                 stars: 1,
                 isVerified: false,
                 title: 'Base is not stable',
@@ -1652,7 +1653,7 @@ export const initialProducts = {
                 media: 6
               },
               {
-                author: 2,
+                author: 4,
                 stars: 3,
                 isVerified: false,
                 title: 'Very few accessories for the 10 quart model.',
@@ -1690,7 +1691,7 @@ export const initialProducts = {
             ],
             reviews: [
               {
-                author: 4,
+                author: 8,
                 stars: 5,
                 isVerified: true,
                 title: 'Perfect Tiny Living appliance',
@@ -1725,7 +1726,7 @@ export const initialProducts = {
                     replyTo: 1
                   },
                   {
-                    author: 8,
+                    author: 7,
                     content: 'I got this at Costco, very handy, easy to use. '
                   },
                   {
@@ -1735,7 +1736,7 @@ export const initialProducts = {
                 ]
               },
               {
-                author: 2,
+                author: 0,
                 stars: 2,
                 isVerified: true,
                 title: 'Float valve doesn\'t pop up on its own.',
@@ -2406,7 +2407,8 @@ export const initialProducts = {
                 author: 4,
                 stars: 5,
                 isVerified: true,
-                title: `This dress looked bit plain to be honest online. I had recently lost a good deal of weight and wasnt sure what size to get. I had a dress from when I was heavier that was a 14 that was now quite big. So I ordered 3 different dresses, a 12, and two size 10's all Calvin Klein, but different styles. This was my "safe" dress.
+                title: 'Classic, beautiful, flattering',
+                content: `This dress looked bit plain to be honest online. I had recently lost a good deal of weight and wasnt sure what size to get. I had a dress from when I was heavier that was a 14 that was now quite big. So I ordered 3 different dresses, a 12, and two size 10's all Calvin Klein, but different styles. This was my "safe" dress.
                 I put this one on last, and instantly my husband who had really liked the first one was like, "that's the one." My friend said basically the same. It was so classy looking, the navy just enough to give it a pop of suprise, so it was more than just a plain little black dress. I wore it to a wedding, where I saw people who I hadn't seen in months. The dress highlighted my weight loss and I recieved so many compliments on that, and the dress, and those who disnt know me before complimented the dress itself.
                 I paired it with nude heels and a nude purse and honestly I felt great. This is truly a beautiful dress. Excellent quality, simple but the color and sheer detail at the hem give it just enough to be special. I highly recommend it.`,
                 media: 2
@@ -2542,7 +2544,7 @@ export const initialProducts = {
             ],
             reviews: [
               {
-                author: 6,
+                author: 4,
                 stars: 4,
                 isVerified: true,
                 title: 'Really loose',
@@ -2837,7 +2839,7 @@ export const initialProducts = {
             ],
             reviews: [
               {
-                author: 6,
+                author: 2,
                 stars: 1,
                 isVerified: true,
                 title: 'Needs improvement',

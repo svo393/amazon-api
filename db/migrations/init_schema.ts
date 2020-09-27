@@ -195,7 +195,6 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t.increments('reviewID')
       t.dateTime('createdAt').notNullable()
       t.dateTime('updatedAt').notNullable()
-      t.jsonb('variation')
       t.string('title')
       t.string('content', 65535).notNullable()
       t.integer('stars').notNullable().unsigned()
@@ -210,6 +209,11 @@ export const up = (knex: Knex): Knex.SchemaBuilder =>
       t
         .integer('groupID')
         .references('groups.groupID')
+        .notNullable()
+
+      t
+        .integer('productID')
+        .references('products.productID')
         .notNullable()
 
       t

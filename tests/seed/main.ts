@@ -1,8 +1,8 @@
 import path from 'path'
-import { isEmpty, pick } from 'ramda'
+import { isEmpty, omit, pick } from 'ramda'
 import supertest from 'supertest'
 import app from '../../src/app'
-import { Address, ObjIndexed, Parameter, UserAddress } from '../../src/types'
+import { Category, ObjIndexed, Parameter, Product, Question, Review, ReviewComment, Vendor } from '../../src/types'
 import { apiURLs } from '../../src/utils/constants'
 import { db } from '../../src/utils/db'
 import { initialProducts, initialUsers } from './seedData'
@@ -91,6 +91,28 @@ export const createOneParameter = async (role: string, name?: string, sessionID?
   return { addedParameter: body, sessionID }
 }
 
+const createOneCategory = async (role: string, name?: string, parentCategoryID?: number): Promise<{ addedCategory: Category; sessionID: string}> => {
+  const { sessionID } = await loginAs(role)
+
+  const { body } = await api
+    .post(apiURLs.categories)
+    .set('Cookie', `sessionID=${sessionID}`)
+    .send({ name, parentCategoryID })
+
+  return { addedCategory: body, sessionID }
+}
+
+const createOneVendor = async (role: string, name?: string): Promise<{ addedVendor: Vendor; sessionID: string}> => {
+  const { sessionID } = await loginAs(role)
+
+  const { body } = await api
+    .post(apiURLs.vendors)
+    .set('Cookie', `sessionID=${sessionID}`)
+    .send({ name })
+
+  return { addedVendor: body, sessionID }
+}
+
 const seed = async (): Promise<void> => {
   await purge()
   await populateUsers()
@@ -134,7 +156,7 @@ const seed = async (): Promise<void> => {
       ))
   }))
 
-  const addresses: (Address & UserAddress)[] = await Promise.all(users
+  await Promise.all(users
     .filter((u) => u.address !== undefined)
     .map(async (u) =>
       (await api
@@ -160,190 +182,162 @@ const seed = async (): Promise<void> => {
     return [ addedParameter.name, addedParameter.parameterID ]
   }))
 
-  //   const products = flatten(await Promise.all(Object.entries(initialProducts).map(async (c) => {
-  //     const { sessionID, userID } = await loginAs('admin')
-  //     const { addedCategory } = await createOneCategory('admin', c[0])
+  await Promise.all(Object.entries(initialProducts).map(async ([ catName, vendors ]) => {
+    const { sessionID, userID } = await loginAs('admin')
+    const { addedCategory } = await createOneCategory('admin', catName)
 
-  //     return await Promise.all(Object.entries(c[1]).map(async (v) => {
-  //       const { addedVendor } = await createOneVendor('admin', v[0])
+    return await Promise.all(Object.entries(vendors).map(async ([ vendorName, groups ]) => {
+      const { addedVendor } = await createOneVendor('admin', vendorName)
 
-  //       return await Promise.all(Object.entries(v[1]).map(async (g) => {
-  //         const bodies = []
+      return await Promise.all(groups.map(async ({ questions, products }: any, groupIndex: number) => {
+        const bodies: any[] = []
+        const firstProduct = products[0]
 
-  //         let { body }: { body: Product } = await api
-  //           .post(apiURLs.products)
-  //           .set('Cookie', `sessionID=${sessionID}`)
-  //           .send({
-  //             ...omit([
-  //               'reviews',
-  //               'questions',
-  //               'media',
-  //               'productParameters'
-  //             ], g[1][0]),
-  //             userID,
-  //             categoryID: addedCategory.categoryID,
-  //             vendorID: addedVendor.vendorID,
-  //             productParameters: g[1][0].productParameters.map((pp) => {
-  //               const parameter: any = parameters.find((p) => p[0] === pp.name)
-  //               return { parameterID: parameter[1], value: pp.value }
-  //             })
-  //           })
-  //         bodies.push(body)
-  //         const groupID = body.groupID
+        let { body }: { body: Product } = await api
+          .post(apiURLs.products)
+          .set('Cookie', `sessionID=${sessionID}`)
+          .send({
+            ...omit([
+              'reviews',
+              'media',
+              'productParameters'
+            ], firstProduct),
+            userID,
+            categoryID: addedCategory.categoryID,
+            vendorID: addedVendor.vendorID,
+            productParameters: firstProduct.productParameters?.map((pp: any) => {
+              const parameter: any = parameters.find((par) => par[0] === pp.name)
+              return { parameterID: parameter[1], value: pp.value }
+            })
+          })
 
-  //         bodies.push(await Promise.all(g[1].map(async (p, i) => {
-  //           if (i !== 0) {
-  //             const result: { body: Product } = await api
-  //               .post(apiURLs.products)
-  //               .set('Cookie', `sessionID=${sessionID}`)
-  //               .send({
-  //                 ...omit([
-  //                   'reviews',
-  //                   'questions',
-  //                   'media',
-  //                   'productParameters'
-  //                 ], p),
-  //                 userID,
-  //                 categoryID: addedCategory.categoryID,
-  //                 vendorID: addedVendor.vendorID,
-  //                 groupID,
-  //                 productParameters: p.productParameters.map((pp) => {
-  //                   const parameter: any = parameters.find((par) => {
-  //                     return par[0] === pp.name
-  //                   })
-  //                   return { parameterID: parameter[1], value: pp.value }
-  //                 })
-  //               })
-  //             body = result.body
-  //           }
+        bodies.push(body)
+        const groupID = body.groupID
 
-  //           if (p.media !== undefined) {
-  //             const uploadAPI = api
-  //               .post(`${apiURLs.products}/${body.productID}/upload`)
-  //               .set('Cookie', `sessionID=${sessionID}`)
+        if (questions !== undefined) {
+          await Promise.all(questions.map(async (q: any) => {
+            const sessionID = users[q.author].sessionID
 
-  //             const mediaRange = [ ...Array(p.media).keys() ]
+            const { body }: { body: Question } = await api
+              .post(`${apiURLs.groups}/${groupID}/questions`)
+              .set('Cookie', `sessionID=${sessionID}`)
+              .send({ content: q.content })
 
-  //             mediaRange.forEach((m) => {
-  //               uploadAPI
-  //                 .attach('productImages', path.join(
-  //                   __dirname, `images/products/${i}_${m}.jpg`
-  //                 ))
-  //             })
-  //             await uploadAPI
-  //           }
+            if (q.answers !== undefined) {
+              await Promise.all(q.answers.map(async (a: any) => {
+                const sessionID = users[a.author].sessionID
 
-  //           if (p.reviews !== undefined) {
-  //             await Promise.all(p.reviews.map(async (r) => {
-  //               const sessionID = users[r.author].sessionID
+                await api
+                  .post(`${apiURLs.questions}/${body.questionID}/answers`)
+                  .set('Cookie', `sessionID=${sessionID}`)
+                  .send({ content: a.content })
+              }))
+            }
+          }))
+        }
 
-  //               const { body }: { body: Review } = await api
-  //                 .post(`${apiURLs.groups}/${groupID}/reviews`)
-  //                 .set('Cookie', `sessionID=${sessionID}`)
-  //                 .send(omit([ 'author', 'comments', 'mediaFiles' ], r))
+        bodies.push(await Promise.all(products.map(async (p: any, i: number) => {
+          if (i !== 0) {
+            const result: { body: Product } = await api
+              .post(apiURLs.products)
+              .set('Cookie', `sessionID=${sessionID}`)
+              .send({
+                ...omit([
+                  'reviews',
+                  'media',
+                  'productParameters'
+                ], p),
+                userID,
+                categoryID: addedCategory.categoryID,
+                vendorID: addedVendor.vendorID,
+                groupID,
+                productParameters: p.productParameters?.map((pp: any) => {
+                  const parameter: any = parameters
+                    .find((par) => par[0] === pp.name)
+                  return { parameterID: parameter[1], value: pp.value }
+                })
+              })
+            body = result.body
+          }
 
-  //               await api
-  //                 .put(`${apiURLs.reviews}/${body.reviewID}`)
-  //                 .set('Cookie', `sessionID=${adminSessionID}`)
-  //                 .send({ isVerified: true, moderationStatus: 'APPROVED' })
+          if (p.media) {
+            const uploadAPI = api
+              .post(`${apiURLs.products}/${body.productID}/upload`)
+              .set('Cookie', `sessionID=${sessionID}`)
 
-  //               if (r.media !== undefined) {
-  //                 const uploadAPI = api
-  //                   .post(`${apiURLs.reviews}/${body.reviewID}/upload`)
-  //                   .set('Cookie', `sessionID=${sessionID}`)
+            const mediaRange = [ ...Array(p.media).keys() ]
 
-  //                 r.mediaFiles !== undefined && r.mediaFiles.map((m) => {
-  //                   uploadAPI
-  //                     .attach('reviewImages', path.join(
-  //                       __dirname, `images/reviews/${m}.jpg`
-  //                     ))
-  //                 })
-  //                 await uploadAPI
-  //               }
+            mediaRange.forEach((m) => {
+              uploadAPI
+                .attach('productImages', path.join(
+                  __dirname, `images/products/${catName}/${vendorName}/${groupIndex}/${i}/${m}.jpg`
+                ))
+            })
+            await uploadAPI
+          }
 
-  //               if (r.comments !== undefined) {
-  //                 await Promise.all(r.comments.map(async (cm: any) => {
-  //                   const sessionID = users[cm.author].sessionID
+          if (p.reviews !== undefined) {
+            await Promise.all(p.reviews.map(async (r: any, reviewIndex: number) => {
+              const sessionID = users[r.author].sessionID
 
-  //                   const reviewComment: { body: ReviewComment } = await api
-  //                     .post(`${apiURLs.reviews}/${body.reviewID}/comments`)
-  //                     .set('Cookie', `sessionID=${sessionID}`)
-  //                     .send(omit([ 'author' ], cm))
+              const { body }: { body: Review } = await api
+                .post(`${apiURLs.groups}/${groupID}/reviews`)
+                .set('Cookie', `sessionID=${sessionID}`)
+                .send({
+                  ...omit([ 'author', 'comments' ], r),
+                  variation: p.groupVariations
+                    ?.reduce((acc: ObjIndexed, cur: ObjIndexed) => {
+                      acc[cur.name] = cur.value
+                      return acc
+                    }, {} as ObjIndexed)
+                })
 
-  //                   await api
-  //                     .put(`${apiURLs.reviewComments}/${reviewComment.body.reviewCommentID}`)
-  //                     .set('Cookie', `sessionID=${adminSessionID}`)
-  //                     .send({ moderationStatus: 'APPROVED' })
-  //                 }))
-  //               }
-  //             }))
-  //           }
+              if (r.media) {
+                const uploadAPI = api
+                  .post(`${apiURLs.reviews}/${body.reviewID}/upload`)
+                  .set('Cookie', `sessionID=${sessionID}`)
 
-  //           if (p.questions !== undefined) {
-  //             await Promise.all(p.questions.map(async (q: any) => {
-  //               const sessionID = users[q.author].sessionID
+                const mediaRange = [ ...Array(r.media).keys() ]
 
-  //               const { body }: { body: Question } = await api
-  //                 .post(`${apiURLs.groups}/${groupID}/questions`)
-  //                 .set('Cookie', `sessionID=${sessionID}`)
-  //                 .send(omit([ 'author', 'answers', 'mediaFiles' ], q))
+                mediaRange.forEach((m) => {
+                  uploadAPI
+                    .attach('reviewImages', path.join(
+                      __dirname, `images/products/${catName}/${vendorName}/${groupIndex}/${i}/reviews/${reviewIndex}/${m}.jpg`
+                    ))
+                })
+                await uploadAPI
+              }
 
-  //               // await api
-  //               //   .put(`${apiURLs.questions}/${body.questionID}`)
-  //               //   .set('Cookie', `sessionID=${adminSessionID}`)
-  //               //   .send({ moderationStatus: 'APPROVED' })
+              if (r.comments !== undefined) {
+                const reviewComments: any = []
 
-  //               if (q.media !== undefined) {
-  //                 const uploadAPI = api
-  //                   .post(`${apiURLs.questions}/${body.questionID}/upload`)
-  //                   .set('Cookie', `sessionID=${sessionID}`)
+                await Promise.all(r.comments.map(async (rc: any) => {
+                  const sessionID = users[rc.author].sessionID
 
-  //                 q.mediaFiles !== undefined && q.mediaFiles.map((m: number) => {
-  //                   uploadAPI
-  //                     .attach('questionImages', path.join(
-  //                       __dirname, `images/questions/${m}.jpg`
-  //                     ))
-  //                 })
-  //                 await uploadAPI
-  //               }
+                  const reviewComment: { body: ReviewComment } = await api
+                    .post(`${apiURLs.reviews}/${body.reviewID}/comments`)
+                    .set('Cookie', `sessionID=${sessionID}`)
+                    .send({
+                      ...omit([ 'author' ], rc),
+                      parentReviewCommentID: rc.replyTo !== undefined
+                        ? reviewComments[rc.replyTo].reviewCommentID
+                        : undefined
+                    })
 
-  //               if (q.answers !== undefined) {
-  //                 await Promise.all(q.answers.map(async (a: any) => {
-  //                   const sessionID = users[a.author].sessionID
+                  reviewComments.push(reviewComment.body)
+                }))
+              }
+            }))
+          }
 
-  //                   const answer: { body: Answer } = await api
-  //                     .post(`${apiURLs.questions}/${body.questionID}/answers`)
-  //                     .set('Cookie', `sessionID=${sessionID}`)
-  //                     .send(omit([ 'author', 'mediaFiles' ], a))
+          return body
+        })))
+        return bodies
+      }))
+    }))
+  }))
 
-  //                   // await api
-  //                   //   .put(`${apiURLs.answers}/${answer.body.answerID}`)
-  //                   //   .set('Cookie', `sessionID=${adminSessionID}`)
-  //                   //   .send({ moderationStatus: 'APPROVED' })
-
-  //                   if (a.media !== undefined) {
-  //                     const uploadAPI = api
-  //                       .post(`${apiURLs.answers}/${answer.body.answerID}/upload`)
-  //                       .set('Cookie', `sessionID=${sessionID}`)
-
-  //                     a.mediaFiles !== undefined && a.mediaFiles.map((m: number) => {
-  //                       uploadAPI
-  //                         .attach('answerImages', path.join(
-  //                           __dirname, `images/answers/${m}.jpg`
-  //                         ))
-  //                     })
-  //                     await uploadAPI
-  //                   }
-  //                 }))
-  //               }
-  //             }))
-  //           }
-  //           return body
-  //         })))
-  //         return bodies
-  //       }))
-  //     }))
-  //   })))
+  // TODO lists and orders
 
   //   const newList1: { body: List } = await api
   //     .post(apiURLs.lists)
