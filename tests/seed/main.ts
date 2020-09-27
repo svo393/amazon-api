@@ -1,12 +1,11 @@
 import path from 'path'
-import { flatten, isEmpty, omit, pick } from 'ramda'
+import { isEmpty, pick } from 'ramda'
 import supertest from 'supertest'
 import app from '../../src/app'
-import { Address, Answer, CartProduct, Invoice, List, ObjIndexed, Order, Product, Question, Review, ReviewComment, UserAddress } from '../../src/types'
+import { Address, ObjIndexed, Parameter, UserAddress } from '../../src/types'
 import { apiURLs } from '../../src/utils/constants'
 import { db } from '../../src/utils/db'
-import { createOneCategory, createOneParameter, createOneVendor, loginAs } from '../testHelper'
-import { initialProducts, initialUsers } from './seedData'
+import { initialUsers } from './seedData'
 
 const adminUser = {
   email: 'admin@example.com',
@@ -64,13 +63,39 @@ const populateUsers = async (): Promise<void> => {
     .where('email', rootUser.email)
 }
 
+const loginAs = async (role: string): Promise<{sessionID: string; userID: number}> => {
+  const user = {
+    email: `${role}@example.com`,
+    password: 'yW%491f8UGYJ',
+    remember: true
+  }
+
+  const res = await api
+    .post('/api/auth/login')
+    .send(user)
+
+  const sessionID = res.header['set-cookie'][0].split('; ')[0].slice(10)
+  return { sessionID, userID: res.body.userID }
+}
+
 const api = supertest(app)
+
+export const createOneParameter = async (role: string, name?: string, sessionID?: string): Promise<{ addedParameter: Parameter; sessionID: string}> => {
+  if (sessionID === undefined) sessionID = (await loginAs(role)).sessionID
+
+  const { body } = await api
+    .post(apiURLs.parameters)
+    .set('Cookie', `sessionID=${sessionID}`)
+    .send(name)
+
+  return { addedParameter: body, sessionID }
+}
 
 const seed = async (): Promise<void> => {
   await purge()
   await populateUsers()
 
-  const { sessionID: adminSessionID } = await loginAs('admin')
+  // const { sessionID: adminSessionID } = await loginAs('admin')
 
   const users = await Promise.all(initialUsers.map(async (u) => {
     const res = await api
@@ -121,16 +146,19 @@ const seed = async (): Promise<void> => {
         })).body
     ))
 
-  //   const allProductParameterNames = new Set<string>()
+  // const allProductParameterNames = new Set<string>()
 
-  //   Object.entries(initialProducts['All-in-Ones Computers'].Acer[0])
-  //     .forEach((ip) => ip[1].productParameters
-  //       .forEach((pp) => allProductParameterNames.add(pp.name)))
+  // Object.values(initialProducts)
+  //   .forEach((c) => Object.values(c)
+  //     .forEach((v) => (v as any[])
+  //       .forEach((g) => (g.products as any[])
+  //         .forEach((p) => (p.productParameters as any[] ?? [])
+  //           .forEach((pp) => allProductParameterNames.add(pp.name))))))
 
-  //   const parameters = await Promise.all(Array.from(allProductParameterNames).map(async (pp) => {
-  //     const { addedParameter } = await createOneParameter('admin', pp, adminSessionID)
-  //     return [ addedParameter.name, addedParameter.parameterID ]
-  //   }))
+  // const parameters = await Promise.all(Array.from(allProductParameterNames).map(async (pp) => {
+  //   const { addedParameter } = await createOneParameter('admin', pp, adminSessionID)
+  //   return [ addedParameter.name, addedParameter.parameterID ]
+  // }))
 
   //   const products = flatten(await Promise.all(Object.entries(initialProducts).map(async (c) => {
   //     const { sessionID, userID } = await loginAs('admin')

@@ -51,6 +51,8 @@ const signupUser = async (userInput: UserSignupInput, req: Request): Promise<Use
 const loginUser = async (userInput: UserLoginInput, req: Request, requiresAdmin = false): Promise<UserBaseData> => {
   const { email, password, remember } = userInput
 
+  console.info('userInput', userInput)
+
   const existingUser = await db<User>('users')
     .first()
     .where('email', email)
