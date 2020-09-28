@@ -1499,6 +1499,10 @@ export const checkProductFilters = ({ query }: Request): ProductsFiltersInput =>
     ? canBeBoolean({ name: 'isAvailable', param: query.isAvailable })
     : undefined
 
+  const reviewCountPerProduct = 'reviewCountPerProduct' in query
+    ? canBeBoolean({ name: 'reviewCountPerProduct', param: query.reviewCountPerProduct })
+    : undefined
+
   const starsMin = 'starsMin' in query
     ? canBeNumber({ name: 'starsMin', param: query.starsMin })
     : undefined
@@ -1527,6 +1531,7 @@ export const checkProductFilters = ({ query }: Request): ProductsFiltersInput =>
     stockMin: stockMin?.param,
     stockMax: stockMax?.param,
     isAvailable: isAvailable?.param,
+    reviewCountPerProduct: reviewCountPerProduct?.param,
     starsMin: starsMin?.param,
     starsMax: starsMax?.param,
     reviewMin: reviewMin?.param,

@@ -319,7 +319,7 @@ export const initialProducts = {
               -The webcan quality is better.
               -We did plug our Firestick into the HDMI port (oh yeah, it has one) and it works. You can use this like a TV if you wanted to.
               -It’s convenient. Plug in the power cord and you’re ready to go.
-              
+
               My husband is in IT and works with this stuff every day. He loves this computer. We have installed it in a public area and created accounts for everyone. The whole family uses it, and the kids are getting a jump on back to school assignments using this. It’s amazing!`,
                 media: 2,
                 comments: [
@@ -379,7 +379,7 @@ export const initialProducts = {
                 content: `My deeply personal understanding tells me that this is how it works: Acer sells limited amount of new AIOs aspire z for $690, "electronics" company workers buy those out and sells them to their company (always a different one). AIOs become used and later are sold for $969. My only problem with that is that the ratings and five stars, and all the positive comments tag along the item since when Acer releases it. Happy customers from Acer leave excellent grades and positive comments, unhappy customers of Something Electronics leave different comments. First category of customers outnumbers the second one, tricking people like myself into thinking that the reseller is legit.
               So this is my review of my purchase. On top of overpaying $300 for it, mine turned out to be damaged as well.
               In two words: Don't buy from this "storefront," wait until Acer is the seller again.
-              
+
               I hope this helps.
               P.S. When Acer sells it, Amazon is the distributor and if you are a prime member your 2-day delivery is free. When reseller sells it, if you don't want to wait a month while it arrives through the cheapest option the reseller chooses, the 2-day delivery option is another $100+`,
                 media: 2
@@ -473,9 +473,9 @@ export const initialProducts = {
                 title: 'Incredibly Easy to Multi-task, Visually Appealing, and Great Form Factor',
                 content: `Overall:
               The screen is phenomenal and easily used as a small TV or high-quality office computer. What is cool about this all-in-one computer is that the monitor actually feels about the same weight and size as a flat-screen monitor from about 5-7 years ago. Yet it is a full computer, which is just amazing. The quality display really makes this a nice product from a graphics perspective. That said, while it has an excellent screen for watching streaming shows, it’s really not a gaming computer as it has an integrated video card and would not be appropriate for high-end gaming. It is awesome if you have wanted to multi-task and stream shows, videos, etc all while performing basic office tasks for work which this computer is really well suited for. Checking emails on this screen is unbelievably convenient because of the large screen and easy viewing of a large number of emails.
-              
+
               The Setup: There is some setup with the display screen. You will need to assemble the stand which is just a matter of screwing together a few parts and it’s fairly easy. Be sure to uncork the plastic from the base and actually screw the screen in. Otherwise, it will literally tilt off of the base and fall. I have provided a picture of how easy it is once it is understood. The keyboard and mouse work without setup and are fully wireless. They are battery-powered though and that isn’t the best.
-              
+
               Specs: The performance for most basic applications except those needing a high-end graphics card is fantastic. I primarily use for Microsoft Office, Adobe, Internet browsing, and streaming. I’ve had no issues and it can simultaneously run a number of programs with 12 GB memory with ease. Other nice features include inbuilt wifi (no Ethernet cord needed) and connections (HDMI) for either a second monitor or output to a larger TV. (note that there is one HDMI in and one HDMI out).
               The 512 GB SSD is great for basic storage especially of almost any set of software (which is really nice to have an SSD for faster run speeds), but an external hard drive would be needed for more expansive storage as this does not have add-on ports since there is no tower. The computer itself runs quiet and has not overheated even under heavy use. Video and sound quality have been qualitatively fantastic in my tests so far and I have no complaints.
               I am really impressed! This computer multi-tasks well and is very user-friendly. Cortana can guide your way through windows with this visually appealing and easy to use computer. Cortana may also be used with Alexa. I think this is an excellent choice and that you will be pleased.`,
@@ -978,7 +978,7 @@ export const initialProducts = {
             Hard drive, memory, optical drive: 1 TB 7200RPM SATA hard drive, 4 GB DDR4-2133 SDRAM (upgradable to 16 GB), DVD-Writer
             HP HD privacy camera: This innovative webcam has a switch designed to cover the camera and disable video when not in use, keeping you safe online
             Keyboard and mouse: HP white wired keyboard with volume control and white wired optical mouse
-        
+
             Operating system: Windows 10 Home. Audio features: Dual 2 W speakers.
             Ports: Headphone/Microphone Combo, 2 USB 3.1 Gen 1, 2 USB 2.0 (rear), HDMI Out (rear), 10/100/1000 Base-T Network, and an HP 3-in-1 Media Card Reader
             Warranty: One-year limited warranty with 24-hour, 7 days a week web support when shipped from and sold by Amazon.com and not a third party seller`,
@@ -1088,7 +1088,7 @@ export const initialProducts = {
             Integrated display: 21.5" diagonal widescreen FHD (1920 x 1080) VA ZBD anti-glare WLED-backlit three-sided micro-edge monitor
             Stereo speakers: Pump up the volume to your favorite music, movie or game
             HP Privacy Camera: The pop-up webcam is only enabled when in use, securing your privacy
-        
+
             Mouse and keyboard: USB white wired keyboard and mouse combo
             USB ports: 4 (2 USB 3.2 Gen 1, 2 USB 2.0)
             Warranty: One-year limited warranty`,
@@ -1380,9 +1380,9 @@ export const initialProducts = {
                 content: `I like the white. Takes a long time to heat up however and my beans are never cooked properly. Rice cooks well. Veggies great.
 
                 The metal cooking pot is already quite tarnished and I havent had it for too long. Not too pleased with that.
-                
+
                 Biggest complaint is the there is already bubbling of the plastic in certain areas on the key pad. I hate when this happens. If I spend good money on something I expect some quality in the buttons. I have used it for a few months now, occasionally and I am quite surprised at the bubbling. Irritating.
-                
+
                 ** edit: the bubbling is on the "+" and "-" buttons the "cancel" button and the "start delay" button plus just below the delay start button. I hadnt added pictures. This was noticed on the first few uses and not after 6 months of use or anything.`,
                 media: 5
               },
@@ -1420,7 +1420,7 @@ export const initialProducts = {
                 content: `ABSOLUTELY NOT. It does not reach high enough pressure for it to be safe to follow the USDA tested recommendations for pressure canning. If you want to can, buy a REAL pressure canner. I've been canning for 56 years as of 2019. I won't even can with a boiling water bath anymore and haven't for years. Tomatoes were the only thing I ever canned that way and the vast majority of modern breeds are not naturally acidic enough for it to be safe. IMNSHO tomatoes were the ONLY thing that was ever safe to put in a boiling water bath. PRESSURE CANNERS MADE FOR THE PURPOSE ONLY.
 
                 I used to seal jelly jars with a layer of paraffin wax and I don't do THAT anymore either.
-                
+
                 Be safe and Do It Right. This is a great kitchen tool for cooking. DO NOT EVEN THINK about trying to can in it. It is WAY too small for one thing, and it isn't safe (the more important reason NOT TO DO IT) for another.`
               },
               {
@@ -1454,13 +1454,13 @@ export const initialProducts = {
                 content: `I bought both the 3 qt. and 6 qt. "Smart Pots" to try... and the 3 qt. is the clear winner!!! I come from a long line of pressure cooking women... that is how I came to own both 6 qt. and 8 qt. traditional stainless steel pressure cookers. I tend to use my 3 qt. Mini Smart Pot a LOT... and store it in a place where it's handy to grab (often). I like the mini b/c it is small and I like the convenience of the timer for most of the day-to-day things I do. And I agree with what everybody else here already stated... I also found the overall size of the 6 qt. Smart Pot TOO BIG… so I sold my 6 quart Smart Pot.
 
                 When I need to cook something in larger portions, I always use my 8 qt. traditional pressure cooker (which isn't that often b/c I usually freeze the extra food into future mini-meals). A traditional pressure cooker PRESSURE COOKS THE SAME as a "Smart Pot" (minus the "timer"), but takes up a LOT LESS STORAGE SPACE -- that why I kept my 8 qt. traditional stainless steel pressure cooker. Yes, it is a pretty darn big pot, but it uses so little storage space (as compared to the larger "Smart Pots"). I also kept my 6 qt. traditional pressure cooker too, simply b/c it nests (stores) nicely inside my 8 qt. pot and does not take up any extra space.
-                
+
                 I should also mention that I only use my 3 qt. Smart Pot Mini Duo for pressure cooking. I was really excited about the idea that I could use one appliance for both pressuring cooking AND slow cooking. THAT is the primary reason why I tried the Smart Pot in the first place. However, I was really disappointed with the Smart Pot slow cooker feature, which does not do as good a job as a traditional slow cooker (b/c the Smart Pot has a small base and is tall vs. the slow cooker which has a very wide base/cooking surface).
-                
+
                 What do I cook in my Smart Pot 3 qt. mini? I frequently cook a 4 lb. whole chicken (or more, if the chicken is cut up), make bone broth, rice or hard boiled eggs. Otherwise, I make anything that you would make with the larger models… I just cut the ingredient list down to fit my smaller machine. Note – personally, I think a traditional rice cooker, hands down makes better rice than a Smart Pot, but when making rice, just for me, I like the convenience of the Smart Pot. However, if I were making rice for company, I definitely use my rice cooker.
-                
+
                 I LOVE my Smart Pot 3 qt. mini – it is small and convenient to use. But the truth about this appliance is (as is also true for ANY size Smart Pot) that, if you are only going to use the pressure cooker feature (which is all I use), the only real difference in function vs. a traditional pressure cooker is “the timer”. And that is, I gotta admit, a nice feature. And that is also why I love my Mini… but it is not enough of a benefit for me to trade-off much needed kitchen space for any of the larger 6 or 8 qt. Smart Pot models which take up a BIGGER amount of space. It’s a tradeoff. And that is also why I am super happy with my Smart Pot 3 qt. Mini and use a traditional 8 qt. pressure cooker when I need to cook MORE.
-                
+
                 I highly recommend the following book whether you are considering purchasing a multicooker or even if you already have one and just want to understand it better: Multicooker Perfection: Cook it Fast or Cook it Slow – You Decide by America’s Test Kitchen (Cooks Illustrated). The book was well organized and a simple read, yet loaded with detailed testing of different Multicooker models, as well as the “pros and cons” of each multicooker feature, along with the even more important “how and why” explanation of their opinion. I got this book at my library, but found it to be so fundamentally valuable that I still went out and bought a copy to own.`
               },
               {
@@ -1552,9 +1552,9 @@ export const initialProducts = {
                 content: `I was loving my instant pot, bragging to all about it. Making my dogs food was so easy! I put in the food and the water, pressed pressure cook and like magic it was just done when it beeped. Getting used to the pressurization wasn't hard at all. It wasn't really difficult to use.
 
                 Until last week... My pot just didn't turn on! I tried other outlets and other electronics so it was not the outlet. I moved the pot to a different outlet, nothing. It was the pot. The manual gave explicit troubleshooting directions based on what is wrong. Not turning on meant that the circuit board blew and it advised to call support, which I did. When you call, an automated message tells you to go online and put in a ticket- because this is clearly a company that doesn't want to be bothered 'talking' to their customers. So I do this. A day later no response! So I email again asking for help. This time I email them the same information. Didn't hear from them until Friday! I needed my pot fixed on Tuesday.... On Thursday though I had had enough and called Amazon who thankfully knows how to treat customers and were able to refund me the product and I shipped it back to them. The pot was less than a year of purchase and within warranty after all! Even Amazon tried getting ahold of the company and they couldn't get a response!
-                
+
                 Beware of this brand! I would look for another pressure cooker because when it breaks, and it likely will, you won't be getting help for days....
-                
+
                 My first attempt to post this review Amazon blocked for an unknown reason. It should be posted though people should know what kind of company this is...`,
                 media: 0,
                 comments: [
@@ -1575,7 +1575,7 @@ export const initialProducts = {
                     content: `Things don't just happen immediately because you think they should. Waiting a few days for help with something won't kill you, and isn't unreasonable. What do you expect? Someone from Insta-Pot personally drives to your house 5 minutes after you email to fix it for you?
 
                     If you're going to get this upset because you couldn't get your Insta-Pot fixed in a couple days, that's a reflection of you - not Insta-Pot.
-                    
+
                     (Not an employee, just a consumer who thinks this review is full of absurd expectations)`
                   },
                   {
@@ -1592,9 +1592,9 @@ export const initialProducts = {
                     content: `I'm getting the same run-around from their customer service. No return messages. I bought the Instant Pot Max for my wife then she told me she had heard of the Air Fryer that sits on top & wanted that as well. So I just ordered it. We love both the products.
 
                     However, I recently noticed the Air Fryer is not compatible with the Instant Pot MAX. I sent them 2 messages just asking why are they not compatible. It's not like I'm even planning to return the Air Fryer. It's working great with our MAX. But I want to know why they are not compatible. It could be a fire issue, it could be it causes one or the other to fail an early life, I don't know. But I don't want to burn our house down.
-                    
+
                     A simple response from the customer service as to why they are not compatible is all I need. If it's a fire issue we'll quit using them together. If it is a "early failure" by using them together then we'll decide if it's worth it.
-                    
+
                     The products are great but they need to do something about the customer service. If & when they respond they'll probably use the Corona Virus as the excuse. My wife & I both work for engineering companies & we are responding to customer questions from home every day. Go figure why Instant Pot can't do the same.`
                   }
                 ]
@@ -1614,15 +1614,15 @@ export const initialProducts = {
             description: `The Instant Pot Duo Nova is the updated Duo. Duo Nova upgrades include the EasySeal Lid to automatically seal when pressure cooking and a cooking progress indicator, so you know when cooking begins. Plus, Duo Nova includes a bonus sealing ring.
 
             The Instant Pot Duo Nova 7-in-1, One-Touch multi-tasking, space-saving, time-saving appliance that pressure cooks, Sautes, steams, slow cooks, warms, and makes delicious meats, eggs, rice, soup, yogurt and more — all in one healthy, dishwasher safe, stainless steel pot. With 12 Smart Programs — ranging from meats, soup, stew, beans, chili, poultry, rice and yogurt, to multigrain, porridge and slow cook — it puts cooking on autopilot.
-            
+
             The Poultry Smart Program cooks moist and tender chicken, turkey and other poultry, even from frozen. The Bean/Chili Program takes dried, unsoaked beans to flavorful cooked beans in no time.
-            
+
             The Meat/Stew Smart Program cooks beef and pork anywhere from rare to fall-off-the-bone. Three customizable temperature settings across each Smart Program let you program your Duo Nova to your preferences. For example, with the Saute function, you can set to simmer, sear or thicken pressure cook your dish to completion — all in one easy-to-clean pot.
-            
+
             Make your favorite slow cooker recipes in your Instant Pot. With the Slow Cook function with three settings (low, medium and high heat), you no longer need an extra slow cooker.
-            
+
             Easy-to-use controls and new easy-to-read icons that indicate cooking progress make selecting Smart Programs and making adjustments simple — even during cooking. The Duo Nova is equipped with dual-pressure settings, giving you the option to cook at Low or High pressure. High pressure can reduce the cooking time by 2 to 6 times, while Low pressure prevents delicate foods from overcooking. It also has both automatic and manual Keep Warm programming to ensure that dishes are kept at ready-to-eat temperatures.
-            
+
             A free Instant Pot app is available on iOS and Android mobiles, loaded with hundreds of easy recipes for almost all cuisines with plenty of great ideas to start your culinary venture.`,
             stock: 37,
             media: 6,
@@ -1646,9 +1646,9 @@ export const initialProducts = {
                 content: `I got the 10 qt and was delighted by the size. It is quite large, which is great when you need to cook for a large group. The inner pot is 6.5" deep (which isn't much difference from a smaller unit) however it is 11" wide on the interior and 12" across on the exterior lip of the stainless pot. Without the lid on the unit it around 10.5" tall, and with the lid it is somewhere between 13-14".
 
                 In regards to features it has plenty, however I was a bit sad it doesn't have the egg feature. But given how many times I have used the function on my smaller Instant Pot, I know it is just 5 minutes high pressure and 5 minutes until I release the pressure.
-                
+
                 I love the new pressure valve. Now I don't have to turn it and make sure it is set properly for the pressure to build. The whole unit is great BUT, the trivet! Seriously the trivet is the same size that comes with the 6qt and comes nowhere close to covering the bottom of the unit. They clearly should have designed a trivet to fit this very large unit. I'm docking one star for that because I find it to be annoying.
-                
+
                 Overall, I'm pleased with this unit and think it is great size that offers a lot of flexibility.`,
                 media: 6
               },
@@ -1660,7 +1660,7 @@ export const initialProducts = {
                 content: `I bought the 10 quart model. I like to cook ribs in the pot and the 6 quart is a little tight with 2 racks of ribs. The 10 quart has plenty of room. The reason I gave this 3 stars instead of 5 is due to the lack of accessories for the pot.
 
                 The rack that comes with the pot is the same size as the one that comes with the 6 quart model. If they’re going to make a bigger pot, they should make accessories to match instead of just sending the same accessories.
-                
+
                 With the 6 quart model I was able to purchase a glass lid in order to use it as a slow cooker. I didn’t find a glass lid on the instant pot site for the 10 quart model.`,
                 media: 0
               }
@@ -1698,17 +1698,17 @@ export const initialProducts = {
                 content: `I use this for everything! How did I live without this before???
 
                 I live in a Sprinter van full-time and was using an induction burner for cooking, but since I've gotten this little gem, I haven't used the induction burner once!
-                
+
                 This is so easy to use, and it's the perfect size for one or two people. I've been making a lot of stews, and I'll saute the onions, carrots, and meat (if I'm using meat) then add everything else, seal it, and set it for 7 minutes on high pressure. I let it release naturally and have a perfectly cooked, tasty meal every time. This gives me enough for 4 or 5 servings.
-                
+
                 I also quick soaked beans the other day by covering them with water, hitting pressure for 5 min. then letting it release naturally and let it sit (not on keep warm) for a couple of hours.
-                
+
                 I'll often make dinner right after I reheat my lunch, and make sure the keep warm function is on. I'm able to drive with it in my sink and have a hot, healthy, delicious meal waiting for me when I'm done driving.
-                
+
                 I've even baked banana bread in it!!! So exciting, because I don't have an oven. It turned out SO good! I used one of the containers and the lid from my To-Go Ware stainless steel lunch container to bake it in on the rack.
-                
+
                 Because this cooks so quickly, it is very easy on my solar system. I can reheat leftovers on saute in 4 minutes, and it's only drawing 67a while it's on.
-                
+
                 I did have a VitaClay, that I absolutely loved for making beans, and especially bone broth, but it takes much longer to cook and is heavier. So, more battery drain, more storage space, and more weight as compared to the Instant Pot Mini and the Mini wins on each count!`,
                 media: 1,
                 comments: [
@@ -1743,9 +1743,9 @@ export const initialProducts = {
                 content: `We're using this pot to cook for two and it does a great job, save for one problem--the little float valve in the lid does not pop up on its own.
 
                 In order to get the float valve to pop up, I have to tap on it or grab the lid and press down on it once enough pressure has been built up inside the pot.
-                
+
                 I can't tell if this is a design flaw or a fault of the valve--it's a pretty basic little thing and unless the valve is catching on a rough bore in the lid or something, I don't see why it won't raise up on its own. Once I get it to pop up, the unit works like a charm.
-                
+
                 I was hoping it was user error, but after four months of using the pot almost weekly and experimenting with advice from online, I'm pretty sure this isn't right. Maybe I should contact the manufacturer, because right now, I have to watch the pot to ensure it will build pressure.`,
                 media: 0
               }
@@ -1834,7 +1834,7 @@ export const initialProducts = {
                 content: `My ex couldn't make a roast to save her life. I don't know why I thought I could, but it turns out I can roast up some bliss...
 
                 For frame of reference (and to learn from my experiences) here's what you'll probably care about. When you buy a 4 quart slow cooker, that's good for about a 4 pound roast. You could maybe fit a 4.5 pounder in there, but it'll be mighty snug and may not work as well as you'd like. I have kids with hollow legs, and think I'll soon be looking for a 6 quart slow cooker. Also- if you're doing a roast, put it on the low heat and give it 8 hours. Yes, sure- you could use the higher heat and get the interior to 160F and eat it, but it won't be the same. Trust me on this. I've taken notes.
-                
+
                 As far as the cooker goes, I like it a lot- easy to clean, convenient size, and versatile. The only thing I'd ask Hamilton Beach to change is to add a power LED or something that will make it clear from across the room if it's on.`,
                 media: 0,
                 comments: [
@@ -2080,7 +2080,7 @@ export const initialProducts = {
                 4. The glass lid would be awesome to peek at how your cook is going, if you could see through it. The condensation gets so bad you can't see through it. I even tried tapping on the lid to knock some of the moisture off, but it made little difference. Grrr...
                 5. As you may be able to tell in the pics, the crock discolored after my second cook. I hand washed and dried both the lid and the crock, so I'm not sure why it became so cloudy.
                 6. The metal hinges you use to lock down the lid for transport are pretty flimsy.
-                
+
                 Too many little things were enough to have me saying "sayonara" Hamilton Beach and "hello" Aicok.`,
                 media: 3
               },

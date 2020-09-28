@@ -189,7 +189,7 @@ const seed = async (): Promise<void> => {
     return await Promise.all(Object.entries(vendors).map(async ([ vendorName, groups ]) => {
       const { addedVendor } = await createOneVendor('admin', vendorName)
 
-      return await Promise.all(groups.map(async ({ questions, products }: any, groupIndex: number) => {
+      return await Promise.all((groups as any).map(async ({ questions, products }: any, groupIndex: number) => {
         const bodies: any[] = []
         const firstProduct = products[0]
 

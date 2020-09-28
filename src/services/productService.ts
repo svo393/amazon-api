@@ -140,7 +140,8 @@ const getProducts = async (productsFiltersInput: ProductsFiltersInput, req: Requ
     starsMax,
     starsMin,
     reviewMax,
-    reviewMin
+    reviewMin,
+    reviewCountPerProduct
   } = productsFiltersInput
 
   // TODO refactor reusable queries
@@ -160,6 +161,8 @@ const getProducts = async (productsFiltersInput: ProductsFiltersInput, req: Requ
 
   let products: Omit<ProductListData, 'images'>[]
 
+  const reviewCountProp = reviewCountPerProduct ? 'productID' : 'groupID'
+
   products = await Promise.all(rawProducts.map(async (p) => {
     const sizesSum = sum(productSizes
       .filter((ps) => ps.productID === p.productID)
@@ -168,7 +171,7 @@ const getProducts = async (productsFiltersInput: ProductsFiltersInput, req: Requ
 
     const reviews = await db<Review>('reviews')
       .select('moderationStatus')
-      .andWhere('groupID', p.groupID)
+      .andWhere(reviewCountProp, p[reviewCountProp])
 
     const hasPermission = [ 'ROOT', 'ADMIN' ].includes(req.session?.role)
 

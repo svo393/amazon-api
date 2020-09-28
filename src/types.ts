@@ -538,6 +538,7 @@ export type ProductsFiltersInput = {
   stockMin?: number;
   stockMax?: number;
   isAvailable?: boolean;
+  reviewCountPerProduct?: boolean;
   starsMin?: number;
   starsMax?: number;
   reviewMin?: number;
