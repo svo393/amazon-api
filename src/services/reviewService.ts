@@ -172,7 +172,7 @@ const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request
         images: images.filter((i) => i.reviewID === r.reviewID),
         votes: voteSum,
         votesDelta: upVoteSum - (voteSum - upVoteSum),
-        author: { avatar: r.avatar, name: r.userName, userID: r.userID },
+        author: { avatar: r.avatar, name: r.userName, userID: r.userID, email: r.userEmail },
         voted: req.session?.userID ? Boolean(voted) : undefined
       }
     })
@@ -181,7 +181,10 @@ const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request
     ? reviews
     : reviews
       .filter((r) => r.moderationStatus === 'APPROVED')
-      .map((r) => ({ ...omit([ 'userEmail' ], r) }))
+      .map((r) => ({
+        ...omit([ 'userEmail' ], r),
+        author: omit([ 'email' ], r.author)
+      }))
 
   let reviewsSorted = sortItems(_reviews, sortBy)
 

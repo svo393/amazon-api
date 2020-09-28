@@ -1,7 +1,7 @@
 import { Request } from 'express'
 import Knex from 'knex'
 import { flatten, omit, sum } from 'ramda'
-import { GroupVariation, Image, Product, ProductCreateInput, ProductData, ProductParameter, ProductsFiltersInput, ProductSize, ProductsMinFiltersInput, ProductUpdateInput, User } from '../types'
+import { GroupVariation, Image, Product, ProductCreateInput, ProductData, ProductParameter, ProductsFiltersInput, ProductSize, ProductsMinFiltersInput, ProductUpdateInput, Review, User } from '../types'
 import { defaultLimit, imagesBasePath } from '../utils/constants'
 import { db, dbTrans } from '../utils/db'
 import fuseIndexes from '../utils/fuseIndexes'
@@ -124,7 +124,7 @@ type ProductListData = Omit<ProductListRawData, 'stars' | 'reviewCount'> & {
   productSizesSum: number | null;
 }
 
-const getProducts = async (productsFiltersInput: ProductsFiltersInput): Promise<{ batch: ProductListData[]; totalCount: number }> => {
+const getProducts = async (productsFiltersInput: ProductsFiltersInput, req: Request): Promise<{ batch: ProductListData[]; totalCount: number }> => {
   const {
     page = 1,
     sortBy = 'groupID',
@@ -166,16 +166,19 @@ const getProducts = async (productsFiltersInput: ProductsFiltersInput): Promise<
       .map(({ qty }) => qty)
     )
 
-    const [ { reviewCount } ] = await db('reviews')
-      .count('reviewID as reviewCount')
-      .where('moderationStatus', 'APPROVED')
+    const reviews = await db<Review>('reviews')
+      .select('moderationStatus')
       .andWhere('groupID', p.groupID)
+
+    const hasPermission = [ 'ROOT', 'ADMIN' ].includes(req.session?.role)
 
     return {
       ...p,
       price: p.price / 100,
       stars: parseFloat(p.stars),
-      reviewCount: parseInt(reviewCount as string),
+      reviewCount: hasPermission
+        ? reviews.length
+        : reviews.filter((r) => r.moderationStatus === 'APPROVED').length,
       productSizes,
       productSizesSum: sizesSum || null
     }
@@ -372,14 +375,12 @@ const getProductByID = async (req: Request): Promise<ProductLimitedData| Product
 
   if (rawProduct === undefined) throw new StatusError(404, 'Not Found')
 
-  const [ { reviewCount } ] = await db('reviews')
-    .count('reviewID as reviewCount')
-    .where('moderationStatus', 'APPROVED')
+  const reviews = await db<Review>('reviews')
+    .select('moderationStatus')
     .andWhere('groupID', rawProduct.groupID)
 
-  const [ { questionCount } ] = await db('questions')
-    .count('questionID as questionCount')
-    .where('moderationStatus', 'APPROVED')
+  const questions = await db<Review>('questions')
+    .select('moderationStatus')
     .andWhere('groupID', rawProduct.groupID)
 
   const ratingStats: { stars: number; count: string }[] = await db('reviews')
@@ -388,6 +389,8 @@ const getProductByID = async (req: Request): Promise<ProductLimitedData| Product
     .where('groupID', rawProduct.groupID)
     .groupBy('stars')
 
+  const hasPermission = [ 'ROOT', 'ADMIN' ].includes(req.session?.role)
+
   const product = {
     ...rawProduct,
     price: rawProduct.price / 100,
@@ -395,8 +398,12 @@ const getProductByID = async (req: Request): Promise<ProductLimitedData| Product
       ? rawProduct.listPrice / 100
       : undefined,
     stars: parseFloat(rawProduct.stars),
-    reviewCount: parseInt(reviewCount as string),
-    questionCount: parseInt(questionCount as string),
+    reviewCount: hasPermission
+      ? reviews.length
+      : reviews.filter((r) => r.moderationStatus === 'APPROVED').length,
+    questionCount: hasPermission
+      ? questions.length
+      : questions.filter((q) => q.moderationStatus === 'APPROVED').length,
     ratingStats: ratingStats.reduce((acc, cur) => {
       acc[cur.stars] = Number(cur.count)
       return acc

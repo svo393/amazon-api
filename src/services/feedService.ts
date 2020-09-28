@@ -11,6 +11,7 @@ const getFeed = async (feedFiltersinput: FeedFiltersInput): Promise<{ batch: Fee
   const {
     page = 1,
     sortBy = 'createdAt_desc',
+    groupID,
     q,
     types,
     moderationStatuses,
@@ -71,6 +72,11 @@ const getFeed = async (feedFiltersinput: FeedFiltersInput): Promise<{ batch: Fee
   if (types !== undefined) {
     feed = feed
       .filter((a) => types.split(',').includes(a.type))
+
+    if (types === 'question' && groupID !== undefined) {
+      feed = feed
+        .filter((a) => (a as Question).groupID === groupID)
+    }
   }
 
   if (moderationStatuses !== undefined) {

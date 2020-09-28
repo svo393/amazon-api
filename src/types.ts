@@ -338,7 +338,7 @@ export type ReviewCreateInput = Pick<Review,
   | 'content'
   | 'productID'
   | 'stars'
->
+> & Partial<Pick<Review, 'isVerified'>>
 
 export type ReviewUpdateInput = Partial<Pick<Review,
   | 'title'

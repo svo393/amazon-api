@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import { omit } from 'ramda'
-import { User, UserRoleUpdateInput, UserSafeData, UsersFiltersInput } from '../types'
+import { Answer, Order, Question, Review, ReviewComment, User, UserRoleUpdateInput, UserSafeData, UsersFiltersInput } from '../types'
 import { defaultLimit, imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
 import { uploadImages } from '../utils/img'
@@ -8,7 +8,6 @@ import sortItems from '../utils/sortItems'
 import StatusError from '../utils/StatusError'
 
 const getUsersQuery: any = db('users as u')
-  .distinct()
   .select(
     'u.email',
     'u.name',
@@ -19,25 +18,26 @@ const getUsersQuery: any = db('users as u')
     'u.userID',
     'u.role'
   )
-  .count('o.orderID as orderCount')
-  .count('r.reviewID as reviewCount')
-  .count('rc.reviewCommentID as reviewCommentCount')
-  .count('q.questionID as questionCount')
-  .count('a.answerID as answerCount')
-  .leftJoin('orders as o', 'u.userID', 'o.userID')
-  .leftJoin('reviews as r', 'u.userID', 'r.userID')
-  .leftJoin('reviewComments as rc', 'u.userID', 'rc.userID')
-  .leftJoin('questions as q', 'u.userID', 'q.userID')
-  .leftJoin('answers as a', 'u.userID', 'a.userID')
-  .where('u.role', '!=', 'ROOT')
-  .groupBy(
-    'u.userID',
-    'o.orderID',
-    'r.reviewID',
-    'rc.reviewCommentID',
-    'q.questionID',
-    'a.answerID'
-  )
+  .whereNot('u.role', 'ROOT')
+  // .distinct()
+  // .count('o.orderID as orderCount')
+  // .count('r.reviewID as reviewCount')
+  // .count('rc.reviewCommentID as reviewCommentCount')
+  // .count('q.questionID as questionCount')
+  // .count('a.answerID as answerCount')
+  // .leftJoin('orders as o', 'u.userID', 'o.userID')
+  // .leftJoin('reviews as r', 'u.userID', 'r.userID')
+  // .leftJoin('reviewComments as rc', 'u.userID', 'rc.userID')
+  // .leftJoin('questions as q', 'u.userID', 'q.userID')
+  // .leftJoin('answers as a', 'u.userID', 'a.userID')
+  // .groupBy(
+  //   'u.userID',
+  //   'o.orderID',
+  //   'r.reviewID',
+  //   'rc.reviewCommentID',
+  //   'q.questionID',
+  //   'a.answerID'
+  // )
 
 type UserRawData = Omit<User,
   | 'password'
@@ -83,14 +83,29 @@ const getUsers = async (usersFiltersinput: UsersFiltersInput): Promise<{ batch: 
 
   const rawUsers: UserRawData[] = await getUsersQuery.clone()
 
+  const orders = await db<Order>('orders')
+    .select('userID')
+
+  const reviews = await db<Review>('reviews')
+    .select('userID')
+
+  const reviewComments = await db<ReviewComment>('reviewComments')
+    .select('userID')
+
+  const questions = await db<Question>('questions')
+    .select('userID')
+
+  const answers = await db<Answer>('answers')
+    .select('userID')
+
   let users = rawUsers
     .map((u) => ({
       ...u,
-      orderCount: parseInt(u.orderCount),
-      reviewCount: parseInt(u.reviewCount),
-      reviewCommentCount: parseInt(u.reviewCommentCount),
-      questionCount: parseInt(u.questionCount),
-      answerCount: parseInt(u.answerCount)
+      orderCount: orders.filter((o) => o.userID === u.userID).length,
+      reviewCount: reviews.filter((r) => r.userID === u.userID).length,
+      reviewCommentCount: reviewComments.filter((rc) => rc.userID === u.userID).length,
+      questionCount: questions.filter((o) => o.userID === u.userID).length,
+      answerCount: answers.filter((a) => a.userID === u.userID).length
     }))
 
   if (roles !== undefined) {
@@ -186,18 +201,47 @@ const getUserByID = async (req: Request): Promise<(UserData | UserPublicData) & 
     .leftJoin('questions as q', 'v.questionID', 'q.questionID')
     .leftJoin('reviews as r', 'v.reviewID', 'r.reviewID')
 
+  const orders = await db<Order>('orders')
+    .select('orderStatus')
+    .where('userID', userID)
+
+  const reviews = await db<Review>('reviews')
+    .select('moderationStatus')
+    .where('userID', userID)
+
+  const reviewComments = await db<ReviewComment>('reviewComments')
+    .select('moderationStatus')
+    .where('userID', userID)
+
+  const questions = await db<Question>('questions')
+    .select('moderationStatus')
+    .where('userID', userID)
+
+  const answers = await db<Answer>('answers')
+    .select('moderationStatus')
+    .where('userID', userID)
+
+  const hasPermission = [ 'ROOT', 'ADMIN' ]
+    .includes(req.session?.role) || req.session?.userID === rawUser.userID
+
   const user = {
     ...rawUser,
     followersCount: parseInt(followersCount as string ?? '0'),
-    reviewCommentCount: parseInt(rawUser.reviewCommentCount ?? '0'),
-    questionCount: parseInt(rawUser.questionCount ?? '0'),
-    answerCount: parseInt(rawUser.answerCount ?? '0'),
-    orderCount: parseInt(rawUser.orderCount ?? '0'),
-    reviewCount: parseInt(rawUser.reviewCount ?? '0'),
-    helpfulVotes: parseInt(helpfulVotes as string)
+    orderCount: orders.length,
+    helpfulVotes: parseInt(helpfulVotes as string),
+    reviewCommentCount: hasPermission
+      ? reviewComments.length
+      : reviewComments.filter((rc) => rc.moderationStatus === 'APPROVED').length,
+    questionCount: hasPermission
+      ? questions.length
+      : questions.filter((q) => q.moderationStatus === 'APPROVED').length,
+    answerCount: hasPermission
+      ? answers.length
+      : answers.filter((a) => a.moderationStatus === 'APPROVED').length,
+    reviewCount: hasPermission
+      ? reviews.length
+      : reviews.filter((r) => r.moderationStatus === 'APPROVED').length
   }
-
-  const hasPermission = [ 'ROOT', 'ADMIN' ].includes(req.session?.role) || req.session?.userID === user.userID
 
   return hasPermission
     ? user

@@ -773,11 +773,16 @@ export const checkNewReview = ({ body }: Request): ReviewCreateInput => {
     canBeNumber
   )({ name: 'stars', param: body.stars })
 
+  const isVerified = 'isVerified' in body
+    ? canBeBoolean({ name: 'isVerified', param: body.isVerified })
+    : undefined
+
   return {
     title: title.param,
     content: content.param,
     productID: productID.param,
-    stars: stars.param
+    stars: stars.param,
+    isVerified: isVerified?.param
   }
 }
 
