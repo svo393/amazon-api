@@ -71,10 +71,10 @@ export type Group = { groupID: number }
 export type Product = {
   productID: number;
   title: string;
-  listPrice?: number;
+  listPrice: number | null;
   price: number;
   bullets: string;
-  description?: string;
+  description: string | null;
   stock: number | null;
   createdAt: Date;
   updatedAt: Date;
@@ -312,7 +312,9 @@ export type ProductCreateInput = Omit<Product,
   | 'updatedAt'
   | 'userID'
   | 'stock'
+  | 'listPrice'
 > & {
+  listPrice?: number;
   stock?: number;
   productSizes?: { name: string; qty: number }[];
   productParameters?: { value: string; parameterID: number }[];
@@ -320,7 +322,7 @@ export type ProductCreateInput = Omit<Product,
   groupVariations?: { name: string; value: string }[];
 }
 
-export type ProductUpdateInput = ProductCreateInput & { groupID: number }
+export type ProductUpdateInput = Omit<ProductCreateInput, 'listPrice'> & { groupID: number; listPrice?: number; }
 
 export type ProductData = Product & {
   group: GroupVariation[];

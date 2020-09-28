@@ -86,9 +86,9 @@ const addProduct = async (productInput: ProductCreateInput, req: Request): Promi
     return {
       ...addedProduct,
       price: addedProduct.price / 100,
-      listPrice: addedProduct.listPrice !== undefined
+      listPrice: addedProduct.listPrice !== null
         ? addedProduct.listPrice / 100
-        : undefined,
+        : null,
       group: addedGroupVariations,
       productSizes: addedProductSizes
     }
@@ -355,10 +355,12 @@ Pick<ProductData, 'createdAt' | 'updatedAt' | 'userID' | 'listPrice'> & {
 
 type RawProduct = Omit<ProductAllData, 'stars' | 'reviewCount | questionCount'> & { stars: string; reviewCount: string; questionCount: string; avatar: boolean; userName: string; userEmail: string }
 
-const getProductByID = async (req: Request): Promise<ProductLimitedData| ProductAllData> => {
+const getProductByID = async ({ reviewCountPerProduct }: { reviewCountPerProduct?: true }, req: Request): Promise<ProductLimitedData| ProductAllData> => {
   const rawProduct: RawProduct = await getProductsQuery.clone()
     .first(
       'p.listPrice',
+      'p.productID',
+      'p.groupID',
       'p.price',
       'p.bullets',
       'p.description',
@@ -378,9 +380,11 @@ const getProductByID = async (req: Request): Promise<ProductLimitedData| Product
 
   if (rawProduct === undefined) throw new StatusError(404, 'Not Found')
 
+  const reviewCountProp = reviewCountPerProduct ? 'productID' : 'groupID'
+
   const reviews = await db<Review>('reviews')
     .select('moderationStatus')
-    .andWhere('groupID', rawProduct.groupID)
+    .andWhere(reviewCountProp, rawProduct[reviewCountProp])
 
   const questions = await db<Review>('questions')
     .select('moderationStatus')
@@ -397,9 +401,9 @@ const getProductByID = async (req: Request): Promise<ProductLimitedData| Product
   const product = {
     ...rawProduct,
     price: rawProduct.price / 100,
-    listPrice: rawProduct.listPrice !== undefined
+    listPrice: rawProduct.listPrice !== null
       ? rawProduct.listPrice / 100
-      : undefined,
+      : null,
     stars: parseFloat(rawProduct.stars),
     reviewCount: hasPermission
       ? reviews.length
@@ -636,9 +640,9 @@ const updateProduct = async (productInput: ProductUpdateInput, req: Request): Pr
     return {
       ...updatedProduct,
       price: updatedProduct.price / 100,
-      listPrice: updatedProduct.listPrice !== undefined
+      listPrice: updatedProduct.listPrice !== null
         ? updatedProduct.listPrice / 100
-        : undefined,
+        : null,
       group: processedGroupVariations,
       productSizes: processedProductSizes
     }

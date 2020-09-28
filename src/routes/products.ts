@@ -3,7 +3,7 @@ import cartProductService from '../services/cartProductService'
 import parameterService from '../services/parameterService'
 import productService from '../services/productService'
 import { UPLOAD_TIMEOUT } from '../utils/config'
-import { checkLocalCart, checkMediaUpload, checkNewProduct, checkProductFilters, checkProductMinFilters, checkProductUpdate } from '../utils/inputValidator'
+import { checkLocalCart, checkMediaUpload, checkNewProduct, checkProductByID, checkProductFilters, checkProductMinFilters, checkProductUpdate } from '../utils/inputValidator'
 import { requireAdmin, multerUpload } from '../utils/middleware'
 
 const router = Router()
@@ -27,7 +27,8 @@ router.get('/min', async (req, res) => {
 })
 
 router.get('/:productID', async (req, res) => {
-  const product = await productService.getProductByID(req)
+  const productByIDInput = checkProductByID(req)
+  const product = await productService.getProductByID(productByIDInput, req)
   res.json(product)
 })
 

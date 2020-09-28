@@ -262,6 +262,14 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
   }
 }
 
+export const checkProductByID = ({ query }: Request): { reviewCountPerProduct?: true } => {
+  const reviewCountPerProduct = 'reviewCountPerProduct' in query
+    ? canBeBoolean({ name: 'reviewCountPerProduct', param: query.reviewCountPerProduct })
+    : undefined
+
+  return { reviewCountPerProduct: reviewCountPerProduct?.param }
+}
+
 export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
   const title = pipe(
     isProvided,

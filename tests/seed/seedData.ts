@@ -492,7 +492,7 @@ export const initialProducts = {
             content: 'cd/dvd? Sd card?',
             answers: [
               {
-                author: 111,
+                author: 1,
                 content: 'no'
               }
             ]

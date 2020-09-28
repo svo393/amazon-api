@@ -189,7 +189,7 @@ const seed = async (): Promise<void> => {
     return await Promise.all(Object.entries(vendors).map(async ([ vendorName, groups ]) => {
       const { addedVendor } = await createOneVendor('admin', vendorName)
 
-      return await Promise.all((groups as any).map(async ({ questions, products }: any, groupIndex: number) => {
+      return await Promise.all((groups).map(async ({ questions, products }: any, groupIndex: number) => {
         const bodies: any[] = []
         const firstProduct = products[0]
 
@@ -258,72 +258,72 @@ const seed = async (): Promise<void> => {
                 })
               })
             body = result.body
-          }
 
-          if (p.media) {
-            const uploadAPI = api
-              .post(`${apiURLs.products}/${body.productID}/upload`)
-              .set('Cookie', `sessionID=${sessionID}`)
-
-            const mediaRange = [ ...Array(p.media).keys() ]
-
-            mediaRange.forEach((m) => {
-              uploadAPI
-                .attach('productImages', path.join(
-                  __dirname, `images/products/${catName}/${vendorName}/${groupIndex}/${i}/${m}.jpg`
-                ))
-            })
-            await uploadAPI
-          }
-
-          if (p.reviews !== undefined) {
-            await Promise.all(p.reviews.map(async (r: any, reviewIndex: number) => {
-              const sessionID = users[r.author].sessionID
-
-              const { body: reviewBody }: { body: Review } = await api
-                .post(`${apiURLs.groups}/${groupID}/reviews`)
+            if (p.media) {
+              const uploadAPI = api
+                .post(`${apiURLs.products}/${body.productID}/upload`)
                 .set('Cookie', `sessionID=${sessionID}`)
-                .send({
-                  ...omit([ 'author', 'comments' ], r),
-                  productID: body.productID
-                })
 
-              if (r.media) {
-                const uploadAPI = api
-                  .post(`${apiURLs.reviews}/${reviewBody.reviewID}/upload`)
+              const mediaRange = [ ...Array(p.media).keys() ]
+
+              mediaRange.forEach((m) => {
+                uploadAPI
+                  .attach('productImages', path.join(
+                    __dirname, `images/products/${catName}/${vendorName}/${groupIndex}/${i}/${m}.jpg`
+                  ))
+              })
+              await uploadAPI
+            }
+
+            if (p.reviews !== undefined) {
+              await Promise.all(p.reviews.map(async (r: any, reviewIndex: number) => {
+                const sessionID = users[r.author].sessionID
+
+                const { body: reviewBody }: { body: Review } = await api
+                  .post(`${apiURLs.groups}/${groupID}/reviews`)
                   .set('Cookie', `sessionID=${sessionID}`)
+                  .send({
+                    ...omit([ 'author', 'comments' ], r),
+                    productID: body.productID
+                  })
 
-                const mediaRange = [ ...Array(r.media).keys() ]
-
-                mediaRange.forEach((m) => {
-                  uploadAPI
-                    .attach('reviewImages', path.join(
-                      __dirname, `images/products/${catName}/${vendorName}/${groupIndex}/${i}/reviews/${reviewIndex}/${m}.jpg`
-                    ))
-                })
-                await uploadAPI
-              }
-
-              if (r.comments !== undefined) {
-                const reviewComments: any = []
-
-                await Promise.all(r.comments.map(async (rc: any) => {
-                  const sessionID = users[rc.author].sessionID
-
-                  const reviewComment: { body: ReviewComment } = await api
-                    .post(`${apiURLs.reviews}/${reviewBody.reviewID}/comments`)
+                if (r.media) {
+                  const uploadAPI = api
+                    .post(`${apiURLs.reviews}/${reviewBody.reviewID}/upload`)
                     .set('Cookie', `sessionID=${sessionID}`)
-                    .send({
-                      ...omit([ 'author' ], rc),
-                      parentReviewCommentID: rc.replyTo !== undefined
-                        ? reviewComments[rc.replyTo].reviewCommentID
-                        : undefined
-                    })
 
-                  reviewComments.push(reviewComment.body)
-                }))
-              }
-            }))
+                  const mediaRange = [ ...Array(r.media).keys() ]
+
+                  mediaRange.forEach((m) => {
+                    uploadAPI
+                      .attach('reviewImages', path.join(
+                        __dirname, `images/products/${catName}/${vendorName}/${groupIndex}/${i}/reviews/${reviewIndex}/${m}.jpg`
+                      ))
+                  })
+                  await uploadAPI
+                }
+
+                if (r.comments !== undefined) {
+                  const reviewComments: any = []
+
+                  await Promise.all(r.comments.map(async (rc: any) => {
+                    const sessionID = users[rc.author].sessionID
+
+                    const reviewComment: { body: ReviewComment } = await api
+                      .post(`${apiURLs.reviews}/${reviewBody.reviewID}/comments`)
+                      .set('Cookie', `sessionID=${sessionID}`)
+                      .send({
+                        ...omit([ 'author' ], rc),
+                        parentReviewCommentID: rc.replyTo !== undefined
+                          ? reviewComments[rc.replyTo].reviewCommentID
+                          : undefined
+                      })
+
+                    reviewComments.push(reviewComment.body)
+                  }))
+                }
+              }))
+            }
           }
 
           return body

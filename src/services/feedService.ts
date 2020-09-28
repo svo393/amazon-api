@@ -161,8 +161,8 @@ const getUserFeed = async (feedFiltersInput: UserFeedFiltersInput, req: Request)
       .groupBy('p.productID')
 
     products = await Promise.all(products.map(async (p) => {
-      const [ { reviewCount } ] = await db('reviews')
-        .count('reviewID as reviewCount')
+      const reviews = await db<Review>('reviews')
+        .select('moderationStatus')
         .where('moderationStatus', 'APPROVED')
         .andWhere('groupID', p.groupID)
 
@@ -170,7 +170,7 @@ const getUserFeed = async (feedFiltersInput: UserFeedFiltersInput, req: Request)
         ...p,
         stars: parseFloat(p.stars as string),
         images: [ images.find((i) => i.productID === p.productID) ],
-        reviewCount: parseInt(reviewCount as string)
+        reviewCount: reviews.length
       }
     }))
 

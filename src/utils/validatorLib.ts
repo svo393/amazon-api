@@ -113,7 +113,7 @@ export const canBeNumber: CP = ({ name, param }) => {
   if (param !== undefined && !/^\d+(?:\.\d{1,2})?$/.test(param)) {
     throw new StatusError(400, `Incorrect ${name}: ${String(param)}`)
   }
-  return { name, param: Number(param) }
+  return { name, param: param === undefined ? undefined : Number(param) }
 }
 
 export const isPositiveNumber: CP = ({ name, param }) => {
