@@ -124,7 +124,7 @@ type ProductListData = Omit<ProductListRawData, 'stars' | 'reviewCount'> & {
   productSizesSum: number | null;
 }
 
-const getProducts = async (productsFiltersInput: ProductsFiltersInput, req: Request): Promise<{ batch: ProductListData[]; totalCount: number }> => {
+const getProducts = async (productsFiltersInput: ProductsFiltersInput, req: Request): Promise<{ batch: ProductListData[]; totalCount: number; hasNextPage: boolean; }> => {
   const {
     page = 1,
     sortBy = 'groupID',
@@ -297,7 +297,10 @@ const getProducts = async (productsFiltersInput: ProductsFiltersInput, req: Requ
     }
   })
 
-  return { batch, totalCount: products.length }
+  const totalCount = products.length
+  const end = (page - 1) * defaultLimit + defaultLimit
+
+  return { batch, totalCount, hasNextPage: end < totalCount }
 }
 
 type ProductMinListData = Pick<ProductListData,

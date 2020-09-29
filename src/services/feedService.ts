@@ -7,7 +7,7 @@ import fuseIndexes from '../utils/fuseIndexes'
 import getCursor from '../utils/getCursor'
 import sortItems from '../utils/sortItems'
 
-const getFeed = async (feedFiltersinput: FeedFiltersInput): Promise<{ batch: Feed; totalCount: number }> => {
+const getFeed = async (feedFiltersinput: FeedFiltersInput): Promise<{ batch: Feed; totalCount: number; hasNextPage: boolean; }> => {
   const {
     page = 1,
     sortBy = 'createdAt_desc',
@@ -112,9 +112,13 @@ const getFeed = async (feedFiltersinput: FeedFiltersInput): Promise<{ batch: Fee
 
   const feedSorted = sortItems(feed, sortBy)
 
+  const totalCount = feedSorted.length
+  const end = (page - 1) * defaultLimit + defaultLimit
+
   return {
     batch: feedSorted.slice((page - 1) * defaultLimit, (page - 1) * defaultLimit + defaultLimit),
-    totalCount: feed.length
+    totalCount,
+    hasNextPage: end < totalCount
   }
 }
 

@@ -78,14 +78,14 @@ export const uploadImages = async (files: Express.Multer.File[], {
 
     if (thumbWidth !== undefined && thumbHeight !== undefined) {
       await image
-        .resize(thumbWidth, thumbHeight, { fit: 'inside' })
+        .resize(thumbWidth, thumbHeight, { fit: 'outside' })
         .jpeg({ progressive: true })
         .toFile(
           path.resolve(imagesPath, `${fileName}_${thumbWidth}.jpg`)
         )
 
       addWebp && await image
-        .resize(thumbWidth, thumbHeight, { fit: 'inside' })
+        .resize(thumbWidth, thumbHeight, { fit: 'outside' })
         .webp()
         .toFile(
           path.resolve(imagesPath, `${fileName}_${thumbWidth}.webp`)

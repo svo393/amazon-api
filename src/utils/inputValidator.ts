@@ -290,10 +290,9 @@ export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
     isNonEmptyString
   )({ name: 'bullets', param: body.bullets })
 
-  const description = pipe(
-    isProvided,
-    isNonEmptyString
-  )({ name: 'description', param: body.description })
+  const description = 'description' in body
+    ? isNonEmptyString({ name: 'description', param: body.description })
+    : undefined
 
   const stock = 'stock' in body
     ? canBeNumber({ name: 'stock', param: body.stock })
@@ -386,7 +385,7 @@ export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
     listPrice: listPrice?.param,
     price: price.param,
     bullets: bullets.param,
-    description: description.param,
+    description: description?.param,
     stock: stock?.param,
     productSizes: productSizes?.param,
     isAvailable: isAvailable.param,
