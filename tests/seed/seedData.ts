@@ -1094,7 +1094,7 @@ export const initialProducts = {
             Warranty: One-year limited warranty`,
             description: 'With an AMD processor and up to 4 GB of RAM, seamlessly go from sending work emails to uploading vacation photos. This All-in-One PC displays more with a three-sided micro-edge display and has an adjustable tilt stand, allowing you to work from multiple perspectives. This PC includes an HD camera with a slide switch for privacy, plus built-in speakers and easy Wi-Fi connectivity. Now, you can stay in touch with family and friends while maintaining peace of mind.',
             stock: 5,
-            media: 7,
+            media: 6,
             isAvailable: true,
             groupVariations: [
               { name: 'Style', value: '22-dd0010' }

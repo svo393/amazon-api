@@ -13,24 +13,10 @@ const getImages = async (imagesFiltersinput: ImagesFiltersInput): Promise<Image[
     userID
   } = imagesFiltersinput
 
-  let images = await db<Image>('images')
-
-  if (productID !== undefined) {
-    images = images
-      .filter((i) => i.productID === productID)
-  }
-
-  if (reviewID !== undefined) {
-    images = images
-      .filter((i) => i.reviewID === reviewID)
-  }
-
-  if (userID !== undefined) {
-    images = images
-      .filter((i) => i.userID === userID)
-  }
-
-  return images
+  return await db<Image>('images')
+    .where('productID', productID ?? 0)
+    .orWhere('reviewID', reviewID ?? 0)
+    .orWhere('userID', userID ?? 0)
 }
 
 const getImagesByGroup = async (req: Request): Promise<Image[]> => {
