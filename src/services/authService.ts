@@ -99,9 +99,7 @@ const checkInUser = async (req: Request): Promise<Partial<UserInfo> & { countryF
     .where('userID', req.session?.userID)
     .first('userID', 'role', 'avatar', 'name', 'cover')
 
-  if (user === undefined) {
-    throw new StatusError(401, 'Unauthorized')
-  }
+  if (user === undefined) return { countryFromIP: 'anywhere*' }
 
   const users: Pick<Follower, 'follows'>[] = await db('followers')
     .select('follows')
