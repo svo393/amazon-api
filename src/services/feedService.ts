@@ -298,7 +298,7 @@ const getFollowsFeed = async (feedFiltersInput: UserFeedFiltersInput, req: Reque
         'r.createdAt',
         'r.updatedAt',
         'r.title',
-        'r.variation',
+        'r.productID',
         'r.content',
         'r.stars',
         'r.isVerified',
@@ -313,21 +313,7 @@ const getFollowsFeed = async (feedFiltersInput: UserFeedFiltersInput, req: Reque
       .andWhere('r.moderationStatus', 'APPROVED')
       .leftJoin('users as u', 'r.userID', 'u.userID')
 
-    const groupIDs = _reviews.map((r) => r.groupID)
-
-    const groupVariations = await db<GroupVariation>('groupVariations')
-      .whereIn('groupID', groupIDs)
-
-    _reviews = _reviews.map((r) => {
-      const [ name, value ] = Object.entries(r.variation)[0]
-
-      const productID = groupVariations
-        .find((gv) => gv.name === name && gv.value === value)?.productID as number
-
-      return { ...r, productID }
-    })
-
-    const productIDs = _reviews.map((r) => r.productID as number)
+    const productIDs = _reviews.map((r) => r.productID)
 
     const images = await db<Image>('images')
       .whereIn('productID', productIDs)
