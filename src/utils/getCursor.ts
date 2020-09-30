@@ -34,6 +34,8 @@ export default ({ startCursor, startCursorType, limit = 4, idProp, idTypes, data
   let endCursorType
 
   const batch = data.slice(start, start + limit)
+  // console.info('limit', limit)
+  // console.info('data', data)
 
   if (batch.length === 0) {
     return {

@@ -65,7 +65,19 @@ type UserData = Omit<UserRawData,
   reviewCount: number;
 }
 
-const getUsers = async (usersFiltersinput: UsersFiltersInput): Promise<{ batch: UserData[]; totalCount: number }> => {
+type UserBatchData = Omit<UserRawData,
+  | 'orderCount'
+  | 'reviewCount'
+  | 'reviewCommentCount'
+  | 'questionCount'
+  | 'answerCount'
+> & {
+  activityCount: number;
+  orderCount: number;
+  reviewCount: number;
+}
+
+const getUsers = async (usersFiltersinput: UsersFiltersInput): Promise<{ batch: UserBatchData[]; totalCount: number }> => {
   const {
     page = 1,
     sortBy = 'email',
@@ -103,9 +115,10 @@ const getUsers = async (usersFiltersinput: UsersFiltersInput): Promise<{ batch: 
       ...u,
       orderCount: orders.filter((o) => o.userID === u.userID).length,
       reviewCount: reviews.filter((r) => r.userID === u.userID).length,
-      reviewCommentCount: reviewComments.filter((rc) => rc.userID === u.userID).length,
-      questionCount: questions.filter((o) => o.userID === u.userID).length,
-      answerCount: answers.filter((a) => a.userID === u.userID).length
+      activityCount:
+        reviewComments.filter((rc) => rc.userID === u.userID).length +
+        questions.filter((o) => o.userID === u.userID).length +
+        answers.filter((a) => a.userID === u.userID).length
     }))
 
   if (roles !== undefined) {
@@ -145,12 +158,12 @@ const getUsers = async (usersFiltersinput: UsersFiltersInput): Promise<{ batch: 
 
   if (activityCountMin !== undefined) {
     users = users
-      .filter((u) => u.reviewCommentCount + u.questionCount + u.answerCount >= activityCountMin)
+      .filter((u) => u.activityCount >= activityCountMin)
   }
 
   if (activityCountMax !== undefined) {
     users = users
-      .filter((u) => u.reviewCommentCount + u.questionCount + u.answerCount <= activityCountMax)
+      .filter((u) => u.activityCount <= activityCountMax)
   }
 
   if (email !== undefined) {
