@@ -303,7 +303,8 @@ const updateReview = async (reviewInput: ReviewUpdateInput, req: Request): Promi
   const [ updatedReview ]: Review[] = await db('reviews')
     .update({
       ...reviewInput,
-      updatedAt: new Date()
+      updatedAt: new Date(),
+      moderationStatus: 'NEW'
     }, [ '*' ])
     .where('reviewID', req.params.reviewID)
 

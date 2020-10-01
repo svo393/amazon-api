@@ -1,5 +1,5 @@
 import { Request } from 'express'
-import { CategoriesFiltersInput, Category, CategoryCreateInput, CategoryUpdateInput } from '../types'
+import { BatchWithCursor, CategoriesFiltersInput, Category, CategoryCreateInput, CategoryUpdateInput } from '../types'
 import { defaultLimit } from '../utils/constants'
 import { db } from '../utils/db'
 import fuseIndexes from '../utils/fuseIndexes'
@@ -28,7 +28,7 @@ type CategoryListData = Omit<CategoryListRawData, 'productCount'> & {
   productCount: number;
 }
 
-const getCategories = async (categoriesFiltersinput: CategoriesFiltersInput): Promise<{ batch: CategoryListData[]; totalCount: number }> => {
+const getCategories = async (categoriesFiltersinput: CategoriesFiltersInput): Promise<BatchWithCursor<CategoryListData>> => {
   const {
     page = 1,
     sortBy = 'groupID',
@@ -57,6 +57,9 @@ const getCategories = async (categoriesFiltersinput: CategoriesFiltersInput): Pr
 
   const categoriesSorted = sortItems(categories, sortBy)
 
+  const totalCount = categories.length
+  const end = (page - 1) * defaultLimit + defaultLimit
+
   const _categoriesSorted = categoriesSorted.map((c) => ({
     ...c,
     children: rawCategories
@@ -66,7 +69,8 @@ const getCategories = async (categoriesFiltersinput: CategoriesFiltersInput): Pr
 
   return {
     batch: _categoriesSorted.slice((page - 1) * defaultLimit, (page - 1) * defaultLimit + defaultLimit),
-    totalCount: categories.length
+    totalCount,
+    hasNextPage: end < totalCount
   }
 }
 

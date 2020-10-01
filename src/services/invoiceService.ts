@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import Knex from 'knex'
-import { Invoice, InvoiceCreateInput, InvoicesFiltersInput, InvoiceUpdateInput } from '../types'
+import { BatchWithCursor, Invoice, InvoiceCreateInput, InvoicesFiltersInput, InvoiceUpdateInput } from '../types'
 import { defaultLimit } from '../utils/constants'
 import { db, dbTrans } from '../utils/db'
 import sortItems from '../utils/sortItems'
@@ -21,7 +21,7 @@ const addInvoice = async (invoiceInput: InvoiceCreateInput): Promise<Invoice> =>
   return addedInvoice
 }
 
-const getInvoices = async (invoicesFiltersinput: InvoicesFiltersInput): Promise<{ batch: Invoice[]; totalCount: number }> => {
+const getInvoices = async (invoicesFiltersinput: InvoicesFiltersInput): Promise<BatchWithCursor<Invoice>> => {
   const {
     page = 1,
     sortBy = 'createdAt_desc',
@@ -89,9 +89,13 @@ const getInvoices = async (invoicesFiltersinput: InvoicesFiltersInput): Promise<
 
   const invoicesSorted = sortItems(invoices, sortBy)
 
+  const totalCount = invoices.length
+  const end = (page - 1) * defaultLimit + defaultLimit
+
   return {
     batch: invoicesSorted.slice((page - 1) * defaultLimit, (page - 1) * defaultLimit + defaultLimit),
-    totalCount: invoices.length
+    totalCount,
+    hasNextPage: end < totalCount
   }
 }
 

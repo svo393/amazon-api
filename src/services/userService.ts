@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import { omit } from 'ramda'
-import { Answer, Order, Question, Review, ReviewComment, User, UserRoleUpdateInput, UserSafeData, UsersFiltersInput } from '../types'
+import { Answer, BatchWithCursor, Order, Question, Review, ReviewComment, User, UserRoleUpdateInput, UserSafeData, UsersFiltersInput } from '../types'
 import { defaultLimit, imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
 import { uploadImages } from '../utils/img'
@@ -77,7 +77,7 @@ type UserBatchData = Omit<UserRawData,
   reviewCount: number;
 }
 
-const getUsers = async (usersFiltersinput: UsersFiltersInput): Promise<{ batch: UserBatchData[]; totalCount: number }> => {
+const getUsers = async (usersFiltersinput: UsersFiltersInput): Promise<BatchWithCursor<UserBatchData>> => {
   const {
     page = 1,
     sortBy = 'email',
@@ -173,9 +173,13 @@ const getUsers = async (usersFiltersinput: UsersFiltersInput): Promise<{ batch: 
 
   const usersSorted = sortItems(users, sortBy)
 
+  const totalCount = users.length
+  const end = (page - 1) * defaultLimit + defaultLimit
+
   return {
     batch: usersSorted.slice((page - 1) * defaultLimit, (page - 1) * defaultLimit + defaultLimit),
-    totalCount: users.length
+    totalCount,
+    hasNextPage: end < totalCount
   }
 }
 

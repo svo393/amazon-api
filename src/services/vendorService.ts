@@ -1,5 +1,5 @@
 import { Request } from 'express'
-import { Vendor, VendorInput, VendorsFiltersInput } from '../types'
+import { BatchWithCursor, Vendor, VendorInput, VendorsFiltersInput } from '../types'
 import { defaultLimit } from '../utils/constants'
 import { db } from '../utils/db'
 import fuseIndexes from '../utils/fuseIndexes'
@@ -27,7 +27,7 @@ type VendorListData = Omit<VendorListRawData, 'productCount'> & {
   productCount: number;
 }
 
-const getVendors = async (vendorsFiltersinput: VendorsFiltersInput): Promise<{ batch: VendorListData[]; totalCount: number }> => {
+const getVendors = async (vendorsFiltersinput: VendorsFiltersInput): Promise<BatchWithCursor<VendorListData>> => {
   const {
     page = 1,
     sortBy = 'groupID',
@@ -55,9 +55,13 @@ const getVendors = async (vendorsFiltersinput: VendorsFiltersInput): Promise<{ b
 
   const vendorsSorted = sortItems(vendors, sortBy)
 
+  const totalCount = vendors.length
+  const end = (page - 1) * defaultLimit + defaultLimit
+
   return {
     batch: vendorsSorted.slice((page - 1) * defaultLimit, (page - 1) * defaultLimit + defaultLimit),
-    totalCount: vendors.length
+    totalCount,
+    hasNextPage: end < totalCount
   }
 }
 

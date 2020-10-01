@@ -1,7 +1,7 @@
 import { Request } from 'express'
 import Knex from 'knex'
 import { flatten, omit, sum } from 'ramda'
-import { GroupVariation, Image, Product, ProductCreateInput, ProductData, ProductParameter, ProductsFiltersInput, ProductSize, ProductsMinFiltersInput, ProductUpdateInput, Question, Review, User } from '../types'
+import { BatchWithCursor, GroupVariation, Image, Product, ProductCreateInput, ProductData, ProductParameter, ProductsFiltersInput, ProductSize, ProductsMinFiltersInput, ProductUpdateInput, Question, Review, User } from '../types'
 import { defaultLimit, imagesBasePath } from '../utils/constants'
 import { db, dbTrans } from '../utils/db'
 import fuseIndexes from '../utils/fuseIndexes'
@@ -124,7 +124,7 @@ type ProductListData = Omit<ProductListRawData, 'stars' | 'reviewCount'> & {
   productSizesSum: number | null;
 }
 
-const getProducts = async (productsFiltersInput: ProductsFiltersInput, req: Request): Promise<{ batch: ProductListData[]; totalCount: number; hasNextPage: boolean; }> => {
+const getProducts = async (productsFiltersInput: ProductsFiltersInput, req: Request): Promise<BatchWithCursor<ProductListData>> => {
   const {
     page = 1,
     sortBy = 'groupID',
@@ -145,7 +145,11 @@ const getProducts = async (productsFiltersInput: ProductsFiltersInput, req: Requ
   } = productsFiltersInput
 
   // TODO refactor reusable queries
-  const rawProducts: ProductListRawData[] = await getProductsQuery.clone()
+  const rawProducts: ProductListRawData[] = groupID !== undefined
+    ? await getProductsQuery.clone()
+      .where('p.groupID', groupID)
+    : await getProductsQuery.clone()
+
   const productIDs = rawProducts.map(({ productID }) => productID)
 
   let groupVariations: GroupVariation[]

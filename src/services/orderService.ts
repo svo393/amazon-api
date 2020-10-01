@@ -2,7 +2,7 @@ import { Request } from 'express'
 import Knex from 'knex'
 import { omit, sum } from 'ramda'
 import { Address, BatchWithCursor, Invoice, Order, OrderCreateInput, OrderFullData, OrderProduct, OrderProductFullData, OrdersFiltersInput, OrderUpdateInput, OrderWithUser } from '../types'
-import { smallLimit } from '../utils/constants'
+import { defaultLimit } from '../utils/constants'
 import { db, dbTrans } from '../utils/db'
 import sortItems from '../utils/sortItems'
 import StatusError from '../utils/StatusError'
@@ -196,9 +196,9 @@ const getOrders = async (ordersFiltersinput: OrdersFiltersInput, req: Request): 
   const ordersSorted = sortItems(orders, sortBy)
 
   const totalCount = orders.length
-  const end = (page - 1) * smallLimit + smallLimit
+  const end = (page - 1) * defaultLimit + defaultLimit
 
-  const batch = ordersSorted.slice((page - 1) * smallLimit, end)
+  const batch = ordersSorted.slice((page - 1) * defaultLimit, end)
 
   const orderIDs = batch.map((o) => o.orderID)
 
@@ -239,7 +239,7 @@ const getOrders = async (ordersFiltersinput: OrdersFiltersInput, req: Request): 
 
   return {
     batch: _batch,
-    totalCount: orders.length,
+    totalCount,
     hasNextPage: end < totalCount
   }
 }
