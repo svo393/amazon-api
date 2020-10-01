@@ -1,7 +1,7 @@
 import { Request } from 'express'
 import Knex from 'knex'
 import { flatten, omit, sum } from 'ramda'
-import { GroupVariation, Image, Product, ProductCreateInput, ProductData, ProductParameter, ProductsFiltersInput, ProductSize, ProductsMinFiltersInput, ProductUpdateInput, Review, User } from '../types'
+import { GroupVariation, Image, Product, ProductCreateInput, ProductData, ProductParameter, ProductsFiltersInput, ProductSize, ProductsMinFiltersInput, ProductUpdateInput, Question, Review, User } from '../types'
 import { defaultLimit, imagesBasePath } from '../utils/constants'
 import { db, dbTrans } from '../utils/db'
 import fuseIndexes from '../utils/fuseIndexes'
@@ -393,6 +393,14 @@ const getProductByID = async ({ reviewCountPerProduct }: { reviewCountPerProduct
     .select('moderationStatus')
     .andWhere('groupID', rawProduct.groupID)
 
+  const _questions: (Pick<Question, 'moderationStatus'> & { answerCount: string })[] = await db('questions as q')
+    .select('q.moderationStatus')
+    .count('a.questionID as answerCount')
+    .where('groupID', rawProduct.groupID)
+    .andWhere('a.moderationStatus', 'APPROVED')
+    .leftJoin('answers as a', 'q.questionID', 'a.questionID')
+    .groupBy('q.questionID')
+
   const ratingStats: { stars: number; count: string }[] = await db('reviews')
     .select('stars')
     .count('stars')
@@ -413,7 +421,7 @@ const getProductByID = async ({ reviewCountPerProduct }: { reviewCountPerProduct
       : reviews.filter((r) => r.moderationStatus === 'APPROVED').length,
     questionCount: hasPermission
       ? questions.length
-      : questions.filter((q) => q.moderationStatus === 'APPROVED').length,
+      : _questions.filter((q) => Number(q.answerCount) !== 0).length,
     ratingStats: ratingStats.reduce((acc, cur) => {
       acc[cur.stars] = Number(cur.count)
       return acc
