@@ -8,20 +8,15 @@ router.get('/:productID/similar', async (req, res) => {
   res.json(product)
 })
 
-router.get('/:productID/with', async (req, res) => {
-  const products = await relService.getWith(req)
+router.get('/:productID/sponsored', async (req, res) => {
+  const products = await relService.getSponsored(req)
   res.json(products)
 })
 
-// router.get('/:productID/sponsored', async (req, res) => {
-//   const products = await relService.getSponsored(req)
-//   res.json(products)
-// })
-
-// router.get('/:productID/after', async (req, res) => {
-//   const products = await relService.getAfter(req)
-//   res.json(products)
-// })
+router.get('/:productID/after', async (req, res) => {
+  const products = await relService.getAfter(req)
+  res.json(products)
+})
 
 // router.get('/:productID/compare', async (req, res) => {
 //   const products = await relService.getCompare(req)
