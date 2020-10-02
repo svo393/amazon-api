@@ -27,6 +27,7 @@ const getProductsQuery: any = db('products as p')
   .leftJoin('reviews as r', 'p.groupID', 'r.groupID')
   .leftJoin('vendors as v', 'p.vendorID', 'v.vendorID')
   .leftJoin('categories as c', 'p.categoryID', 'c.categoryID')
+  .where('r.moderationStatus', 'APPROVED')
   .groupBy('p.productID', 'vendorName', 'categoryName')
 
 const addProduct = async (productInput: ProductCreateInput, req: Request): Promise<ProductData> => {

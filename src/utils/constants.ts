@@ -36,6 +36,7 @@ export const apiURLs = {
   paymentMethods: `${baseAPI}/payment-methods`,
   products: `${baseAPI}/products`,
   questions: `${baseAPI}/questions`,
+  rels: `${baseAPI}/rels`,
   reviewComments: `${baseAPI}/review-comments`,
   reviews: `${baseAPI}/reviews`,
   roles: `${baseAPI}/roles`,
