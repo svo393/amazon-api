@@ -1,8 +1,7 @@
 import { Request } from 'express'
-import { flatten } from 'ramda'
-import { Image, ObjIndexed, Product, Vote } from '../types'
+import { flatten, omit } from 'ramda'
+import { Image, ObjIndexed, Product } from '../types'
 import { db } from '../utils/db'
-import StatusError from '../utils/StatusError'
 
 const getRelsQuery: any = db('products as p')
   .avg('stars as stars')
@@ -102,13 +101,20 @@ const getCompare = async (req: Request): Promise<ProductRelData[] | null> => {
     .andWhereNot('ps.stock', 0)
 
   if (products.length === 0) return []
-  const productIDs = products.map((p) => p.productID)
+
+  const productIDs = products
+    .map((p) => p.productID)
 
   const productParameters = await db('productParameters as pp')
     .join('parameters as p', 'pp.parameterID', 'p.parameterID')
     .whereIn('pp.productID', productIDs)
 
+  const curProductParameterIDs = productParameters
+    .filter((pp) => pp.productID === Number(productID))
+    .map((pp) => pp.parameterID)
+
   const parameters = productParameters
+    .filter((pp) => curProductParameterIDs.includes(pp.parameterID) && pp.productID !== Number(productID))
     .reduce((acc, cur) => {
       if (acc[cur.parameterID] === undefined) {
         acc[cur.parameterID] = [ cur ]
@@ -119,23 +125,30 @@ const getCompare = async (req: Request): Promise<ProductRelData[] | null> => {
     }, {} as ObjIndexed)
 
   const _parameters: any = Object.values(parameters)
-    .filter((p: any) => {
-      return p.length > 4 &&
-        p.find((p: any) => p.productID === Number(productID))
-    })
+    .filter((p: any) => p.length > 4)
 
   if (_parameters.length < 2) return []
-
-  const images = await db<Image>('images')
-    .whereIn('productID', productIDs)
-    .andWhere('index', 0)
 
   const batch = products
     .filter((p) => p.productID !== Number(productID))
 
-  if (batch.length < 4) return []
+  if (batch.length < 3) return []
 
-  const _batch: (Pick<Product, 'title' | 'price' | 'productID' | 'groupID'> & { stars: string; reviewCount: string; ratingStats: { stars: number; count: string }[] })[] = await Promise.all(batch.map(async (p) => ({
+  const batchWithCounts = batch
+    .map((p) => {
+      let matchCount = 0
+
+      _parameters.forEach((pr: any) => {
+        const match = pr.find((i: any) => i.productID === p.productID)
+        if (match) { matchCount += 1 }
+      })
+
+      return { ...p, matchCount }
+    })
+    .sort((a, b) => b.matchCount - a.matchCount)
+    .slice(0, 4)
+
+  const _batch: (Pick<Product, 'title' | 'price' | 'productID' | 'groupID'> & { stars: string; reviewCount: string; ratingStats: { stars: number; count: string }[] })[] = await Promise.all(batchWithCounts.map(async (p) => ({
     ...p,
     ratingStats: (await db('reviews')
       .select('stars')
@@ -145,11 +158,13 @@ const getCompare = async (req: Request): Promise<ProductRelData[] | null> => {
     ) as { stars: number; count: string }[]
   })))
 
+  const images = await db<Image>('images')
+    .whereIn('productID', _batch.map((p) => p.productID))
+    .andWhere('index', 0)
+
   return _batch
-    .sort(() => Math.random() - 0.5)
-    .slice(0, 4)
     .map((p) => ({
-      ...p,
+      ...omit([ 'matchCount' ], p),
       images: images.filter((i) => i.productID === p.productID),
       price: p.price / 100,
       stars: parseFloat(p.stars),
