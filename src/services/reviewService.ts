@@ -299,6 +299,18 @@ const getReviewByID = async (req: Request): Promise<ReviewWithUser> => {
   return _review
 }
 
+const checkExistingReview = async (req: Request): Promise<{ groupID: number; isReviewed: boolean }> => {
+  const review = await db<Review>('reviews')
+    .first('reviewID')
+    .where('groupID', req.params.groupID)
+    .andWhere('userID', req.session?.userID)
+
+  return {
+    groupID: Number(req.params.groupID),
+    isReviewed: review !== undefined
+  }
+}
+
 const updateReview = async (reviewInput: ReviewUpdateInput, req: Request): Promise<Review> => {
   const [ updatedReview ]: Review[] = await db('reviews')
     .update({
@@ -351,6 +363,7 @@ export default {
   getReviews,
   getReviewByID,
   updateReview,
+  checkExistingReview,
   deleteReview,
   uploadReviewImages
 }

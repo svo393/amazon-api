@@ -54,4 +54,8 @@ router.post('/:groupID/questions', requireAuth, async (req, res) => {
   res.status(201).json(addedQuestion)
 })
 
+router.get('/:groupID/check-review', requireAuth, async (req, res) => {
+  res.json(await reviewService.checkExistingReview(req))
+})
+
 export default router
