@@ -154,6 +154,7 @@ const getCompare = async (req: Request): Promise<ProductRelData[] | null> => {
       .select('stars')
       .count('stars')
       .where('groupID', p.groupID)
+      .andWhere('moderationStatus', 'APPROVED')
       .groupBy('stars')
     ) as { stars: number; count: string }[]
   })))

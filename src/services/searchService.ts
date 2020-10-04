@@ -1,18 +1,22 @@
 import { Request } from 'express'
 import Fuse from 'fuse.js'
-import { flatten, omit } from 'ramda'
-import { AskFiltersInput, Matches, ObjIndexed, Product, Question, Review, Vote } from '../types'
+import { flatten, omit, sum } from 'ramda'
+import { AskFiltersInput, BatchWithCursor, Image, Matches, ObjIndexed, Product, ProductSize, Question, Review, SearchFiltersInput, Vote } from '../types'
+import { defaultLimit } from '../utils/constants'
 import { db } from '../utils/db'
+import fuseIndexes from '../utils/fuseIndexes'
 import fuseMatches from '../utils/fuseMatches'
+import sortItems from '../utils/sortItems'
 import StatusError from '../utils/StatusError'
+import { getProductsQuery } from './productService'
 
 type ProductData = Pick<Product, 'groupID' | 'bullets'>
+type Author = { name: string; userID: number }
 
 type QuestionData = Pick<Question, 'questionID' | 'content'> & { answerContent: string; answerID: number; createdAt: string } & Author
 
 type ReviewData = Pick<Review, 'reviewID' | 'content' | 'title' | 'stars'> & Author
 
-type Author = { name: string; userID: number }
 type AnswerData = { answerID: number; content: string; createdAt: string }
 
 type QuestionItem = (Omit<QuestionData, 'name' | 'userID' | 'answerContent' | 'answerID' | 'createdAt'> & {
@@ -21,13 +25,13 @@ type QuestionItem = (Omit<QuestionData, 'name' | 'userID' | 'answerContent' | 'a
   answers: (AnswerData & { author: Author; votes: number; matches: Matches })[];
 })
 
-type Return = {
+type AskReturn = {
   product?: ProductData & { matches: Matches };
   questions: (Omit<QuestionItem, 'answers'> & { answer: (AnswerData & { author: Author; votes: number; matches: Matches }) })[];
   reviews: (Omit<ReviewData, 'name' | 'userID'> & { author: Author; votes: number; matches: Matches })[];
 }
 
-const getAsk = async (askFiltersinput: AskFiltersInput, req: Request): Promise<Return> => {
+const getAsk = async (askFiltersinput: AskFiltersInput, req: Request): Promise<AskReturn> => {
   const { q } = askFiltersinput
 
   const product = await db<Product>('products')
@@ -151,4 +155,99 @@ const getAsk = async (askFiltersinput: AskFiltersInput, req: Request): Promise<R
   }
 }
 
-export default { getAsk }
+type ProductSearchData = Pick<Product, 'title' | 'groupID' | 'bullets' | 'productID' | 'price' | 'listPrice' | 'description' | 'stock' | 'isAvailable' | 'categoryID' | 'vendorID'> & { vendorName: string; categoryName: string; stars: string }
+
+type ProductSearchReturn = Omit<ProductSearchData, 'stars'> & {
+  stars: number,
+  reviewCount: number;
+  images: Omit<Image, 'userID'>[];
+  productSizesSum: number | null
+ }
+
+const getSearch = async (searchFiltersinput: SearchFiltersInput): Promise<BatchWithCursor<ProductSearchReturn>> => {
+  const {
+    page = 1,
+    q,
+    sortBy = 'createdAt_desc'
+  } = searchFiltersinput
+
+  let products: ProductSearchData[] = await getProductsQuery.clone()
+    .select('p.bullets', 'p.description', 'p.listPrice')
+
+  products = products
+    .filter((_, i) => fuseIndexes(products, [
+      'title',
+      'bullets',
+      'description'
+    ], q).includes(i))
+
+  let productsSorted = sortItems(products, sortBy)
+
+  const totalCount = products.length
+  const end = (page - 1) * 5 + 5 // TODO change 5 do defaultLimit
+
+  const batch = productsSorted.slice((page - 1) * 5, end)
+
+  const productIDs = batch.map(({ productID }) => productID)
+
+  const images = await db<Image>('images')
+    .whereIn('productID', productIDs)
+    .andWhere('index', 0)
+
+  const productSizes = await db<ProductSize>('productSizes')
+    .whereIn('productID', productIDs)
+
+  const _batch = await Promise.all(batch.map(async (p) => {
+    const sizesSum = sum(productSizes
+      .filter((ps) => ps.productID === p.productID)
+      .map(({ qty }) => qty)
+    )
+
+    const reviews: any = await db('reviews')
+      .count('reviewID')
+      .where('moderationStatus', 'APPROVED')
+      .andWhere('groupID', p.groupID)
+
+    const ratingStats = await db('reviews')
+      .select('stars')
+      .count('stars')
+      .where('groupID', p.groupID)
+      .andWhere('moderationStatus', 'APPROVED')
+      .groupBy('stars')
+
+    const image = images.find((i) => i.productID === p.productID)
+
+    return {
+      ...p,
+      price: p.price / 100,
+      listPrice: p.listPrice !== null
+        ? p.listPrice / 100
+        : null,
+      stars: parseFloat(p.stars),
+      reviewCount: parseInt(reviews[0].count),
+      productSizesSum: sizesSum || null,
+      ratingStats: ratingStats.reduce((acc, cur) => {
+        acc[cur.stars] = Number(cur.count)
+        return acc
+      }, {} as { [ k: number ]: number }),
+      images: image !== undefined
+        ? [ {
+          imageID: image.imageID,
+          index: 0,
+          productID: p.productID
+        } ]
+        : []
+    }
+  }))
+
+  return {
+    batch: _batch,
+    totalCount,
+    hasNextPage: end < totalCount
+  }
+}
+
+export default {
+  getAsk,
+  getSearch
+}

@@ -496,6 +496,11 @@ export type FeedFiltersInput = {
 }
 
 export type AskFiltersInput = { q: string }
+export type SearchFiltersInput = {
+  q: string;
+  page?: number;
+  sortBy?: string;
+ }
 
 export type ReviewsFiltersInput = {
   q?: string;

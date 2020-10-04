@@ -10,7 +10,7 @@ import { uploadImages } from '../utils/img'
 import sortItems from '../utils/sortItems'
 import StatusError from '../utils/StatusError'
 
-const getProductsQuery: any = db('products as p')
+export const getProductsQuery: any = db('products as p')
   .select(
     'p.productID',
     'p.title',
@@ -187,7 +187,7 @@ const getProducts = async (productsFiltersInput: ProductsFiltersInput, req: Requ
       reviewCount: hasPermission
         ? reviews.length
         : reviews.filter((r) => r.moderationStatus === 'APPROVED').length,
-      productSizes,
+      productSizes: productSizes.filter((ps) => ps.productID === p.productID),
       productSizesSum: sizesSum || null
     }
   }))
@@ -197,6 +197,7 @@ const getProducts = async (productsFiltersInput: ProductsFiltersInput, req: Requ
       .select('stars')
       .count('stars')
       .where('groupID', groupID)
+      .andWhere('moderationStatus', 'APPROVED')
       .groupBy('stars')
 
     groupVariations = await db<GroupVariation>('groupVariations')
@@ -410,6 +411,7 @@ const getProductByID = async ({ reviewCountPerProduct }: { reviewCountPerProduct
     .select('stars')
     .count('stars')
     .where('groupID', rawProduct.groupID)
+    .andWhere('moderationStatus', 'APPROVED')
     .groupBy('stars')
 
   const hasPermission = [ 'ROOT', 'ADMIN' ].includes(req.session?.role)

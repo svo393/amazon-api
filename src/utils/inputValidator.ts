@@ -1,6 +1,6 @@
 import { Express, Request } from 'express'
 import { pipe } from 'ramda'
-import { AddressCreateInput, AddressTypeInput, AddressUpdateInput, AnswerCreateInput, AnswerUpdateInput, AskFiltersInput, CartProduct, CartProductDeleteInput, CartProductInput, CategoriesFiltersInput, CategoryCreateInput, CategoryUpdateInput, CursorInput, FeedFiltersInput, GroupVariationCreateInput, GroupVariationDeleteInput, GroupVariationUpdateInput, ImagesDeleteInput, ImagesFiltersInput, ImagesUpdateInput, InvoiceCreateInput, InvoicesFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ListUpdateInput, LocalCart, ModerationStatus, OrderCreateInput, OrderProductInput, OrdersFiltersInput, OrderStatus, OrderUpdateInput, ParameterInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionCursorInput, QuestionUpdateInput, ReviewCommentCreateInput, ReviewCommentUpdateInput, ReviewCreateInput, ReviewsFiltersInput, ReviewUpdateInput, Role, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserFeedFiltersInput, UserLoginInput, UserPasswordUpdateInput, UserRoleUpdateInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorInput, VendorsFiltersInput, VotesCreateInput, VotesFiltersInput } from '../types'
+import { AddressCreateInput, AddressTypeInput, AddressUpdateInput, AnswerCreateInput, AnswerUpdateInput, AskFiltersInput, CartProduct, CartProductDeleteInput, CartProductInput, CategoriesFiltersInput, CategoryCreateInput, CategoryUpdateInput, CursorInput, FeedFiltersInput, GroupVariationCreateInput, GroupVariationDeleteInput, GroupVariationUpdateInput, ImagesDeleteInput, ImagesFiltersInput, ImagesUpdateInput, InvoiceCreateInput, InvoicesFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ListUpdateInput, LocalCart, ModerationStatus, OrderCreateInput, OrderProductInput, OrdersFiltersInput, OrderStatus, OrderUpdateInput, ParameterInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionCursorInput, QuestionUpdateInput, ReviewCommentCreateInput, ReviewCommentUpdateInput, ReviewCreateInput, ReviewsFiltersInput, ReviewUpdateInput, Role, SearchFiltersInput, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserFeedFiltersInput, UserLoginInput, UserPasswordUpdateInput, UserRoleUpdateInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorInput, VendorsFiltersInput, VotesCreateInput, VotesFiltersInput } from '../types'
 import { canBeBoolean, canBeNumber, hasDefinedProps, isArray, isDate, isEmail, isInputProvided, isNonEmptyString, isNonEmptyStringOrNull, isPasswordValid, isPositiveNumber, isProvided, isSomeProvided, isString } from './validatorLib'
 
 export const checkNewUser = ({ body }: Request): UserSignupInput => {
@@ -1273,7 +1273,7 @@ export const checkOrderFilters = ({ query }: Request): OrdersFiltersInput => {
 
 export const checkVendorFilters = ({ query }: Request): VendorsFiltersInput => {
   const q = 'q' in query
-    ? isNonEmptyString({ name: 'q', param: query.q })
+    ? isNonEmptyString({ name: 'query', param: query.q })
     : undefined
 
   const sortBy = 'sortBy' in query
@@ -1296,7 +1296,7 @@ export const checkVendorFilters = ({ query }: Request): VendorsFiltersInput => {
 
 export const checkCategoryFilters = ({ query }: Request): CategoriesFiltersInput => {
   const q = 'q' in query
-    ? isNonEmptyString({ name: 'q', param: query.q })
+    ? isNonEmptyString({ name: 'query', param: query.q })
     : undefined
 
   const sortBy = 'sortBy' in query
@@ -1387,7 +1387,7 @@ export const checkUserFilters = ({ query }: Request): UsersFiltersInput => {
 
 export const checkFeedFilters = ({ query }: Request): FeedFiltersInput => {
   const q = 'q' in query
-    ? isNonEmptyString({ name: 'q', param: query.q })
+    ? isNonEmptyString({ name: 'query', param: query.q })
     : undefined
 
   const sortBy = 'sortBy' in query
@@ -1582,7 +1582,7 @@ export const checkImagesDelete = ({ body }: Request): ImagesDeleteInput => {
 
 export const checkReviewFilters = ({ query }: Request): ReviewsFiltersInput => {
   const q = 'q' in query
-    ? isNonEmptyString({ name: 'q', param: query.q })
+    ? isNonEmptyString({ name: 'query', param: query.q })
     : undefined
 
   const limit = 'limit' in query
@@ -1721,9 +1721,33 @@ export const checkAskFilters = ({ query }: Request): AskFiltersInput => {
   const q = pipe(
     isProvided,
     isNonEmptyString
-  )({ name: 'q', param: query.q })
+  )({ name: 'query', param: query.q })
 
   return { q: q.param }
+}
+
+export const checkSearchFilters = ({ query }: Request): SearchFiltersInput => {
+  const q = pipe(
+    isProvided,
+    isNonEmptyString
+  )({ name: 'query', param: query.q })
+
+  const page = 'page' in query
+    ? pipe(
+      canBeNumber,
+      isPositiveNumber
+    )({ name: 'page', param: query.page })
+    : undefined
+
+  const sortBy = 'sortBy' in query
+    ? isNonEmptyString({ name: 'sortBy', param: query.sortBy })
+    : undefined
+
+  return {
+    q: q.param,
+    page: page?.param,
+    sortBy: sortBy?.param
+  }
 }
 
 export const checkFollows = ({ query }: Request): Pick<CursorInput, 'startCursor'> => {
