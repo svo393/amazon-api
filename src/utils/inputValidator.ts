@@ -1743,10 +1743,15 @@ export const checkSearchFilters = ({ query }: Request): SearchFiltersInput => {
     ? isNonEmptyString({ name: 'sortBy', param: query.sortBy })
     : undefined
 
+  const outOfStock = 'outOfStock' in query
+    ? canBeBoolean({ name: 'outOfStock', param: query.outOfStock })
+    : undefined
+
   return {
     q: q.param,
     page: page?.param,
-    sortBy: sortBy?.param
+    sortBy: sortBy?.param,
+    outOfStock: outOfStock?.param
   }
 }
 

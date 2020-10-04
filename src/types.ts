@@ -500,6 +500,7 @@ export type SearchFiltersInput = {
   q: string;
   page?: number;
   sortBy?: string;
+  outOfStock?: boolean;
  }
 
 export type ReviewsFiltersInput = {

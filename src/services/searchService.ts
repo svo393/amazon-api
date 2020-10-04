@@ -168,7 +168,8 @@ const getSearch = async (searchFiltersinput: SearchFiltersInput): Promise<BatchW
   const {
     page = 1,
     q,
-    sortBy = 'createdAt_desc'
+    sortBy = 'createdAt_desc',
+    outOfStock = false
   } = searchFiltersinput
 
   let products: ProductSearchData[] = await getProductsQuery.clone()
@@ -181,28 +182,34 @@ const getSearch = async (searchFiltersinput: SearchFiltersInput): Promise<BatchW
       'description'
     ], q).includes(i))
 
-  let productsSorted = sortItems(products, sortBy)
-
-  const totalCount = products.length
-  const end = (page - 1) * 5 + 5 // TODO change 5 do defaultLimit
-
-  const batch = productsSorted.slice((page - 1) * 5, end)
-
-  const productIDs = batch.map(({ productID }) => productID)
-
-  const images = await db<Image>('images')
-    .whereIn('productID', productIDs)
-    .andWhere('index', 0)
-
   const productSizes = await db<ProductSize>('productSizes')
-    .whereIn('productID', productIDs)
+    .whereIn('productID', products.map(({ productID }) => productID))
 
-  const _batch = await Promise.all(batch.map(async (p) => {
+  let _products = products.map((p) => {
     const sizesSum = sum(productSizes
       .filter((ps) => ps.productID === p.productID)
       .map(({ qty }) => qty)
     )
 
+    return { ...p, productSizesSum: sizesSum || null }
+  })
+
+  if (!outOfStock) {
+    _products = _products
+      .filter((p) => p.stock || p.productSizesSum)
+  }
+
+  const totalCount = _products.length
+  const end = (page - 1) * 5 + 5 // TODO change 5 do defaultLimit
+
+  const productsSorted = sortItems(_products, sortBy)
+  const batch = productsSorted.slice((page - 1) * 5, end)
+
+  const images = await db<Image>('images')
+    .whereIn('productID', batch.map(({ productID }) => productID))
+    .andWhere('index', 0)
+
+  const _batch = await Promise.all(batch.map(async (p) => {
     const reviews: any = await db('reviews')
       .count('reviewID')
       .where('moderationStatus', 'APPROVED')
@@ -225,7 +232,6 @@ const getSearch = async (searchFiltersinput: SearchFiltersInput): Promise<BatchW
         : null,
       stars: parseFloat(p.stars),
       reviewCount: parseInt(reviews[0].count),
-      productSizesSum: sizesSum || null,
       ratingStats: ratingStats.reduce((acc, cur) => {
         acc[cur.stars] = Number(cur.count)
         return acc
