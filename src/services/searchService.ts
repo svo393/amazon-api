@@ -155,7 +155,7 @@ const getAsk = async (askFiltersinput: AskFiltersInput, req: Request): Promise<A
   }
 }
 
-type ProductSearchData = Pick<Product, 'title' | 'groupID' | 'bullets' | 'productID' | 'price' | 'listPrice' | 'description' | 'stock' | 'isAvailable' | 'categoryID' | 'vendorID'> & { vendorName: string; categoryName: string; stars: string }
+type ProductSearchData = Pick<Product, 'title' | 'groupID' | 'bullets' | 'productID' | 'price' | 'listPrice' | 'description' | 'stock' | 'isAvailable' | 'categoryID' | 'vendorID'> & { vendorName: string; categoryName: string; stars: string; productSizesSum: number | null }
 
 type ProductSearchReturn = Omit<ProductSearchData, 'stars'> & {
   stars: number,
@@ -164,28 +164,37 @@ type ProductSearchReturn = Omit<ProductSearchData, 'stars'> & {
   productSizesSum: number | null
  }
 
-const getSearch = async (searchFiltersinput: SearchFiltersInput): Promise<BatchWithCursor<ProductSearchReturn>> => {
+type Caterogy = [number, string, number]
+
+const getSearch = async (searchFiltersinput: SearchFiltersInput): Promise<BatchWithCursor<ProductSearchReturn> & { categories: Caterogy[]}> => {
   const {
     page = 1,
     q,
     sortBy = 'createdAt_desc',
-    outOfStock = false
+    outOfStock = false,
+    categoryID
   } = searchFiltersinput
 
   let products: ProductSearchData[] = await getProductsQuery.clone()
     .select('p.bullets', 'p.description', 'p.listPrice')
 
-  products = products
-    .filter((_, i) => fuseIndexes(products, [
-      'title',
-      'bullets',
-      'description'
-    ], q).includes(i))
+  if (categoryID !== undefined) {
+    products = products.filter((p) => p.categoryID === categoryID)
+  }
+
+  if (q !== undefined) {
+    products = products
+      .filter((_, i) => fuseIndexes(products, [
+        'title',
+        'bullets',
+        'description'
+      ], q).includes(i))
+  }
 
   const productSizes = await db<ProductSize>('productSizes')
     .whereIn('productID', products.map(({ productID }) => productID))
 
-  let _products = products.map((p) => {
+  products = products.map((p) => {
     const sizesSum = sum(productSizes
       .filter((ps) => ps.productID === p.productID)
       .map(({ qty }) => qty)
@@ -195,14 +204,24 @@ const getSearch = async (searchFiltersinput: SearchFiltersInput): Promise<BatchW
   })
 
   if (!outOfStock) {
-    _products = _products
+    products = products
       .filter((p) => p.stock || p.productSizesSum)
   }
 
-  const totalCount = _products.length
+  const categories = products
+    .reduce((acc, cur) => {
+      if (acc[cur.categoryID] === undefined) {
+        acc[cur.categoryID] = [ cur.categoryID, cur.categoryName, 1 ]
+      } else {
+        acc[cur.categoryID][2] += 1
+      }
+      return acc
+    }, {} as ObjIndexed)
+
+  const totalCount = products.length
   const end = (page - 1) * 5 + 5 // TODO change 5 do defaultLimit
 
-  const productsSorted = sortItems(_products, sortBy)
+  const productsSorted = sortItems(products, sortBy)
   const batch = productsSorted.slice((page - 1) * 5, end)
 
   const images = await db<Image>('images')
@@ -249,7 +268,8 @@ const getSearch = async (searchFiltersinput: SearchFiltersInput): Promise<BatchW
   return {
     batch: _batch,
     totalCount,
-    hasNextPage: end < totalCount
+    hasNextPage: end < totalCount,
+    categories: Object.values(categories)
   }
 }
 

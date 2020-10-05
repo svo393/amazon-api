@@ -1727,16 +1727,22 @@ export const checkAskFilters = ({ query }: Request): AskFiltersInput => {
 }
 
 export const checkSearchFilters = ({ query }: Request): SearchFiltersInput => {
-  const q = pipe(
-    isProvided,
-    isNonEmptyString
-  )({ name: 'query', param: query.q })
+  const q = 'q' in query
+    ? isNonEmptyString({ name: 'query', param: query.q })
+    : undefined
 
   const page = 'page' in query
     ? pipe(
       canBeNumber,
       isPositiveNumber
     )({ name: 'page', param: query.page })
+    : undefined
+
+  const categoryID = 'categoryID' in query
+    ? pipe(
+      canBeNumber,
+      isPositiveNumber
+    )({ name: 'categoryID', param: query.categoryID })
     : undefined
 
   const sortBy = 'sortBy' in query
@@ -1747,12 +1753,13 @@ export const checkSearchFilters = ({ query }: Request): SearchFiltersInput => {
     ? canBeBoolean({ name: 'outOfStock', param: query.outOfStock })
     : undefined
 
-  return {
-    q: q.param,
+  return hasDefinedProps<SearchFiltersInput>({
+    q: q?.param,
     page: page?.param,
+    categoryID: categoryID?.param,
     sortBy: sortBy?.param,
     outOfStock: outOfStock?.param
-  }
+  })
 }
 
 export const checkFollows = ({ query }: Request): Pick<CursorInput, 'startCursor'> => {

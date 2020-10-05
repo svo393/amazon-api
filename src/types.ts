@@ -497,10 +497,11 @@ export type FeedFiltersInput = {
 
 export type AskFiltersInput = { q: string }
 export type SearchFiltersInput = {
-  q: string;
+  q?: string;
   page?: number;
   sortBy?: string;
   outOfStock?: boolean;
+  categoryID?: number;
  }
 
 export type ReviewsFiltersInput = {
