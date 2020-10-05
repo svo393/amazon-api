@@ -187,6 +187,16 @@ const getSearch = async (searchFiltersinput: SearchFiltersInput): Promise<BatchW
     products = products.filter((p) => p.categoryID === categoryID)
   }
 
+  const vendors = products
+    .reduce((acc, cur) => {
+      if (acc[cur.vendorID] === undefined) {
+        acc[cur.vendorID] = [ cur.vendorID, cur.vendorName, 1 ]
+      } else {
+        acc[cur.vendorID][2] += 1
+      }
+      return acc
+    }, {} as ObjIndexed)
+
   if (vendorIDs !== undefined) {
     products = products.filter((p) => vendorIDs.includes(p.vendorID))
   }
@@ -223,16 +233,6 @@ const getSearch = async (searchFiltersinput: SearchFiltersInput): Promise<BatchW
         acc[cur.categoryID] = [ cur.categoryID, cur.categoryName, 1 ]
       } else {
         acc[cur.categoryID][2] += 1
-      }
-      return acc
-    }, {} as ObjIndexed)
-
-  const vendors = products
-    .reduce((acc, cur) => {
-      if (acc[cur.vendorID] === undefined) {
-        acc[cur.vendorID] = [ cur.vendorID, cur.vendorName, 1 ]
-      } else {
-        acc[cur.vendorID][2] += 1
       }
       return acc
     }, {} as ObjIndexed)

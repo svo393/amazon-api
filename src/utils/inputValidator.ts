@@ -1769,3 +1769,11 @@ export const checkSearchFilters = ({ query }: Request): SearchFiltersInput => {
     outOfStock: outOfStock?.param
   })
 }
+
+export const checkFollows = ({ query }: Request): Pick<CursorInput, 'startCursor'> => {
+  const startCursor = 'startCursor' in query
+    ? canBeNumber({ name: 'startCursor', param: query.startCursor })
+    : undefined
+
+  return { startCursor: startCursor?.param }
+}
