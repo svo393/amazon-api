@@ -502,7 +502,7 @@ export type SearchFiltersInput = {
   sortBy?: string;
   outOfStock?: boolean;
   categoryID?: number;
-  vendorID?: number;
+  vendorIDs?: number[];
  }
 
 export type ReviewsFiltersInput = {

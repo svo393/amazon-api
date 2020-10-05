@@ -165,15 +165,19 @@ type ProductSearchReturn = Omit<ProductSearchData, 'stars'> & {
  }
 
 type Caterogy = [number, string, number]
+type Vendor = [number, string, number]
 
-const getSearch = async (searchFiltersinput: SearchFiltersInput): Promise<BatchWithCursor<ProductSearchReturn> & { categories: Caterogy[]}> => {
+const getSearch = async (searchFiltersinput: SearchFiltersInput): Promise<BatchWithCursor<ProductSearchReturn> & {
+  categories: Caterogy[]
+  vendors: Vendor[]
+}> => {
   const {
     page = 1,
     q,
     sortBy = 'createdAt_desc',
     outOfStock = false,
     categoryID,
-    vendorID
+    vendorIDs
   } = searchFiltersinput
 
   let products: ProductSearchData[] = await getProductsQuery.clone()
@@ -183,8 +187,8 @@ const getSearch = async (searchFiltersinput: SearchFiltersInput): Promise<BatchW
     products = products.filter((p) => p.categoryID === categoryID)
   }
 
-  if (vendorID !== undefined) {
-    products = products.filter((p) => p.vendorID === vendorID)
+  if (vendorIDs !== undefined) {
+    products = products.filter((p) => vendorIDs.includes(p.vendorID))
   }
 
   if (q !== undefined) {
@@ -219,6 +223,16 @@ const getSearch = async (searchFiltersinput: SearchFiltersInput): Promise<BatchW
         acc[cur.categoryID] = [ cur.categoryID, cur.categoryName, 1 ]
       } else {
         acc[cur.categoryID][2] += 1
+      }
+      return acc
+    }, {} as ObjIndexed)
+
+  const vendors = products
+    .reduce((acc, cur) => {
+      if (acc[cur.vendorID] === undefined) {
+        acc[cur.vendorID] = [ cur.vendorID, cur.vendorName, 1 ]
+      } else {
+        acc[cur.vendorID][2] += 1
       }
       return acc
     }, {} as ObjIndexed)
@@ -274,7 +288,8 @@ const getSearch = async (searchFiltersinput: SearchFiltersInput): Promise<BatchW
     batch: _batch,
     totalCount,
     hasNextPage: end < totalCount,
-    categories: Object.values(categories)
+    categories: Object.values(categories),
+    vendors: Object.values(vendors)
   }
 }
 

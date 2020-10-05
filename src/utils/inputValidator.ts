@@ -1732,28 +1732,28 @@ export const checkSearchFilters = ({ query }: Request): SearchFiltersInput => {
     : undefined
 
   const page = 'page' in query
-    ? pipe(
-      canBeNumber,
-      isPositiveNumber
-    )({ name: 'page', param: query.page })
+    ? pipe(canBeNumber, isPositiveNumber)({ name: 'page', param: query.page })
     : undefined
 
   const categoryID = 'categoryID' in query
-    ? pipe(
-      canBeNumber,
-      isPositiveNumber
-    )({ name: 'categoryID', param: query.categoryID })
+    ? pipe(canBeNumber, isPositiveNumber)(
+      { name: 'categoryID', param: query.categoryID }
+    )
     : undefined
 
-  const vendorID = 'vendorID' in query
-    ? pipe(
-      canBeNumber,
-      isPositiveNumber
-    )({ name: 'vendorID', param: query.vendorID })
+  let vendorIDs = 'vendorIDs' in query
+    ? (query.vendorIDs as string)
+      .split(',')
+      .map((i) => {
+        pipe(canBeNumber, isPositiveNumber)({ name: 'vendorID', param: i })
+        return Number(i)
+      })
     : undefined
 
   const sortBy = 'sortBy' in query
-    ? isNonEmptyString({ name: 'sortBy', param: query.sortBy })
+    ? isNonEmptyString(
+      { name: 'sortBy', param: query.sortBy }
+    )
     : undefined
 
   const outOfStock = 'outOfStock' in query
@@ -1764,16 +1764,8 @@ export const checkSearchFilters = ({ query }: Request): SearchFiltersInput => {
     q: q?.param,
     page: page?.param,
     categoryID: categoryID?.param,
-    vendorID: vendorID?.param,
+    vendorIDs: vendorIDs,
     sortBy: sortBy?.param,
     outOfStock: outOfStock?.param
   })
-}
-
-export const checkFollows = ({ query }: Request): Pick<CursorInput, 'startCursor'> => {
-  const startCursor = 'startCursor' in query
-    ? canBeNumber({ name: 'startCursor', param: query.startCursor })
-    : undefined
-
-  return { startCursor: startCursor?.param }
 }
