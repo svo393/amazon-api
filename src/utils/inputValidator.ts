@@ -1745,6 +1745,13 @@ export const checkSearchFilters = ({ query }: Request): SearchFiltersInput => {
     )({ name: 'categoryID', param: query.categoryID })
     : undefined
 
+  const vendorID = 'vendorID' in query
+    ? pipe(
+      canBeNumber,
+      isPositiveNumber
+    )({ name: 'vendorID', param: query.vendorID })
+    : undefined
+
   const sortBy = 'sortBy' in query
     ? isNonEmptyString({ name: 'sortBy', param: query.sortBy })
     : undefined
@@ -1757,6 +1764,7 @@ export const checkSearchFilters = ({ query }: Request): SearchFiltersInput => {
     q: q?.param,
     page: page?.param,
     categoryID: categoryID?.param,
+    vendorID: vendorID?.param,
     sortBy: sortBy?.param,
     outOfStock: outOfStock?.param
   })

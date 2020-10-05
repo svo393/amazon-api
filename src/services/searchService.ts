@@ -172,7 +172,8 @@ const getSearch = async (searchFiltersinput: SearchFiltersInput): Promise<BatchW
     q,
     sortBy = 'createdAt_desc',
     outOfStock = false,
-    categoryID
+    categoryID,
+    vendorID
   } = searchFiltersinput
 
   let products: ProductSearchData[] = await getProductsQuery.clone()
@@ -180,6 +181,10 @@ const getSearch = async (searchFiltersinput: SearchFiltersInput): Promise<BatchW
 
   if (categoryID !== undefined) {
     products = products.filter((p) => p.categoryID === categoryID)
+  }
+
+  if (vendorID !== undefined) {
+    products = products.filter((p) => p.vendorID === vendorID)
   }
 
   if (q !== undefined) {
