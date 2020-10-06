@@ -155,10 +155,10 @@ const getAsk = async (askFiltersinput: AskFiltersInput, req: Request): Promise<A
   }
 }
 
-type ProductSearchData = Pick<Product, 'title' | 'groupID' | 'bullets' | 'productID' | 'price' | 'listPrice' | 'description' | 'stock' | 'isAvailable' | 'categoryID' | 'vendorID'> & { vendorName: string; categoryName: string; stars: string; productSizesSum: number | null }
+type ProductSearchData = Pick<Product, 'title' | 'groupID' | 'bullets' | 'productID' | 'price' | 'listPrice' | 'description' | 'stock' | 'isAvailable' | 'categoryID' | 'vendorID'> & { vendorName: string; categoryName: string; stars: string | number; productSizesSum: number | null }
 
 type ProductSearchReturn = Omit<ProductSearchData, 'stars'> & {
-  stars: number,
+  stars: number | string,
   reviewCount: number;
   images: Omit<Image, 'userID'>[];
   productSizesSum: number | null
@@ -171,6 +171,7 @@ const getSearch = async (searchFiltersinput: SearchFiltersInput): Promise<BatchW
   categories: Caterogy[]
   vendors: Vendor[]
   prices: number[]
+  ratings: number[]
 }> => {
   const {
     page = 1,
@@ -180,36 +181,26 @@ const getSearch = async (searchFiltersinput: SearchFiltersInput): Promise<BatchW
     categoryID,
     vendorIDs,
     priceMin,
-    priceMax
+    priceMax,
+    starsMin
   } = searchFiltersinput
 
-  let products: ProductSearchData[] = await getProductsQuery.clone()
+  let _products: ProductSearchData[] = await getProductsQuery.clone()
     .select('p.bullets', 'p.description', 'p.listPrice')
 
-  products = products.map((p) => ({
+  _products = _products.map((p) => ({
     ...p,
+    stars: parseFloat(p.stars as string),
     price: p.price / 100,
     listPrice: p.listPrice !== null
       ? p.listPrice / 100
       : null
   }))
 
+  let products = _products
+
   if (categoryID !== undefined) {
     products = products.filter((p) => p.categoryID === categoryID)
-  }
-
-  const vendors = products
-    .reduce((acc, cur) => {
-      if (acc[cur.vendorID] === undefined) {
-        acc[cur.vendorID] = [ cur.vendorID, cur.vendorName, 1 ]
-      } else {
-        acc[cur.vendorID][2] += 1
-      }
-      return acc
-    }, {} as ObjIndexed)
-
-  if (vendorIDs !== undefined) {
-    products = products.filter((p) => vendorIDs.includes(p.vendorID))
   }
 
   if (q !== undefined) {
@@ -231,9 +222,9 @@ const getSearch = async (searchFiltersinput: SearchFiltersInput): Promise<BatchW
       .filter((p) => p.price <= priceMax)
   }
 
-  if (!outOfStock) {
+  if (starsMin !== undefined) {
     products = products
-      .filter((p) => p.stock || p.productSizesSum)
+      .filter((p) => p.stars >= starsMin)
   }
 
   const productSizes = await db<ProductSize>('productSizes')
@@ -248,6 +239,11 @@ const getSearch = async (searchFiltersinput: SearchFiltersInput): Promise<BatchW
     return { ...p, productSizesSum: sizesSum || null }
   })
 
+  if (outOfStock === false) {
+    products = products
+      .filter((p) => p.stock || p.productSizesSum)
+  }
+
   const categories = products
     .reduce((acc, cur) => {
       if (acc[cur.categoryID] === undefined) {
@@ -257,6 +253,43 @@ const getSearch = async (searchFiltersinput: SearchFiltersInput): Promise<BatchW
       }
       return acc
     }, {} as ObjIndexed)
+
+  const vendors = _products
+    .reduce((acc, cur) => {
+      const isPresent = Boolean(products.find((p) => p.productID === cur.productID))
+
+      if (acc[cur.vendorID] === undefined) {
+        acc[cur.vendorID] = [ cur.vendorID, cur.vendorName, isPresent ? 1 : 0 ]
+      } else {
+        acc[cur.vendorID][2] += isPresent ? 1 : 0
+      }
+      return acc
+    }, {} as ObjIndexed)
+
+  if (vendorIDs !== undefined) {
+    products = products.filter((p) => vendorIDs.includes(p.vendorID))
+  }
+
+  const ratings = products
+    .reduce((acc, cur) => {
+      switch (true) {
+        case cur.stars >= 4:
+          acc[0] += 1
+          break
+
+        case cur.stars >= 3:
+          acc[1] += 1
+          break
+
+        case cur.stars >= 2:
+          acc[2] += 1
+          break
+
+        default:
+          acc[3] += 1
+      }
+      return acc
+    }, [ 0, 0, 0, 0 ])
 
   const prices = products
     .reduce((acc, cur) => {
@@ -310,7 +343,6 @@ const getSearch = async (searchFiltersinput: SearchFiltersInput): Promise<BatchW
 
     return {
       ...p,
-      stars: parseFloat(p.stars),
       reviewCount: parseInt(reviews[0].count),
       ratingStats: ratingStats.reduce((acc, cur) => {
         acc[cur.stars] = Number(cur.count)
@@ -332,7 +364,8 @@ const getSearch = async (searchFiltersinput: SearchFiltersInput): Promise<BatchW
     hasNextPage: end < totalCount,
     categories: Object.values(categories),
     vendors: Object.values(vendors),
-    prices
+    prices,
+    ratings
   }
 }
 

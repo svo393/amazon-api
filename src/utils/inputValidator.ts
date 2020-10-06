@@ -1768,6 +1768,10 @@ export const checkSearchFilters = ({ query }: Request): SearchFiltersInput => {
     ? canBeNumber({ name: 'priceMax', param: query.priceMax })
     : undefined
 
+  const starsMin = 'starsMin' in query
+    ? canBeNumber({ name: 'starsMin', param: query.starsMin })
+    : undefined
+
   return hasDefinedProps<SearchFiltersInput>({
     q: q?.param,
     page: page?.param,
@@ -1776,6 +1780,7 @@ export const checkSearchFilters = ({ query }: Request): SearchFiltersInput => {
     sortBy: sortBy?.param,
     priceMin: priceMin?.param,
     priceMax: priceMax?.param,
+    starsMin: starsMin?.param,
     outOfStock: outOfStock?.param
   })
 }

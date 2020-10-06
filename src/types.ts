@@ -505,6 +505,7 @@ export type SearchFiltersInput = {
   vendorIDs?: number[];
   priceMin?: number;
   priceMax?: number;
+  starsMin?: number;
  }
 
 export type ReviewsFiltersInput = {
