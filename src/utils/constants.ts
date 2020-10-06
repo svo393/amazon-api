@@ -59,3 +59,44 @@ export const parametersBL = [
   'Color',
   'Size'
 ]
+
+export const sizeMap = {
+  'xx-small': 'XXS',
+  'x-small': 'XS',
+  small: 'S',
+  medium: 'M',
+  large: 'L',
+  'x-large': 'XL',
+  'xx-large': '2XL',
+  'xxx-large': '3XL',
+  'xxxx-large': '4XL',
+  'xxxxx-large': '5XL'
+}
+
+export const sizeList = [
+  'XXS',
+  'XS',
+  'S',
+  'M',
+  'L',
+  'XL',
+  '2XL',
+  '3XL',
+  '4XL',
+  '5XL'
+]
+
+export const colorList = [
+  'black',
+  'gray',
+  'red',
+  'orange',
+  'yellow',
+  'green',
+  'teal',
+  'blue',
+  'indigo',
+  'purple',
+  'pink',
+  'white'
+]

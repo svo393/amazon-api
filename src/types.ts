@@ -503,6 +503,7 @@ export type SearchFiltersInput = {
   outOfStock?: boolean;
   categoryID?: number;
   vendorIDs?: number[];
+  colors?: string[];
   priceMin?: number;
   priceMax?: number;
   starsMin?: number;

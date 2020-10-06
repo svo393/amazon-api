@@ -1750,6 +1750,15 @@ export const checkSearchFilters = ({ query }: Request): SearchFiltersInput => {
       })
     : undefined
 
+  let colors = 'colors' in query
+    ? (query.colors as string)
+      .split(',')
+      .map((i) => {
+        isNonEmptyString({ name: 'color', param: i })
+        return i
+      })
+    : undefined
+
   const sortBy = 'sortBy' in query
     ? isNonEmptyString(
       { name: 'sortBy', param: query.sortBy }
@@ -1778,6 +1787,7 @@ export const checkSearchFilters = ({ query }: Request): SearchFiltersInput => {
     page: page?.param,
     categoryID: categoryID?.param,
     vendorIDs: vendorIDs,
+    colors: colors,
     sortBy: sortBy?.param,
     priceMin: priceMin?.param,
     priceMax: priceMax?.param,
