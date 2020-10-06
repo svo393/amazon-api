@@ -1,8 +1,8 @@
 import { Request } from 'express'
 import Fuse from 'fuse.js'
 import { flatten, omit, sum } from 'ramda'
-import { AskFiltersInput, BatchWithCursor, Image, Matches, ObjIndexed, Product, ProductSize, Question, Review, SearchFiltersInput, Vote } from '../types'
-import { defaultLimit } from '../utils/constants'
+import { AskFiltersInput, BatchWithCursor, GroupVariation, Image, Matches, ObjIndexed, Product, ProductSize, Question, Review, SearchFiltersInput, Vote } from '../types'
+import { defaultLimit, parametersBL } from '../utils/constants'
 import { db } from '../utils/db'
 import fuseIndexes from '../utils/fuseIndexes'
 import fuseMatches from '../utils/fuseMatches'
@@ -172,6 +172,7 @@ const getSearch = async (searchFiltersinput: SearchFiltersInput): Promise<BatchW
   vendors: Vendor[]
   prices: number[]
   ratings: number[]
+  filters: { [ k: string]: string[] }
 }> => {
   const {
     page = 1,
@@ -182,8 +183,11 @@ const getSearch = async (searchFiltersinput: SearchFiltersInput): Promise<BatchW
     vendorIDs,
     priceMin,
     priceMax,
-    starsMin
+    starsMin,
+    ...restFilters
   } = searchFiltersinput
+
+  console.info('restFilters', restFilters)
 
   let _products: ProductSearchData[] = await getProductsQuery.clone()
     .select('p.bullets', 'p.description', 'p.listPrice')
@@ -316,6 +320,35 @@ const getSearch = async (searchFiltersinput: SearchFiltersInput): Promise<BatchW
       return acc
     }, [ 0, 0, 0, 0, 0 ])
 
+  const productIDs = products
+    .map((p) => p.productID)
+
+  const productParameters = await db('productParameters as pp')
+    .join('parameters as p', 'pp.parameterID', 'p.parameterID')
+    .whereIn('pp.productID', productIDs)
+    .whereNotIn('name', parametersBL)
+
+  const groupVariations = await db<GroupVariation>('groupVariations')
+    .where('name', 'Color')
+    .whereIn('productID', productIDs)
+
+  const filters: { [ k: string ]: Set<string>} = productParameters
+    .reduce((acc, cur) => {
+      if (acc[cur.name] === undefined) {
+        acc[cur.name] = new Set([ cur.value ])
+      } else {
+        acc[cur.name].add(cur.value)
+      }
+      return acc
+    }, {} as ObjIndexed)
+
+  filters.Colors = new Set(groupVariations.map((gv) => gv.value))
+
+  filters.Sizes = new Set(productSizes
+    .filter((ps) => productIDs.includes(ps.productID))
+    .map((ps) => ps.name)
+  )
+
   const totalCount = products.length
   const end = (page - 1) * 5 + 5 // TODO change 5 do defaultLimit
 
@@ -365,7 +398,12 @@ const getSearch = async (searchFiltersinput: SearchFiltersInput): Promise<BatchW
     categories: Object.values(categories),
     vendors: Object.values(vendors),
     prices,
-    ratings
+    ratings,
+    filters: Object.entries(filters)
+      .reduce((acc, [ k, v ]) => {
+        acc[k] = [ ...v ]
+        return acc
+      }, {} as { [ k: string ]: string[] })
   }
 }
 

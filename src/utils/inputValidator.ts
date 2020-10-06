@@ -1773,6 +1773,7 @@ export const checkSearchFilters = ({ query }: Request): SearchFiltersInput => {
     : undefined
 
   return hasDefinedProps<SearchFiltersInput>({
+    ...query,
     q: q?.param,
     page: page?.param,
     categoryID: categoryID?.param,

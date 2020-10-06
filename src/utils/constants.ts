@@ -48,3 +48,14 @@ export const apiURLs = {
 
 export const defaultLimit = 10
 export const smallLimit = 3
+
+export const parametersBL = [
+  'Item model number',
+  'Manufacturer',
+  'Department',
+  'Brand',
+  'Brand Name',
+  'Product model number',
+  'Color',
+  'Size'
+]
