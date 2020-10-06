@@ -170,6 +170,7 @@ type Vendor = [number, string, number]
 const getSearch = async (searchFiltersinput: SearchFiltersInput): Promise<BatchWithCursor<ProductSearchReturn> & {
   categories: Caterogy[]
   vendors: Vendor[]
+  prices: number[]
 }> => {
   const {
     page = 1,
@@ -177,11 +178,21 @@ const getSearch = async (searchFiltersinput: SearchFiltersInput): Promise<BatchW
     sortBy = 'createdAt_desc',
     outOfStock = false,
     categoryID,
-    vendorIDs
+    vendorIDs,
+    priceMin,
+    priceMax
   } = searchFiltersinput
 
   let products: ProductSearchData[] = await getProductsQuery.clone()
     .select('p.bullets', 'p.description', 'p.listPrice')
+
+  products = products.map((p) => ({
+    ...p,
+    price: p.price / 100,
+    listPrice: p.listPrice !== null
+      ? p.listPrice / 100
+      : null
+  }))
 
   if (categoryID !== undefined) {
     products = products.filter((p) => p.categoryID === categoryID)
@@ -210,6 +221,21 @@ const getSearch = async (searchFiltersinput: SearchFiltersInput): Promise<BatchW
       ], q).includes(i))
   }
 
+  if (priceMin !== undefined) {
+    products = products
+      .filter((p) => p.price >= priceMin)
+  }
+
+  if (priceMax !== undefined) {
+    products = products
+      .filter((p) => p.price <= priceMax)
+  }
+
+  if (!outOfStock) {
+    products = products
+      .filter((p) => p.stock || p.productSizesSum)
+  }
+
   const productSizes = await db<ProductSize>('productSizes')
     .whereIn('productID', products.map(({ productID }) => productID))
 
@@ -222,11 +248,6 @@ const getSearch = async (searchFiltersinput: SearchFiltersInput): Promise<BatchW
     return { ...p, productSizesSum: sizesSum || null }
   })
 
-  if (!outOfStock) {
-    products = products
-      .filter((p) => p.stock || p.productSizesSum)
-  }
-
   const categories = products
     .reduce((acc, cur) => {
       if (acc[cur.categoryID] === undefined) {
@@ -236,6 +257,31 @@ const getSearch = async (searchFiltersinput: SearchFiltersInput): Promise<BatchW
       }
       return acc
     }, {} as ObjIndexed)
+
+  const prices = products
+    .reduce((acc, cur) => {
+      switch (true) {
+        case cur.price <= 25:
+          acc[0] += 1
+          break
+
+        case cur.price > 25 && cur.price <= 50:
+          acc[1] += 1
+          break
+
+        case cur.price > 50 && cur.price <= 100:
+          acc[2] += 1
+          break
+
+        case cur.price > 100 && cur.price <= 200:
+          acc[3] += 1
+          break
+
+        default:
+          acc[4] += 1
+      }
+      return acc
+    }, [ 0, 0, 0, 0, 0 ])
 
   const totalCount = products.length
   const end = (page - 1) * 5 + 5 // TODO change 5 do defaultLimit
@@ -264,10 +310,6 @@ const getSearch = async (searchFiltersinput: SearchFiltersInput): Promise<BatchW
 
     return {
       ...p,
-      price: p.price / 100,
-      listPrice: p.listPrice !== null
-        ? p.listPrice / 100
-        : null,
       stars: parseFloat(p.stars),
       reviewCount: parseInt(reviews[0].count),
       ratingStats: ratingStats.reduce((acc, cur) => {
@@ -289,7 +331,8 @@ const getSearch = async (searchFiltersinput: SearchFiltersInput): Promise<BatchW
     totalCount,
     hasNextPage: end < totalCount,
     categories: Object.values(categories),
-    vendors: Object.values(vendors)
+    vendors: Object.values(vendors),
+    prices
   }
 }
 

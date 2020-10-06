@@ -1760,12 +1760,22 @@ export const checkSearchFilters = ({ query }: Request): SearchFiltersInput => {
     ? canBeBoolean({ name: 'outOfStock', param: query.outOfStock })
     : undefined
 
+  const priceMin = 'priceMin' in query
+    ? canBeNumber({ name: 'priceMin', param: query.priceMin })
+    : undefined
+
+  const priceMax = 'priceMax' in query
+    ? canBeNumber({ name: 'priceMax', param: query.priceMax })
+    : undefined
+
   return hasDefinedProps<SearchFiltersInput>({
     q: q?.param,
     page: page?.param,
     categoryID: categoryID?.param,
     vendorIDs: vendorIDs,
     sortBy: sortBy?.param,
+    priceMin: priceMin?.param,
+    priceMax: priceMax?.param,
     outOfStock: outOfStock?.param
   })
 }

@@ -503,6 +503,8 @@ export type SearchFiltersInput = {
   outOfStock?: boolean;
   categoryID?: number;
   vendorIDs?: number[];
+  priceMin?: number;
+  priceMax?: number;
  }
 
 export type ReviewsFiltersInput = {
