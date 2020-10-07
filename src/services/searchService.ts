@@ -1,5 +1,5 @@
 import { Request } from 'express'
-import { flatten, omit, sum } from 'ramda'
+import { flatten, isEmpty, omit, sum } from 'ramda'
 import { AskFiltersInput, BatchWithCursor, GroupVariation, Image, Matches, ObjIndexed, Product, ProductSize, Question, Review, SearchFiltersInput, Vote } from '../types'
 import { colorList, parametersBL, sizeList, sizeMap } from '../utils/constants'
 import { db } from '../utils/db'
@@ -359,6 +359,22 @@ const getSearch = async (searchFiltersinput: SearchFiltersInput): Promise<BatchW
       return acc
     }, [ 0, 0, 0, 0, 0 ])
 
+  let _productParameters: typeof productParameters = []
+
+  if (!isEmpty(restFilters)) {
+    Object.entries(restFilters).forEach(([ name, values ]) => {
+      _productParameters.push(
+        productParameters.filter(
+          (pp) => pp.name === name && values.split(',').includes(pp.value)
+        )
+      )
+    })
+
+    products = products.filter(
+      (p) => _productParameters.every((i) => i.some((pp: any) => pp.productID === p.productID))
+    )
+  }
+
   const totalCount = products.length
   const end = (page - 1) * 5 + 5 // TODO change 5 do defaultLimit
 
@@ -401,7 +417,11 @@ const getSearch = async (searchFiltersinput: SearchFiltersInput): Promise<BatchW
     }
   }))
 
-  const filters: { [ k: string ]: Set<string> } = productParameters
+  const newProductParameters = !isEmpty(restFilters)
+    ? flatten(_productParameters) : productParameters
+
+  const filters: { [ k: string ]: Set<string> } = newProductParameters
+    .filter((pp) => products.map((p) => p.productID).includes(pp.productID))
     .reduce((acc, cur) => {
       if (acc[cur.name] === undefined) {
         acc[cur.name] = new Set([ cur.value ])
