@@ -60,7 +60,7 @@ export const parametersBL = [
   'Size'
 ]
 
-export const sizeMap = {
+export const sizeMap: { [ k: string ]: string } = {
   'xx-small': 'XXS',
   'x-small': 'XS',
   small: 'S',

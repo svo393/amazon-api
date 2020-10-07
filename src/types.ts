@@ -504,6 +504,7 @@ export type SearchFiltersInput = {
   categoryID?: number;
   vendorIDs?: number[];
   colors?: string[];
+  sizes?: string[];
   priceMin?: number;
   priceMax?: number;
   starsMin?: number;

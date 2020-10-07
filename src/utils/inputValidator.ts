@@ -1759,6 +1759,15 @@ export const checkSearchFilters = ({ query }: Request): SearchFiltersInput => {
       })
     : undefined
 
+  let sizes = 'sizes' in query
+    ? (query.sizes as string)
+      .split(',')
+      .map((i) => {
+        isNonEmptyString({ name: 'size', param: i })
+        return i
+      })
+    : undefined
+
   const sortBy = 'sortBy' in query
     ? isNonEmptyString(
       { name: 'sortBy', param: query.sortBy }
@@ -1788,6 +1797,7 @@ export const checkSearchFilters = ({ query }: Request): SearchFiltersInput => {
     categoryID: categoryID?.param,
     vendorIDs: vendorIDs,
     colors: colors,
+    sizes: sizes,
     sortBy: sortBy?.param,
     priceMin: priceMin?.param,
     priceMax: priceMax?.param,

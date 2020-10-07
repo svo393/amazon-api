@@ -1,8 +1,7 @@
 import { Request } from 'express'
-import Fuse from 'fuse.js'
 import { flatten, omit, sum } from 'ramda'
 import { AskFiltersInput, BatchWithCursor, GroupVariation, Image, Matches, ObjIndexed, Product, ProductSize, Question, Review, SearchFiltersInput, Vote } from '../types'
-import { colorList, defaultLimit, parametersBL } from '../utils/constants'
+import { colorList, parametersBL, sizeList, sizeMap } from '../utils/constants'
 import { db } from '../utils/db'
 import fuseIndexes from '../utils/fuseIndexes'
 import fuseMatches from '../utils/fuseMatches'
@@ -182,6 +181,7 @@ const getSearch = async (searchFiltersinput: SearchFiltersInput): Promise<BatchW
     categoryID,
     vendorIDs,
     colors,
+    sizes,
     priceMin,
     priceMax,
     starsMin,
@@ -232,6 +232,7 @@ const getSearch = async (searchFiltersinput: SearchFiltersInput): Promise<BatchW
 
   const productSizes = await db<ProductSize>('productSizes')
     .whereIn('productID', products.map(({ productID }) => productID))
+    .andWhereNot('qty', 0)
 
   products = products.map((p) => {
     const sizesSum = sum(productSizes
@@ -266,22 +267,25 @@ const getSearch = async (searchFiltersinput: SearchFiltersInput): Promise<BatchW
     products = products.filter((p) => productsWithColors.includes(p.productID))
   }
 
-  const filters: { [ k: string ]: Set<string> } = productParameters
-    .reduce((acc, cur) => {
-      if (acc[cur.name] === undefined) {
-        acc[cur.name] = new Set([ cur.value ])
-      } else {
-        acc[cur.name].add(cur.value)
-      }
-      return acc
-    }, {} as ObjIndexed)
+  if (sizes !== undefined) {
+    const reversedSizeMap = Object.entries(sizeMap)
+      .reduce((acc, cur) => {
+        if (acc[cur[1]] === undefined) {
+          acc[cur[1]] = [ cur[0] ]
+        } else {
+          acc[cur[1]].push(cur[0])
+        }
+        return acc
+      }, {} as ObjIndexed)
 
-  filters.Colors = new Set(groupVariations.map((gv) => gv.value))
-
-  filters.Sizes = new Set(productSizes
-    .filter((ps) => productIDs.includes(ps.productID))
-    .map((ps) => ps.name)
-  )
+    const productsWithSizes = productSizes
+      .filter((ps) =>
+        sizes.map((s) => s.toLowerCase()).includes(ps.name.toLowerCase()) ||
+        sizes.some((s) => reversedSizeMap[s]?.includes(ps.name.toLowerCase()))
+      )
+      .map((ps) => ps.productID)
+    products = products.filter((p) => productsWithSizes.includes(p.productID))
+  }
 
   const categories = products
     .reduce((acc, cur) => {
@@ -397,8 +401,36 @@ const getSearch = async (searchFiltersinput: SearchFiltersInput): Promise<BatchW
     }
   }))
 
+  const filters: { [ k: string ]: Set<string> } = productParameters
+    .reduce((acc, cur) => {
+      if (acc[cur.name] === undefined) {
+        acc[cur.name] = new Set([ cur.value ])
+      } else {
+        acc[cur.name].add(cur.value)
+      }
+      return acc
+    }, {} as ObjIndexed)
+
+  filters.Colors = new Set(groupVariations.map((gv) => gv.value))
+
+  filters.Sizes = new Set(productSizes
+    .filter((ps) => products.map((p) => p.productID).includes(ps.productID))
+    .map((ps) => ps.name)
+  )
+
   const colorFilters = colorList
     .filter((c) => [ ...filters.Colors ].some((i) => i.toLowerCase().includes(c)))
+
+  const sizeFilters = sizeList
+    .filter((s) => [ ...filters.Sizes ].some((i) =>
+      i.toLowerCase() === s.toLowerCase() ||
+      sizeMap[i.toLowerCase()] === s)
+    )
+    .concat([ ...filters.Sizes ]
+      .filter(
+        (s) => sizeMap[s.toLowerCase()] === undefined && !sizeList.includes(s.toUpperCase())
+      ).sort((a, b) => Number(a) - Number(b))
+    )
 
   const _filters = {
     ...Object.entries(filters)
@@ -408,7 +440,8 @@ const getSearch = async (searchFiltersinput: SearchFiltersInput): Promise<BatchW
         acc[k] = [ ...v ]
         return acc
       }, {} as { [ k: string ]: string[] }),
-    Colors: colorFilters
+    Colors: colorFilters,
+    Sizes: sizeFilters
   }
 
   return {
