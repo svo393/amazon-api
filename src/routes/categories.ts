@@ -17,6 +17,11 @@ router.get('/', async (req, res) => {
   res.json(categories)
 })
 
+router.get('/departments', async (_, res) => {
+  const categories = await categoryService.getDepartments()
+  res.json(categories)
+})
+
 router.get('/:categoryID', async (req, res) => {
   const category = await categoryService.getCategoryByID(req)
   res.json(category)

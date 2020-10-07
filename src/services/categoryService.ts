@@ -74,6 +74,9 @@ const getCategories = async (categoriesFiltersinput: CategoriesFiltersInput): Pr
   }
 }
 
+const getDepartments = async (): Promise<Category[]> =>
+  await db<Category>('categories').whereNull('parentCategoryID')
+
 type Parent = { name: string; categoryID: number };
 
 type SingleCategoryData = Omit<CategoryListData, 'parentCategoryID'> & { parentChain: Parent[] }
@@ -128,6 +131,7 @@ const updateCategory = async (categoryInput: CategoryUpdateInput, req: Request):
 export default {
   addCategory,
   getCategories,
+  getDepartments,
   getCategoryByID,
   updateCategory
 }
