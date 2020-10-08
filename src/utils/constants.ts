@@ -51,6 +51,7 @@ export const smallLimit = 3
 
 export const parametersBL = [
   'Item model number',
+  'Product Dimensions',
   'Manufacturer',
   'Department',
   'Brand',

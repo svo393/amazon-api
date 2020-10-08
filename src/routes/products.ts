@@ -3,8 +3,8 @@ import cartProductService from '../services/cartProductService'
 import parameterService from '../services/parameterService'
 import productService from '../services/productService'
 import { UPLOAD_TIMEOUT } from '../utils/config'
-import { checkLocalCart, checkMediaUpload, checkNewProduct, checkProductByID, checkProductFilters, checkProductMinFilters, checkProductUpdate } from '../utils/inputValidator'
-import { requireAdmin, multerUpload } from '../utils/middleware'
+import { checkHistory, checkLocalCart, checkMediaUpload, checkNewProduct, checkProductByID, checkProductFilters, checkProductMinFilters, checkProductUpdate } from '../utils/inputValidator'
+import { multerUpload, requireAdmin } from '../utils/middleware'
 
 const router = Router()
 
@@ -23,6 +23,12 @@ router.get('/', async (req, res) => {
 router.get('/min', async (req, res) => {
   const productsMinFiltersInput = checkProductMinFilters(req)
   const products = await productService.getProductsMin(productsMinFiltersInput)
+  res.json(products)
+})
+
+router.get('/history', async (req, res) => {
+  const historyInput = checkHistory(req)
+  const products = await productService.getHistoryProducts(historyInput)
   res.json(products)
 })
 

@@ -56,7 +56,6 @@ const getAsk = async (askFiltersinput: AskFiltersInput, req: Request): Promise<A
     .where('q.groupID', product.groupID)
 
   const questionMatches = fuseMatches(_questions, [ 'content' ], q, 'questionID')
-
   const answerMatches = fuseMatches(_questions, [ 'answerContent' ], q, 'answerID')
 
   let questions: QuestionItem[] = Object.values(_questions
@@ -251,10 +250,12 @@ const getSearch = async (searchFiltersinput: SearchFiltersInput): Promise<BatchW
   const productIDs = products
     .map((p) => p.productID)
 
-  const productParameters = await db('productParameters as pp')
+  let productParameters = await db('productParameters as pp')
     .join('parameters as p', 'pp.parameterID', 'p.parameterID')
     .whereIn('pp.productID', productIDs)
     .whereNotIn('name', parametersBL)
+
+  productParameters = productParameters.filter((pp) => !pp.value.includes('#'))
 
   const groupVariations = await db<GroupVariation>('groupVariations')
     .where('name', 'Color')

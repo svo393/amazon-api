@@ -1,7 +1,7 @@
 import { Request } from 'express'
 import Knex from 'knex'
 import { flatten, omit, sum } from 'ramda'
-import { BatchWithCursor, GroupVariation, Image, Product, ProductCreateInput, ProductData, ProductParameter, ProductsFiltersInput, ProductSize, ProductsMinFiltersInput, ProductUpdateInput, Question, Review, User } from '../types'
+import { BatchWithCursor, GroupVariation, HistoryInput, Image, Product, ProductCreateInput, ProductData, ProductParameter, ProductsFiltersInput, ProductSize, ProductsMinFiltersInput, ProductUpdateInput, Question, Review, User } from '../types'
 import { defaultLimit, imagesBasePath } from '../utils/constants'
 import { db, dbTrans } from '../utils/db'
 import fuseIndexes from '../utils/fuseIndexes'
@@ -343,6 +343,30 @@ const getProductsMin = async (productsFiltersinput: ProductsMinFiltersInput): Pr
   }
 
   return products
+}
+
+type HistoryProduct = {
+  productID: number
+  title: string
+  imageID: number
+}
+
+const getHistoryProducts = async ({ items }: HistoryInput): Promise<{ batch: Partial<Product>[] }> => {
+  const products: HistoryProduct[] = await db('products as p')
+    .select('p.productID', 'title', 'i.imageID')
+    .whereIn('p.productID', items)
+    .leftJoin('images as i', 'p.productID', 'i.productID')
+    .where('i.index', 0)
+
+  const images = await db<Image>('images')
+    .whereIn('productID', items)
+
+  return {
+    batch: products.map((p) => ({
+      ...omit([ 'imageID' ], p),
+      images: images.filter((i) => i.productID === p.productID)
+    }))
+  }
 }
 
 type ProductLimitedData = Omit<ProductListData, 'images'> & {
@@ -707,6 +731,7 @@ export default {
   addProduct,
   getProducts,
   getProductsMin,
+  getHistoryProducts,
   getProductByID,
   updateProduct,
   uploadProductImages

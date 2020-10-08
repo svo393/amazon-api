@@ -563,6 +563,7 @@ export type ProductsFiltersInput = {
 }
 
 export type ProductsMinFiltersInput = { title?: string }
+export type HistoryInput = { items: number[] }
 
 export type UsersFiltersInput = {
   roles?: string;
