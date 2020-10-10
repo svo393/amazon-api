@@ -147,8 +147,8 @@ export const isEmail: CP = ({ name, param }) => {
 }
 
 export const isPasswordValid: CP = ({ name, param }) => {
-  if (param.length < 6) {
-    throw new StatusError(422, 'Password must be at least 6 characters')
+  if (param.length < 8) {
+    throw new StatusError(422, 'Password must be at least 8 characters')
   }
   return { name, param }
 }

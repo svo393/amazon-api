@@ -274,7 +274,7 @@ export type UserPasswordUpdateInput = { curPassword: string; newPassword: string
 
 export type PasswordRequestInput = Pick<User, 'email'>
 
-export type PasswordResetInput = { password: string; resetToken: string }
+export type PasswordResetInput = { newPassword: string; resetToken: string }
 
 export type CategoryCreateInput = Pick<Category, 'name' | 'parentCategoryID'>
 

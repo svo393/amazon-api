@@ -1,12 +1,12 @@
 import bcrypt from 'bcrypt'
-import { randomBytes } from 'crypto'
+// import { randomBytes } from 'crypto'
 import { Request } from 'express'
 import { omit } from 'ramda'
-import { promisify } from 'util'
+// import { promisify } from 'util'
 import { Follower, PasswordRequestInput, PasswordResetInput, User, UserLoginInput, UserPasswordUpdateInput, UserSafeData, UserSignupInput, UserUpdateInput } from '../types'
 import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
-// import { makeANiceEmail, transport } from '../utils/mail'
+// import { makeEmail, transport } from '../utils/mail'
 
 type UserBaseData = Omit<UserSafeData, | 'role'> & { following: number[] }
 
@@ -161,44 +161,45 @@ const sendPasswordReset = async (userInput: PasswordRequestInput): Promise<void>
   const { email } = userInput
 
   const user = await db<User>('users')
-    .first()
+    .first('email')
     .where('email', email)
 
   if (user === undefined) throw new StatusError(401, 'Invalid Email')
 
-  const resetToken = (await promisify(randomBytes)(20)).toString('hex')
-  const resetTokenCreatedAt = new Date()
+  // const resetToken = (await promisify(randomBytes)(3)).toString('hex')
+  const resetToken = '42b47b'
 
   await db('users')
-    .update({ resetToken, resetTokenCreatedAt })
+    .update({ resetToken, resetTokenCreatedAt: new Date() })
     .where('email', email)
 
-  // try { // TODO
+  // try {
   //   await transport.sendMail({
   //     from: 'ecom@example.com',
   //     to: email,
-  //     subject: 'Your Password Reset Token',
-  //     html: makeANiceEmail(`Your Password Reset Token is Here!
-  //         <br/>
-  //         <a href='${env.BASE_URL}/reset-password?resetToken=${resetToken}'>
-  //           Click Here to Reset
-  //         </a>`)
+  //     subject: 'Amazon password assistance',
+  //     html: makeEmail(
+  //         `<h2>To authenticate, please use the following One Time Password (OTP):</h2>
+  //         <p>${resetToken}</p>
+  //         <p>Do not share this OTP with anyone. Amazon takes your account security very seriously. Amazon Customer Service will never ask you to disclose or verify your Amazon password, OTP, credit card, or banking account number. If you receive a suspicious email with a link to update your account information, do not click on the link—instead, report the email to Amazon for investigation.</p>
+  //         <p>We hope to see you again soon.</p>`
+  //     )
   //   })
   // } catch (_) {
   //   throw new StatusError(500, 'Error requesting password reset. Please try again later.')
   // }
 }
 
-const resetPassword = async ({ password, resetToken }: PasswordResetInput): Promise<Omit<UserBaseData, 'following'>> => {
+const resetPassword = async ({ newPassword, resetToken }: PasswordResetInput): Promise<UserBaseData> => {
   const user = await db<User>('users')
     .first('userID', 'resetTokenCreatedAt')
     .where('resetToken', resetToken)
 
   if (user?.resetTokenCreatedAt === undefined || Number(user.resetTokenCreatedAt) + 3600000 < Date.now()) {
-    throw new StatusError(401, 'Reset token is invalid or expired')
+    throw new StatusError(401, 'OTP is invalid or expired')
   }
 
-  const passwordHash = await bcrypt.hash(password, 10)
+  const passwordHash = await bcrypt.hash(newPassword, 10)
 
   const [ updatedUser ]: User[] = await db<User>('users')
     .update({
@@ -208,11 +209,18 @@ const resetPassword = async ({ password, resetToken }: PasswordResetInput): Prom
     }, [ '*' ])
     .where('userID', user.userID)
 
-  return omit([
-    'password',
-    'resetToken',
-    'resetTokenCreatedAt'
-  ], updatedUser)
+  const users: Pick<Follower, 'follows'>[] = await db('followers')
+    .select('follows')
+    .where('userID', updatedUser.userID)
+
+  return {
+    ...omit([
+      'password',
+      'resetToken',
+      'resetTokenCreatedAt'
+    ], updatedUser),
+    following: users.map((u) => u.follows)
+  }
 }
 
 export default {

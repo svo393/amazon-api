@@ -124,15 +124,15 @@ export const checkUserResetToken = ({ body }: Request): PasswordResetInput => {
     isNonEmptyString
   )({ name: 'resetToken', param: body.resetToken })
 
-  const password = pipe(
+  const newPassword = pipe(
     isProvided,
     isNonEmptyString,
     isPasswordValid
-  )({ name: 'password', param: body.password })
+  )({ name: 'newPassword', param: body.newPassword })
 
   return {
     resetToken: resetToken.param,
-    password: password.param
+    newPassword: newPassword.param
   }
 }
 
