@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import Knex from 'knex'
-import { CartProduct, CartProductDeleteInput, CartProductInput, Image, LocalCart, Product, ProductSize } from '../types'
+import { CartProduct, CartProductDeleteInput, CartProductInput, Image, LocalCart, ObjIndexed, Product, ProductSize } from '../types'
 import { db, dbTrans } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
@@ -91,22 +91,29 @@ const getCartProductsByUser = async (localCart: LocalCart, req: Request): Promis
       .select('productID', 'stock')
       .whereIn('productID', localCartProductIDs)
 
-    const productSizes = await trx<ProductSize>('productSizes')
-      .whereIn('productID', localCartProductIDs)
-
     const existingProductIDs = existingProducts.map((p) => p.productID)
 
     const cart = await trx<CartProduct>('cartProducts')
       .where('userID', userID)
 
-    const mergedCart = cart.map((cp) => {
-      const item = localCart
-        .find((lcp) => lcp.productID === cp.productID && lcp.size === cp.size)
+    const productSizes = await trx<ProductSize>('productSizes')
+      .whereIn('productID', localCartProductIDs.concat(cart.map((cp) => cp.productID)))
 
-      return item ?? cp
-    })
+    const mergedCart = cart
+      .map((cp) => {
+        const item = localCart
+          .find((lcp) => lcp.productID === cp.productID && lcp.size === cp.size)
+        return item !== undefined ? { ...item, qty: item.qty + cp.qty } : cp
+      })
 
-    await Promise.all(mergedCart.map(async (cp) => {
+    const _localCart = localCart
+      .map((cp) => ({ ...cp, userID: Number(userID) }))
+      .filter((lcp) =>
+        !cart.find((cp) => cp.productID === lcp.productID && cp.size === lcp.size))
+
+    const _mergedCart = mergedCart.concat(_localCart)
+
+    await Promise.all(_mergedCart.map(async (cp) => {
       if (existingProductIDs.includes(cp.productID)) {
         const _stock = cp.size === 'stock'
           ? existingProducts.find((ep) => ep.productID === cp.productID)?.stock
@@ -129,10 +136,7 @@ const getCartProductsByUser = async (localCart: LocalCart, req: Request): Promis
             .andWhere('userID', userID)
             .andWhere('size', cp.size)
           : await trx('cartProducts')
-            .insert({
-              ...cp,
-              userID
-            }, [ '*' ])
+            .insert({ ...cp, userID }, [ '*' ])
       }
     }))
 
