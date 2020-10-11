@@ -28,6 +28,7 @@ router.post('/logout', requireAuth, (req, res) => {
   req.session !== undefined && req.session.destroy((err) => {
     if (err) throw new StatusError(400, 'There was a problem logging out')
   })
+  res.clearCookie('sessionID')
   res.json(null)
 })
 
@@ -65,7 +66,7 @@ router.post('/request-password-reset', async (req, res) => {
 
 router.post('/reset-password', async (req, res) => {
   const userPasswordResetInput = checkUserResetToken(req)
-  const updatedUser = await authService.resetPassword(userPasswordResetInput)
+  const updatedUser = await authService.resetPassword(userPasswordResetInput, req)
   res.json(updatedUser)
 })
 

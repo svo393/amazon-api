@@ -190,7 +190,7 @@ const sendPasswordReset = async (userInput: PasswordRequestInput): Promise<void>
   // }
 }
 
-const resetPassword = async ({ newPassword, resetToken }: PasswordResetInput): Promise<UserBaseData> => {
+const resetPassword = async ({ newPassword, resetToken }: PasswordResetInput, req: Request): Promise<UserBaseData> => {
   const user = await db<User>('users')
     .first('userID', 'resetTokenCreatedAt')
     .where('resetToken', resetToken)
@@ -212,6 +212,11 @@ const resetPassword = async ({ newPassword, resetToken }: PasswordResetInput): P
   const users: Pick<Follower, 'follows'>[] = await db('followers')
     .select('follows')
     .where('userID', updatedUser.userID)
+
+  if (req.session !== undefined) {
+    req.session.userID = updatedUser.userID
+    req.session.role = updatedUser.role
+  }
 
   return {
     ...omit([
