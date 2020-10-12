@@ -2,6 +2,7 @@ import { Request } from 'express'
 import Knex from 'knex'
 import { omit, sum } from 'ramda'
 import { Address, BatchWithCursor, Invoice, Order, OrderCreateInput, OrderFullData, OrderProduct, OrderProductFullData, OrdersFiltersInput, OrderUpdateInput, OrderWithUser } from '../types'
+import reformatDate from '../utils/compareDates'
 import { defaultLimit } from '../utils/constants'
 import { db, dbTrans } from '../utils/db'
 import sortItems from '../utils/sortItems'
@@ -175,12 +176,14 @@ const getOrders = async (ordersFiltersinput: OrdersFiltersInput, req: Request): 
 
   if (createdFrom !== undefined) {
     orders = orders
-      .filter((o) => o.createdAt >= new Date(createdFrom))
+      .filter((o) =>
+        reformatDate(o.createdAt) >= reformatDate(new Date(createdFrom)))
   }
 
   if (createdTo !== undefined) {
     orders = orders
-      .filter((o) => o.createdAt <= new Date(createdTo))
+      .filter((o) =>
+        reformatDate(o.createdAt) <= reformatDate(new Date(createdTo)))
   }
 
   if (userEmail !== undefined) {

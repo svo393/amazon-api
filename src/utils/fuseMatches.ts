@@ -1,12 +1,13 @@
 import Fuse from 'fuse.js'
 import { omit } from 'ramda'
 
-// TODO tune options
 export default (data: any[], keys: string[], query: string, idProp: string) =>
   (new Fuse(data, {
+    threshold: 0.1,
     minMatchCharLength: 3,
     includeMatches: true,
-    keys
+    keys,
+    ignoreLocation: true
   })).search(query)
     .reduce((acc, cur) => {
       if (cur.matches === undefined) return {}

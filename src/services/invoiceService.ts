@@ -1,6 +1,7 @@
 import { Request } from 'express'
 import Knex from 'knex'
 import { BatchWithCursor, Invoice, InvoiceCreateInput, InvoicesFiltersInput, InvoiceUpdateInput } from '../types'
+import reformatDate from '../utils/compareDates'
 import { defaultLimit } from '../utils/constants'
 import { db, dbTrans } from '../utils/db'
 import sortItems from '../utils/sortItems'
@@ -74,12 +75,14 @@ const getInvoices = async (invoicesFiltersinput: InvoicesFiltersInput): Promise<
 
   if (createdFrom !== undefined) {
     invoices = invoices
-      .filter((i) => i.createdAt >= new Date(createdFrom))
+      .filter((i) =>
+        reformatDate(i.createdAt) >= reformatDate(new Date(createdFrom)))
   }
 
   if (createdTo !== undefined) {
     invoices = invoices
-      .filter((i) => i.createdAt <= new Date(createdTo))
+      .filter((i) =>
+        reformatDate(i.createdAt) <= reformatDate(new Date(createdTo)))
   }
 
   if (userEmail !== undefined) {

@@ -1,6 +1,7 @@
 import { Request } from 'express'
 import { omit } from 'ramda'
-import { Answer, Feed, FeedFiltersInput, Follower, GroupVariation, Image, Product, Question, Review, ReviewComment, User, UserFeed, UserFeedFiltersInput } from '../types'
+import { Answer, Feed, FeedFiltersInput, Follower, Image, Product, Question, Review, ReviewComment, User, UserFeed, UserFeedFiltersInput } from '../types'
+import reformatDate from '../utils/compareDates'
 import { defaultLimit } from '../utils/constants'
 import { db } from '../utils/db'
 import fuseIndexes from '../utils/fuseIndexes'
@@ -88,14 +89,14 @@ const getFeed = async (feedFiltersinput: FeedFiltersInput): Promise<{ batch: Fee
   if (createdFrom !== undefined) {
     feed = feed
       .filter((a) =>
-        a.createdAt >= new Date(createdFrom))
+        reformatDate(a.createdAt) >= reformatDate(new Date(createdFrom)))
   }
 
   // TODO misses today in filter
   if (createdTo !== undefined) {
     feed = feed
       .filter((a) =>
-        a.createdAt <= new Date(createdTo))
+        reformatDate(a.createdAt) <= reformatDate(new Date(createdTo)))
   }
 
   if (userEmail !== undefined) {

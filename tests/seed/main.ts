@@ -333,8 +333,6 @@ const seed = async (): Promise<void> => {
     }))
   }))
 
-  // TODO lists and orders
-
   //   const newList1: { body: List } = await api
   //     .post(apiURLs.lists)
   //     .set('Cookie', `sessionID=${users[0].sessionID}`)

@@ -1,6 +1,7 @@
 import { Request } from 'express'
 import { flatten, omit } from 'ramda'
 import { BatchWithCursor, Image, Matches, Review, ReviewCreateInput, ReviewsFiltersInput, ReviewUpdateInput, ReviewWithUser, Vote } from '../types'
+import reformatDate from '../utils/compareDates'
 import { defaultLimit, imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
 import fuseMatches from '../utils/fuseMatches'
@@ -110,12 +111,14 @@ const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request
 
   if (createdFrom !== undefined) {
     reviews = reviews
-      .filter((r) => r.createdAt >= new Date(createdFrom))
+      .filter((r) =>
+        reformatDate(r.createdAt) >= reformatDate(new Date(createdFrom)))
   }
 
   if (createdTo !== undefined) {
     reviews = reviews
-      .filter((r) => r.createdAt <= new Date(createdTo))
+      .filter((r) =>
+        reformatDate(r.createdAt) <= reformatDate(new Date(createdTo)))
   }
 
   if (starsMin !== undefined) {

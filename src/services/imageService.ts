@@ -55,7 +55,6 @@ const deleteImages = async (images: ImagesDeleteInput): Promise<void> => {
 
     if (deleteCount === 0) throw new StatusError(404, 'Not Found')
 
-    // TODO try async rather than sync
     const dir = `${imagesBasePath}/images`
     const files = fs.readdirSync(dir)
 

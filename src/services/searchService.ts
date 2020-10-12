@@ -377,7 +377,7 @@ const getSearch = async (searchFiltersinput: SearchFiltersInput): Promise<BatchW
   }
 
   const totalCount = products.length
-  const end = (page - 1) * 5 + 5 // TODO change 5 do defaultLimit
+  const end = (page - 1) * 5 + 5
 
   const productsSorted = sortItems(products, sortBy)
   const batch = productsSorted.slice((page - 1) * 5, end)

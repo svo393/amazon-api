@@ -145,7 +145,6 @@ const getProducts = async (productsFiltersInput: ProductsFiltersInput, req: Requ
     reviewCountPerProduct
   } = productsFiltersInput
 
-  // TODO refactor reusable queries
   const rawProducts: ProductListRawData[] = groupID !== undefined
     ? await getProductsQuery.clone()
       .where('p.groupID', groupID)

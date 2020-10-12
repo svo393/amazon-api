@@ -1,6 +1,7 @@
 import { Request } from 'express'
 import { omit } from 'ramda'
 import { Answer, BatchWithCursor, Order, Question, Review, ReviewComment, User, UserRoleUpdateInput, UserSafeData, UsersFiltersInput } from '../types'
+import reformatDate from '../utils/compareDates'
 import { defaultLimit, imagesBasePath } from '../utils/constants'
 import { db } from '../utils/db'
 import { uploadImages } from '../utils/img'
@@ -128,12 +129,14 @@ const getUsers = async (usersFiltersinput: UsersFiltersInput): Promise<BatchWith
 
   if (createdFrom !== undefined) {
     users = users
-      .filter((u) => u.createdAt >= new Date(createdFrom))
+      .filter((u) =>
+        reformatDate(u.createdAt) >= reformatDate(new Date(createdFrom)))
   }
 
   if (createdTo !== undefined) {
     users = users
-      .filter((u) => u.createdAt <= new Date(createdTo))
+      .filter((u) =>
+        reformatDate(u.createdAt) <= reformatDate(new Date(createdTo)))
   }
 
   if (orderCountMin !== undefined) {
