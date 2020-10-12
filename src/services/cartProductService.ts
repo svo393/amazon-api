@@ -1,6 +1,7 @@
 import { Request } from 'express'
 import Knex from 'knex'
-import { CartProduct, CartProductDeleteInput, CartProductInput, Image, LocalCart, ObjIndexed, Product, ProductSize } from '../types'
+import { omit } from 'ramda'
+import { CartProduct, CartProductDeleteInput, CartProductInput, Image, LocalCart, Product, ProductSize } from '../types'
 import { db, dbTrans } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
@@ -102,6 +103,7 @@ const getCartProductsByUser = async (localCart: LocalCart, req: Request): Promis
     const mergedCart = cart
       .map((cp) => {
         const item = localCart
+          .filter((lcp) => lcp.toMerge)
           .find((lcp) => lcp.productID === cp.productID && lcp.size === cp.size)
         return item !== undefined ? { ...item, qty: item.qty + cp.qty } : cp
       })
@@ -136,7 +138,7 @@ const getCartProductsByUser = async (localCart: LocalCart, req: Request): Promis
             .andWhere('userID', userID)
             .andWhere('size', cp.size)
           : await trx('cartProducts')
-            .insert({ ...cp, userID }, [ '*' ])
+            .insert({ ...omit([ 'toMerge' ], cp), userID }, [ '*' ])
       }
     }))
 

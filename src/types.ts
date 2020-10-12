@@ -406,7 +406,7 @@ export type ProductParametersInput = Pick<ProductParameter, 'value' | 'parameter
 export type CartProductInput = Pick<CartProduct, 'qty' | 'size'>
 export type CartProductDeleteInput = Pick<CartProduct, 'size'>
 
-export type LocalCart = Omit<CartProduct, 'userID'>[]
+export type LocalCart = (Omit<CartProduct, 'userID'> & { toMerge: boolean })[]
 
 export type OrderCreateInput = Pick<Order,
   | 'shippingMethod'

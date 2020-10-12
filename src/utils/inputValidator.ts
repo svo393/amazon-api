@@ -545,7 +545,7 @@ export const checkAddressType = ({ body }: Request): AddressTypeInput => {
 
 export const checkLocalCart = ({ body }: Request): LocalCart => {
   isArray({ name: 'body', param: body })
-  return body.map((cp: Omit<CartProduct, 'userID'>) => {
+  return body.map((cp: Omit<CartProduct, 'userID'> & { toMerge: boolean }) => {
     const qty = pipe(
       isProvided,
       canBeNumber
@@ -561,10 +561,16 @@ export const checkLocalCart = ({ body }: Request): LocalCart => {
       canBeNumber
     )({ name: 'productID', param: cp.productID })
 
+    const toMerge = pipe(
+      isProvided,
+      canBeBoolean
+    )({ name: 'toMerge', param: cp.toMerge })
+
     return {
       qty: qty.param,
       size: size.param,
-      productID: productID.param
+      productID: productID.param,
+      toMerge: toMerge.param
     }
   })
 }
