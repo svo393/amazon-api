@@ -1,3 +1,4 @@
+import axios from 'axios'
 import bcrypt from 'bcrypt'
 // import { randomBytes } from 'crypto'
 import { Request } from 'express'
@@ -49,7 +50,7 @@ const signupUser = async (userInput: UserSignupInput, req: Request): Promise<Use
 }
 
 const loginUser = async (userInput: UserLoginInput, req: Request, requiresAdmin = false): Promise<UserBaseData> => {
-  const { email, password, remember } = userInput
+  const { email, password } = userInput
 
   const existingUser = await db<User>('users')
     .first()
@@ -91,15 +92,22 @@ const loginUser = async (userInput: UserLoginInput, req: Request, requiresAdmin 
 type UserInfo = Pick<User, 'userID' | 'role' | 'avatar' | 'name' | 'cover'> & { following: number[] }
 
 const checkInUser = async (req: Request): Promise<Partial<UserInfo> & { countryFromIP: string }> => {
+  let countryFromIP
+
+  try {
+    const { data } = (await axios.get(`https://ipapi.co/${req.ip}/country_name`))
+    countryFromIP = ![ undefined, 'Undefined' ].includes(data) ? data : 'anywhere*'
+  } catch (error) { countryFromIP = 'anywhere*' }
+
   if (req.session?.userID === undefined) {
-    return { countryFromIP: 'anywhere*' }
+    return { countryFromIP }
   }
 
   const user = await db<User>('users')
     .where('userID', req.session?.userID)
     .first('userID', 'role', 'avatar', 'name', 'cover')
 
-  if (user === undefined) return { countryFromIP: 'anywhere*' }
+  if (user === undefined) return { countryFromIP }
 
   const users: Pick<Follower, 'follows'>[] = await db('followers')
     .select('follows')
@@ -108,7 +116,7 @@ const checkInUser = async (req: Request): Promise<Partial<UserInfo> & { countryF
   return {
     ...user,
     following: users.map((u) => u.follows),
-    countryFromIP: 'anywhere*' // TODO implement country check
+    countryFromIP
   }
 }
 
