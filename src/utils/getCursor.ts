@@ -9,7 +9,7 @@ type Props = {
   data: any[];
 }
 
-export default ({ startCursor, startCursorType, limit = 4, idProp, idTypes, data }: Props) => {
+const getCursor = ({ startCursor, startCursorType, limit = 4, idProp, idTypes, data }: Props) => {
   const totalCount = data.length
 
   if (totalCount === 0) {
@@ -67,3 +67,5 @@ export default ({ startCursor, startCursorType, limit = 4, idProp, idTypes, data
     batch
   }
 }
+
+export default getCursor

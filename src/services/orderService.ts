@@ -5,6 +5,7 @@ import { Address, BatchWithCursor, Invoice, Order, OrderCreateInput, OrderFullDa
 import reformatDate from '../utils/compareDates'
 import { defaultLimit } from '../utils/constants'
 import { db, dbTrans } from '../utils/db'
+import getCursor from '../utils/getCursor'
 import sortItems from '../utils/sortItems'
 import StatusError from '../utils/StatusError'
 
@@ -104,9 +105,9 @@ const addOrder = async (orderInput: OrderCreateInput, req: Request): Promise<Ord
   })
 }
 
-const getOrders = async (ordersFiltersinput: OrdersFiltersInput, req: Request): Promise<BatchWithCursor<OrderWithUser & Invoice & { invoiceCreatedAt: Date; invoiceUpdatedAt: Date }>> => {
+const getOrders = async (ordersFiltersinput: OrdersFiltersInput, req: Request): Promise<any> => {
   const {
-    page = 1,
+    page,
     sortBy = 'createdAt_desc',
     orderStatuses,
     shippingMethods,
@@ -115,7 +116,8 @@ const getOrders = async (ordersFiltersinput: OrdersFiltersInput, req: Request): 
     createdFrom,
     createdTo,
     userEmail,
-    userID
+    userID,
+    startCursor
   } = ordersFiltersinput
 
   if (![ 'ROOT', 'ADMIN' ].includes(req.session?.role)) {
@@ -198,10 +200,19 @@ const getOrders = async (ordersFiltersinput: OrdersFiltersInput, req: Request): 
 
   const ordersSorted = sortItems(orders, sortBy)
 
-  const totalCount = orders.length
-  const end = (page - 1) * defaultLimit + defaultLimit
+  const cursorData = page === undefined
+    ? getCursor({
+      startCursor,
+      limit: 1,
+      idProp: 'orderID',
+      data: ordersSorted
+    })
+    : undefined
 
-  const batch = ordersSorted.slice((page - 1) * defaultLimit, end)
+  const totalCount = orders.length
+  const end = ((page ?? 1) - 1) * 1 + 1
+
+  const batch = cursorData?.batch ?? ordersSorted.slice(((page ?? 1) - 1) * 1, end)
 
   const orderIDs = batch.map((o) => o.orderID)
 
@@ -239,12 +250,16 @@ const getOrders = async (ordersFiltersinput: OrdersFiltersInput, req: Request): 
   _batch.forEach((o) => {
     if (o.orderProducts.length === 0) { throw new StatusError() }
   })
-
-  return {
-    batch: _batch,
-    totalCount,
-    hasNextPage: end < totalCount
-  }
+  return cursorData !== undefined
+    ? {
+      ...cursorData,
+      batch: _batch
+    }
+    : {
+      batch: _batch,
+      totalCount,
+      hasNextPage: end < totalCount
+    }
 }
 
 const getOrderByID = async (req: Request): Promise<OrderWithUser & Invoice & { invoiceCreatedAt: Date; invoiceUpdatedAt: Date }> => {

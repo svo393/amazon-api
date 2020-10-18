@@ -259,7 +259,7 @@ export type ReviewCommentWithUser = ReviewComment & {
 
 export type UserSignupInput = Pick<User, 'email' | 'password' | 'name'>
 
-export type UserLoginInput = Pick<User, 'email' | 'password'> & { remember: boolean } // TODO remember option
+export type UserLoginInput = Pick<User, 'email' | 'password'> & { remember?: boolean }
 
 export type UserRoleUpdateInput = { role: string }
 
@@ -389,6 +389,7 @@ export type QuestionCursorInput = CursorInput & {
 export type BatchWithCursor<T> = {
   totalCount: number;
   endCursor?: number;
+  endCursorType?: string;
   hasNextPage: boolean;
   batch: T[];
 }
@@ -434,6 +435,7 @@ export type OrdersFiltersInput = {
   shippingMethods?: string;
   userEmail?: string;
   userID?: number;
+  startCursor?: number;
 }
 
 export type OrderProductInput = Omit<OrderProduct, | 'orderID' | 'productID'>

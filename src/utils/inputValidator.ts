@@ -40,15 +40,14 @@ export const checkUserLogin = ({ body }: Request): UserLoginInput => {
     isNonEmptyString
   )({ name: 'password', param: body.password })
 
-  const remember = pipe(
-    isProvided,
-    canBeBoolean
-  )({ name: 'remember', param: body.remember })
+  const remember = 'remember' in body
+    ? canBeBoolean({ name: 'remember', param: body.remember })
+    : undefined
 
   return {
     email: email.param.toLowerCase(),
     password: password.param,
-    remember: remember.param
+    remember: remember?.param
   }
 }
 
@@ -1263,6 +1262,10 @@ export const checkOrderFilters = ({ query }: Request): OrdersFiltersInput => {
     ? canBeNumber({ name: 'userID', param: query.userID })
     : undefined
 
+  const startCursor = 'startCursor' in query
+    ? canBeNumber({ name: 'startCursor', param: query.startCursor })
+    : undefined
+
   return {
     sortBy: sortBy?.param,
     page: page?.param,
@@ -1273,6 +1276,7 @@ export const checkOrderFilters = ({ query }: Request): OrdersFiltersInput => {
     orderStatuses: orderStatuses?.param,
     shippingMethods: shippingMethods?.param,
     userEmail: userEmail?.param,
+    startCursor: startCursor?.param,
     userID: userID?.param
   }
 }
