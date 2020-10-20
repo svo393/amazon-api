@@ -10,7 +10,7 @@ import questionService from '../services/questionService'
 import userAddressService from '../services/userAddressService'
 import userService from '../services/userService'
 import { UPLOAD_TIMEOUT } from '../utils/config'
-import { checkCartProduct, checkCartProductDelete, checkFollows, checkLocalCart, checkNewOrder, checkSingleMediaUpload, checkUserAddressesUpdate, checkUserFeedFilters, checkUserFilters, checkUserRoleUpdate, checkUserUpdate } from '../utils/inputValidator'
+import { checkCartProduct, checkCartProductDelete, checkFollows, checkLocalCart, checkNewOrder, checkSingleMediaUpload, checkUserAddressesUpdate, checkUserFeedFilters, checkUserFilters, checkUserRoleUpdate } from '../utils/inputValidator'
 import { multerUpload, requireAdmin, requireRoot, requireSameUser, requireSameUserOrAdmin } from '../utils/middleware'
 
 const router = Router()

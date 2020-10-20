@@ -1823,10 +1823,14 @@ export const checkSearchFilters = ({ query }: Request): SearchFiltersInput => {
   })
 }
 
-export const checkFollows = ({ query }: Request): Pick<CursorInput, 'startCursor'> => {
+export const checkFollows = ({ query }: Request): Pick<CursorInput, 'startCursor'> & { limit?: string } => {
   const startCursor = 'startCursor' in query
     ? canBeNumber({ name: 'startCursor', param: query.startCursor })
     : undefined
 
-  return { startCursor: startCursor?.param }
+  const limit = 'limit' in query
+    ? canBeNumber({ name: 'limit', param: query.limit })
+    : undefined
+
+  return { startCursor: startCursor?.param, limit: limit?.param }
 }

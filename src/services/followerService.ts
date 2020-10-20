@@ -30,8 +30,8 @@ const getFollowersByUser = async (req: Request): Promise<Follower[]> => {
     .where('follows', req.params.userID)
 }
 
-const getFollowedByUser = async (cursorInput: Pick<CursorInput, 'startCursor'>, req: Request): Promise<{ userID: number; follows: BatchWithCursor<Pick<User, 'userID' | 'avatar' | 'name'>> }> => {
-  const { startCursor } = cursorInput
+const getFollowedByUser = async (cursorInput: Pick<CursorInput, 'startCursor'> & { limit?: number }, req: Request): Promise<{ userID: number; follows: BatchWithCursor<Pick<User, 'userID' | 'avatar' | 'name'>> }> => {
+  const { startCursor, limit } = cursorInput
   const { userID } = req.params
 
   let users: Pick<User, 'userID' | 'avatar' | 'name'>[] = await db('followers as f')
@@ -50,7 +50,7 @@ const getFollowedByUser = async (cursorInput: Pick<CursorInput, 'startCursor'>, 
     userID: Number(userID),
     follows: getCursor({
       startCursor,
-      limit: 2,
+      limit: limit ?? 2,
       idProp: 'follows',
       data: users
     })
