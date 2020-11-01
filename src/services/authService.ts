@@ -91,11 +91,11 @@ const loginUser = async (userInput: UserLoginInput, req: Request, requiresAdmin 
 
 type UserInfo = Pick<User, 'userID' | 'role' | 'avatar' | 'name' | 'cover'> & { following: number[] }
 
-const checkInUser = async (req: Request): Promise<Partial<UserInfo> & { countryFromIP: string }> => {
+const checkInUser = async ({ ip }: { ip: string }, req: Request): Promise<Partial<UserInfo> & { countryFromIP: string }> => {
   let countryFromIP
 
   try {
-    const { data } = (await axios.get(`https://ipapi.co/${req.ip}/country_name`))
+    const { data } = (await axios.get(`https://ipapi.co/${ip}/country_name`))
     countryFromIP = ![ undefined, 'Undefined' ].includes(data) ? data : 'anywhere*'
   } catch (error) { countryFromIP = 'anywhere*' }
 

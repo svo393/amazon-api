@@ -67,8 +67,8 @@ const getAsk = async (askFiltersinput: AskFiltersInput, req: Request): Promise<A
         author: { name: cur.name, userID: cur.userID },
         matches: cur.answerID in answerMatches
           ? answerMatches[cur.answerID].map((m) => ({
-            ...m, key: m.key === 'answerContent' ? 'content' : m.key
-          }))
+              ...m, key: m.key === 'answerContent' ? 'content' : m.key
+            }))
           : undefined
       }
 
@@ -410,16 +410,17 @@ const getSearch = async (searchFiltersinput: SearchFiltersInput): Promise<BatchW
       }, {} as { [ k: number ]: number }),
       images: image !== undefined
         ? [ {
-          imageID: image.imageID,
-          index: 0,
-          productID: p.productID
-        } ]
+            imageID: image.imageID,
+            index: 0,
+            productID: p.productID
+          } ]
         : []
     }
   }))
 
   const newProductParameters = !isEmpty(restFilters)
-    ? flatten(_productParameters) : productParameters
+    ? flatten(_productParameters)
+    : productParameters
 
   const filters: { [ k: string ]: Set<string> } = newProductParameters
     .filter((pp) => products.map((p) => p.productID).includes(pp.productID))

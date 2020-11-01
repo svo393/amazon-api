@@ -24,6 +24,11 @@ router.get('/:groupID/images', async (req, res) => {
   res.json(images)
 })
 
+router.get('/:groupID/review-images', async (req, res) => {
+  const images = await imageService.getReviewImages(req)
+  res.json(images)
+})
+
 router.post('/:groupID/product/:productID', requireAdmin, async (req, res) => {
   const groupVariationCreateInput = checkNewGroupVariation(req)
   const addedGroupVariation = await groupService.addGroupVariation(groupVariationCreateInput, req)

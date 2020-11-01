@@ -1,7 +1,7 @@
 import { Request } from 'express'
 import fs from 'fs'
 import Knex from 'knex'
-import { Image, ImagesDeleteInput, ImagesFiltersInput, ImagesUpdateInput, Product } from '../types'
+import { Image, ImagesDeleteInput, ImagesFiltersInput, ImagesUpdateInput, Product, Review } from '../types'
 import { imagesBasePath } from '../utils/constants'
 import { db, dbTrans } from '../utils/db'
 import StatusError from '../utils/StatusError'
@@ -26,6 +26,15 @@ const getImagesByGroup = async (req: Request): Promise<Image[]> => {
 
   return await db('images')
     .whereIn('productID', products.map((p) => p.productID))
+}
+
+const getReviewImages = async (req: Request): Promise<Image[]> => {
+  const reviews = await db<Review>('reviews')
+    .select('reviewID')
+    .where('groupID', req.params.groupID)
+
+  return await db<Image>('images')
+    .whereIn('reviewID', reviews.map((p) => p.reviewID))
 }
 
 const updateImages = async (images: ImagesUpdateInput): Promise<Image[]> => {
@@ -72,6 +81,7 @@ const deleteImages = async (images: ImagesDeleteInput): Promise<void> => {
 export default {
   getImages,
   getImagesByGroup,
+  getReviewImages,
   updateImages,
   deleteImages
 }

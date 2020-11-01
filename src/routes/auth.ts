@@ -1,6 +1,6 @@
 import Router from 'express'
 import authService from '../services/authService'
-import { checkNewUser, checkUserLogin, checkUserPasswordUpdate, checkUserResetRequest, checkUserResetToken, checkUserUpdate } from '../utils/inputValidator'
+import { checkNewUser, checkUserIP, checkUserLogin, checkUserPasswordUpdate, checkUserResetRequest, checkUserResetToken, checkUserUpdate } from '../utils/inputValidator'
 import { requireAdmin, requireAuth, requireSameUser } from '../utils/middleware'
 import StatusError from '../utils/StatusError'
 
@@ -49,12 +49,13 @@ router.put('/:userID/password', requireSameUser('params'), async (req, res) => {
 // })
 
 router.get('/check-in', async (req, res) => {
-  const user = await authService.checkInUser(req)
+  const userIP = checkUserIP(req)
+  const user = await authService.checkInUser(userIP, req)
   res.json(user)
 })
 
 router.get('/admin/check-in', requireAdmin, async (req, res) => {
-  const user = await authService.checkInUser(req)
+  const user = await authService.checkInUser({ ip: '' }, req)
   res.json(user)
 })
 
