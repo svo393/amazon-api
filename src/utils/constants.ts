@@ -47,7 +47,7 @@ export const apiURLs = {
 }
 
 export const defaultLimit = 10
-export const smallLimit = 3
+export const smallLimit = 5
 
 export const parametersBL = [
   'Item model number',
