@@ -1,9 +1,9 @@
 import { Request } from 'express'
 import Knex from 'knex'
 import { omit, sum } from 'ramda'
-import { Address, BatchWithCursor, Invoice, Order, OrderCreateInput, OrderFullData, OrderProduct, OrderProductFullData, OrdersFiltersInput, OrderUpdateInput, OrderWithUser } from '../types'
+import { Address, Invoice, Order, OrderCreateInput, OrderFullData, OrderProduct, OrderProductFullData, OrdersFiltersInput, OrderUpdateInput, OrderWithUser } from '../types'
 import reformatDate from '../utils/compareDates'
-import { defaultLimit } from '../utils/constants'
+import { smallLimit } from '../utils/constants'
 import { db, dbTrans } from '../utils/db'
 import getCursor from '../utils/getCursor'
 import sortItems from '../utils/sortItems'
@@ -202,17 +202,17 @@ const getOrders = async (ordersFiltersinput: OrdersFiltersInput, req: Request): 
 
   const cursorData = page === undefined
     ? getCursor({
-      startCursor,
-      limit: 1,
-      idProp: 'orderID',
-      data: ordersSorted
-    })
+        startCursor,
+        limit: smallLimit,
+        idProp: 'orderID',
+        data: ordersSorted
+      })
     : undefined
 
   const totalCount = orders.length
-  const end = ((page ?? 1) - 1) * 1 + 1
+  const end = ((page ?? 1) - 1) * smallLimit + smallLimit
 
-  const batch = cursorData?.batch ?? ordersSorted.slice(((page ?? 1) - 1) * 1, end)
+  const batch = cursorData?.batch ?? ordersSorted.slice(((page ?? 1) - 1) * smallLimit, end)
 
   const orderIDs = batch.map((o) => o.orderID)
 
@@ -252,14 +252,14 @@ const getOrders = async (ordersFiltersinput: OrdersFiltersInput, req: Request): 
   })
   return cursorData !== undefined
     ? {
-      ...cursorData,
-      batch: _batch
-    }
+        ...cursorData,
+        batch: _batch
+      }
     : {
-      batch: _batch,
-      totalCount,
-      hasNextPage: end < totalCount
-    }
+        batch: _batch,
+        totalCount,
+        hasNextPage: end < totalCount
+      }
 }
 
 const getOrderByID = async (req: Request): Promise<OrderWithUser & Invoice & { invoiceCreatedAt: Date; invoiceUpdatedAt: Date }> => {

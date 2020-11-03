@@ -1,6 +1,7 @@
 {
   "author": "",
   "dependencies": {
+    "@types/express-serve-static-core": "^4.17.13",
     "axios": "^0.21.0",
     "bcrypt": "^5.0.0",
     "connect-redis": "^5.0.0",

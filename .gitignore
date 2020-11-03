@@ -12,3 +12,5 @@ node_modules
 /tmp
 /tests/seed/images
 /sessions
+
+/db/knexfile.ts
