@@ -14,8 +14,10 @@ const config = {
     connection: {
       host: '127.0.0.1',
       user: 'knex',
-      password: 'pokker1988',
-      database: 'amazon'
+      password: '12345678',
+      database: 'amazon-api'
+      // password: 'pokker1988',
+      // database: 'amazon'
     },
     pool: { min: 0, max: 30 }
   },
