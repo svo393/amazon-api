@@ -235,8 +235,6 @@ const getReviews = async (reviewsFiltersInput: ReviewsFiltersInput, req: Request
 const getReviewByID = async (req: Request): Promise<ReviewWithUser> => {
   const { reviewID } = req.params
 
-  const userHasPermission = [ 'ROOT', 'ADMIN' ].includes(req.session?.role)
-
   const review: any = await db('reviews as r')
     .first(
       'r.reviewID',
@@ -271,6 +269,8 @@ const getReviewByID = async (req: Request): Promise<ReviewWithUser> => {
         .where('moderationStatus', 'APPROVED')
         .orWhere('userID', req.session?.userID ?? 0)
     })
+
+  const userHasPermission = [ 'ROOT', 'ADMIN' ].includes(req.session?.role) || (review !== undefined && review.userID === req.session?.userID)
 
   if (review === undefined || (review.moderationStatus !== 'APPROVED' && !userHasPermission)) throw new StatusError(404, 'Not Found')
 
