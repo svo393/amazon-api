@@ -13,6 +13,14 @@ type Config = {
   MAIL_PORT: string;
   MAIL_USER: string;
   MAIL_PASS: string;
+  DB_HOST_DEV: string;
+  DB_NAME_DEV: string;
+  DB_USER_DEV: string;
+  DB_PASS_DEV: string;
+  DB_HOST_PROD: string;
+  DB_NAME_PROD: string;
+  DB_USER_PROD: string;
+  DB_PASS_PROD: string;
   BASE_URLS: (string | undefined)[];
 }
 
@@ -25,17 +33,20 @@ const envVars: Config = pickAll([
   'MAIL_HOST',
   'MAIL_PORT',
   'MAIL_USER',
-  'MAIL_PASS'
+  'MAIL_PASS',
+  'DB_HOST_DEV',
+  'DB_NAME_DEV',
+  'DB_USER_DEV',
+  'DB_PASS_DEV',
+  'DB_HOST_PROD',
+  'DB_NAME_PROD',
+  'DB_USER_PROD',
+  'DB_PASS_PROD'
 ], process.env)
 
 envVars.BASE_URLS = process.env.NODE_ENV === 'production'
   ? [ process.env.PROD_URL1, process.env.PROD_URL2 ]
-  : [
-    process.env.DEV_URL1,
-    process.env.DEV_URL2,
-    process.env.DEV_URL3,
-    process.env.DEV_URL4
-  ]
+  : [ process.env.DEV_URL1, process.env.DEV_URL2 ]
 
 export const UPLOAD_TIMEOUT = 20000
 

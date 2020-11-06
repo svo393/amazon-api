@@ -1,34 +1,25 @@
+import env from '../src/utils/config'
+
 const config = {
   development: {
     client: 'pg',
     connection: {
-      host: '127.0.0.1',
-      user: 'knex',
-      password: '12345678',
-      database: 'amazon-api'
+      host: env.DB_HOST_DEV,
+      database: env.DB_NAME_DEV,
+      user: env.DB_USER_DEV,
+      password: env.DB_PASS_DEV
     },
-    pool: { min: 0, max: 30 } // TODO what is optimum
+    pool: { min: 0, max: 30 }
   },
   production: {
     client: 'pg',
     connection: {
-      host: '127.0.0.1',
-      user: 'knex',
-      password: '12345678',
-      database: 'amazon-api'
-      // password: 'pokker1988',
-      // database: 'amazon'
+      host: env.DB_HOST_PROD,
+      database: env.DB_NAME_PROD,
+      user: env.DB_USER_PROD,
+      password: env.DB_PASS_PROD
     },
     pool: { min: 0, max: 30 }
-  },
-  test: {
-    client: 'pg',
-    connection: {
-      host: '127.0.0.1',
-      user: 'knex',
-      password: '12345678',
-      database: 'amazon-api'
-    }
   }
 }
 
