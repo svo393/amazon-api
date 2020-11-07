@@ -67,7 +67,7 @@ app.use(session({
   resave: false,
   rolling: true,
   cookie: {
-    httpOnly: false,
+    httpOnly: true,
     maxAge: parseInt(env.SESSION_MAX_AGE),
     sameSite: 'lax'
     // path: 'https://admin.rolloven.net/',
