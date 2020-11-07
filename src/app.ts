@@ -44,7 +44,7 @@ app.use(cors({
   optionsSuccessStatus: 200
 }))
 
-app.use(express.static(path.join(process.cwd(), 'public'))) // TODO migrate to nginx
+// app.use(express.static(path.join(process.cwd(), 'public')))
 app.use(express.json())
 app.use(cookieParser())
 
