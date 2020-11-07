@@ -7,7 +7,7 @@ import express from 'express'
 import session from 'express-session'
 import helmet from 'helmet'
 import logger from 'morgan'
-import path from 'path'
+// import path from 'path'
 // import redis from 'redis'
 import router from './routes'
 import env from './utils/config'
@@ -33,6 +33,7 @@ app.use(helmet())
 
 app.use(cors({
   credentials: true,
+  allowedHeaders: '',
   origin: (origin, callback) => {
     if (!origin) return callback(null, true)
 
@@ -66,10 +67,11 @@ app.use(session({
   resave: false,
   rolling: true,
   cookie: {
-    httpOnly: true,
-    maxAge: parseInt(env.SESSION_MAX_AGE),
-    sameSite: 'lax'
-    // secure: process.env.NODE_ENV === 'production'
+    httpOnly: false,
+    maxAge: parseInt(env.SESSION_MAX_AGE)
+    // sameSite: 'none',
+    // path: 'https://admin.rolloven.net/',
+    // domain: 'admin.rolloven.net'
   }
 }))
 
