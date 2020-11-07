@@ -231,6 +231,7 @@ const getUserFeed = async (feedFiltersInput: UserFeedFiltersInput, req: Request)
       )
       .where('rc.userID', userID)
       .andWhere('rc.moderationStatus', 'APPROVED')
+      .andWhere('r.moderationStatus', 'APPROVED')
       .leftJoin('reviews as r', 'rc.reviewID', 'r.reviewID')
       .leftJoin('users as u', 'r.userID', 'u.userID')
 
