@@ -33,7 +33,7 @@ app.use(helmet())
 
 app.use(cors({
   credentials: true,
-  allowedHeaders: '',
+  allowedHeaders: 'Set-Cookie',
   origin: (origin, callback) => {
     if (!origin) return callback(null, true)
 
