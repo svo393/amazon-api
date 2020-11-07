@@ -7,7 +7,7 @@ import express from 'express'
 import session from 'express-session'
 import helmet from 'helmet'
 import logger from 'morgan'
-// import path from 'path'
+import path from 'path'
 // import redis from 'redis'
 import router from './routes'
 import env from './utils/config'
@@ -44,7 +44,7 @@ app.use(cors({
   optionsSuccessStatus: 200
 }))
 
-// app.use(express.static(path.join(process.cwd(), 'public')))
+env.STATIC_FILES_ENABLED && app.use(express.static(path.join(process.cwd(), 'public')))
 app.use(express.json())
 app.use(cookieParser())
 

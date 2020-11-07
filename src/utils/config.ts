@@ -8,6 +8,7 @@ type Config = {
   REDIS_PASS: string;
   SESSION_SECRET: string;
   SESSION_MAX_AGE: string;
+  STATIC_FILES_ENABLED: boolean;
   NODE_ENV: string;
   MAIL_HOST: string;
   MAIL_PORT: string;
@@ -29,6 +30,7 @@ const envVars: Config = pickAll([
   'REDIS_PASS',
   'SESSION_SECRET',
   'SESSION_MAX_AGE',
+  'STATIC_FILES_ENABLED',
   'NODE_ENV',
   'MAIL_HOST',
   'MAIL_PORT',
