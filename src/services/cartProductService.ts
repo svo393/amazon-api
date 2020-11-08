@@ -50,11 +50,11 @@ const addCartProduct = async (cartProductInput: CartProductInput, req: Request):
 
     const [ addedCP ]: CartProduct[] = newQty !== undefined
       ? await trx('cartProducts')
-        .first()
-        .update({ qty: newQty }, [ '*' ])
-        .where('productID', productID)
-        .andWhere('userID', userID)
-        .andWhere('size', size)
+          .first()
+          .update({ qty: newQty }, [ '*' ])
+          .where('productID', productID)
+          .andWhere('userID', userID)
+          .andWhere('size', size)
       : await trx('cartProducts')
         .insert({
           ...cartProductInput,
@@ -133,10 +133,10 @@ const getCartProductsByUser = async (localCart: LocalCart, req: Request): Promis
 
         newQty !== undefined
           ? await trx('cartProducts')
-            .update({ qty: newQty }, [ '*' ])
-            .where('productID', cp.productID)
-            .andWhere('userID', userID)
-            .andWhere('size', cp.size)
+              .update({ qty: newQty }, [ '*' ])
+              .where('productID', cp.productID)
+              .andWhere('userID', userID)
+              .andWhere('size', cp.size)
           : await trx('cartProducts')
             .insert({ ...omit([ 'toMerge' ], cp), userID }, [ '*' ])
       }
@@ -243,6 +243,7 @@ const deleteCartProduct = async (cartProductInput: CartProductDeleteInput, req: 
       .del()
       .where('userID', req.params.userID)
       .andWhere('productID', req.params.productID)
+      .andWhere('size', cartProductInput.size)
 
     if (deleteCount === 0 || cartProduct === undefined) throw new StatusError(404, 'Not Found')
 
