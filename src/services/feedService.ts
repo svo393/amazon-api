@@ -34,6 +34,8 @@ const getFeed = async (feedFiltersinput: FeedFiltersInput): Promise<{ batch: Fee
       'u.email as userEmail'
     )
     .join('users as u', 'rc.userID', 'u.userID')
+    .andWhere('rc.moderationStatus', 'APPROVED')
+    .leftJoin('reviews as r', 'rc.reviewID', 'r.reviewID')
     .groupBy('rc.reviewCommentID', 'userEmail')
 
   const questions: (Question & { userEmail: string })[] = await db('questions as q')
