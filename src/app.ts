@@ -69,8 +69,6 @@ app.use(session({
     httpOnly: true,
     maxAge: parseInt(env.SESSION_MAX_AGE),
     sameSite: 'lax'
-    // path: 'https://admin.rolloven.net/',
-    // domain: 'admin.rolloven.net'
   }
 }))
 
