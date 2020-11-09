@@ -54,6 +54,8 @@ const getAsk = async (askFiltersinput: AskFiltersInput, req: Request): Promise<A
     .join('answers as a', 'q.questionID', 'a.questionID')
     .join('users as u', 'a.userID', 'u.userID')
     .where('q.groupID', product.groupID)
+    .andWhere('q.moderationStatus', 'APPROVED')
+    .andWhere('a.moderationStatus', 'APPROVED')
 
   const questionMatches = fuseMatches(_questions, [ 'content' ], q, 'questionID')
   const answerMatches = fuseMatches(_questions, [ 'answerContent' ], q, 'answerID')
@@ -93,6 +95,7 @@ const getAsk = async (askFiltersinput: AskFiltersInput, req: Request): Promise<A
     )
     .join('users as u', 'r.userID', 'u.userID')
     .where('r.groupID', product.groupID)
+    .andWhere('r.moderationStatus', 'APPROVED')
 
   const reviewMatches = fuseMatches(_reviews, [ 'content', 'title' ], q, 'reviewID')
 
