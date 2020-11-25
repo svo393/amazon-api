@@ -69,6 +69,7 @@ app.use(session({
     httpOnly: true,
     maxAge: parseInt(env.SESSION_MAX_AGE),
     sameSite: 'lax'
+    // TODO add domain from origin
   }
 }))
 
