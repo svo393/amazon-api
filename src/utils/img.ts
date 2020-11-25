@@ -93,5 +93,5 @@ export const uploadImages = async (files: Express.Multer.File[], {
     }
   }))
 
-  files.map((file) => { fs.unlink(file.path, (err) => err && logger.error(err)) })
+  files.forEach((file) => { fs.unlink(file.path, (err) => err && logger.error(err)) })
 }
