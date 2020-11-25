@@ -181,15 +181,15 @@ const getQuestionsByGroup = async (questionsInput: QuestionCursorInput, req: Req
 
         return curAnswers.length !== 0
           ? {
-            ...omit([ 'votesDelta' ], q),
-            answers: getCursor({
-              startCursor: undefined,
-              limit: answerLimit,
-              idProp: 'answerID',
-              data: sortItems(curAnswers, 'votesDelta_desc')
-                .map((a) => omit([ 'votesDelta' ], a))
-            })
-          }
+              ...omit([ 'votesDelta' ], q),
+              answers: getCursor({
+                startCursor: undefined,
+                limit: answerLimit,
+                idProp: 'answerID',
+                data: sortItems(curAnswers, 'votesDelta_desc')
+                  .map((a) => omit([ 'votesDelta' ], a))
+              })
+            }
           : omit([ 'votesDelta' ], q)
       })
     }
@@ -244,9 +244,12 @@ const getQuestionByID = async (req: Request): Promise<QuestionWithUser> => {
 }
 
 const updateQuestion = async (questionInput: QuestionUpdateInput, req: Request): Promise<Question> => {
+  const userIsAdmin = [ 'ROOT', 'ADMIN' ].includes(req.session?.role)
+
   const [ updatedQuestion ]: Question[] = await db('questions')
     .update({
       ...questionInput,
+      moderationStatus: userIsAdmin ? questionInput.moderationStatus : 'NEW',
       updatedAt: new Date()
     }, [ '*' ])
     .where('questionID', req.params.questionID)

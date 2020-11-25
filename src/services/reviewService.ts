@@ -315,11 +315,13 @@ const checkExistingReview = async (req: Request): Promise<{ groupID: number; isR
 }
 
 const updateReview = async (reviewInput: ReviewUpdateInput, req: Request): Promise<Review> => {
+  const userIsAdmin = [ 'ROOT', 'ADMIN' ].includes(req.session?.role)
+
   const [ updatedReview ]: Review[] = await db('reviews')
     .update({
       ...reviewInput,
-      updatedAt: new Date(),
-      moderationStatus: 'NEW'
+      moderationStatus: userIsAdmin ? reviewInput.moderationStatus : 'NEW',
+      updatedAt: new Date()
     }, [ '*' ])
     .where('reviewID', req.params.reviewID)
 

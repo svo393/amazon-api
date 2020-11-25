@@ -161,9 +161,12 @@ const getAnswerByID = async (req: Request): Promise<AnswerWithUser> => {
 }
 
 const updateAnswer = async (answerInput: AnswerUpdateInput, req: Request): Promise<Answer> => {
+  const userIsAdmin = [ 'ROOT', 'ADMIN' ].includes(req.session?.role)
+
   const [ updatedAnswer ]: Answer[] = await db('answers')
     .update({
       ...answerInput,
+      moderationStatus: userIsAdmin ? answerInput.moderationStatus : 'NEW',
       updatedAt: new Date()
     }, [ '*' ])
     .where('answerID', req.params.answerID)

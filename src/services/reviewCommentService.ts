@@ -142,9 +142,12 @@ const getReviewCommentByID = async (req: Request): Promise<ReviewCommentWithUser
 }
 
 const updateReviewComment = async (reviewCommentInput: ReviewCommentUpdateInput, req: Request): Promise<ReviewComment> => {
+  const userIsAdmin = [ 'ROOT', 'ADMIN' ].includes(req.session?.role)
+
   const [ updatedReviewComment ]: ReviewComment[] = await db('reviewComments')
     .update({
       ...reviewCommentInput,
+      moderationStatus: userIsAdmin ? reviewCommentInput.moderationStatus : 'NEW',
       updatedAt: new Date()
     }, [ '*' ])
     .where('reviewCommentID', req.params.reviewCommentID)
