@@ -1,5 +1,4 @@
 import checkEmail from 'validator/lib/isEmail'
-import { ObjIndexed } from '../types'
 import StatusError from './StatusError'
 
 type CP = (params: {
@@ -53,7 +52,7 @@ export const hasDefinedProps = <T>(param: T): T => {
 }
 
 export const isInputProvided = (
-  param: ObjIndexed,
+  param: Record<string, any>,
   msg = 'Missing input'
 ): void => {
   if (param === undefined) {

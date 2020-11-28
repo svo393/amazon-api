@@ -1,9 +1,5 @@
 import Fuse from 'fuse.js'
 
-export interface ObjIndexed {
-  [k: string]: any
-}
-
 //
 // Types from schema in order of creation
 //

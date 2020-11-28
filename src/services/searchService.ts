@@ -6,7 +6,6 @@ import {
   GroupVariation,
   Image,
   Matches,
-  ObjIndexed,
   Product,
   ProductSize,
   Question,
@@ -151,7 +150,7 @@ const getAsk = async (
         acc[cur.questionID].answers.push(answer)
       }
       return acc
-    }, {} as ObjIndexed)
+    }, {} as Record<string, any>)
   )
 
   const _reviews: ReviewData[] = await db('reviews as r')
@@ -393,7 +392,7 @@ const getSearch = async (
         }
         return acc
       },
-      {} as ObjIndexed
+      {} as Record<string, any>
     )
 
     const productsWithSizes = productSizes
@@ -419,7 +418,7 @@ const getSearch = async (
       acc[cur.categoryID][2] += 1
     }
     return acc
-  }, {} as ObjIndexed)
+  }, {} as Record<string, any>)
 
   const vendors = _products.reduce((acc, cur) => {
     const isPresent = Boolean(
@@ -436,7 +435,7 @@ const getSearch = async (
       acc[cur.vendorID][2] += isPresent ? 1 : 0
     }
     return acc
-  }, {} as ObjIndexed)
+  }, {} as Record<string, any>)
 
   if (vendorIDs !== undefined) {
     products = products.filter((p) => vendorIDs.includes(p.vendorID))
@@ -576,7 +575,7 @@ const getSearch = async (
         acc[cur.name].add(cur.value)
       }
       return acc
-    }, {} as ObjIndexed)
+    }, {} as Record<string, any>)
 
   filters.Colors = new Set(groupVariations.map((gv) => gv.value))
 

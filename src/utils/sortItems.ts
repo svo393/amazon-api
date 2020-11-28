@@ -1,10 +1,9 @@
 import { equals } from 'ramda'
-import { ObjIndexed } from '../types'
 
 const sortItems = <T>(items: T[], sort: string): T[] => {
   const compareValues = ([_key, _order]: string[]) => (
-    a: ObjIndexed,
-    b: ObjIndexed
+    a: Record<string, any>,
+    b: Record<string, any>
   ) => {
     let key = _key
     let order = _order

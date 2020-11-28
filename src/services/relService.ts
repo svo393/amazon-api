@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import { flatten, omit } from 'ramda'
-import { Image, ObjIndexed, Product } from '../types'
+import { Image, Product } from '../types'
 import { db } from '../utils/db'
 
 const getRelsQuery: any = db('products as p')
@@ -144,7 +144,7 @@ const getCompare = async (
         acc[cur.parameterID].push(cur)
       }
       return acc
-    }, {} as ObjIndexed)
+    }, {} as Record<string, any>)
 
   const _parameters: any = Object.values(parameters).filter(
     (p: any) => p.length > 4
