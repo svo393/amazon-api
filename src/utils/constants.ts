@@ -13,10 +13,9 @@ export const addressTypes = [
 export const moderationStatuses = ['NEW', 'APPROVED', 'REJECTED']
 export const orderStatuses = ['DONE', 'SHIPPED', 'NEW', 'CANCELED']
 export const invoiceStatuses = ['DONE', 'NEW', 'CANCELED']
-
 export const imagesBasePath = './public/media'
-
 export const baseAPI = '/api'
+
 export const apiURLs = {
   addresses: `${baseAPI}/addresses`,
   addressTypes: `${baseAPI}/address-types`,

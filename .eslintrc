@@ -6,22 +6,11 @@
     "eslint:recommended",
     "prettier",
     "prettier/standard",
+    "prettier/@typescript-eslint",
     "plugin:promise/recommended",
     "plugin:sonarjs/recommended"
   ],
   "overrides": [
-    // {
-    //   "env": {
-    //     "browser": true,
-    //     "es2021": true
-    //   },
-    //   "extends": ["plugin:react/recommended", "prettier/react"],
-    //   "files": ["src/**/*.{ts,js,jsx,tsx}"],
-    //   "rules": {
-    //     "react/no-children-prop": "off",
-    //     "react/prop-types": "off"
-    //   }
-    // },
     {
       "env": {
         "commonjs": true,
@@ -45,14 +34,14 @@
     //   ],
     //   "files": ["{src,tests}/**/*.{ts,tsx}"],
     //   "rules": {
-    //     // "@typescript-eslint/no-explicit-any": "on",
-    //     // "@typescript-eslint/no-unsafe-assignment": "on",
-    //     // "@typescript-eslint/no-unsafe-call": "on",
-    //     // "@typescript-eslint/no-unsafe-member-access": "on",
-    //     // "@typescript-eslint/no-unsafe-return": "on",
+    //     // "@typescript-eslint/no-explicit-any": "error",
+    //     // "@typescript-eslint/no-unsafe-assignment": "error",
+    //     // "@typescript-eslint/no-unsafe-call": "error",
+    //     // "@typescript-eslint/no-unsafe-member-access": "error",
+    //     // "@typescript-eslint/no-unsafe-return": "error",
+    //     // "@typescript-eslint/restrict-template-expressions": "error",
     //     "@typescript-eslint/no-unused-params": "off",
-    //     "@typescript-eslint/no-unused-vars": "off",
-    //     // "@typescript-eslint/restrict-template-expressions": "on"
+    //     "@typescript-eslint/no-unused-vars": "off"
     //   }
     // },
     {
@@ -76,10 +65,5 @@
     "prefer-const": "error",
     "no-unused-params": "off",
     "no-unused-vars": "off"
-  },
-  "settings": {
-    "react": {
-      "version": "detect"
-    }
   }
 }
