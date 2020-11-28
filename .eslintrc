@@ -1,80 +1,85 @@
 {
   "env": {
-    "browser": true,
-    "es6": true,
-    "jest": true
+    "es2021": true
   },
   "extends": [
-    "plugin:@typescript-eslint/recommended",
-    "plugin:@typescript-eslint/recommended-requiring-type-checking",
-    "standard"
+    "eslint:recommended",
+    "prettier",
+    "prettier/standard",
+    "plugin:promise/recommended",
+    "plugin:sonarjs/recommended"
+  ],
+  "overrides": [
+    // {
+    //   "env": {
+    //     "browser": true,
+    //     "es2021": true
+    //   },
+    //   "extends": ["plugin:react/recommended", "prettier/react"],
+    //   "files": ["src/**/*.{ts,js,jsx,tsx}"],
+    //   "rules": {
+    //     "react/no-children-prop": "off",
+    //     "react/prop-types": "off"
+    //   }
+    // },
+    {
+      "env": {
+        "commonjs": true,
+        "node": true
+      },
+      "extends": ["plugin:node/recommended"],
+      "files": [
+        "src/**/*.{ts,js,jsx,tsx}",
+        "db/**/*.{ts,js,jsx,tsx}"
+      ],
+      "rules": {
+        "node/no-unsupported-features/es-syntax": "off",
+        "node/no-missing-import": "off"
+      }
+    },
+    // {
+    //   "extends": [
+    //     "prettier/@typescript-eslint",
+    //     "plugin:@typescript-eslint/recommended",
+    //     "plugin:@typescript-eslint/recommended-requiring-type-checking"
+    //   ],
+    //   "files": ["{src,tests}/**/*.{ts,tsx}"],
+    //   "rules": {
+    //     // "@typescript-eslint/no-explicit-any": "on",
+    //     // "@typescript-eslint/no-unsafe-assignment": "on",
+    //     // "@typescript-eslint/no-unsafe-call": "on",
+    //     // "@typescript-eslint/no-unsafe-member-access": "on",
+    //     // "@typescript-eslint/no-unsafe-return": "on",
+    //     "@typescript-eslint/no-unused-params": "off",
+    //     "@typescript-eslint/no-unused-vars": "off",
+    //     // "@typescript-eslint/restrict-template-expressions": "on"
+    //   }
+    // },
+    {
+      "env": {
+        "jest": true,
+        "node": true
+      },
+      "files": ["tests/**/*.{js,jsx,ts,tsx}"]
+    }
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "project": "./tsconfig.json"
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "ecmaVersion": 2021,
+    "project": "tsconfig.eslint.json"
   },
-  "plugins": [
-    "@typescript-eslint"
-  ],
+  "plugins": ["@typescript-eslint", "promise", "sonarjs", "prettier"],
   "rules": {
-    "@typescript-eslint/camelcase": 0,
-    "@typescript-eslint/explicit-function-return-type": 0,
-    "@typescript-eslint/no-explicit-any": 0,
-    "@typescript-eslint/no-unsafe-assignment": 0,
-    "@typescript-eslint/no-unsafe-member-access": 0,
-    "@typescript-eslint/no-unsafe-return": 0,
-    "@typescript-eslint/no-unsafe-call": 0,
-    "@typescript-eslint/no-floating-promises": 0,
-    "@typescript-eslint/restrict-template-expressions": 0,
-    "array-bracket-spacing": [
-      1,
-      "always"
-    ],
-    "arrow-parens": [
-      1,
-      "always"
-    ],
-    "no-unused-vars": 0,
-    "padded-blocks": [
-      1,
-      "never",
-      {
-        "allowSingleLineBlocks": true
-      }
-    ],
-    "padding-line-between-statements": [
-      1,
-      {
-        "blankLine": "always",
-        "next": "*",
-        "prev": "import"
-      },
-      {
-        "blankLine": "never",
-        "next": "import",
-        "prev": "import"
-      },
-      {
-        "blankLine": "always",
-        "next": "export",
-        "prev": "*"
-      },
-      {
-        "blankLine": "any",
-        "next": "export",
-        "prev": "export"
-      },
-      {
-        "blankLine": "always",
-        "next": [
-          "multiline-const",
-          "multiline-let",
-          "multiline-expression",
-          "multiline-block-like"
-        ],
-        "prev": "*"
-      }
-    ],
-    "prefer-const": 0
+    "prefer-const": "error",
+    "no-unused-params": "off",
+    "no-unused-vars": "off"
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
   }
 }
