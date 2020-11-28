@@ -23,7 +23,7 @@ const getCursor = ({
     return {
       totalCount: 0,
       hasNextPage: false,
-      batch: []
+      batch: [] as any[]
     }
   }
 

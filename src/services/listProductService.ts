@@ -1,8 +1,8 @@
 import { Request } from 'express'
-import { List, ListProduct } from '../types'
+import Knex from 'knex'
+import { ListProduct } from '../types'
 import { db, dbTrans } from '../utils/db'
 import StatusError from '../utils/StatusError'
-import Knex from 'knex'
 
 const addListProduct = async (req: Request): Promise<ListProduct> => {
   const {
