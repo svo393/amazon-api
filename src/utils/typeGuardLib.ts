@@ -42,7 +42,9 @@ export const isObject: CP = ({ name, param }) => {
   return { name, param }
 }
 
-export const hasDefinedProps = <T>(param: T): T => {
+export const hasDefinedProps = <T = Record<string, any>>(
+  param: T
+): T => {
   const strippedObject = JSON.parse(JSON.stringify(param))
 
   if (Object.keys(strippedObject).length === 0) {
