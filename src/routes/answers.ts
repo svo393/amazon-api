@@ -1,10 +1,7 @@
 import Router from 'express'
 import answerService from '../services/answerService'
 import voteService from '../services/voteService'
-import {
-  checkAnswerUpdate,
-  checkNewVote
-} from '../utils/inputValidator'
+import { checkAnswerUpdate, checkNewVote } from '../utils/typeGuard'
 import {
   requireAuth,
   requireCreator,

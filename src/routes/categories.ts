@@ -4,7 +4,7 @@ import {
   checkCategoryFilters,
   checkCategoryUpdate,
   checkNewCategory
-} from '../utils/inputValidator'
+} from '../utils/typeGuard'
 import { requireAdmin } from '../utils/middleware'
 
 const router = Router()

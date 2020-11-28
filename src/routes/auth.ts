@@ -8,7 +8,7 @@ import {
   checkUserResetRequest,
   checkUserResetToken,
   checkUserUpdate
-} from '../utils/inputValidator'
+} from '../utils/typeGuard'
 import {
   requireAdmin,
   requireAuth,

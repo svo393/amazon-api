@@ -1,6 +1,6 @@
 import Router from 'express'
 import paymentMethodService from '../services/paymentMethodService'
-import { checkPaymentMethod } from '../utils/inputValidator'
+import { checkPaymentMethod } from '../utils/typeGuard'
 import { requireAdmin } from '../utils/middleware'
 
 const router = Router()

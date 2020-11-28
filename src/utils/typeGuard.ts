@@ -82,7 +82,7 @@ import {
   isProvided,
   isSomeProvided,
   isString
-} from './validatorLib'
+} from './typeGuardLib'
 
 export const checkUserIP = ({ query }: Request): { ip: string } => {
   const ip = isProvided({ name: 'ip', param: query.ip })

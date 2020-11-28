@@ -10,7 +10,7 @@ import {
   checkNewQuestion,
   checkNewReview,
   checkQuestionsCursor
-} from '../utils/inputValidator'
+} from '../utils/typeGuard'
 import { requireAdmin, requireAuth } from '../utils/middleware'
 
 const router = Router()

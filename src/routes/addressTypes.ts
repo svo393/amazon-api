@@ -1,7 +1,7 @@
 import Router from 'express'
 import addressService from '../services/addressService'
 import addressTypeService from '../services/addressTypeService'
-import { checkAddressType } from '../utils/inputValidator'
+import { checkAddressType } from '../utils/typeGuard'
 import { requireAdmin } from '../utils/middleware'
 
 const router = Router()

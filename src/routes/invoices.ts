@@ -4,7 +4,7 @@ import {
   checkInvoiceUpdate,
   checkNewInvoice,
   checkInvoiceFilters
-} from '../utils/inputValidator'
+} from '../utils/typeGuard'
 import {
   requireAdmin,
   requireAuth,

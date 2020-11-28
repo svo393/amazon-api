@@ -4,7 +4,7 @@ import {
   checkImageFilters,
   checkImagesDelete,
   checkImagesUpdate
-} from '../utils/inputValidator'
+} from '../utils/typeGuard'
 
 const router = Router()
 

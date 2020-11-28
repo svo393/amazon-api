@@ -3,7 +3,7 @@ import moderationStatusService from '../services/moderationStatusService'
 import {
   checkNewModerationStatus,
   checkModerationStatusUpdate
-} from '../utils/inputValidator'
+} from '../utils/typeGuard'
 import { requireAdmin } from '../utils/middleware'
 
 const router = Router()

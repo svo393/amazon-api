@@ -5,7 +5,7 @@ import {
   checkAddressUpdate,
   checkNewAddress,
   checkNewUserAddress
-} from '../utils/inputValidator'
+} from '../utils/typeGuard'
 import { requireAuth } from '../utils/middleware'
 
 const router = Router()

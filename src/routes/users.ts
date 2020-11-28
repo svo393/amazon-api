@@ -21,7 +21,7 @@ import {
   checkUserFeedFilters,
   checkUserFilters,
   checkUserRoleUpdate
-} from '../utils/inputValidator'
+} from '../utils/typeGuard'
 import {
   multerUpload,
   requireAdmin,

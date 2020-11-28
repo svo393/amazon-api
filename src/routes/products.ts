@@ -12,7 +12,7 @@ import {
   checkProductFilters,
   checkProductMinFilters,
   checkProductUpdate
-} from '../utils/inputValidator'
+} from '../utils/typeGuard'
 import { multerUpload, requireAdmin } from '../utils/middleware'
 
 const router = Router()

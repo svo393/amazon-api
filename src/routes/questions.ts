@@ -7,7 +7,7 @@ import {
   checkNewAnswer,
   checkNewVote,
   checkQuestionUpdate
-} from '../utils/inputValidator'
+} from '../utils/typeGuard'
 import {
   requireAuth,
   requireCreator,

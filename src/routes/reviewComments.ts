@@ -1,6 +1,6 @@
 import Router from 'express'
 import reviewCommentService from '../services/reviewCommentService'
-import { checkReviewCommentUpdate } from '../utils/inputValidator'
+import { checkReviewCommentUpdate } from '../utils/typeGuard'
 import {
   requireCreator,
   requireCreatorOrAdmin

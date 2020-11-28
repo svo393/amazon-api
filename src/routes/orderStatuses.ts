@@ -3,7 +3,7 @@ import orderStatusService from '../services/orderStatusService'
 import {
   checkNewOrderStatus,
   checkOrderStatusUpdate
-} from '../utils/inputValidator'
+} from '../utils/typeGuard'
 import { requireAdmin } from '../utils/middleware'
 
 const router = Router()

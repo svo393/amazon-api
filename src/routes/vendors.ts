@@ -1,9 +1,6 @@
 import Router from 'express'
 import vendorService from '../services/vendorService'
-import {
-  checkVendor,
-  checkVendorFilters
-} from '../utils/inputValidator'
+import { checkVendor, checkVendorFilters } from '../utils/typeGuard'
 import { requireAdmin } from '../utils/middleware'
 
 const router = Router()

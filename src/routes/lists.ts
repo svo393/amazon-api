@@ -1,10 +1,7 @@
 import Router from 'express'
 import listProductsService from '../services/listProductService'
 import listService from '../services/listService'
-import {
-  checkListUpdate,
-  checkNewList
-} from '../utils/inputValidator'
+import { checkListUpdate, checkNewList } from '../utils/typeGuard'
 import { requireCreator, requireAuth } from '../utils/middleware'
 
 const router = Router()

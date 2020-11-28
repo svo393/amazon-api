@@ -3,7 +3,7 @@ import searchService from '../services/searchService'
 import {
   checkAskFilters,
   checkSearchFilters
-} from '../utils/inputValidator'
+} from '../utils/typeGuard'
 
 const router = Router()
 

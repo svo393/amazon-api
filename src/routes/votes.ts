@@ -1,6 +1,6 @@
 import Router from 'express'
 import voteService from '../services/voteService'
-import { checkVoteFilters } from '../utils/inputValidator'
+import { checkVoteFilters } from '../utils/typeGuard'
 
 const router = Router()
 

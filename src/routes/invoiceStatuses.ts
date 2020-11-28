@@ -3,7 +3,7 @@ import invoiceStatusService from '../services/invoiceStatusService'
 import {
   checkNewInvoiceStatus,
   checkInvoiceStatusUpdate
-} from '../utils/inputValidator'
+} from '../utils/typeGuard'
 import { requireAdmin } from '../utils/middleware'
 
 const router = Router()

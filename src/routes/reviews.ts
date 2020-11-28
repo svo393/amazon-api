@@ -10,7 +10,7 @@ import {
   checkReviewComments,
   checkReviewFilters,
   checkReviewUpdate
-} from '../utils/inputValidator'
+} from '../utils/typeGuard'
 import {
   multerUpload,
   requireAuth,

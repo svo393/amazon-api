@@ -1,6 +1,6 @@
 import Router from 'express'
 import roleService from '../services/roleService'
-import { checkRole } from '../utils/inputValidator'
+import { checkRole } from '../utils/typeGuard'
 import { requireRoot } from '../utils/middleware'
 
 const router = Router()

@@ -1,6 +1,6 @@
 import Router from 'express'
 import parameterService from '../services/parameterService'
-import { checkParameter } from '../utils/inputValidator'
+import { checkParameter } from '../utils/typeGuard'
 import { requireAdmin } from '../utils/middleware'
 
 const router = Router()

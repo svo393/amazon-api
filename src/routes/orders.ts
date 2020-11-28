@@ -5,7 +5,7 @@ import {
   checkOrderProduct,
   checkOrderFilters,
   checkOrderUpdate
-} from '../utils/inputValidator'
+} from '../utils/typeGuard'
 import {
   requireAdmin,
   requireAuth,

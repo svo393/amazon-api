@@ -1,6 +1,6 @@
 import Router from 'express'
 import shippingMethodService from '../services/shippingMethodService'
-import { checkShippingMethod } from '../utils/inputValidator'
+import { checkShippingMethod } from '../utils/typeGuard'
 import { requireAdmin } from '../utils/middleware'
 
 const router = Router()
