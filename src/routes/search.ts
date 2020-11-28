@@ -1,6 +1,9 @@
 import Router from 'express'
 import searchService from '../services/searchService'
-import { checkAskFilters, checkSearchFilters } from '../utils/inputValidator'
+import {
+  checkAskFilters,
+  checkSearchFilters
+} from '../utils/inputValidator'
 
 const router = Router()
 

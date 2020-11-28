@@ -1,20 +1,28 @@
 import { Request } from 'express'
-import { ShippingMethod as SM, ShippingMethodInput as SMInput } from '../types'
+import {
+  ShippingMethod as SM,
+  ShippingMethodInput as SMInput
+} from '../types'
 import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
 const addShippingMethod = async (smInput: SMInput): Promise<SM> => {
-  const { rows: [ addedSM ] }: { rows: SM[] } = await db.raw(
+  const {
+    rows: [addedSM]
+  }: { rows: SM[] } = await db.raw(
     `
     ? ON CONFLICT
       DO NOTHING
       RETURNING *;
     `,
-    [ db('shippingMethods').insert(smInput) ]
+    [db('shippingMethods').insert(smInput)]
   )
 
   if (addedSM === undefined) {
-    throw new StatusError(409, `ShippingMethod with name "${smInput.shippingMethodName}" already exists`)
+    throw new StatusError(
+      409,
+      `ShippingMethod with name "${smInput.shippingMethodName}" already exists`
+    )
   }
   return addedSM
 }
@@ -32,9 +40,12 @@ const getShippingMethodByName = async (req: Request): Promise<SM> => {
   return sm
 }
 
-const updateShippingMethod = async (smInput: SMInput, req: Request): Promise<SM> => {
-  const [ updatedSM ]: SM[] = await db('shippingMethods')
-    .update(smInput, [ '*' ])
+const updateShippingMethod = async (
+  smInput: SMInput,
+  req: Request
+): Promise<SM> => {
+  const [updatedSM]: SM[] = await db('shippingMethods')
+    .update(smInput, ['*'])
     .where('shippingMethodName', req.params.shippingMethodName)
 
   if (updatedSM === undefined) throw new StatusError(404, 'Not Found')

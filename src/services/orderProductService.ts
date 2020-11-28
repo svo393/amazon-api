@@ -4,36 +4,52 @@ import { db, dbTrans } from '../utils/db'
 import StatusError from '../utils/StatusError'
 import Knex from 'knex'
 
-const addOrderProduct = async (orderProductInput: OrderProductInput, req: Request): Promise<OrderProduct> => {
-  const { rows: [ addedOrderProduct ] }: { rows: OrderProduct[] } = await db.raw(
+const addOrderProduct = async (
+  orderProductInput: OrderProductInput,
+  req: Request
+): Promise<OrderProduct> => {
+  const {
+    rows: [addedOrderProduct]
+  }: { rows: OrderProduct[] } = await db.raw(
     `
     ? ON CONFLICT
       DO NOTHING
       RETURNING *;
     `,
-    [ db('orderProducts').insert({
-      ...orderProductInput,
-      orderID: req.params.orderID,
-      productID: req.params.productID
-    }) ]
+    [
+      db('orderProducts').insert({
+        ...orderProductInput,
+        orderID: req.params.orderID,
+        productID: req.params.productID
+      })
+    ]
   )
 
   if (addedOrderProduct === undefined) {
-    throw new StatusError(409, 'This product is already added to the order')
+    throw new StatusError(
+      409,
+      'This product is already added to the order'
+    )
   }
   return addedOrderProduct
 }
 
-const updateOrderProduct = async (orderProductInput: OrderProductInput, req: Request): Promise<OrderProduct> => {
+const updateOrderProduct = async (
+  orderProductInput: OrderProductInput,
+  req: Request
+): Promise<OrderProduct> => {
   const { qty, size, price } = orderProductInput
   return await dbTrans(async (trx: Knex.Transaction) => {
-    const [ updatedOrderProduct ]: OrderProduct[] = await trx('orderProducts')
-      .update({ qty, price }, [ '*' ])
+    const [updatedOrderProduct]: OrderProduct[] = await trx(
+      'orderProducts'
+    )
+      .update({ qty, price }, ['*'])
       .where('productID', req.params.productID)
       .andWhere('orderID', req.params.orderID)
       .andWhere('size', size)
 
-    if (updatedOrderProduct === undefined) throw new StatusError(404, 'Not Found')
+    if (updatedOrderProduct === undefined)
+      throw new StatusError(404, 'Not Found')
 
     await trx('orders')
       .update({ updatedAt: new Date() })

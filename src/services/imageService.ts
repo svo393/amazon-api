@@ -1,17 +1,22 @@
 import { Request } from 'express'
 import fs from 'fs'
 import Knex from 'knex'
-import { Image, ImagesDeleteInput, ImagesFiltersInput, ImagesUpdateInput, Product, Review } from '../types'
+import {
+  Image,
+  ImagesDeleteInput,
+  ImagesFiltersInput,
+  ImagesUpdateInput,
+  Product,
+  Review
+} from '../types'
 import { imagesBasePath } from '../utils/constants'
 import { db, dbTrans } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
-const getImages = async (imagesFiltersinput: ImagesFiltersInput): Promise<Image[]> => {
-  const {
-    productID,
-    reviewID,
-    userID
-  } = imagesFiltersinput
+const getImages = async (
+  imagesFiltersinput: ImagesFiltersInput
+): Promise<Image[]> => {
+  const { productID, reviewID, userID } = imagesFiltersinput
 
   return await db<Image>('images')
     .where('productID', productID ?? 0)
@@ -24,8 +29,10 @@ const getImagesByGroup = async (req: Request): Promise<Image[]> => {
     .select('productID')
     .where('groupID', req.params.groupID)
 
-  return await db('images')
-    .whereIn('productID', products.map((p) => p.productID))
+  return await db('images').whereIn(
+    'productID',
+    products.map((p) => p.productID)
+  )
 }
 
 const getReviewImages = async (req: Request): Promise<Image[]> => {
@@ -33,28 +40,39 @@ const getReviewImages = async (req: Request): Promise<Image[]> => {
     .select('reviewID')
     .where('groupID', req.params.groupID)
 
-  return await db<Image>('images')
-    .whereIn('reviewID', reviews.map((p) => p.reviewID))
+  return await db<Image>('images').whereIn(
+    'reviewID',
+    reviews.map((p) => p.reviewID)
+  )
 }
 
-const updateImages = async (images: ImagesUpdateInput): Promise<Image[]> => {
+const updateImages = async (
+  images: ImagesUpdateInput
+): Promise<Image[]> => {
   return dbTrans(async (trx: Knex.Transaction) => {
-    return await Promise.all(images.map(async (i) => {
-      await trx('images')
-        .update({ index: Number((`${Date.now()}${i.imageID}`).slice(8)) })
-        .where('imageID', i.imageID)
+    return await Promise.all(
+      images.map(async (i) => {
+        await trx('images')
+          .update({
+            index: Number(`${Date.now()}${i.imageID}`.slice(8))
+          })
+          .where('imageID', i.imageID)
 
-      const [ updatedImage ]: Image[] = await trx('images')
-        .update({ index: i.index }, [ '*' ])
-        .where('imageID', i.imageID)
+        const [updatedImage]: Image[] = await trx('images')
+          .update({ index: i.index }, ['*'])
+          .where('imageID', i.imageID)
 
-      if (updatedImage === undefined) throw new StatusError(404, 'Not Found')
-      return updatedImage
-    }))
+        if (updatedImage === undefined)
+          throw new StatusError(404, 'Not Found')
+        return updatedImage
+      })
+    )
   })
 }
 
-const deleteImages = async (images: ImagesDeleteInput): Promise<void> => {
+const deleteImages = async (
+  images: ImagesDeleteInput
+): Promise<void> => {
   const imageIDs = images.map((i) => i.imageID)
 
   await dbTrans(async (trx: Knex.Transaction) => {
@@ -70,9 +88,10 @@ const deleteImages = async (images: ImagesDeleteInput): Promise<void> => {
     const filesToDelete = new Set()
 
     files.forEach((f) =>
-      imageIDs.forEach((id) =>
-        f.includes(id.toString()) && filesToDelete.add(f)
-      ))
+      imageIDs.forEach(
+        (id) => f.includes(id.toString()) && filesToDelete.add(f)
+      )
+    )
 
     filesToDelete.forEach((f) => fs.unlinkSync(`${dir}/${f}`))
   })

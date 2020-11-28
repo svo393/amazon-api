@@ -18,7 +18,10 @@ router.get('/', requireRoot, async (_, res) => {
 
 router.put('/:roleName', requireRoot, async (req, res) => {
   const roleUpdateInput = checkRole(req)
-  const updatedRole = await roleService.updateRole(roleUpdateInput, req)
+  const updatedRole = await roleService.updateRole(
+    roleUpdateInput,
+    req
+  )
   res.json(updatedRole)
 })
 

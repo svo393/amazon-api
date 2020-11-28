@@ -1,13 +1,18 @@
 import Router from 'express'
 import orderStatusService from '../services/orderStatusService'
-import { checkNewOrderStatus, checkOrderStatusUpdate } from '../utils/inputValidator'
+import {
+  checkNewOrderStatus,
+  checkOrderStatusUpdate
+} from '../utils/inputValidator'
 import { requireAdmin } from '../utils/middleware'
 
 const router = Router()
 
 router.post('/', requireAdmin, async (req, res) => {
   const orderStatusCreateInput = checkNewOrderStatus(req)
-  const addedOrderStatus = await orderStatusService.addOrderStatus(orderStatusCreateInput)
+  const addedOrderStatus = await orderStatusService.addOrderStatus(
+    orderStatusCreateInput
+  )
   res.status(201).json(addedOrderStatus)
 })
 
@@ -18,7 +23,10 @@ router.get('/', requireAdmin, async (_, res) => {
 
 router.put('/:orderStatusName', requireAdmin, async (req, res) => {
   const orderStatusUpdateInput = checkOrderStatusUpdate(req)
-  const updatedOrderStatus = await orderStatusService.updateOrderStatus(orderStatusUpdateInput, req)
+  const updatedOrderStatus = await orderStatusService.updateOrderStatus(
+    orderStatusUpdateInput,
+    req
+  )
   res.json(updatedOrderStatus)
 })
 

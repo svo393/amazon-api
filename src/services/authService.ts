@@ -4,14 +4,29 @@ import bcrypt from 'bcrypt'
 import { Request } from 'express'
 import { omit } from 'ramda'
 // import { promisify } from 'util'
-import { Follower, PasswordRequestInput, PasswordResetInput, User, UserLoginInput, UserPasswordUpdateInput, UserSafeData, UserSignupInput, UserUpdateInput } from '../types'
+import {
+  Follower,
+  PasswordRequestInput,
+  PasswordResetInput,
+  User,
+  UserLoginInput,
+  UserPasswordUpdateInput,
+  UserSafeData,
+  UserSignupInput,
+  UserUpdateInput
+} from '../types'
 import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
 // import { makeEmail, transport } from '../utils/mail'
 
-type UserBaseData = Omit<UserSafeData, | 'role'> & { following: number[] }
+type UserBaseData = Omit<UserSafeData, 'role'> & {
+  following: number[]
+}
 
-const signupUser = async (userInput: UserSignupInput, req: Request): Promise<UserBaseData> => {
+const signupUser = async (
+  userInput: UserSignupInput,
+  req: Request
+): Promise<UserBaseData> => {
   const { email, password, name } = userInput
 
   const existingUser = await db<User>('users')
@@ -19,37 +34,47 @@ const signupUser = async (userInput: UserSignupInput, req: Request): Promise<Use
     .where('email', email)
 
   if (existingUser !== undefined) {
-    throw new StatusError(409, `User with email '${email}' already exists`)
+    throw new StatusError(
+      409,
+      `User with email '${email}' already exists`
+    )
   }
 
   const passwordHash = await bcrypt.hash(password, 10)
 
-  const [ addedUser ]: User[] = await db<User>('users')
-    .insert({
+  const [addedUser]: User[] = await db<User>('users').insert(
+    {
       name,
       email,
       password: passwordHash,
       createdAt: new Date(),
       role: 'CUSTOMER'
-    }, [ '*' ])
+    },
+    ['*']
+  )
 
-  if (addedUser === undefined) { throw new StatusError() }
+  if (addedUser === undefined) {
+    throw new StatusError()
+  }
 
   if (req.session !== undefined) {
     req.session.userID = addedUser.userID
     req.session.role = addedUser.role
   }
   return {
-    ...omit([
-      'password',
-      'resetToken',
-      'resetTokenCreatedAt'
-    ], addedUser),
+    ...omit(
+      ['password', 'resetToken', 'resetTokenCreatedAt'],
+      addedUser
+    ),
     following: []
   }
 }
 
-const loginUser = async (userInput: UserLoginInput, req: Request, requiresAdmin = false): Promise<UserBaseData> => {
+const loginUser = async (
+  userInput: UserLoginInput,
+  req: Request,
+  requiresAdmin = false
+): Promise<UserBaseData> => {
   const { email, password } = userInput
 
   const existingUser = await db<User>('users')
@@ -60,7 +85,10 @@ const loginUser = async (userInput: UserLoginInput, req: Request, requiresAdmin 
     throw new StatusError(401, 'Invalid Email or Password')
   }
 
-  if (requiresAdmin && ![ 'ADMIN', 'ROOT' ].includes(existingUser.role)) {
+  if (
+    requiresAdmin &&
+    !['ADMIN', 'ROOT'].includes(existingUser.role)
+  ) {
     throw new StatusError(403, 'Forbidden')
   }
 
@@ -68,7 +96,10 @@ const loginUser = async (userInput: UserLoginInput, req: Request, requiresAdmin 
     .select('follows')
     .where('userID', existingUser.userID)
 
-  const isPasswordValid = await bcrypt.compare(password, existingUser.password)
+  const isPasswordValid = await bcrypt.compare(
+    password,
+    existingUser.password
+  )
 
   if (!isPasswordValid) {
     throw new StatusError(401, 'Invalid Email or Password')
@@ -80,24 +111,35 @@ const loginUser = async (userInput: UserLoginInput, req: Request, requiresAdmin 
   }
 
   return {
-    ...omit([
-      'password',
-      'resetToken',
-      'resetTokenCreatedAt'
-    ], existingUser),
+    ...omit(
+      ['password', 'resetToken', 'resetTokenCreatedAt'],
+      existingUser
+    ),
     following: users.map((u) => u.follows)
   }
 }
 
-type UserInfo = Pick<User, 'userID' | 'role' | 'avatar' | 'name' | 'cover'> & { following: number[] }
+type UserInfo = Pick<
+  User,
+  'userID' | 'role' | 'avatar' | 'name' | 'cover'
+> & { following: number[] }
 
-const checkInUser = async ({ ip }: { ip: string }, req: Request): Promise<Partial<UserInfo> & { countryFromIP: string }> => {
+const checkInUser = async (
+  { ip }: { ip: string },
+  req: Request
+): Promise<Partial<UserInfo> & { countryFromIP: string }> => {
   let countryFromIP
 
   try {
-    const { data } = (await axios.get(`https://ipapi.co/${ip}/country_name`))
-    countryFromIP = ![ undefined, 'Undefined' ].includes(data) ? data : 'anywhere*'
-  } catch (error) { countryFromIP = 'anywhere*' }
+    const { data } = await axios.get(
+      `https://ipapi.co/${ip}/country_name`
+    )
+    countryFromIP = ![undefined, 'Undefined'].includes(data)
+      ? data
+      : 'anywhere*'
+  } catch (error) {
+    countryFromIP = 'anywhere*'
+  }
 
   if (req.session?.userID === undefined) {
     return { countryFromIP }
@@ -120,41 +162,76 @@ const checkInUser = async ({ ip }: { ip: string }, req: Request): Promise<Partia
   }
 }
 
-const updateProfile = async (userInput: UserUpdateInput, req: Request): Promise<Omit<UserInfo, 'following'>> => {
-  const [ updatedUser ]: Pick<User, 'userID' | 'role' | 'avatar' | 'name' | 'cover' | 'info'>[] = await db('users')
-    .update(userInput, [ 'userID', 'role', 'avatar', 'name', 'cover', 'info' ])
+const updateProfile = async (
+  userInput: UserUpdateInput,
+  req: Request
+): Promise<Omit<UserInfo, 'following'>> => {
+  const [updatedUser]: Pick<
+    User,
+    'userID' | 'role' | 'avatar' | 'name' | 'cover' | 'info'
+  >[] = await db('users')
+    .update(userInput, [
+      'userID',
+      'role',
+      'avatar',
+      'name',
+      'cover',
+      'info'
+    ])
     .where('userID', req.params.userID)
 
-  if (updatedUser === undefined) { throw new StatusError(404, 'Not Found') }
+  if (updatedUser === undefined) {
+    throw new StatusError(404, 'Not Found')
+  }
 
   return updatedUser
 }
 
-const updatePassword = async (userInput: UserPasswordUpdateInput, req: Request): Promise<Omit<UserInfo, 'following' | 'cover' | 'role'>> => {
+const updatePassword = async (
+  userInput: UserPasswordUpdateInput,
+  req: Request
+): Promise<Omit<UserInfo, 'following' | 'cover' | 'role'>> => {
   const { curPassword, newPassword } = userInput
 
   const user = await db<User>('users')
     .first()
     .where('userID', req.session?.userID)
 
-  if (user === undefined) { throw new StatusError(404, 'Not Found') }
+  if (user === undefined) {
+    throw new StatusError(404, 'Not Found')
+  }
 
-  const isPasswordValid = await bcrypt.compare(curPassword, user.password)
-  if (!isPasswordValid) { throw new StatusError(401, 'Invalid Password') }
+  const isPasswordValid = await bcrypt.compare(
+    curPassword,
+    user.password
+  )
+  if (!isPasswordValid) {
+    throw new StatusError(401, 'Invalid Password')
+  }
 
   const passwordHash = await bcrypt.hash(newPassword, 10)
 
-  const [ updatedUser ]: Pick<User, 'userID' | 'avatar' | 'name' | 'info'>[] = await db('users')
-    .update({ password: passwordHash }, [ 'userID', 'avatar', 'name', 'info' ])
+  const [updatedUser]: Pick<
+    User,
+    'userID' | 'avatar' | 'name' | 'info'
+  >[] = await db('users')
+    .update({ password: passwordHash }, [
+      'userID',
+      'avatar',
+      'name',
+      'info'
+    ])
     .where('userID', req.params.userID)
 
-  if (updatedUser === undefined) { throw new StatusError() }
+  if (updatedUser === undefined) {
+    throw new StatusError()
+  }
 
   return updatedUser
 }
 
 const deleteUser = async (req: Request): Promise<void> => {
-  if ([ 'ROOT', 'ADMIN' ].includes(req.session?.role)) {
+  if (['ROOT', 'ADMIN'].includes(req.session?.role)) {
     throw new StatusError(451, 'Not gonna happen')
   }
 
@@ -165,7 +242,9 @@ const deleteUser = async (req: Request): Promise<void> => {
   if (deleteCount === 0) throw new StatusError(404, 'Not Found')
 }
 
-const sendPasswordReset = async (userInput: PasswordRequestInput): Promise<void> => {
+const sendPasswordReset = async (
+  userInput: PasswordRequestInput
+): Promise<void> => {
   const { email } = userInput
 
   const user = await db<User>('users')
@@ -198,23 +277,32 @@ const sendPasswordReset = async (userInput: PasswordRequestInput): Promise<void>
   // }
 }
 
-const resetPassword = async ({ newPassword, resetToken }: PasswordResetInput, req: Request): Promise<UserBaseData> => {
+const resetPassword = async (
+  { newPassword, resetToken }: PasswordResetInput,
+  req: Request
+): Promise<UserBaseData> => {
   const user = await db<User>('users')
     .first('userID', 'resetTokenCreatedAt')
     .where('resetToken', resetToken)
 
-  if (user?.resetTokenCreatedAt === undefined || Number(user.resetTokenCreatedAt) + 3600000 < Date.now()) {
+  if (
+    user?.resetTokenCreatedAt === undefined ||
+    Number(user.resetTokenCreatedAt) + 3600000 < Date.now()
+  ) {
     throw new StatusError(401, 'OTP is invalid or expired')
   }
 
   const passwordHash = await bcrypt.hash(newPassword, 10)
 
-  const [ updatedUser ]: User[] = await db<User>('users')
-    .update({
-      resetToken: null,
-      resetTokenCreatedAt: null,
-      password: passwordHash
-    }, [ '*' ])
+  const [updatedUser]: User[] = await db<User>('users')
+    .update(
+      {
+        resetToken: null,
+        resetTokenCreatedAt: null,
+        password: passwordHash
+      },
+      ['*']
+    )
     .where('userID', user.userID)
 
   const users: Pick<Follower, 'follows'>[] = await db('followers')
@@ -227,11 +315,10 @@ const resetPassword = async ({ newPassword, resetToken }: PasswordResetInput, re
   }
 
   return {
-    ...omit([
-      'password',
-      'resetToken',
-      'resetTokenCreatedAt'
-    ], updatedUser),
+    ...omit(
+      ['password', 'resetToken', 'resetTokenCreatedAt'],
+      updatedUser
+    ),
     following: users.map((u) => u.follows)
   }
 }

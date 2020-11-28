@@ -1,7 +1,88 @@
 import { Request } from 'express'
 import { pipe } from 'ramda'
-import { AddressCreateInput, AddressTypeInput, AddressUpdateInput, AnswerCreateInput, AnswerUpdateInput, AskFiltersInput, CartProduct, CartProductDeleteInput, CartProductInput, CategoriesFiltersInput, CategoryCreateInput, CategoryUpdateInput, CursorInput, FeedFiltersInput, GroupVariationCreateInput, GroupVariationDeleteInput, GroupVariationUpdateInput, HistoryInput, ImagesDeleteInput, ImagesFiltersInput, ImagesUpdateInput, InvoiceCreateInput, InvoicesFiltersInput, InvoiceStatus, InvoiceUpdateInput, ListCreateInput, ListUpdateInput, LocalCart, ModerationStatus, OrderCreateInput, OrderProductInput, OrdersFiltersInput, OrderStatus, OrderUpdateInput, ParameterInput, PasswordRequestInput, PasswordResetInput, PaymentMethod, ProductCreateInput, ProductsFiltersInput, ProductUpdateInput, QuestionCreateInput, QuestionCursorInput, QuestionUpdateInput, ReviewCommentCreateInput, ReviewCommentUpdateInput, ReviewCreateInput, ReviewsFiltersInput, ReviewUpdateInput, Role, SearchFiltersInput, ShippingMethodInput, UserAddressCreateInput, UserAddressUpdateInput, UserFeedFiltersInput, UserLoginInput, UserPasswordUpdateInput, UserRoleUpdateInput, UsersFiltersInput, UserSignupInput, UserUpdateInput, VendorInput, VendorsFiltersInput, VotesCreateInput, VotesFiltersInput } from '../types'
-import { canBeBoolean, canBeNumber, hasDefinedProps, isArray, isDate, isEmail, isInputProvided, isNonEmptyString, isNonEmptyStringOrNull, isPasswordValid, isPositiveNumber, isProvided, isSomeProvided, isString } from './validatorLib'
+import {
+  AddressCreateInput,
+  AddressTypeInput,
+  AddressUpdateInput,
+  AnswerCreateInput,
+  AnswerUpdateInput,
+  AskFiltersInput,
+  CartProduct,
+  CartProductDeleteInput,
+  CartProductInput,
+  CategoriesFiltersInput,
+  CategoryCreateInput,
+  CategoryUpdateInput,
+  CursorInput,
+  FeedFiltersInput,
+  GroupVariationCreateInput,
+  GroupVariationDeleteInput,
+  GroupVariationUpdateInput,
+  HistoryInput,
+  ImagesDeleteInput,
+  ImagesFiltersInput,
+  ImagesUpdateInput,
+  InvoiceCreateInput,
+  InvoicesFiltersInput,
+  InvoiceStatus,
+  InvoiceUpdateInput,
+  ListCreateInput,
+  ListUpdateInput,
+  LocalCart,
+  ModerationStatus,
+  OrderCreateInput,
+  OrderProductInput,
+  OrdersFiltersInput,
+  OrderStatus,
+  OrderUpdateInput,
+  ParameterInput,
+  PasswordRequestInput,
+  PasswordResetInput,
+  PaymentMethod,
+  ProductCreateInput,
+  ProductsFiltersInput,
+  ProductUpdateInput,
+  QuestionCreateInput,
+  QuestionCursorInput,
+  QuestionUpdateInput,
+  ReviewCommentCreateInput,
+  ReviewCommentUpdateInput,
+  ReviewCreateInput,
+  ReviewsFiltersInput,
+  ReviewUpdateInput,
+  Role,
+  SearchFiltersInput,
+  ShippingMethodInput,
+  UserAddressCreateInput,
+  UserAddressUpdateInput,
+  UserFeedFiltersInput,
+  UserLoginInput,
+  UserPasswordUpdateInput,
+  UserRoleUpdateInput,
+  UsersFiltersInput,
+  UserSignupInput,
+  UserUpdateInput,
+  VendorInput,
+  VendorsFiltersInput,
+  VotesCreateInput,
+  VotesFiltersInput
+} from '../types'
+import {
+  canBeBoolean,
+  canBeNumber,
+  hasDefinedProps,
+  isArray,
+  isDate,
+  isEmail,
+  isInputProvided,
+  isNonEmptyString,
+  isNonEmptyStringOrNull,
+  isPasswordValid,
+  isPositiveNumber,
+  isProvided,
+  isSomeProvided,
+  isString
+} from './validatorLib'
 
 export const checkUserIP = ({ query }: Request): { ip: string } => {
   const ip = isProvided({ name: 'ip', param: query.ip })
@@ -45,9 +126,10 @@ export const checkUserLogin = ({ body }: Request): UserLoginInput => {
     isNonEmptyString
   )({ name: 'password', param: body.password })
 
-  const remember = 'remember' in body
-    ? canBeBoolean({ name: 'remember', param: body.remember })
-    : undefined
+  const remember =
+    'remember' in body
+      ? canBeBoolean({ name: 'remember', param: body.remember })
+      : undefined
 
   return {
     email: email.param.toLowerCase(),
@@ -56,31 +138,36 @@ export const checkUserLogin = ({ body }: Request): UserLoginInput => {
   }
 }
 
-export const checkUserUpdate = ({ body }: Request): UserUpdateInput => {
-  const email = 'email' in body
-    ? pipe(
-        isNonEmptyString,
-        isEmail
-      )({ name: 'email', param: body.email })
-    : undefined
+export const checkUserUpdate = ({
+  body
+}: Request): UserUpdateInput => {
+  const email =
+    'email' in body
+      ? pipe(
+          isNonEmptyString,
+          isEmail
+        )({ name: 'email', param: body.email })
+      : undefined
 
-  const name = 'name' in body
-    ? isNonEmptyString(
-        { name: 'name', param: body.name }
-      )
-    : undefined
+  const name =
+    'name' in body
+      ? isNonEmptyString({ name: 'name', param: body.name })
+      : undefined
 
-  const info = 'info' in body
-    ? isNonEmptyStringOrNull({ name: 'info', param: body.info })
-    : undefined
+  const info =
+    'info' in body
+      ? isNonEmptyStringOrNull({ name: 'info', param: body.info })
+      : undefined
 
-  const avatar = 'avatar' in body
-    ? canBeBoolean({ name: 'avatar', param: body.avatar })
-    : undefined
+  const avatar =
+    'avatar' in body
+      ? canBeBoolean({ name: 'avatar', param: body.avatar })
+      : undefined
 
-  const cover = 'cover' in body
-    ? canBeBoolean({ name: 'cover', param: body.cover })
-    : undefined
+  const cover =
+    'cover' in body
+      ? canBeBoolean({ name: 'cover', param: body.cover })
+      : undefined
 
   return hasDefinedProps<UserUpdateInput>({
     name: name?.param,
@@ -91,28 +178,36 @@ export const checkUserUpdate = ({ body }: Request): UserUpdateInput => {
   })
 }
 
-export const checkUserRoleUpdate = ({ body }: Request): UserRoleUpdateInput => {
-  const role = isNonEmptyString(
-    { name: 'role', param: body.role }
-  )
+export const checkUserRoleUpdate = ({
+  body
+}: Request): UserRoleUpdateInput => {
+  const role = isNonEmptyString({ name: 'role', param: body.role })
 
   return { role: role.param }
 }
 
-export const checkUserPasswordUpdate = ({ body }: Request): UserPasswordUpdateInput => {
-  const curPassword = isNonEmptyString(
-    { name: 'curPassword', param: body.curPassword }
-  )
+export const checkUserPasswordUpdate = ({
+  body
+}: Request): UserPasswordUpdateInput => {
+  const curPassword = isNonEmptyString({
+    name: 'curPassword',
+    param: body.curPassword
+  })
 
   const newPassword = pipe(
     isNonEmptyString,
     isPasswordValid
   )({ name: 'newPassword', param: body.newPassword })
 
-  return { curPassword: curPassword.param, newPassword: newPassword.param }
+  return {
+    curPassword: curPassword.param,
+    newPassword: newPassword.param
+  }
 }
 
-export const checkUserResetRequest = ({ body }: Request): PasswordRequestInput => {
+export const checkUserResetRequest = ({
+  body
+}: Request): PasswordRequestInput => {
   const email = pipe(
     isProvided,
     isNonEmptyString,
@@ -122,7 +217,9 @@ export const checkUserResetRequest = ({ body }: Request): PasswordRequestInput =
   return { email: email.param.toLowerCase() }
 }
 
-export const checkUserResetToken = ({ body }: Request): PasswordResetInput => {
+export const checkUserResetToken = ({
+  body
+}: Request): PasswordResetInput => {
   const resetToken = pipe(
     isProvided,
     isNonEmptyString
@@ -140,15 +237,18 @@ export const checkUserResetToken = ({ body }: Request): PasswordResetInput => {
   }
 }
 
-export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
+export const checkNewProduct = ({
+  body
+}: Request): ProductCreateInput => {
   const title = pipe(
     isProvided,
     isNonEmptyString
   )({ name: 'title', param: body.title })
 
-  const listPrice = 'listPrice' in body
-    ? canBeNumber({ name: 'listPrice', param: body.listPrice })
-    : undefined
+  const listPrice =
+    'listPrice' in body
+      ? canBeNumber({ name: 'listPrice', param: body.listPrice })
+      : undefined
 
   const price = pipe(
     isProvided,
@@ -160,17 +260,23 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
     isNonEmptyString
   )({ name: 'bullets', param: body.bullets })
 
-  const description = 'description' in body
-    ? isNonEmptyString({ name: 'description', param: body.description })
-    : undefined
+  const description =
+    'description' in body
+      ? isNonEmptyString({
+          name: 'description',
+          param: body.description
+        })
+      : undefined
 
-  const stock = 'stock' in body
-    ? canBeNumber({ name: 'stock', param: body.stock })
-    : undefined
+  const stock =
+    'stock' in body
+      ? canBeNumber({ name: 'stock', param: body.stock })
+      : undefined
 
-  let productSizes = 'productSizes' in body
-    ? isArray({ name: 'productSizes', param: body.productSizes })
-    : undefined
+  let productSizes =
+    'productSizes' in body
+      ? isArray({ name: 'productSizes', param: body.productSizes })
+      : undefined
 
   productSizes = {
     ...productSizes,
@@ -188,8 +294,8 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
   }
 
   isSomeProvided({
-    input: [ stock, productSizes ],
-    names: [ 'stock', 'productSizes' ]
+    input: [stock, productSizes],
+    names: ['stock', 'productSizes']
   })
 
   const isAvailable = pipe(
@@ -207,13 +313,18 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
     canBeNumber
   )({ name: 'vendorID', param: body.vendorID })
 
-  const groupID = 'groupID' in body
-    ? canBeNumber({ name: 'groupID', param: body.groupID })
-    : undefined
+  const groupID =
+    'groupID' in body
+      ? canBeNumber({ name: 'groupID', param: body.groupID })
+      : undefined
 
-  let groupVariations = 'groupVariations' in body
-    ? isArray({ name: 'groupVariations', param: body.groupVariations })
-    : undefined
+  let groupVariations =
+    'groupVariations' in body
+      ? isArray({
+          name: 'groupVariations',
+          param: body.groupVariations
+        })
+      : undefined
 
   groupVariations = {
     ...groupVariations,
@@ -230,9 +341,13 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
     }))
   }
 
-  let productParameters = 'productParameters' in body
-    ? isArray({ name: 'productParameters', param: body.productParameters })
-    : undefined
+  let productParameters =
+    'productParameters' in body
+      ? isArray({
+          name: 'productParameters',
+          param: body.productParameters
+        })
+      : undefined
 
   productParameters = {
     ...productParameters,
@@ -266,23 +381,32 @@ export const checkNewProduct = ({ body }: Request): ProductCreateInput => {
   }
 }
 
-export const checkProductByID = ({ query }: Request): { reviewCountPerProduct?: true } => {
-  const reviewCountPerProduct = 'reviewCountPerProduct' in query
-    ? canBeBoolean({ name: 'reviewCountPerProduct', param: query.reviewCountPerProduct })
-    : undefined
+export const checkProductByID = ({
+  query
+}: Request): { reviewCountPerProduct?: true } => {
+  const reviewCountPerProduct =
+    'reviewCountPerProduct' in query
+      ? canBeBoolean({
+          name: 'reviewCountPerProduct',
+          param: query.reviewCountPerProduct
+        })
+      : undefined
 
   return { reviewCountPerProduct: reviewCountPerProduct?.param }
 }
 
-export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
+export const checkProductUpdate = ({
+  body
+}: Request): ProductUpdateInput => {
   const title = pipe(
     isProvided,
     isNonEmptyString
   )({ name: 'title', param: body.title })
 
-  const listPrice = 'listPrice' in body
-    ? canBeNumber({ name: 'listPrice', param: body.listPrice })
-    : undefined
+  const listPrice =
+    'listPrice' in body
+      ? canBeNumber({ name: 'listPrice', param: body.listPrice })
+      : undefined
 
   const price = pipe(
     isProvided,
@@ -294,17 +418,23 @@ export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
     isNonEmptyString
   )({ name: 'bullets', param: body.bullets })
 
-  const description = 'description' in body
-    ? isNonEmptyString({ name: 'description', param: body.description })
-    : undefined
+  const description =
+    'description' in body
+      ? isNonEmptyString({
+          name: 'description',
+          param: body.description
+        })
+      : undefined
 
-  const stock = 'stock' in body
-    ? canBeNumber({ name: 'stock', param: body.stock })
-    : undefined
+  const stock =
+    'stock' in body
+      ? canBeNumber({ name: 'stock', param: body.stock })
+      : undefined
 
-  let productSizes = 'productSizes' in body
-    ? isArray({ name: 'productSizes', param: body.productSizes })
-    : undefined
+  let productSizes =
+    'productSizes' in body
+      ? isArray({ name: 'productSizes', param: body.productSizes })
+      : undefined
 
   productSizes = {
     ...productSizes,
@@ -322,8 +452,8 @@ export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
   }
 
   isSomeProvided({
-    input: [ stock, productSizes ],
-    names: [ 'stock', 'productSizes' ]
+    input: [stock, productSizes],
+    names: ['stock', 'productSizes']
   })
 
   const isAvailable = pipe(
@@ -346,9 +476,13 @@ export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
     canBeNumber
   )({ name: 'groupID', param: body.groupID })
 
-  let groupVariations = 'groupVariations' in body
-    ? isArray({ name: 'groupVariations', param: body.groupVariations })
-    : undefined
+  let groupVariations =
+    'groupVariations' in body
+      ? isArray({
+          name: 'groupVariations',
+          param: body.groupVariations
+        })
+      : undefined
 
   groupVariations = {
     ...groupVariations,
@@ -365,9 +499,13 @@ export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
     }))
   }
 
-  let productParameters = 'productParameters' in body
-    ? isArray({ name: 'productParameters', param: body.productParameters })
-    : undefined
+  let productParameters =
+    'productParameters' in body
+      ? isArray({
+          name: 'productParameters',
+          param: body.productParameters
+        })
+      : undefined
 
   productParameters = {
     ...productParameters,
@@ -401,26 +539,36 @@ export const checkProductUpdate = ({ body }: Request): ProductUpdateInput => {
   }
 }
 
-export const checkMediaUpload = ({ files }: Request): Express.Multer.File[] => {
+export const checkMediaUpload = ({
+  files
+}: Request): Express.Multer.File[] => {
   isInputProvided(files, 'Missing images')
   isArray({ name: 'images', param: files })
   return files as Express.Multer.File[]
 }
 
-export const checkSingleMediaUpload = ({ file }: Request): Express.Multer.File => {
+export const checkSingleMediaUpload = ({
+  file
+}: Request): Express.Multer.File => {
   isInputProvided(file, 'Missing image')
   return file
 }
 
-export const checkNewCategory = ({ body }: Request): CategoryCreateInput => {
+export const checkNewCategory = ({
+  body
+}: Request): CategoryCreateInput => {
   const name = pipe(
     isProvided,
     isNonEmptyString
   )({ name: 'name', param: body.name })
 
-  const parentCategoryID = 'parentCategoryID' in body
-    ? canBeNumber({ name: 'parentCategoryID', param: body.parentCategoryID })
-    : undefined
+  const parentCategoryID =
+    'parentCategoryID' in body
+      ? canBeNumber({
+          name: 'parentCategoryID',
+          param: body.parentCategoryID
+        })
+      : undefined
 
   return {
     name: name.param,
@@ -428,14 +576,21 @@ export const checkNewCategory = ({ body }: Request): CategoryCreateInput => {
   }
 }
 
-export const checkCategoryUpdate = ({ body }: Request): CategoryUpdateInput => {
-  const name = 'name' in body
-    ? isNonEmptyString({ name: 'name', param: body.name })
-    : undefined
+export const checkCategoryUpdate = ({
+  body
+}: Request): CategoryUpdateInput => {
+  const name =
+    'name' in body
+      ? isNonEmptyString({ name: 'name', param: body.name })
+      : undefined
 
-  const parentCategoryID = 'parentCategoryID' in body
-    ? canBeNumber({ name: 'parentCategoryID', param: body.parentCategoryID })
-    : undefined
+  const parentCategoryID =
+    'parentCategoryID' in body
+      ? canBeNumber({
+          name: 'parentCategoryID',
+          param: body.parentCategoryID
+        })
+      : undefined
 
   return hasDefinedProps<CategoryUpdateInput>({
     name: name?.param,
@@ -461,25 +616,37 @@ export const checkRole = ({ body }: Request): Role => {
   return { roleName: roleName.param }
 }
 
-export const checkNewModerationStatus = ({ body }: Request): ModerationStatus => {
+export const checkNewModerationStatus = ({
+  body
+}: Request): ModerationStatus => {
   const moderationStatusName = pipe(
     isProvided,
     isNonEmptyString
-  )({ name: 'moderationStatusName', param: body.moderationStatusName })
+  )({
+    name: 'moderationStatusName',
+    param: body.moderationStatusName
+  })
 
   return { moderationStatusName: moderationStatusName.param }
 }
 
-export const checkModerationStatusUpdate = ({ body }: Request): ModerationStatus => {
+export const checkModerationStatusUpdate = ({
+  body
+}: Request): ModerationStatus => {
   const moderationStatusName = pipe(
     isProvided,
     isNonEmptyString
-  )({ name: 'moderationStatusName', param: body.moderationStatusName })
+  )({
+    name: 'moderationStatusName',
+    param: body.moderationStatusName
+  })
 
   return { moderationStatusName: moderationStatusName.param }
 }
 
-export const checkNewOrderStatus = ({ body }: Request): OrderStatus => {
+export const checkNewOrderStatus = ({
+  body
+}: Request): OrderStatus => {
   const orderStatusName = pipe(
     isProvided,
     isNonEmptyString
@@ -488,7 +655,9 @@ export const checkNewOrderStatus = ({ body }: Request): OrderStatus => {
   return { orderStatusName: orderStatusName.param }
 }
 
-export const checkOrderStatusUpdate = ({ body }: Request): OrderStatus => {
+export const checkOrderStatusUpdate = ({
+  body
+}: Request): OrderStatus => {
   const orderStatusName = pipe(
     isProvided,
     isNonEmptyString
@@ -497,7 +666,9 @@ export const checkOrderStatusUpdate = ({ body }: Request): OrderStatus => {
   return { orderStatusName: orderStatusName.param }
 }
 
-export const checkNewInvoiceStatus = ({ body }: Request): InvoiceStatus => {
+export const checkNewInvoiceStatus = ({
+  body
+}: Request): InvoiceStatus => {
   const invoiceStatusName = pipe(
     isProvided,
     isNonEmptyString
@@ -506,7 +677,9 @@ export const checkNewInvoiceStatus = ({ body }: Request): InvoiceStatus => {
   return { invoiceStatusName: invoiceStatusName.param }
 }
 
-export const checkInvoiceStatusUpdate = ({ body }: Request): InvoiceStatus => {
+export const checkInvoiceStatusUpdate = ({
+  body
+}: Request): InvoiceStatus => {
   const invoiceStatusName = pipe(
     isProvided,
     isNonEmptyString
@@ -515,15 +688,18 @@ export const checkInvoiceStatusUpdate = ({ body }: Request): InvoiceStatus => {
   return { invoiceStatusName: invoiceStatusName.param }
 }
 
-export const checkShippingMethod = ({ body }: Request): ShippingMethodInput => {
+export const checkShippingMethod = ({
+  body
+}: Request): ShippingMethodInput => {
   const shippingMethodName = pipe(
     isProvided,
     isNonEmptyString
   )({ name: 'shippingMethodName', param: body.shippingMethodName })
 
-  const isPrivate = 'isPrivate' in body
-    ? canBeBoolean({ name: 'isPrivate', param: body.isPrivate })
-    : undefined
+  const isPrivate =
+    'isPrivate' in body
+      ? canBeBoolean({ name: 'isPrivate', param: body.isPrivate })
+      : undefined
 
   return {
     shippingMethodName: shippingMethodName.param,
@@ -531,15 +707,18 @@ export const checkShippingMethod = ({ body }: Request): ShippingMethodInput => {
   }
 }
 
-export const checkAddressType = ({ body }: Request): AddressTypeInput => {
+export const checkAddressType = ({
+  body
+}: Request): AddressTypeInput => {
   const addressTypeName = pipe(
     isProvided,
     isNonEmptyString
   )({ name: 'addressTypeName', param: body.addressTypeName })
 
-  const isPrivate = 'isPrivate' in body
-    ? canBeBoolean({ name: 'isPrivate', param: body.isPrivate })
-    : undefined
+  const isPrivate =
+    'isPrivate' in body
+      ? canBeBoolean({ name: 'isPrivate', param: body.isPrivate })
+      : undefined
 
   return {
     addressTypeName: addressTypeName.param,
@@ -549,37 +728,41 @@ export const checkAddressType = ({ body }: Request): AddressTypeInput => {
 
 export const checkLocalCart = ({ body }: Request): LocalCart => {
   isArray({ name: 'body', param: body })
-  return body.map((cp: Omit<CartProduct, 'userID'> & { toMerge: boolean }) => {
-    const qty = pipe(
-      isProvided,
-      canBeNumber
-    )({ name: 'qty', param: cp.qty })
+  return body.map(
+    (cp: Omit<CartProduct, 'userID'> & { toMerge: boolean }) => {
+      const qty = pipe(
+        isProvided,
+        canBeNumber
+      )({ name: 'qty', param: cp.qty })
 
-    const size = pipe(
-      isProvided,
-      isString
-    )({ name: 'size', param: cp.size })
+      const size = pipe(
+        isProvided,
+        isString
+      )({ name: 'size', param: cp.size })
 
-    const productID = pipe(
-      isProvided,
-      canBeNumber
-    )({ name: 'productID', param: cp.productID })
+      const productID = pipe(
+        isProvided,
+        canBeNumber
+      )({ name: 'productID', param: cp.productID })
 
-    const toMerge = pipe(
-      isProvided,
-      canBeBoolean
-    )({ name: 'toMerge', param: cp.toMerge })
+      const toMerge = pipe(
+        isProvided,
+        canBeBoolean
+      )({ name: 'toMerge', param: cp.toMerge })
 
-    return {
-      qty: qty.param,
-      size: size.param,
-      productID: productID.param,
-      toMerge: toMerge.param
+      return {
+        qty: qty.param,
+        size: size.param,
+        productID: productID.param,
+        toMerge: toMerge.param
+      }
     }
-  })
+  )
 }
 
-export const checkCartProduct = ({ body }: Request): CartProductInput => {
+export const checkCartProduct = ({
+  body
+}: Request): CartProductInput => {
   const qty = pipe(
     isProvided,
     canBeNumber
@@ -593,7 +776,9 @@ export const checkCartProduct = ({ body }: Request): CartProductInput => {
   return { qty: qty.param, size: size.param }
 }
 
-export const checkCartProductDelete = ({ body }: Request): CartProductDeleteInput => {
+export const checkCartProductDelete = ({
+  body
+}: Request): CartProductDeleteInput => {
   const size = pipe(
     isProvided,
     isString
@@ -602,7 +787,9 @@ export const checkCartProductDelete = ({ body }: Request): CartProductDeleteInpu
   return { size: size.param }
 }
 
-export const checkPaymentMethod = ({ body }: Request): PaymentMethod => {
+export const checkPaymentMethod = ({
+  body
+}: Request): PaymentMethod => {
   const paymentMethodName = pipe(
     isProvided,
     isNonEmptyString
@@ -611,10 +798,13 @@ export const checkPaymentMethod = ({ body }: Request): PaymentMethod => {
   return { paymentMethodName: paymentMethodName.param }
 }
 
-export const checkNewAddress = ({ body }: Request): AddressCreateInput => {
-  const isDefault = 'isDefault' in body
-    ? canBeBoolean({ name: 'isDefault', param: body.isDefault })
-    : undefined
+export const checkNewAddress = ({
+  body
+}: Request): AddressCreateInput => {
+  const isDefault =
+    'isDefault' in body
+      ? canBeBoolean({ name: 'isDefault', param: body.isDefault })
+      : undefined
 
   const country = pipe(
     isProvided,
@@ -636,9 +826,13 @@ export const checkNewAddress = ({ body }: Request): AddressCreateInput => {
     isNonEmptyString
   )({ name: 'streetAddressLine1', param: body.streetAddressLine1 })
 
-  const streetAddressLine2 = 'streetAddressLine2' in body
-    ? isString({ name: 'streetAddressLine2', param: body.streetAddressLine2 })
-    : undefined
+  const streetAddressLine2 =
+    'streetAddressLine2' in body
+      ? isString({
+          name: 'streetAddressLine2',
+          param: body.streetAddressLine2
+        })
+      : undefined
 
   const city = pipe(
     isProvided,
@@ -674,46 +868,70 @@ export const checkNewAddress = ({ body }: Request): AddressCreateInput => {
   }
 }
 
-export const checkAddressUpdate = ({ body }: Request): AddressUpdateInput => {
-  const isDefault = 'isDefault' in body
-    ? canBeBoolean({ name: 'isDefault', param: body.isDefault })
-    : undefined
+export const checkAddressUpdate = ({
+  body
+}: Request): AddressUpdateInput => {
+  const isDefault =
+    'isDefault' in body
+      ? canBeBoolean({ name: 'isDefault', param: body.isDefault })
+      : undefined
 
-  const addressType = 'addressType' in body
-    ? isNonEmptyString({ name: 'addressType', param: body.addressType })
-    : undefined
+  const addressType =
+    'addressType' in body
+      ? isNonEmptyString({
+          name: 'addressType',
+          param: body.addressType
+        })
+      : undefined
 
-  const country = 'country' in body
-    ? isNonEmptyString({ name: 'country', param: body.country })
-    : undefined
+  const country =
+    'country' in body
+      ? isNonEmptyString({ name: 'country', param: body.country })
+      : undefined
 
-  const fullName = 'fullName' in body
-    ? isNonEmptyString({ name: 'fullName', param: body.fullName })
-    : undefined
+  const fullName =
+    'fullName' in body
+      ? isNonEmptyString({ name: 'fullName', param: body.fullName })
+      : undefined
 
-  const streetAddressLine1 = 'streetAddressLine1' in body
-    ? isNonEmptyString({ name: 'streetAddressLine1', param: body.streetAddressLine1 })
-    : undefined
+  const streetAddressLine1 =
+    'streetAddressLine1' in body
+      ? isNonEmptyString({
+          name: 'streetAddressLine1',
+          param: body.streetAddressLine1
+        })
+      : undefined
 
-  const streetAddressLine2 = 'streetAddressLine2' in body
-    ? isString({ name: 'streetAddressLine2', param: body.streetAddressLine2 })
-    : undefined
+  const streetAddressLine2 =
+    'streetAddressLine2' in body
+      ? isString({
+          name: 'streetAddressLine2',
+          param: body.streetAddressLine2
+        })
+      : undefined
 
-  const city = 'city' in body
-    ? isNonEmptyString({ name: 'city', param: body.city })
-    : undefined
+  const city =
+    'city' in body
+      ? isNonEmptyString({ name: 'city', param: body.city })
+      : undefined
 
-  const region = 'region' in body
-    ? isNonEmptyString({ name: 'region', param: body.region })
-    : undefined
+  const region =
+    'region' in body
+      ? isNonEmptyString({ name: 'region', param: body.region })
+      : undefined
 
-  const postalCode = 'postalCode' in body
-    ? canBeNumber({ name: 'postalCode', param: body.postalCode })
-    : undefined
+  const postalCode =
+    'postalCode' in body
+      ? canBeNumber({ name: 'postalCode', param: body.postalCode })
+      : undefined
 
-  const phoneNumber = 'phoneNumber' in body
-    ? isNonEmptyString({ name: 'phoneNumber', param: body.phoneNumber })
-    : undefined
+  const phoneNumber =
+    'phoneNumber' in body
+      ? isNonEmptyString({
+          name: 'phoneNumber',
+          param: body.phoneNumber
+        })
+      : undefined
 
   return hasDefinedProps<AddressUpdateInput>({
     isDefault: isDefault?.param,
@@ -729,15 +947,20 @@ export const checkAddressUpdate = ({ body }: Request): AddressUpdateInput => {
   })
 }
 
-export const checkNewUserAddress = ({ body }: Request): UserAddressCreateInput => {
-  const isDefault = 'isDefault' in body
-    ? canBeBoolean({ name: 'isDefault', param: body.isDefault })
-    : undefined
+export const checkNewUserAddress = ({
+  body
+}: Request): UserAddressCreateInput => {
+  const isDefault =
+    'isDefault' in body
+      ? canBeBoolean({ name: 'isDefault', param: body.isDefault })
+      : undefined
 
   return { isDefault: isDefault?.param }
 }
 
-export const checkUserAddressesUpdate = ({ body }: Request): UserAddressUpdateInput => {
+export const checkUserAddressesUpdate = ({
+  body
+}: Request): UserAddressUpdateInput => {
   const isDefault = pipe(
     isProvided,
     canBeBoolean
@@ -760,7 +983,9 @@ export const checkNewList = ({ body }: Request): ListCreateInput => {
   return { name: name.param, productID: productID.param }
 }
 
-export const checkListUpdate = ({ body }: Request): ListUpdateInput => {
+export const checkListUpdate = ({
+  body
+}: Request): ListUpdateInput => {
   const name = pipe(
     isProvided,
     isNonEmptyString
@@ -769,7 +994,9 @@ export const checkListUpdate = ({ body }: Request): ListUpdateInput => {
   return { name: name.param }
 }
 
-export const checkNewReview = ({ body }: Request): ReviewCreateInput => {
+export const checkNewReview = ({
+  body
+}: Request): ReviewCreateInput => {
   const title = pipe(
     isProvided,
     isNonEmptyString
@@ -790,9 +1017,10 @@ export const checkNewReview = ({ body }: Request): ReviewCreateInput => {
     canBeNumber
   )({ name: 'stars', param: body.stars })
 
-  const isVerified = 'isVerified' in body
-    ? canBeBoolean({ name: 'isVerified', param: body.isVerified })
-    : undefined
+  const isVerified =
+    'isVerified' in body
+      ? canBeBoolean({ name: 'isVerified', param: body.isVerified })
+      : undefined
 
   return {
     title: title.param,
@@ -803,26 +1031,36 @@ export const checkNewReview = ({ body }: Request): ReviewCreateInput => {
   }
 }
 
-export const checkReviewUpdate = ({ body }: Request): ReviewUpdateInput => {
-  const title = 'title' in body
-    ? isNonEmptyString({ name: 'title', param: body.title })
-    : undefined
+export const checkReviewUpdate = ({
+  body
+}: Request): ReviewUpdateInput => {
+  const title =
+    'title' in body
+      ? isNonEmptyString({ name: 'title', param: body.title })
+      : undefined
 
-  const content = 'content' in body
-    ? isNonEmptyString({ name: 'content', param: body.content })
-    : undefined
+  const content =
+    'content' in body
+      ? isNonEmptyString({ name: 'content', param: body.content })
+      : undefined
 
-  const stars = 'content' in body
-    ? canBeNumber({ name: 'stars', param: body.stars })
-    : undefined
+  const stars =
+    'content' in body
+      ? canBeNumber({ name: 'stars', param: body.stars })
+      : undefined
 
-  const isVerified = 'isVerified' in body
-    ? canBeBoolean({ name: 'isVerified', param: body.isVerified })
-    : undefined
+  const isVerified =
+    'isVerified' in body
+      ? canBeBoolean({ name: 'isVerified', param: body.isVerified })
+      : undefined
 
-  const moderationStatus = 'moderationStatus' in body
-    ? isNonEmptyString({ name: 'moderationStatus', param: body.moderationStatus })
-    : undefined
+  const moderationStatus =
+    'moderationStatus' in body
+      ? isNonEmptyString({
+          name: 'moderationStatus',
+          param: body.moderationStatus
+        })
+      : undefined
 
   return hasDefinedProps<ReviewUpdateInput>({
     title: title?.param,
@@ -833,17 +1071,21 @@ export const checkReviewUpdate = ({ body }: Request): ReviewUpdateInput => {
   })
 }
 
-export const checkNewReviewComment = ({ body }: Request): ReviewCommentCreateInput => {
+export const checkNewReviewComment = ({
+  body
+}: Request): ReviewCommentCreateInput => {
   const content = pipe(
     isProvided,
     isNonEmptyString
   )({ name: 'content', param: body.content })
 
-  const parentReviewCommentID = 'parentReviewCommentID' in body
-    ? canBeNumber(
-        { name: 'parentReviewCommentID', param: body.parentReviewCommentID }
-      )
-    : undefined
+  const parentReviewCommentID =
+    'parentReviewCommentID' in body
+      ? canBeNumber({
+          name: 'parentReviewCommentID',
+          param: body.parentReviewCommentID
+        })
+      : undefined
 
   return {
     content: content.param,
@@ -851,18 +1093,23 @@ export const checkNewReviewComment = ({ body }: Request): ReviewCommentCreateInp
   }
 }
 
-export const checkReviewComments = ({ query }: Request): CursorInput => {
-  const startCursor = 'startCursor' in query
-    ? canBeNumber({ name: 'startCursor', param: query.startCursor })
-    : undefined
+export const checkReviewComments = ({
+  query
+}: Request): CursorInput => {
+  const startCursor =
+    'startCursor' in query
+      ? canBeNumber({ name: 'startCursor', param: query.startCursor })
+      : undefined
 
-  const limit = 'limit' in query
-    ? canBeNumber({ name: 'limit', param: query.limit })
-    : undefined
+  const limit =
+    'limit' in query
+      ? canBeNumber({ name: 'limit', param: query.limit })
+      : undefined
 
-  const sortBy = 'sortBy' in query
-    ? isNonEmptyString({ name: 'sortBy', param: query.sortBy })
-    : undefined
+  const sortBy =
+    'sortBy' in query
+      ? isNonEmptyString({ name: 'sortBy', param: query.sortBy })
+      : undefined
 
   return {
     startCursor: startCursor?.param,
@@ -871,14 +1118,21 @@ export const checkReviewComments = ({ query }: Request): CursorInput => {
   }
 }
 
-export const checkReviewCommentUpdate = ({ body }: Request): ReviewCommentUpdateInput => {
-  const content = 'content' in body
-    ? isNonEmptyString({ name: 'content', param: body.content })
-    : undefined
+export const checkReviewCommentUpdate = ({
+  body
+}: Request): ReviewCommentUpdateInput => {
+  const content =
+    'content' in body
+      ? isNonEmptyString({ name: 'content', param: body.content })
+      : undefined
 
-  const moderationStatus = 'moderationStatus' in body
-    ? isNonEmptyString({ name: 'moderationStatus', param: body.moderationStatus })
-    : undefined
+  const moderationStatus =
+    'moderationStatus' in body
+      ? isNonEmptyString({
+          name: 'moderationStatus',
+          param: body.moderationStatus
+        })
+      : undefined
 
   return hasDefinedProps<ReviewCommentUpdateInput>({
     content: content?.param,
@@ -886,30 +1140,41 @@ export const checkReviewCommentUpdate = ({ body }: Request): ReviewCommentUpdate
   })
 }
 
-export const checkQuestionsCursor = ({ query }: Request): QuestionCursorInput => {
-  const startCursor = 'startCursor' in query
-    ? canBeNumber({ name: 'startCursor', param: query.startCursor })
-    : undefined
+export const checkQuestionsCursor = ({
+  query
+}: Request): QuestionCursorInput => {
+  const startCursor =
+    'startCursor' in query
+      ? canBeNumber({ name: 'startCursor', param: query.startCursor })
+      : undefined
 
-  const limit = 'limit' in query
-    ? canBeNumber({ name: 'limit', param: query.limit })
-    : undefined
+  const limit =
+    'limit' in query
+      ? canBeNumber({ name: 'limit', param: query.limit })
+      : undefined
 
-  const sortBy = 'sortBy' in query
-    ? isNonEmptyString({ name: 'sortBy', param: query.sortBy })
-    : undefined
+  const sortBy =
+    'sortBy' in query
+      ? isNonEmptyString({ name: 'sortBy', param: query.sortBy })
+      : undefined
 
-  const page = 'page' in query
-    ? canBeNumber({ name: 'page', param: query.page })
-    : undefined
+  const page =
+    'page' in query
+      ? canBeNumber({ name: 'page', param: query.page })
+      : undefined
 
-  const answerLimit = 'answerLimit' in query
-    ? canBeNumber({ name: 'answerLimit', param: query.answerLimit })
-    : undefined
+  const answerLimit =
+    'answerLimit' in query
+      ? canBeNumber({ name: 'answerLimit', param: query.answerLimit })
+      : undefined
 
-  const onlyAnswered = 'onlyAnswered' in query
-    ? canBeBoolean({ name: 'onlyAnswered', param: query.onlyAnswered })
-    : undefined
+  const onlyAnswered =
+    'onlyAnswered' in query
+      ? canBeBoolean({
+          name: 'onlyAnswered',
+          param: query.onlyAnswered
+        })
+      : undefined
 
   return {
     startCursor: startCursor?.param,
@@ -921,7 +1186,9 @@ export const checkQuestionsCursor = ({ query }: Request): QuestionCursorInput =>
   }
 }
 
-export const checkNewQuestion = ({ body }: Request): QuestionCreateInput => {
+export const checkNewQuestion = ({
+  body
+}: Request): QuestionCreateInput => {
   const content = pipe(
     isProvided,
     isNonEmptyString
@@ -930,14 +1197,21 @@ export const checkNewQuestion = ({ body }: Request): QuestionCreateInput => {
   return { content: content.param }
 }
 
-export const checkQuestionUpdate = ({ body }: Request): QuestionUpdateInput => {
-  const content = 'content' in body
-    ? isNonEmptyString({ name: 'content', param: body.content })
-    : undefined
+export const checkQuestionUpdate = ({
+  body
+}: Request): QuestionUpdateInput => {
+  const content =
+    'content' in body
+      ? isNonEmptyString({ name: 'content', param: body.content })
+      : undefined
 
-  const moderationStatus = 'moderationStatus' in body
-    ? isNonEmptyString({ name: 'moderationStatus', param: body.moderationStatus })
-    : undefined
+  const moderationStatus =
+    'moderationStatus' in body
+      ? isNonEmptyString({
+          name: 'moderationStatus',
+          param: body.moderationStatus
+        })
+      : undefined
 
   return hasDefinedProps<QuestionUpdateInput>({
     content: content?.param,
@@ -946,17 +1220,20 @@ export const checkQuestionUpdate = ({ body }: Request): QuestionUpdateInput => {
 }
 
 export const checkAnswers = ({ query }: Request): CursorInput => {
-  const startCursor = 'startCursor' in query
-    ? canBeNumber({ name: 'startCursor', param: query.startCursor })
-    : undefined
+  const startCursor =
+    'startCursor' in query
+      ? canBeNumber({ name: 'startCursor', param: query.startCursor })
+      : undefined
 
-  const limit = 'limit' in query
-    ? canBeNumber({ name: 'limit', param: query.limit })
-    : undefined
+  const limit =
+    'limit' in query
+      ? canBeNumber({ name: 'limit', param: query.limit })
+      : undefined
 
-  const page = 'page' in query
-    ? canBeNumber({ name: 'page', param: query.page })
-    : undefined
+  const page =
+    'page' in query
+      ? canBeNumber({ name: 'page', param: query.page })
+      : undefined
 
   return {
     startCursor: startCursor?.param,
@@ -965,7 +1242,9 @@ export const checkAnswers = ({ query }: Request): CursorInput => {
   }
 }
 
-export const checkNewAnswer = ({ body }: Request): AnswerCreateInput => {
+export const checkNewAnswer = ({
+  body
+}: Request): AnswerCreateInput => {
   const content = pipe(
     isProvided,
     isNonEmptyString
@@ -974,14 +1253,21 @@ export const checkNewAnswer = ({ body }: Request): AnswerCreateInput => {
   return { content: content.param }
 }
 
-export const checkAnswerUpdate = ({ body }: Request): AnswerUpdateInput => {
-  const content = 'content' in body
-    ? isNonEmptyString({ name: 'content', param: body.content })
-    : undefined
+export const checkAnswerUpdate = ({
+  body
+}: Request): AnswerUpdateInput => {
+  const content =
+    'content' in body
+      ? isNonEmptyString({ name: 'content', param: body.content })
+      : undefined
 
-  const moderationStatus = 'moderationStatus' in body
-    ? isNonEmptyString({ name: 'moderationStatus', param: body.moderationStatus })
-    : undefined
+  const moderationStatus =
+    'moderationStatus' in body
+      ? isNonEmptyString({
+          name: 'moderationStatus',
+          param: body.moderationStatus
+        })
+      : undefined
 
   return hasDefinedProps<AnswerUpdateInput>({
     content: content?.param,
@@ -998,7 +1284,9 @@ export const checkParameter = ({ body }: Request): ParameterInput => {
   return { name: name.param }
 }
 
-export const checkNewGroupVariation = ({ body }: Request): GroupVariationCreateInput => {
+export const checkNewGroupVariation = ({
+  body
+}: Request): GroupVariationCreateInput => {
   const name = pipe(
     isProvided,
     isNonEmptyString
@@ -1015,7 +1303,9 @@ export const checkNewGroupVariation = ({ body }: Request): GroupVariationCreateI
   }
 }
 
-export const checkGroupVariationUpdate = ({ body }: Request): GroupVariationUpdateInput => {
+export const checkGroupVariationUpdate = ({
+  body
+}: Request): GroupVariationUpdateInput => {
   const value = pipe(
     isProvided,
     isNonEmptyString
@@ -1024,7 +1314,9 @@ export const checkGroupVariationUpdate = ({ body }: Request): GroupVariationUpda
   return { value: value.param }
 }
 
-export const checkGroupVariationDeletion = ({ body }: Request): GroupVariationDeleteInput => {
+export const checkGroupVariationDeletion = ({
+  body
+}: Request): GroupVariationDeleteInput => {
   const name = pipe(
     isProvided,
     isNonEmptyString
@@ -1033,7 +1325,9 @@ export const checkGroupVariationDeletion = ({ body }: Request): GroupVariationDe
   return { name: name.param }
 }
 
-export const checkNewOrder = ({ body }: Request): OrderCreateInput => {
+export const checkNewOrder = ({
+  body
+}: Request): OrderCreateInput => {
   const addressID = pipe(
     isProvided,
     canBeNumber
@@ -1068,18 +1362,29 @@ export const checkNewOrder = ({ body }: Request): OrderCreateInput => {
   }
 }
 
-export const checkOrderUpdate = ({ body }: Request): OrderUpdateInput => {
-  const addressID = 'addressID' in body
-    ? canBeNumber({ name: 'addressID', param: body.addressID })
-    : undefined
+export const checkOrderUpdate = ({
+  body
+}: Request): OrderUpdateInput => {
+  const addressID =
+    'addressID' in body
+      ? canBeNumber({ name: 'addressID', param: body.addressID })
+      : undefined
 
-  const orderStatus = 'orderStatus' in body
-    ? isNonEmptyString({ name: 'orderStatus', param: body.orderStatus })
-    : undefined
+  const orderStatus =
+    'orderStatus' in body
+      ? isNonEmptyString({
+          name: 'orderStatus',
+          param: body.orderStatus
+        })
+      : undefined
 
-  const shippingMethod = 'shippingMethod' in body
-    ? isNonEmptyString({ name: 'shippingMethod', param: body.shippingMethod })
-    : undefined
+  const shippingMethod =
+    'shippingMethod' in body
+      ? isNonEmptyString({
+          name: 'shippingMethod',
+          param: body.shippingMethod
+        })
+      : undefined
 
   return hasDefinedProps<OrderUpdateInput>({
     addressID: addressID?.param,
@@ -1088,7 +1393,9 @@ export const checkOrderUpdate = ({ body }: Request): OrderUpdateInput => {
   })
 }
 
-export const checkOrderProduct = ({ body }: Request): OrderProductInput => {
+export const checkOrderProduct = ({
+  body
+}: Request): OrderProductInput => {
   const qty = pipe(
     isProvided,
     canBeNumber
@@ -1111,7 +1418,9 @@ export const checkOrderProduct = ({ body }: Request): OrderProductInput => {
   }
 }
 
-export const checkNewInvoice = ({ body }: Request): InvoiceCreateInput => {
+export const checkNewInvoice = ({
+  body
+}: Request): InvoiceCreateInput => {
   const details = pipe(
     isProvided,
     isNonEmptyString
@@ -1146,22 +1455,34 @@ export const checkNewInvoice = ({ body }: Request): InvoiceCreateInput => {
   }
 }
 
-export const checkInvoiceUpdate = ({ body }: Request): InvoiceUpdateInput => {
-  const amount = 'amount' in body
-    ? canBeNumber({ name: 'amount', param: body.amount })
-    : undefined
+export const checkInvoiceUpdate = ({
+  body
+}: Request): InvoiceUpdateInput => {
+  const amount =
+    'amount' in body
+      ? canBeNumber({ name: 'amount', param: body.amount })
+      : undefined
 
-  const details = 'details' in body
-    ? isNonEmptyString({ name: 'details', param: body.details })
-    : undefined
+  const details =
+    'details' in body
+      ? isNonEmptyString({ name: 'details', param: body.details })
+      : undefined
 
-  const invoiceStatus = 'invoiceStatus' in body
-    ? isNonEmptyString({ name: 'invoiceStatus', param: body.invoiceStatus })
-    : undefined
+  const invoiceStatus =
+    'invoiceStatus' in body
+      ? isNonEmptyString({
+          name: 'invoiceStatus',
+          param: body.invoiceStatus
+        })
+      : undefined
 
-  const paymentMethod = 'paymentMethod' in body
-    ? isNonEmptyString({ name: 'paymentMethod', param: body.paymentMethod })
-    : undefined
+  const paymentMethod =
+    'paymentMethod' in body
+      ? isNonEmptyString({
+          name: 'paymentMethod',
+          param: body.paymentMethod
+        })
+      : undefined
 
   return hasDefinedProps<InvoiceUpdateInput>({
     amount: amount?.param,
@@ -1171,45 +1492,65 @@ export const checkInvoiceUpdate = ({ body }: Request): InvoiceUpdateInput => {
   })
 }
 
-export const checkInvoiceFilters = ({ query }: Request): InvoicesFiltersInput => {
-  const amountMin = 'amountMin' in query
-    ? canBeNumber({ name: 'amountMin', param: query.amountMin })
-    : undefined
+export const checkInvoiceFilters = ({
+  query
+}: Request): InvoicesFiltersInput => {
+  const amountMin =
+    'amountMin' in query
+      ? canBeNumber({ name: 'amountMin', param: query.amountMin })
+      : undefined
 
-  const sortBy = 'sortBy' in query
-    ? isNonEmptyString({ name: 'sortBy', param: query.sortBy })
-    : undefined
+  const sortBy =
+    'sortBy' in query
+      ? isNonEmptyString({ name: 'sortBy', param: query.sortBy })
+      : undefined
 
-  const page = 'page' in query
-    ? pipe(
-        canBeNumber,
-        isPositiveNumber
-      )({ name: 'page', param: query.page })
-    : undefined
+  const page =
+    'page' in query
+      ? pipe(
+          canBeNumber,
+          isPositiveNumber
+        )({ name: 'page', param: query.page })
+      : undefined
 
-  const amountMax = 'amountMax' in query
-    ? canBeNumber({ name: 'amountMax', param: query.amountMax })
-    : undefined
+  const amountMax =
+    'amountMax' in query
+      ? canBeNumber({ name: 'amountMax', param: query.amountMax })
+      : undefined
 
-  const createdFrom = 'createdFrom' in query
-    ? isDate({ name: 'createdFrom', param: query.createdFrom })
-    : undefined
+  const createdFrom =
+    'createdFrom' in query
+      ? isDate({ name: 'createdFrom', param: query.createdFrom })
+      : undefined
 
-  const createdTo = 'createdTo' in query
-    ? isDate({ name: 'createdTo', param: query.createdTo })
-    : undefined
+  const createdTo =
+    'createdTo' in query
+      ? isDate({ name: 'createdTo', param: query.createdTo })
+      : undefined
 
-  const invoiceStatuses = 'invoiceStatuses' in query
-    ? isNonEmptyString({ name: 'invoiceStatuses', param: query.invoiceStatuses })
-    : undefined
+  const invoiceStatuses =
+    'invoiceStatuses' in query
+      ? isNonEmptyString({
+          name: 'invoiceStatuses',
+          param: query.invoiceStatuses
+        })
+      : undefined
 
-  const paymentMethods = 'paymentMethods' in query
-    ? isNonEmptyString({ name: 'paymentMethods', param: query.paymentMethods })
-    : undefined
+  const paymentMethods =
+    'paymentMethods' in query
+      ? isNonEmptyString({
+          name: 'paymentMethods',
+          param: query.paymentMethods
+        })
+      : undefined
 
-  const userEmail = 'userEmail' in query
-    ? isNonEmptyString({ name: 'userEmail', param: query.userEmail })
-    : undefined
+  const userEmail =
+    'userEmail' in query
+      ? isNonEmptyString({
+          name: 'userEmail',
+          param: query.userEmail
+        })
+      : undefined
 
   return {
     sortBy: sortBy?.param,
@@ -1224,53 +1565,75 @@ export const checkInvoiceFilters = ({ query }: Request): InvoicesFiltersInput =>
   }
 }
 
-export const checkOrderFilters = ({ query }: Request): OrdersFiltersInput => {
-  const amountMin = 'amountMin' in query
-    ? canBeNumber({ name: 'amountMin', param: query.amountMin })
-    : undefined
+export const checkOrderFilters = ({
+  query
+}: Request): OrdersFiltersInput => {
+  const amountMin =
+    'amountMin' in query
+      ? canBeNumber({ name: 'amountMin', param: query.amountMin })
+      : undefined
 
-  const sortBy = 'sortBy' in query
-    ? isNonEmptyString({ name: 'sortBy', param: query.sortBy })
-    : undefined
+  const sortBy =
+    'sortBy' in query
+      ? isNonEmptyString({ name: 'sortBy', param: query.sortBy })
+      : undefined
 
-  const page = 'page' in query
-    ? pipe(
-        canBeNumber,
-        isPositiveNumber
-      )({ name: 'page', param: query.page })
-    : undefined
+  const page =
+    'page' in query
+      ? pipe(
+          canBeNumber,
+          isPositiveNumber
+        )({ name: 'page', param: query.page })
+      : undefined
 
-  const amountMax = 'amountMax' in query
-    ? canBeNumber({ name: 'amountMax', param: query.amountMax })
-    : undefined
+  const amountMax =
+    'amountMax' in query
+      ? canBeNumber({ name: 'amountMax', param: query.amountMax })
+      : undefined
 
-  const createdFrom = 'createdFrom' in query
-    ? isDate({ name: 'createdFrom', param: query.createdFrom })
-    : undefined
+  const createdFrom =
+    'createdFrom' in query
+      ? isDate({ name: 'createdFrom', param: query.createdFrom })
+      : undefined
 
-  const createdTo = 'createdTo' in query
-    ? isDate({ name: 'createdTo', param: query.createdTo })
-    : undefined
+  const createdTo =
+    'createdTo' in query
+      ? isDate({ name: 'createdTo', param: query.createdTo })
+      : undefined
 
-  const orderStatuses = 'orderStatuses' in query
-    ? isNonEmptyString({ name: 'orderStatuses', param: query.orderStatuses })
-    : undefined
+  const orderStatuses =
+    'orderStatuses' in query
+      ? isNonEmptyString({
+          name: 'orderStatuses',
+          param: query.orderStatuses
+        })
+      : undefined
 
-  const shippingMethods = 'shippingMethods' in query
-    ? isNonEmptyString({ name: 'shippingMethods', param: query.shippingMethods })
-    : undefined
+  const shippingMethods =
+    'shippingMethods' in query
+      ? isNonEmptyString({
+          name: 'shippingMethods',
+          param: query.shippingMethods
+        })
+      : undefined
 
-  const userEmail = 'userEmail' in query
-    ? isNonEmptyString({ name: 'userEmail', param: query.userEmail })
-    : undefined
+  const userEmail =
+    'userEmail' in query
+      ? isNonEmptyString({
+          name: 'userEmail',
+          param: query.userEmail
+        })
+      : undefined
 
-  const userID = 'userID' in query
-    ? canBeNumber({ name: 'userID', param: query.userID })
-    : undefined
+  const userID =
+    'userID' in query
+      ? canBeNumber({ name: 'userID', param: query.userID })
+      : undefined
 
-  const startCursor = 'startCursor' in query
-    ? canBeNumber({ name: 'startCursor', param: query.startCursor })
-    : undefined
+  const startCursor =
+    'startCursor' in query
+      ? canBeNumber({ name: 'startCursor', param: query.startCursor })
+      : undefined
 
   return {
     sortBy: sortBy?.param,
@@ -1287,21 +1650,26 @@ export const checkOrderFilters = ({ query }: Request): OrdersFiltersInput => {
   }
 }
 
-export const checkVendorFilters = ({ query }: Request): VendorsFiltersInput => {
-  const q = 'q' in query
-    ? isNonEmptyString({ name: 'query', param: query.q })
-    : undefined
+export const checkVendorFilters = ({
+  query
+}: Request): VendorsFiltersInput => {
+  const q =
+    'q' in query
+      ? isNonEmptyString({ name: 'query', param: query.q })
+      : undefined
 
-  const sortBy = 'sortBy' in query
-    ? isNonEmptyString({ name: 'sortBy', param: query.sortBy })
-    : undefined
+  const sortBy =
+    'sortBy' in query
+      ? isNonEmptyString({ name: 'sortBy', param: query.sortBy })
+      : undefined
 
-  const page = 'page' in query
-    ? pipe(
-        canBeNumber,
-        isPositiveNumber
-      )({ name: 'page', param: query.page })
-    : undefined
+  const page =
+    'page' in query
+      ? pipe(
+          canBeNumber,
+          isPositiveNumber
+        )({ name: 'page', param: query.page })
+      : undefined
 
   return {
     sortBy: sortBy?.param,
@@ -1310,21 +1678,26 @@ export const checkVendorFilters = ({ query }: Request): VendorsFiltersInput => {
   }
 }
 
-export const checkCategoryFilters = ({ query }: Request): CategoriesFiltersInput => {
-  const q = 'q' in query
-    ? isNonEmptyString({ name: 'query', param: query.q })
-    : undefined
+export const checkCategoryFilters = ({
+  query
+}: Request): CategoriesFiltersInput => {
+  const q =
+    'q' in query
+      ? isNonEmptyString({ name: 'query', param: query.q })
+      : undefined
 
-  const sortBy = 'sortBy' in query
-    ? isNonEmptyString({ name: 'sortBy', param: query.sortBy })
-    : undefined
+  const sortBy =
+    'sortBy' in query
+      ? isNonEmptyString({ name: 'sortBy', param: query.sortBy })
+      : undefined
 
-  const page = 'page' in query
-    ? pipe(
-        canBeNumber,
-        isPositiveNumber
-      )({ name: 'page', param: query.page })
-    : undefined
+  const page =
+    'page' in query
+      ? pipe(
+          canBeNumber,
+          isPositiveNumber
+        )({ name: 'page', param: query.page })
+      : undefined
 
   return {
     q: q?.param,
@@ -1333,57 +1706,89 @@ export const checkCategoryFilters = ({ query }: Request): CategoriesFiltersInput
   }
 }
 
-export const checkUserFilters = ({ query }: Request): UsersFiltersInput => {
-  const roles = 'roles' in query
-    ? isNonEmptyString({ name: 'roles', param: query.roles })
-    : undefined
+export const checkUserFilters = ({
+  query
+}: Request): UsersFiltersInput => {
+  const roles =
+    'roles' in query
+      ? isNonEmptyString({ name: 'roles', param: query.roles })
+      : undefined
 
-  const createdFrom = 'createdFrom' in query
-    ? isDate({ name: 'createdFrom', param: query.createdFrom })
-    : undefined
+  const createdFrom =
+    'createdFrom' in query
+      ? isDate({ name: 'createdFrom', param: query.createdFrom })
+      : undefined
 
-  const createdTo = 'createdTo' in query
-    ? isDate({ name: 'createdTo', param: query.createdTo })
-    : undefined
+  const createdTo =
+    'createdTo' in query
+      ? isDate({ name: 'createdTo', param: query.createdTo })
+      : undefined
 
-  const sortBy = 'sortBy' in query
-    ? isNonEmptyString({ name: 'sortBy', param: query.sortBy })
-    : undefined
+  const sortBy =
+    'sortBy' in query
+      ? isNonEmptyString({ name: 'sortBy', param: query.sortBy })
+      : undefined
 
-  const page = 'page' in query
-    ? pipe(
-        canBeNumber,
-        isPositiveNumber
-      )({ name: 'page', param: query.page })
-    : undefined
+  const page =
+    'page' in query
+      ? pipe(
+          canBeNumber,
+          isPositiveNumber
+        )({ name: 'page', param: query.page })
+      : undefined
 
-  const orderCountMin = 'orderCountMin' in query
-    ? canBeNumber({ name: 'orderCountMin', param: query.orderCountMin })
-    : undefined
+  const orderCountMin =
+    'orderCountMin' in query
+      ? canBeNumber({
+          name: 'orderCountMin',
+          param: query.orderCountMin
+        })
+      : undefined
 
-  const orderCountMax = 'orderCountMax' in query
-    ? canBeNumber({ name: 'orderCountMax', param: query.orderCountMax })
-    : undefined
+  const orderCountMax =
+    'orderCountMax' in query
+      ? canBeNumber({
+          name: 'orderCountMax',
+          param: query.orderCountMax
+        })
+      : undefined
 
-  const reviewCountMin = 'reviewCountMin' in query
-    ? canBeNumber({ name: 'reviewCountMin', param: query.reviewCountMin })
-    : undefined
+  const reviewCountMin =
+    'reviewCountMin' in query
+      ? canBeNumber({
+          name: 'reviewCountMin',
+          param: query.reviewCountMin
+        })
+      : undefined
 
-  const reviewCountMax = 'reviewCountMax' in query
-    ? canBeNumber({ name: 'reviewCountMax', param: query.reviewCountMax })
-    : undefined
+  const reviewCountMax =
+    'reviewCountMax' in query
+      ? canBeNumber({
+          name: 'reviewCountMax',
+          param: query.reviewCountMax
+        })
+      : undefined
 
-  const activityCountMin = 'activityCountMin' in query
-    ? canBeNumber({ name: 'activityCountMin', param: query.activityCountMin })
-    : undefined
+  const activityCountMin =
+    'activityCountMin' in query
+      ? canBeNumber({
+          name: 'activityCountMin',
+          param: query.activityCountMin
+        })
+      : undefined
 
-  const activityCountMax = 'activityCountMax' in query
-    ? canBeNumber({ name: 'activityCountMax', param: query.activityCountMax })
-    : undefined
+  const activityCountMax =
+    'activityCountMax' in query
+      ? canBeNumber({
+          name: 'activityCountMax',
+          param: query.activityCountMax
+        })
+      : undefined
 
-  const email = 'email' in query
-    ? isNonEmptyString({ name: 'email', param: query.email })
-    : undefined
+  const email =
+    'email' in query
+      ? isNonEmptyString({ name: 'email', param: query.email })
+      : undefined
 
   return {
     roles: roles?.param,
@@ -1401,45 +1806,62 @@ export const checkUserFilters = ({ query }: Request): UsersFiltersInput => {
   }
 }
 
-export const checkFeedFilters = ({ query }: Request): FeedFiltersInput => {
-  const q = 'q' in query
-    ? isNonEmptyString({ name: 'query', param: query.q })
-    : undefined
+export const checkFeedFilters = ({
+  query
+}: Request): FeedFiltersInput => {
+  const q =
+    'q' in query
+      ? isNonEmptyString({ name: 'query', param: query.q })
+      : undefined
 
-  const sortBy = 'sortBy' in query
-    ? isNonEmptyString({ name: 'sortBy', param: query.sortBy })
-    : undefined
+  const sortBy =
+    'sortBy' in query
+      ? isNonEmptyString({ name: 'sortBy', param: query.sortBy })
+      : undefined
 
-  const groupID = 'groupID' in query
-    ? canBeNumber({ name: 'groupID', param: query.groupID })
-    : undefined
+  const groupID =
+    'groupID' in query
+      ? canBeNumber({ name: 'groupID', param: query.groupID })
+      : undefined
 
-  const page = 'page' in query
-    ? pipe(
-        canBeNumber,
-        isPositiveNumber
-      )({ name: 'page', param: query.page })
-    : undefined
+  const page =
+    'page' in query
+      ? pipe(
+          canBeNumber,
+          isPositiveNumber
+        )({ name: 'page', param: query.page })
+      : undefined
 
-  const types = 'types' in query
-    ? isNonEmptyString({ name: 'types', param: query.types })
-    : undefined
+  const types =
+    'types' in query
+      ? isNonEmptyString({ name: 'types', param: query.types })
+      : undefined
 
-  const moderationStatuses = 'moderationStatuses' in query
-    ? isNonEmptyString({ name: 'moderationStatuses', param: query.moderationStatuses })
-    : undefined
+  const moderationStatuses =
+    'moderationStatuses' in query
+      ? isNonEmptyString({
+          name: 'moderationStatuses',
+          param: query.moderationStatuses
+        })
+      : undefined
 
-  const createdFrom = 'createdFrom' in query
-    ? isDate({ name: 'createdFrom', param: query.createdFrom })
-    : undefined
+  const createdFrom =
+    'createdFrom' in query
+      ? isDate({ name: 'createdFrom', param: query.createdFrom })
+      : undefined
 
-  const createdTo = 'createdTo' in query
-    ? isDate({ name: 'createdTo', param: query.createdTo })
-    : undefined
+  const createdTo =
+    'createdTo' in query
+      ? isDate({ name: 'createdTo', param: query.createdTo })
+      : undefined
 
-  const userEmail = 'userEmail' in query
-    ? isNonEmptyString({ name: 'userEmail', param: query.userEmail })
-    : undefined
+  const userEmail =
+    'userEmail' in query
+      ? isNonEmptyString({
+          name: 'userEmail',
+          param: query.userEmail
+        })
+      : undefined
 
   return {
     sortBy: sortBy?.param,
@@ -1454,18 +1876,26 @@ export const checkFeedFilters = ({ query }: Request): FeedFiltersInput => {
   }
 }
 
-export const checkUserFeedFilters = ({ query }: Request): UserFeedFiltersInput => {
-  const types = 'types' in query
-    ? isNonEmptyString({ name: 'types', param: query.types })
-    : undefined
+export const checkUserFeedFilters = ({
+  query
+}: Request): UserFeedFiltersInput => {
+  const types =
+    'types' in query
+      ? isNonEmptyString({ name: 'types', param: query.types })
+      : undefined
 
-  const startCursor = 'startCursor' in query
-    ? canBeNumber({ name: 'startCursor', param: query.startCursor })
-    : undefined
+  const startCursor =
+    'startCursor' in query
+      ? canBeNumber({ name: 'startCursor', param: query.startCursor })
+      : undefined
 
-  const startCursorType = 'startCursorType' in query
-    ? isNonEmptyString({ name: 'startCursorType', param: query.startCursorType })
-    : undefined
+  const startCursorType =
+    'startCursorType' in query
+      ? isNonEmptyString({
+          name: 'startCursorType',
+          param: query.startCursorType
+        })
+      : undefined
 
   return {
     types: types?.param,
@@ -1474,73 +1904,103 @@ export const checkUserFeedFilters = ({ query }: Request): UserFeedFiltersInput =
   }
 }
 
-export const checkProductFilters = ({ query }: Request): ProductsFiltersInput => {
-  const groupID = 'groupID' in query
-    ? canBeNumber({ name: 'groupID', param: query.groupID })
-    : undefined
+export const checkProductFilters = ({
+  query
+}: Request): ProductsFiltersInput => {
+  const groupID =
+    'groupID' in query
+      ? canBeNumber({ name: 'groupID', param: query.groupID })
+      : undefined
 
-  const sortBy = 'sortBy' in query
-    ? isNonEmptyString({ name: 'sortBy', param: query.sortBy })
-    : undefined
+  const sortBy =
+    'sortBy' in query
+      ? isNonEmptyString({ name: 'sortBy', param: query.sortBy })
+      : undefined
 
-  const page = 'page' in query
-    ? pipe(
-        canBeNumber,
-        isPositiveNumber
-      )({ name: 'page', param: query.page })
-    : undefined
+  const page =
+    'page' in query
+      ? pipe(
+          canBeNumber,
+          isPositiveNumber
+        )({ name: 'page', param: query.page })
+      : undefined
 
-  const title = 'title' in query
-    ? isNonEmptyString({ name: 'title', param: query.title })
-    : undefined
+  const title =
+    'title' in query
+      ? isNonEmptyString({ name: 'title', param: query.title })
+      : undefined
 
-  const priceMin = 'priceMin' in query
-    ? canBeNumber({ name: 'priceMin', param: query.priceMin })
-    : undefined
+  const priceMin =
+    'priceMin' in query
+      ? canBeNumber({ name: 'priceMin', param: query.priceMin })
+      : undefined
 
-  const priceMax = 'priceMax' in query
-    ? canBeNumber({ name: 'priceMax', param: query.priceMax })
-    : undefined
+  const priceMax =
+    'priceMax' in query
+      ? canBeNumber({ name: 'priceMax', param: query.priceMax })
+      : undefined
 
-  const categoryName = 'categoryName' in query
-    ? isNonEmptyString({ name: 'categoryName', param: query.categoryName })
-    : undefined
+  const categoryName =
+    'categoryName' in query
+      ? isNonEmptyString({
+          name: 'categoryName',
+          param: query.categoryName
+        })
+      : undefined
 
-  const vendorName = 'vendorName' in query
-    ? isNonEmptyString({ name: 'vendorName', param: query.vendorName })
-    : undefined
+  const vendorName =
+    'vendorName' in query
+      ? isNonEmptyString({
+          name: 'vendorName',
+          param: query.vendorName
+        })
+      : undefined
 
-  const stockMin = 'stockMin' in query
-    ? canBeNumber({ name: 'stockMin', param: query.stockMin })
-    : undefined
+  const stockMin =
+    'stockMin' in query
+      ? canBeNumber({ name: 'stockMin', param: query.stockMin })
+      : undefined
 
-  const stockMax = 'stockMax' in query
-    ? canBeNumber({ name: 'stockMax', param: query.stockMax })
-    : undefined
+  const stockMax =
+    'stockMax' in query
+      ? canBeNumber({ name: 'stockMax', param: query.stockMax })
+      : undefined
 
-  const isAvailable = 'isAvailable' in query
-    ? canBeBoolean({ name: 'isAvailable', param: query.isAvailable })
-    : undefined
+  const isAvailable =
+    'isAvailable' in query
+      ? canBeBoolean({
+          name: 'isAvailable',
+          param: query.isAvailable
+        })
+      : undefined
 
-  const reviewCountPerProduct = 'reviewCountPerProduct' in query
-    ? canBeBoolean({ name: 'reviewCountPerProduct', param: query.reviewCountPerProduct })
-    : undefined
+  const reviewCountPerProduct =
+    'reviewCountPerProduct' in query
+      ? canBeBoolean({
+          name: 'reviewCountPerProduct',
+          param: query.reviewCountPerProduct
+        })
+      : undefined
 
-  const starsMin = 'starsMin' in query
-    ? canBeNumber({ name: 'starsMin', param: query.starsMin })
-    : undefined
+  const starsMin =
+    'starsMin' in query
+      ? canBeNumber({ name: 'starsMin', param: query.starsMin })
+      : undefined
 
-  const starsMax = 'starsMax' in query
-    ? canBeNumber({ name: 'starsMax', param: query.starsMax })
-    : undefined
+  const starsMax =
+    'starsMax' in query
+      ? canBeNumber({ name: 'starsMax', param: query.starsMax })
+      : undefined
 
-  const reviewMin = 'reviewMin' in query
-    ? canBeNumber({ name: 'reviewMin', param: query.reviewMin })
-    : undefined
+  const reviewMin =
+    'reviewMin' in query
+      ? canBeNumber({ name: 'reviewMin', param: query.reviewMin })
+      : undefined
 
-  const reviewMax = 'reviewMax' in query
-    ? canBeNumber({ name: 'reviewMax', param: query.reviewMax })
-    : undefined
+  const reviewMax =
+    'reviewMax' in query
+      ? canBeNumber({ name: 'reviewMax', param: query.reviewMax })
+      : undefined
 
   return {
     groupID: groupID?.param,
@@ -1562,10 +2022,13 @@ export const checkProductFilters = ({ query }: Request): ProductsFiltersInput =>
   }
 }
 
-export const checkProductMinFilters = ({ query }: Request): ProductsFiltersInput => {
-  const title = 'title' in query
-    ? isNonEmptyString({ name: 'title', param: query.title })
-    : undefined
+export const checkProductMinFilters = ({
+  query
+}: Request): ProductsFiltersInput => {
+  const title =
+    'title' in query
+      ? isNonEmptyString({ name: 'title', param: query.title })
+      : undefined
 
   return { title: title?.param }
 }
@@ -1574,10 +2037,14 @@ export const checkHistory = ({ query }: Request): HistoryInput => {
   const items = isProvided({ name: 'items', param: query.items })
   items.param.split(',').forEach((i: any) => canBeNumber(i))
 
-  return { items: items.param.split(',').map((i: string) => Number(i)) }
+  return {
+    items: items.param.split(',').map((i: string) => Number(i))
+  }
 }
 
-export const checkImagesUpdate = ({ body }: Request): ImagesUpdateInput => {
+export const checkImagesUpdate = ({
+  body
+}: Request): ImagesUpdateInput => {
   const images: any[] = isArray({ name: 'images', param: body }).param
 
   return images.map((i) => ({
@@ -1592,7 +2059,9 @@ export const checkImagesUpdate = ({ body }: Request): ImagesUpdateInput => {
   }))
 }
 
-export const checkImagesDelete = ({ body }: Request): ImagesDeleteInput => {
+export const checkImagesDelete = ({
+  body
+}: Request): ImagesDeleteInput => {
   const images: any[] = isArray({ name: 'images', param: body }).param
 
   return images.map((i) => ({
@@ -1603,69 +2072,92 @@ export const checkImagesDelete = ({ body }: Request): ImagesDeleteInput => {
   }))
 }
 
-export const checkReviewFilters = ({ query }: Request): ReviewsFiltersInput => {
-  const q = 'q' in query
-    ? isNonEmptyString({ name: 'query', param: query.q })
-    : undefined
+export const checkReviewFilters = ({
+  query
+}: Request): ReviewsFiltersInput => {
+  const q =
+    'q' in query
+      ? isNonEmptyString({ name: 'query', param: query.q })
+      : undefined
 
-  const limit = 'limit' in query
-    ? canBeNumber({ name: 'limit', param: query.limit })
-    : undefined
+  const limit =
+    'limit' in query
+      ? canBeNumber({ name: 'limit', param: query.limit })
+      : undefined
 
-  const groupID = 'groupID' in query
-    ? canBeNumber({ name: 'groupID', param: query.groupID })
-    : undefined
+  const groupID =
+    'groupID' in query
+      ? canBeNumber({ name: 'groupID', param: query.groupID })
+      : undefined
 
-  const sortBy = 'sortBy' in query
-    ? isNonEmptyString({ name: 'sortBy', param: query.sortBy })
-    : undefined
+  const sortBy =
+    'sortBy' in query
+      ? isNonEmptyString({ name: 'sortBy', param: query.sortBy })
+      : undefined
 
-  const productID = 'productID' in query
-    ? canBeNumber({ name: 'productID', param: query.productID })
-    : undefined
+  const productID =
+    'productID' in query
+      ? canBeNumber({ name: 'productID', param: query.productID })
+      : undefined
 
-  const page = 'page' in query
-    ? pipe(
-        canBeNumber,
-        isPositiveNumber
-      )({ name: 'page', param: query.page })
-    : undefined
+  const page =
+    'page' in query
+      ? pipe(
+          canBeNumber,
+          isPositiveNumber
+        )({ name: 'page', param: query.page })
+      : undefined
 
-  const userEmail = 'userEmail' in query
-    ? isNonEmptyString({ name: 'userEmail', param: query.userEmail })
-    : undefined
+  const userEmail =
+    'userEmail' in query
+      ? isNonEmptyString({
+          name: 'userEmail',
+          param: query.userEmail
+        })
+      : undefined
 
-  const moderationStatuses = 'moderationStatuses' in query
-    ? isNonEmptyString({ name: 'moderationStatuses', param: query.moderationStatuses })
-    : undefined
+  const moderationStatuses =
+    'moderationStatuses' in query
+      ? isNonEmptyString({
+          name: 'moderationStatuses',
+          param: query.moderationStatuses
+        })
+      : undefined
 
-  const isVerified = 'isVerified' in query
-    ? canBeBoolean({ name: 'isVerified', param: query.isVerified })
-    : undefined
+  const isVerified =
+    'isVerified' in query
+      ? canBeBoolean({ name: 'isVerified', param: query.isVerified })
+      : undefined
 
-  const createdFrom = 'createdFrom' in query
-    ? isDate({ name: 'createdFrom', param: query.createdFrom })
-    : undefined
+  const createdFrom =
+    'createdFrom' in query
+      ? isDate({ name: 'createdFrom', param: query.createdFrom })
+      : undefined
 
-  const createdTo = 'createdTo' in query
-    ? isDate({ name: 'createdTo', param: query.createdTo })
-    : undefined
+  const createdTo =
+    'createdTo' in query
+      ? isDate({ name: 'createdTo', param: query.createdTo })
+      : undefined
 
-  const starsMin = 'starsMin' in query
-    ? canBeNumber({ name: 'starsMin', param: query.starsMin })
-    : undefined
+  const starsMin =
+    'starsMin' in query
+      ? canBeNumber({ name: 'starsMin', param: query.starsMin })
+      : undefined
 
-  const starsMax = 'starsMax' in query
-    ? canBeNumber({ name: 'starsMax', param: query.starsMax })
-    : undefined
+  const starsMax =
+    'starsMax' in query
+      ? canBeNumber({ name: 'starsMax', param: query.starsMax })
+      : undefined
 
-  const votesMin = 'votesMin' in query
-    ? canBeNumber({ name: 'votesMin', param: query.votesMin })
-    : undefined
+  const votesMin =
+    'votesMin' in query
+      ? canBeNumber({ name: 'votesMin', param: query.votesMin })
+      : undefined
 
-  const votesMax = 'votesMax' in query
-    ? canBeNumber({ name: 'votesMax', param: query.votesMax })
-    : undefined
+  const votesMax =
+    'votesMax' in query
+      ? canBeNumber({ name: 'votesMax', param: query.votesMax })
+      : undefined
 
   return {
     sortBy: sortBy?.param,
@@ -1686,18 +2178,23 @@ export const checkReviewFilters = ({ query }: Request): ReviewsFiltersInput => {
   }
 }
 
-export const checkImageFilters = ({ query }: Request): ImagesFiltersInput => {
-  const productID = 'productID' in query
-    ? canBeNumber({ name: 'productID', param: query.productID })
-    : undefined
+export const checkImageFilters = ({
+  query
+}: Request): ImagesFiltersInput => {
+  const productID =
+    'productID' in query
+      ? canBeNumber({ name: 'productID', param: query.productID })
+      : undefined
 
-  const reviewID = 'reviewID' in query
-    ? canBeNumber({ name: 'reviewID', param: query.reviewID })
-    : undefined
+  const reviewID =
+    'reviewID' in query
+      ? canBeNumber({ name: 'reviewID', param: query.reviewID })
+      : undefined
 
-  const userID = 'userID' in query
-    ? canBeNumber({ name: 'userID', param: query.userID })
-    : undefined
+  const userID =
+    'userID' in query
+      ? canBeNumber({ name: 'userID', param: query.userID })
+      : undefined
 
   return {
     productID: productID?.param,
@@ -1715,22 +2212,28 @@ export const checkNewVote = ({ body }: Request): VotesCreateInput => {
   return { vote: vote.param }
 }
 
-export const checkVoteFilters = ({ query }: Request): VotesFiltersInput => {
-  const reviewID = 'reviewID' in query
-    ? canBeNumber({ name: 'reviewID', param: query.reviewID })
-    : undefined
+export const checkVoteFilters = ({
+  query
+}: Request): VotesFiltersInput => {
+  const reviewID =
+    'reviewID' in query
+      ? canBeNumber({ name: 'reviewID', param: query.reviewID })
+      : undefined
 
-  const questionID = 'questionID' in query
-    ? canBeNumber({ name: 'questionID', param: query.questionID })
-    : undefined
+  const questionID =
+    'questionID' in query
+      ? canBeNumber({ name: 'questionID', param: query.questionID })
+      : undefined
 
-  const answerID = 'answerID' in query
-    ? canBeNumber({ name: 'answerID', param: query.answerID })
-    : undefined
+  const answerID =
+    'answerID' in query
+      ? canBeNumber({ name: 'answerID', param: query.answerID })
+      : undefined
 
-  const userID = 'userID' in query
-    ? canBeNumber({ name: 'userID', param: query.userID })
-    : undefined
+  const userID =
+    'userID' in query
+      ? canBeNumber({ name: 'userID', param: query.userID })
+      : undefined
 
   return {
     reviewID: reviewID?.param,
@@ -1740,7 +2243,9 @@ export const checkVoteFilters = ({ query }: Request): VotesFiltersInput => {
   }
 }
 
-export const checkAskFilters = ({ query }: Request): AskFiltersInput => {
+export const checkAskFilters = ({
+  query
+}: Request): AskFiltersInput => {
   const q = pipe(
     isProvided,
     isNonEmptyString
@@ -1749,69 +2254,81 @@ export const checkAskFilters = ({ query }: Request): AskFiltersInput => {
   return { q: q.param }
 }
 
-export const checkSearchFilters = ({ query }: Request): SearchFiltersInput => {
-  const q = 'q' in query
-    ? isNonEmptyString({ name: 'query', param: query.q })
-    : undefined
+export const checkSearchFilters = ({
+  query
+}: Request): SearchFiltersInput => {
+  const q =
+    'q' in query
+      ? isNonEmptyString({ name: 'query', param: query.q })
+      : undefined
 
-  const page = 'page' in query
-    ? pipe(canBeNumber, isPositiveNumber)({ name: 'page', param: query.page })
-    : undefined
+  const page =
+    'page' in query
+      ? pipe(
+          canBeNumber,
+          isPositiveNumber
+        )({ name: 'page', param: query.page })
+      : undefined
 
-  const categoryID = 'categoryID' in query
-    ? pipe(canBeNumber, isPositiveNumber)(
-        { name: 'categoryID', param: query.categoryID }
-      )
-    : undefined
+  const categoryID =
+    'categoryID' in query
+      ? pipe(
+          canBeNumber,
+          isPositiveNumber
+        )({ name: 'categoryID', param: query.categoryID })
+      : undefined
 
-  let vendorIDs = 'vendorIDs' in query
-    ? (query.vendorIDs as string)
-        .split(',')
-        .map((i) => {
-          pipe(canBeNumber, isPositiveNumber)({ name: 'vendorID', param: i })
+  const vendorIDs =
+    'vendorIDs' in query
+      ? (query.vendorIDs as string).split(',').map((i) => {
+          pipe(
+            canBeNumber,
+            isPositiveNumber
+          )({ name: 'vendorID', param: i })
           return Number(i)
         })
-    : undefined
+      : undefined
 
-  let colors = 'colors' in query
-    ? (query.colors as string)
-        .split(',')
-        .map((i) => {
+  const colors =
+    'colors' in query
+      ? (query.colors as string).split(',').map((i) => {
           isNonEmptyString({ name: 'color', param: i })
           return i
         })
-    : undefined
+      : undefined
 
-  let sizes = 'sizes' in query
-    ? (query.sizes as string)
-        .split(',')
-        .map((i) => {
+  const sizes =
+    'sizes' in query
+      ? (query.sizes as string).split(',').map((i) => {
           isNonEmptyString({ name: 'size', param: i })
           return i
         })
-    : undefined
+      : undefined
 
-  const sortBy = 'sortBy' in query
-    ? isNonEmptyString(
-        { name: 'sortBy', param: query.sortBy }
-      )
-    : undefined
+  const sortBy =
+    'sortBy' in query
+      ? isNonEmptyString({ name: 'sortBy', param: query.sortBy })
+      : undefined
 
-  const outOfStock = 'outOfStock' in query
-    ? canBeBoolean({ name: 'outOfStock', param: query.outOfStock })
-    : undefined
+  const outOfStock =
+    'outOfStock' in query
+      ? canBeBoolean({ name: 'outOfStock', param: query.outOfStock })
+      : undefined
 
-  const priceMin = 'priceMin' in query
-    ? canBeNumber({ name: 'priceMin', param: query.priceMin })
-    : undefined
+  const priceMin =
+    'priceMin' in query
+      ? canBeNumber({ name: 'priceMin', param: query.priceMin })
+      : undefined
 
-  const priceMax = 'priceMax' in query
-    ? canBeNumber({ name: 'priceMax', param: query.priceMax })
-    : undefined
+  const priceMax =
+    'priceMax' in query
+      ? canBeNumber({ name: 'priceMax', param: query.priceMax })
+      : undefined
 
-  const starsMin = 'starsMin' in query
-    ? canBeNumber({ name: 'starsMin', param: query.starsMin })
-    : undefined
+  const starsMin =
+    'starsMin' in query
+      ? canBeNumber({ name: 'starsMin', param: query.starsMin })
+      : undefined
 
   return hasDefinedProps<SearchFiltersInput>({
     ...query,
@@ -1829,14 +2346,20 @@ export const checkSearchFilters = ({ query }: Request): SearchFiltersInput => {
   })
 }
 
-export const checkFollows = ({ query }: Request): Pick<CursorInput, 'startCursor'> & { limit?: number } => {
-  const startCursor = 'startCursor' in query
-    ? canBeNumber({ name: 'startCursor', param: query.startCursor })
-    : undefined
+export const checkFollows = ({
+  query
+}: Request): Pick<CursorInput, 'startCursor'> & {
+  limit?: number
+} => {
+  const startCursor =
+    'startCursor' in query
+      ? canBeNumber({ name: 'startCursor', param: query.startCursor })
+      : undefined
 
-  const limit = 'limit' in query
-    ? canBeNumber({ name: 'limit', param: query.limit })
-    : undefined
+  const limit =
+    'limit' in query
+      ? canBeNumber({ name: 'limit', param: query.limit })
+      : undefined
 
   return { startCursor: startCursor?.param, limit: limit?.param }
 }

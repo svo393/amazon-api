@@ -1,53 +1,82 @@
 import { Request } from 'express'
 import Knex from 'knex'
 import { equals, omit, pick } from 'ramda'
-import { Address, AddressCreateInput, AddressUpdateInput, UserAddress } from '../types'
+import {
+  Address,
+  AddressCreateInput,
+  AddressUpdateInput,
+  UserAddress
+} from '../types'
 import { db, dbTrans } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
-const addAddress = async (addressInput: AddressCreateInput, req: Request): Promise<Address & UserAddress> => {
+const addAddress = async (
+  addressInput: AddressCreateInput,
+  req: Request
+): Promise<Address & UserAddress> => {
   const userID: number = req.session?.userID
 
   const { isDefault } = addressInput
 
   return await dbTrans(async (trx: Knex.Transaction) => {
-    const existingUserAddresses = await trx<Address & UserAddress>('addresses as a')
+    const existingUserAddresses = await trx<Address & UserAddress>(
+      'addresses as a'
+    )
       .joinRaw('LEFT JOIN "userAddresses" as ua USING ("addressID")')
       .where('userID', userID)
 
-    existingUserAddresses.length !== 0 && isDefault && await trx('userAddresses')
-      .where('userID', userID)
-      .andWhere('isDefault', true)
-      .update({ isDefault: false }, [ '*' ])
+    existingUserAddresses.length !== 0 &&
+      isDefault &&
+      (await trx('userAddresses')
+        .where('userID', userID)
+        .andWhere('isDefault', true)
+        .update({ isDefault: false }, ['*']))
 
-    const [ addedAddress ]: Address[] = await trx('addresses')
-      .insert(omit([ 'isDefault' ], addressInput), [ '*' ])
+    const [addedAddress]: Address[] = await trx('addresses').insert(
+      omit(['isDefault'], addressInput),
+      ['*']
+    )
 
-    const [ addedUserAddress ]: UserAddress[] = await trx('userAddresses')
-      .insert({
+    const [addedUserAddress]: UserAddress[] = await trx(
+      'userAddresses'
+    ).insert(
+      {
         isDefault: isDefault ?? existingUserAddresses.length === 0,
         addressID: addedAddress.addressID,
         userID
-      }, [ '*' ])
+      },
+      ['*']
+    )
 
     return { ...addedAddress, ...addedUserAddress }
   })
 }
 
-const getAddressesByUser = async (req: Request): Promise<(Address & UserAddress)[]> => {
+const getAddressesByUser = async (
+  req: Request
+): Promise<(Address & UserAddress)[]> => {
   return await db('userAddresses as ua')
     .where('userID', req.params.userID)
     .join('addresses as a', 'ua.addressID', 'a.addressID')
 }
 
-const getAddressesByType = async (req: Request): Promise<Address[]> => {
-  return await db('addresses')
-    .where('addressType', req.params.addressTypeName)
+const getAddressesByType = async (
+  req: Request
+): Promise<Address[]> => {
+  return await db('addresses').where(
+    'addressType',
+    req.params.addressTypeName
+  )
 }
 
-type AddressFullData = Address & { userID: string; isPrivate: boolean }
+type AddressFullData = Address & {
+  userID: string
+  isPrivate: boolean
+}
 
-const getAddressByID = async (req: Request): Promise<AddressFullData> => {
+const getAddressByID = async (
+  req: Request
+): Promise<AddressFullData> => {
   const address: AddressFullData = await db('addresses as a')
     .first(
       'a.addressID',
@@ -58,7 +87,11 @@ const getAddressByID = async (req: Request): Promise<AddressFullData> => {
     )
     .where('addressID', req.params.addressID)
     .joinRaw('JOIN "userAddresses" as ua USING ("addressID")')
-    .leftJoin('addressTypes as at', 'a.addressType', 'at.addressTypeName')
+    .leftJoin(
+      'addressTypes as at',
+      'a.addressType',
+      'at.addressTypeName'
+    )
 
   if (address === undefined) throw new StatusError(404, 'Not Found')
 
@@ -66,7 +99,7 @@ const getAddressByID = async (req: Request): Promise<AddressFullData> => {
 
   if (
     address.isPrivate &&
-    (!role || ![ 'ROOT', 'ADMIN' ].includes(role)) &&
+    (!role || !['ROOT', 'ADMIN'].includes(role)) &&
     address.userID !== req.session?.userID
   ) {
     throw new StatusError(404, 'Not Found')
@@ -74,35 +107,47 @@ const getAddressByID = async (req: Request): Promise<AddressFullData> => {
   return address
 }
 
-const updateAddress = async (addressInput: AddressUpdateInput, req: Request): Promise<Address & UserAddress> => {
+const updateAddress = async (
+  addressInput: AddressUpdateInput,
+  req: Request
+): Promise<Address & UserAddress> => {
   const { addressID } = req.params
   const userID = req.session?.userID
 
-  const setDefaultOnly = equals(Object.keys(addressInput), [ 'isDefault' ])
+  const setDefaultOnly = equals(Object.keys(addressInput), [
+    'isDefault'
+  ])
 
   return await dbTrans(async (trx: Knex.Transaction) => {
     let updatedAddress = {}
     let updatedUserAddress = {}
 
-    addressInput.isDefault && await trx('userAddresses')
-      .where('userID', userID)
-      .andWhere('isDefault', true)
-      .update({ isDefault: false }, [ '*' ])
+    addressInput.isDefault &&
+      (await trx('userAddresses')
+        .where('userID', userID)
+        .andWhere('isDefault', true)
+        .update({ isDefault: false }, ['*']))
 
     if (!setDefaultOnly) {
-      updatedAddress = (await trx('addresses')
-        .update({ ...omit([ 'isDefault' ], addressInput) }, [ '*' ])
-        .where('addressID', addressID))[0]
+      updatedAddress = (
+        await trx('addresses')
+          .update({ ...omit(['isDefault'], addressInput) }, ['*'])
+          .where('addressID', addressID)
+      )[0]
     }
 
     if (addressInput.isDefault !== undefined) {
       updatedUserAddress = await trx('userAddresses')
-        .update({ ...pick([ 'isDefault' ], addressInput) }, [ '*' ])
+        .update({ ...pick(['isDefault'], addressInput) }, ['*'])
         .where('addressID', addressID)
         .andWhere('userID', userID)
     }
 
-    if ((setDefaultOnly && updatedAddress === undefined) || updatedUserAddress === undefined) throw new StatusError(404, 'Not Found')
+    if (
+      (setDefaultOnly && updatedAddress === undefined) ||
+      updatedUserAddress === undefined
+    )
+      throw new StatusError(404, 'Not Found')
 
     return { ...updatedAddress, ...updatedUserAddress }
   })
@@ -126,7 +171,13 @@ const deleteAddress = async (req: Request): Promise<Address> => {
       .del()
       .where('addressID', req.params.addressID)
 
-    if (addressDeleteCount === 0 || address === undefined || userAddressDeleteCount === 0 || address === undefined) throw new StatusError(404, 'Not Found')
+    if (
+      addressDeleteCount === 0 ||
+      address === undefined ||
+      userAddressDeleteCount === 0 ||
+      address === undefined
+    )
+      throw new StatusError(404, 'Not Found')
 
     return { ...address, ...userAddress }
   })
