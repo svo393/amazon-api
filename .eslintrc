@@ -7,8 +7,8 @@
     "prettier",
     "prettier/standard",
     "prettier/@typescript-eslint",
-    "plugin:promise/recommended",
-    "plugin:sonarjs/recommended"
+    "plugin:promise/recommended"
+    // "plugin:sonarjs/recommended"
   ],
   "overrides": [
     {
@@ -60,7 +60,12 @@
     "ecmaVersion": 2021,
     "project": "tsconfig.eslint.json"
   },
-  "plugins": ["@typescript-eslint", "promise", "sonarjs", "prettier"],
+  "plugins": [
+    "@typescript-eslint",
+    "promise",
+    // "sonarjs",
+    "prettier"
+  ],
   "rules": {
     "prefer-const": "error",
     "no-unused-params": "off",

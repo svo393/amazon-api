@@ -1,4 +1,4 @@
-import { Request } from 'express'
+import { Express, Request } from 'express'
 import Knex from 'knex'
 import { flatten, omit, sum } from 'ramda'
 import {

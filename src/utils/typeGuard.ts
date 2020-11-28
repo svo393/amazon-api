@@ -1,4 +1,4 @@
-import { Request } from 'express'
+import { Express, Request } from 'express'
 import { pipe } from 'ramda'
 import {
   AddressCreateInput,
@@ -494,9 +494,7 @@ export const checkModerationStatus = ({
   return { moderationStatusName: moderationStatusName.param }
 }
 
-export const checkOrderStatus = ({
-  body
-}: Request): OrderStatus => {
+export const checkOrderStatus = ({ body }: Request): OrderStatus => {
   const orderStatusName = pipe(
     isProvided,
     isNonEmptyString
@@ -1708,8 +1706,7 @@ export const checkUserFeedFilters = ({
 
 export const checkProductFilters = ({
   query
-}: // eslint-disable-next-line sonarjs/cognitive-complexity
-Request): ProductsFiltersInput => {
+}: Request): ProductsFiltersInput => {
   const groupID =
     'groupID' in query
       ? canBeNumber({ name: 'groupID', param: query.groupID })

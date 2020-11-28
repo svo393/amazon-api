@@ -156,10 +156,11 @@ const getOrders = async (
     startCursor
   } = ordersFiltersinput
 
-  if (!['ROOT', 'ADMIN'].includes(req.session?.role)) {
-    if (userID === undefined || req.session?.userID !== userID) {
-      throw new StatusError(403, 'Forbidden')
-    }
+  if (
+    !['ROOT', 'ADMIN'].includes(req.session?.role) &&
+    (userID === undefined || req.session?.userID !== userID)
+  ) {
+    throw new StatusError(403, 'Forbidden')
   }
 
   let orders: (Order &

@@ -1,4 +1,4 @@
-import { Request } from 'express'
+import { Express, Request } from 'express'
 import { omit } from 'ramda'
 import {
   Answer,

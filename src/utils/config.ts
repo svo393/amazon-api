@@ -57,8 +57,7 @@ envVars.BASE_URLS =
 export const UPLOAD_TIMEOUT = 20000
 
 if (Object.values(envVars).some((v) => v === undefined)) {
-  console.error('Missing environment variables. Shutting down...')
-  process.exit(1)
+  throw new Error('Missing environment variables. Shutting down...')
 }
 
 export default envVars
