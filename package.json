@@ -74,6 +74,7 @@
   "name": "amazon-api",
   "private": true,
   "scripts": {
+    "build": "rm -rf dist && tsc",
     "debug": "cross-env NODE_ENV=development DEBUG=knex:query,knex:tx  ts-node-dev src/index.ts",
     "dev": "cross-env NODE_ENV=development ts-node-dev src/index.ts",
     "init": "cross-env NODE_ENV=development ts-node ./db/init.ts",
@@ -81,8 +82,7 @@
     "lint": "eslint **/*.ts --ignore-pattern node_modules/",
     "migrate:down": "knex migrate:down --knexfile ./db/knexfile.ts",
     "migrate:up": "knex migrate:up --knexfile ./db/knexfile.ts && cross-env NODE_ENV=development ts-node ./db/destroy.ts",
-    "start": "cross-env NODE_ENV=production node dist/src/index.js",
-    "tsc": "rm -rf dist && tsc"
+    "start": "cross-env NODE_ENV=production node dist/src/index.js"
   },
   "version": "1.0.0"
 }
