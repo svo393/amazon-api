@@ -1,15 +1,12 @@
 import Router from 'express'
 import invoiceStatusService from '../services/invoiceStatusService'
-import {
-  checkNewInvoiceStatus,
-  checkInvoiceStatusUpdate
-} from '../utils/typeGuard'
+import { checkInvoiceStatus } from '../utils/typeGuard'
 import { requireAdmin } from '../utils/middleware'
 
 const router = Router()
 
 router.post('/', requireAdmin, async (req, res) => {
-  const invoiceStatusCreateInput = checkNewInvoiceStatus(req)
+  const invoiceStatusCreateInput = checkInvoiceStatus(req)
   const addedInvoiceStatus = await invoiceStatusService.addInvoiceStatus(
     invoiceStatusCreateInput
   )
@@ -22,7 +19,7 @@ router.get('/', requireAdmin, async (_, res) => {
 })
 
 router.put('/:invoiceStatusName', requireAdmin, async (req, res) => {
-  const invoiceStatusUpdateInput = checkInvoiceStatusUpdate(req)
+  const invoiceStatusUpdateInput = checkInvoiceStatus(req)
   const updatedInvoiceStatus = await invoiceStatusService.updateInvoiceStatus(
     invoiceStatusUpdateInput,
     req

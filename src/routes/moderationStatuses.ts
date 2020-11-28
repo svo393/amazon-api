@@ -1,15 +1,12 @@
 import Router from 'express'
 import moderationStatusService from '../services/moderationStatusService'
-import {
-  checkNewModerationStatus,
-  checkModerationStatusUpdate
-} from '../utils/typeGuard'
+import { checkModerationStatus } from '../utils/typeGuard'
 import { requireAdmin } from '../utils/middleware'
 
 const router = Router()
 
 router.post('/', requireAdmin, async (req, res) => {
-  const moderationStatusCreateInput = checkNewModerationStatus(req)
+  const moderationStatusCreateInput = checkModerationStatus(req)
   const addedModerationStatus = await moderationStatusService.addModerationStatus(
     moderationStatusCreateInput
   )
@@ -25,9 +22,7 @@ router.put(
   '/:moderationStatusName',
   requireAdmin,
   async (req, res) => {
-    const moderationStatusUpdateInput = checkModerationStatusUpdate(
-      req
-    )
+    const moderationStatusUpdateInput = checkModerationStatus(req)
     const updatedModerationStatus = await moderationStatusService.updateModerationStatus(
       moderationStatusUpdateInput,
       req

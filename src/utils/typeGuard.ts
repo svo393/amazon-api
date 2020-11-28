@@ -237,9 +237,10 @@ export const checkUserResetToken = ({
   }
 }
 
-export const checkNewProduct = ({
-  body
-}: Request): ProductCreateInput => {
+export const checkProduct = (
+  { body }: Request,
+  checkNew = false
+): ProductCreateInput | ProductUpdateInput => {
   const title = pipe(
     isProvided,
     isNonEmptyString
@@ -313,10 +314,14 @@ export const checkNewProduct = ({
     canBeNumber
   )({ name: 'vendorID', param: body.vendorID })
 
-  const groupID =
-    'groupID' in body
+  const groupID = checkNew
+    ? 'groupID' in body
       ? canBeNumber({ name: 'groupID', param: body.groupID })
       : undefined
+    : pipe(
+        isProvided,
+        canBeNumber
+      )({ name: 'groupID', param: body.groupID })
 
   let groupVariations =
     'groupVariations' in body
@@ -375,7 +380,7 @@ export const checkNewProduct = ({
     isAvailable: isAvailable.param,
     categoryID: categoryID.param,
     vendorID: vendorID.param,
-    groupID: groupID?.param,
+    groupID: checkNew ? groupID?.param : groupID.param,
     groupVariations: groupVariations?.param,
     productParameters: productParameters?.param
   }
@@ -393,150 +398,6 @@ export const checkProductByID = ({
       : undefined
 
   return { reviewCountPerProduct: reviewCountPerProduct?.param }
-}
-
-export const checkProductUpdate = ({
-  body
-}: Request): ProductUpdateInput => {
-  const title = pipe(
-    isProvided,
-    isNonEmptyString
-  )({ name: 'title', param: body.title })
-
-  const listPrice =
-    'listPrice' in body
-      ? canBeNumber({ name: 'listPrice', param: body.listPrice })
-      : undefined
-
-  const price = pipe(
-    isProvided,
-    canBeNumber
-  )({ name: 'price', param: body.price })
-
-  const bullets = pipe(
-    isProvided,
-    isNonEmptyString
-  )({ name: 'bullets', param: body.bullets })
-
-  const description =
-    'description' in body
-      ? isNonEmptyString({
-          name: 'description',
-          param: body.description
-        })
-      : undefined
-
-  const stock =
-    'stock' in body
-      ? canBeNumber({ name: 'stock', param: body.stock })
-      : undefined
-
-  let productSizes =
-    'productSizes' in body
-      ? isArray({ name: 'productSizes', param: body.productSizes })
-      : undefined
-
-  productSizes = {
-    ...productSizes,
-    name: 'productSizes',
-    param: productSizes?.param.map((pp: any) => ({
-      name: pipe(
-        isProvided,
-        isNonEmptyString
-      )({ name: 'name', param: pp.name }).param,
-      qty: pipe(
-        isProvided,
-        canBeNumber
-      )({ name: 'qty', param: pp.qty }).param
-    }))
-  }
-
-  isSomeProvided({
-    input: [stock, productSizes],
-    names: ['stock', 'productSizes']
-  })
-
-  const isAvailable = pipe(
-    isProvided,
-    canBeBoolean
-  )({ name: 'isAvailable', param: body.isAvailable })
-
-  const categoryID = pipe(
-    isProvided,
-    canBeNumber
-  )({ name: 'categoryID', param: body.categoryID })
-
-  const vendorID = pipe(
-    isProvided,
-    canBeNumber
-  )({ name: 'vendorID', param: body.vendorID })
-
-  const groupID = pipe(
-    isProvided,
-    canBeNumber
-  )({ name: 'groupID', param: body.groupID })
-
-  let groupVariations =
-    'groupVariations' in body
-      ? isArray({
-          name: 'groupVariations',
-          param: body.groupVariations
-        })
-      : undefined
-
-  groupVariations = {
-    ...groupVariations,
-    name: 'groupVariations',
-    param: groupVariations?.param.map((gv: any) => ({
-      name: pipe(
-        isProvided,
-        isNonEmptyString
-      )({ name: 'name', param: gv.name }).param,
-      value: pipe(
-        isProvided,
-        isNonEmptyString
-      )({ name: 'value', param: gv.value }).param
-    }))
-  }
-
-  let productParameters =
-    'productParameters' in body
-      ? isArray({
-          name: 'productParameters',
-          param: body.productParameters
-        })
-      : undefined
-
-  productParameters = {
-    ...productParameters,
-    name: 'productParameters',
-    param: productParameters?.param.map((pp: any) => ({
-      parameterID: pipe(
-        isProvided,
-        canBeNumber
-      )({ name: 'parameterID', param: pp.parameterID }).param,
-      value: pipe(
-        isProvided,
-        isNonEmptyString
-      )({ name: 'value', param: pp.value }).param
-    }))
-  }
-
-  return {
-    title: title.param,
-    listPrice: listPrice?.param,
-    price: price.param,
-    bullets: bullets.param,
-    description: description?.param,
-    stock: stock?.param,
-    productSizes: productSizes?.param,
-    isAvailable: isAvailable.param,
-    categoryID: categoryID.param,
-    vendorID: vendorID.param,
-    groupID: groupID.param,
-    groupVariations: groupVariations?.param,
-    productParameters: productParameters?.param
-  }
 }
 
 export const checkMediaUpload = ({
@@ -598,7 +459,7 @@ export const checkCategoryUpdate = ({
   })
 }
 
-export const checkVendor = ({ body }: Request): VendorInput => {
+export const checkName = (body: any): { name: string } => {
   const name = pipe(
     isProvided,
     isNonEmptyString
@@ -606,6 +467,9 @@ export const checkVendor = ({ body }: Request): VendorInput => {
 
   return { name: name.param }
 }
+
+export const checkVendor = ({ body }: Request): VendorInput =>
+  checkName(body)
 
 export const checkRole = ({ body }: Request): Role => {
   const roleName = pipe(
@@ -616,7 +480,7 @@ export const checkRole = ({ body }: Request): Role => {
   return { roleName: roleName.param }
 }
 
-export const checkNewModerationStatus = ({
+export const checkModerationStatus = ({
   body
 }: Request): ModerationStatus => {
   const moderationStatusName = pipe(
@@ -630,21 +494,7 @@ export const checkNewModerationStatus = ({
   return { moderationStatusName: moderationStatusName.param }
 }
 
-export const checkModerationStatusUpdate = ({
-  body
-}: Request): ModerationStatus => {
-  const moderationStatusName = pipe(
-    isProvided,
-    isNonEmptyString
-  )({
-    name: 'moderationStatusName',
-    param: body.moderationStatusName
-  })
-
-  return { moderationStatusName: moderationStatusName.param }
-}
-
-export const checkNewOrderStatus = ({
+export const checkOrderStatus = ({
   body
 }: Request): OrderStatus => {
   const orderStatusName = pipe(
@@ -655,29 +505,7 @@ export const checkNewOrderStatus = ({
   return { orderStatusName: orderStatusName.param }
 }
 
-export const checkOrderStatusUpdate = ({
-  body
-}: Request): OrderStatus => {
-  const orderStatusName = pipe(
-    isProvided,
-    isNonEmptyString
-  )({ name: 'orderStatusName', param: body.orderStatusName })
-
-  return { orderStatusName: orderStatusName.param }
-}
-
-export const checkNewInvoiceStatus = ({
-  body
-}: Request): InvoiceStatus => {
-  const invoiceStatusName = pipe(
-    isProvided,
-    isNonEmptyString
-  )({ name: 'invoiceStatusName', param: body.invoiceStatusName })
-
-  return { invoiceStatusName: invoiceStatusName.param }
-}
-
-export const checkInvoiceStatusUpdate = ({
+export const checkInvoiceStatus = ({
   body
 }: Request): InvoiceStatus => {
   const invoiceStatusName = pipe(
@@ -983,16 +811,8 @@ export const checkNewList = ({ body }: Request): ListCreateInput => {
   return { name: name.param, productID: productID.param }
 }
 
-export const checkListUpdate = ({
-  body
-}: Request): ListUpdateInput => {
-  const name = pipe(
-    isProvided,
-    isNonEmptyString
-  )({ name: 'name', param: body.name })
-
-  return { name: name.param }
-}
+export const checkListUpdate = ({ body }: Request): ListUpdateInput =>
+  checkName(body)
 
 export const checkNewReview = ({
   body
@@ -1186,9 +1006,7 @@ export const checkQuestionsCursor = ({
   }
 }
 
-export const checkNewQuestion = ({
-  body
-}: Request): QuestionCreateInput => {
+const checkContent = (body: any): { content: string } => {
   const content = pipe(
     isProvided,
     isNonEmptyString
@@ -1196,6 +1014,10 @@ export const checkNewQuestion = ({
 
   return { content: content.param }
 }
+
+export const checkNewQuestion = ({
+  body
+}: Request): QuestionCreateInput => checkContent(body)
 
 export const checkQuestionUpdate = ({
   body
@@ -1244,14 +1066,7 @@ export const checkAnswers = ({ query }: Request): CursorInput => {
 
 export const checkNewAnswer = ({
   body
-}: Request): AnswerCreateInput => {
-  const content = pipe(
-    isProvided,
-    isNonEmptyString
-  )({ name: 'content', param: body.content })
-
-  return { content: content.param }
-}
+}: Request): AnswerCreateInput => checkContent(body)
 
 export const checkAnswerUpdate = ({
   body
@@ -1275,14 +1090,8 @@ export const checkAnswerUpdate = ({
   })
 }
 
-export const checkParameter = ({ body }: Request): ParameterInput => {
-  const name = pipe(
-    isProvided,
-    isNonEmptyString
-  )({ name: 'name', param: body.name })
-
-  return { name: name.param }
-}
+export const checkParameter = ({ body }: Request): ParameterInput =>
+  checkName(body)
 
 export const checkNewGroupVariation = ({
   body
@@ -1316,14 +1125,7 @@ export const checkGroupVariationUpdate = ({
 
 export const checkGroupVariationDeletion = ({
   body
-}: Request): GroupVariationDeleteInput => {
-  const name = pipe(
-    isProvided,
-    isNonEmptyString
-  )({ name: 'name', param: body.name })
-
-  return { name: name.param }
-}
+}: Request): GroupVariationDeleteInput => checkName(body)
 
 export const checkNewOrder = ({
   body
@@ -1906,7 +1708,8 @@ export const checkUserFeedFilters = ({
 
 export const checkProductFilters = ({
   query
-}: Request): ProductsFiltersInput => {
+}: // eslint-disable-next-line sonarjs/cognitive-complexity
+Request): ProductsFiltersInput => {
   const groupID =
     'groupID' in query
       ? canBeNumber({ name: 'groupID', param: query.groupID })

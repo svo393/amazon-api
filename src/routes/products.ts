@@ -7,18 +7,17 @@ import {
   checkHistory,
   checkLocalCart,
   checkMediaUpload,
-  checkNewProduct,
+  checkProduct,
   checkProductByID,
   checkProductFilters,
-  checkProductMinFilters,
-  checkProductUpdate
+  checkProductMinFilters
 } from '../utils/typeGuard'
 import { multerUpload, requireAdmin } from '../utils/middleware'
 
 const router = Router()
 
 router.post('/', requireAdmin, async (req, res) => {
-  const productInput = checkNewProduct(req)
+  const productInput = checkProduct(req, true)
   const addedProduct = await productService.addProduct(
     productInput,
     req
@@ -61,7 +60,7 @@ router.get('/:productID', async (req, res) => {
 })
 
 router.put('/:productID', requireAdmin, async (req, res) => {
-  const productInput = checkProductUpdate(req)
+  const productInput = checkProduct(req)
   const updatedProduct = await productService.updateProduct(
     productInput,
     req
