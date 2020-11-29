@@ -1,28 +1,40 @@
 import { Request } from 'express'
 import Knex from 'knex'
-import { BatchWithCursor, Invoice, InvoiceCreateInput, InvoicesFiltersInput, InvoiceUpdateInput } from '../types'
+import {
+  BatchWithCursor,
+  Invoice,
+  InvoiceCreateInput,
+  InvoicesFiltersInput,
+  InvoiceUpdateInput
+} from '../types'
 import reformatDate from '../utils/compareDates'
 import { defaultLimit } from '../utils/constants'
 import { db, dbTrans } from '../utils/db'
 import sortItems from '../utils/sortItems'
 import StatusError from '../utils/StatusError'
 
-const addInvoice = async (invoiceInput: InvoiceCreateInput): Promise<Invoice> => {
+const addInvoice = async (
+  invoiceInput: InvoiceCreateInput
+): Promise<Invoice> => {
   const now = new Date()
 
-  const [ addedInvoice ]: Invoice[] = await db('invoices')
-    .insert({
+  const [addedInvoice]: Invoice[] = await db('invoices').insert(
+    {
       ...invoiceInput,
       amount: invoiceInput.amount * 100,
       invoiceStatus: 'NEW',
       createdAt: now,
       updatedAt: now
-    }, [ '*' ])
+    },
+    ['*']
+  )
 
   return addedInvoice
 }
 
-const getInvoices = async (invoicesFiltersinput: InvoicesFiltersInput): Promise<BatchWithCursor<Invoice>> => {
+const getInvoices = async (
+  invoicesFiltersinput: InvoicesFiltersInput
+): Promise<BatchWithCursor<Invoice>> => {
   const {
     page = 1,
     sortBy = 'createdAt_desc',
@@ -35,7 +47,11 @@ const getInvoices = async (invoicesFiltersinput: InvoicesFiltersInput): Promise<
     userEmail
   } = invoicesFiltersinput
 
-  let invoices: (Invoice & { avatar: boolean; userName: string; userEmail: string })[] = await db('invoices as i')
+  let invoices: (Invoice & {
+    avatar: boolean
+    userName: string
+    userEmail: string
+  })[] = await db('invoices as i')
     .select(
       'i.invoiceID',
       'i.amount',
@@ -54,40 +70,44 @@ const getInvoices = async (invoicesFiltersinput: InvoicesFiltersInput): Promise<
   invoices = invoices.map((i) => ({ ...i, amount: i.amount / 100 }))
 
   if (invoiceStatuses !== undefined) {
-    invoices = invoices
-      .filter((i) => invoiceStatuses.split(',').includes(i.invoiceStatus))
+    invoices = invoices.filter((i) =>
+      invoiceStatuses.split(',').includes(i.invoiceStatus)
+    )
   }
 
   if (paymentMethods !== undefined) {
-    invoices = invoices
-      .filter((i) => paymentMethods.split(',').includes(i.paymentMethod))
+    invoices = invoices.filter((i) =>
+      paymentMethods.split(',').includes(i.paymentMethod)
+    )
   }
 
   if (amountMin !== undefined) {
-    invoices = invoices
-      .filter((i) => i.amount >= amountMin)
+    invoices = invoices.filter((i) => i.amount >= amountMin)
   }
 
   if (amountMax !== undefined) {
-    invoices = invoices
-      .filter((i) => i.amount <= amountMax)
+    invoices = invoices.filter((i) => i.amount <= amountMax)
   }
 
   if (createdFrom !== undefined) {
-    invoices = invoices
-      .filter((i) =>
-        reformatDate(i.createdAt) >= reformatDate(new Date(createdFrom)))
+    invoices = invoices.filter(
+      (i) =>
+        reformatDate(i.createdAt) >=
+        reformatDate(new Date(createdFrom))
+    )
   }
 
   if (createdTo !== undefined) {
-    invoices = invoices
-      .filter((i) =>
-        reformatDate(i.createdAt) <= reformatDate(new Date(createdTo)))
+    invoices = invoices.filter(
+      (i) =>
+        reformatDate(i.createdAt) <= reformatDate(new Date(createdTo))
+    )
   }
 
   if (userEmail !== undefined) {
-    invoices = invoices
-      .filter((i) => i.userEmail?.toLowerCase().includes(userEmail.toLowerCase()))
+    invoices = invoices.filter((i) =>
+      i.userEmail?.toLowerCase().includes(userEmail.toLowerCase())
+    )
   }
 
   const invoicesSorted = sortItems(invoices, sortBy)
@@ -96,15 +116,19 @@ const getInvoices = async (invoicesFiltersinput: InvoicesFiltersInput): Promise<
   const end = (page - 1) * defaultLimit + defaultLimit
 
   return {
-    batch: invoicesSorted.slice((page - 1) * defaultLimit, (page - 1) * defaultLimit + defaultLimit),
+    batch: invoicesSorted.slice(
+      (page - 1) * defaultLimit,
+      (page - 1) * defaultLimit + defaultLimit
+    ),
     totalCount,
     hasNextPage: end < totalCount
   }
 }
 
-const getInvoicesByUser = async (req: Request): Promise<Invoice[]> => {
-  return await db('invoices')
-    .where('userID', req.params.userID)
+const getInvoicesByUser = async (
+  req: Request
+): Promise<Invoice[]> => {
+  return await db('invoices').where('userID', req.params.userID)
 }
 
 const getInvoiceByID = async (req: Request): Promise<Invoice> => {
@@ -128,28 +152,45 @@ const getInvoiceByID = async (req: Request): Promise<Invoice> => {
   return { ...invoice, amount: invoice.amount / 100 }
 }
 
-const updateInvoice = async (invoiceInput: InvoiceUpdateInput, req: Request): Promise<Invoice> => {
+const updateInvoice = async (
+  invoiceInput: InvoiceUpdateInput,
+  req: Request
+): Promise<Invoice> => {
   return await dbTrans(async (trx: Knex.Transaction) => {
-    const invoice: { invoiceStatusName: string } = await trx('invoices as i')
+    const invoice: { invoiceStatusName: string } = await trx(
+      'invoices as i'
+    )
       .first('is.invoiceStatusName')
       .where('invoiceID', req.params.invoiceID)
-      .join('invoiceStatuses as is', 'i.invoiceStatus', 'is.invoiceStatusName')
+      .join(
+        'invoiceStatuses as is',
+        'i.invoiceStatus',
+        'is.invoiceStatusName'
+      )
 
-    if ([ 'DONE', 'CANCELED' ].includes(invoice.invoiceStatusName)) {
-      throw new StatusError(410, 'This invoice can\'t be updated anymore')
+    if (['DONE', 'CANCELED'].includes(invoice.invoiceStatusName)) {
+      throw new StatusError(
+        410,
+        "This invoice can't be updated anymore"
+      )
     }
 
-    const [ updatedInvoice ]: Invoice[] = await trx('invoices')
-      .update({
-        ...invoiceInput,
-        amount: invoiceInput.amount !== undefined
-          ? invoiceInput.amount * 100
-          : undefined,
-        updatedAt: new Date()
-      }, [ '*' ])
+    const [updatedInvoice]: Invoice[] = await trx('invoices')
+      .update(
+        {
+          ...invoiceInput,
+          amount:
+            invoiceInput.amount !== undefined
+              ? invoiceInput.amount * 100
+              : undefined,
+          updatedAt: new Date()
+        },
+        ['*']
+      )
       .where('invoiceID', req.params.invoiceID)
 
-    if (updatedInvoice === undefined) throw new StatusError(404, 'Not Found')
+    if (updatedInvoice === undefined)
+      throw new StatusError(404, 'Not Found')
     return updatedInvoice
   })
 }

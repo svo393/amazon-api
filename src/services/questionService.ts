@@ -1,25 +1,40 @@
 import { Request } from 'express'
 import Knex from 'knex'
 import { omit } from 'ramda'
-import { AnswerWithUser, BatchWithCursor, Question, QuestionCreateInput, QuestionCursorInput, QuestionUpdateInput, QuestionWithUser, User, Vote } from '../types'
+import {
+  AnswerWithUser,
+  BatchWithCursor,
+  Question,
+  QuestionCreateInput,
+  QuestionCursorInput,
+  QuestionUpdateInput,
+  QuestionWithUser,
+  User,
+  Vote
+} from '../types'
 import { defaultLimit } from '../utils/constants'
 import { db, dbTrans } from '../utils/db'
 import getCursor from '../utils/getCursor'
 import sortItems from '../utils/sortItems'
 import StatusError from '../utils/StatusError'
 
-const addQuestion = async (questionInput: QuestionCreateInput, req: Request): Promise<QuestionWithUser & { upVotes: number }> => {
+const addQuestion = async (
+  questionInput: QuestionCreateInput,
+  req: Request
+): Promise<QuestionWithUser & { upVotes: number }> => {
   const now = new Date()
 
   return await dbTrans(async (trx: Knex.Transaction) => {
-    const [ addedQuestion ]: Question[] = await trx('questions')
-      .insert({
+    const [addedQuestion]: Question[] = await trx('questions').insert(
+      {
         ...questionInput,
         userID: req.session?.userID,
         createdAt: now,
         updatedAt: now,
         groupID: req.params.groupID
-      }, [ '*' ])
+      },
+      ['*']
+    )
 
     const user = await trx<User>('users')
       .first()
@@ -40,20 +55,25 @@ const addQuestion = async (questionInput: QuestionCreateInput, req: Request): Pr
   })
 }
 
-const getQuestionsByUser = async (req: Request): Promise<Question[]> => {
-  return await db('questions')
-    .where('userID', req.params.userID)
+const getQuestionsByUser = async (
+  req: Request
+): Promise<Question[]> => {
+  return await db('questions').where('userID', req.params.userID)
 }
 
-type QuestionWithDescendants =
-BatchWithCursor<Question & {
-  votes: number;
-  upVotes: number;
-  voted?: true;
-  answers?: BatchWithCursor<AnswerWithUser>;
-}> & { groupID: number }
+type QuestionWithDescendants = BatchWithCursor<
+  Question & {
+    votes: number
+    upVotes: number
+    voted?: true
+    answers?: BatchWithCursor<AnswerWithUser>
+  }
+> & { groupID: number }
 
-const getQuestionsByGroup = async (questionsInput: QuestionCursorInput, req: Request): Promise<QuestionWithDescendants> => {
+const getQuestionsByGroup = async (
+  questionsInput: QuestionCursorInput,
+  req: Request
+): Promise<QuestionWithDescendants> => {
   const {
     startCursor,
     limit,
@@ -65,7 +85,9 @@ const getQuestionsByGroup = async (questionsInput: QuestionCursorInput, req: Req
 
   const { groupID } = req.params
 
-  let questions: (Question & { answerCount?: string })[] = await db('questions as q')
+  let questions: (Question & { answerCount?: string })[] = await db(
+    'questions as q'
+  )
     .select(
       'q.questionID',
       'q.createdAt',
@@ -87,17 +109,23 @@ const getQuestionsByGroup = async (questionsInput: QuestionCursorInput, req: Req
     .orWhereNotNull('answerID')
 
   questions = questions
-    .filter((q) => onlyAnswered ? Number(q.answerCount) !== 0 : true)
+    .filter((q) =>
+      onlyAnswered ? Number(q.answerCount) !== 0 : true
+    )
     .map((q) => {
-      const voteSum = votes
-        .filter((v) => v.questionID === q.questionID)
-        .length
+      const voteSum = votes.filter(
+        (v) => v.questionID === q.questionID
+      ).length
 
-      const upVoteSum = votes
-        .filter((v) => v.questionID === q.questionID && v.vote)
-        .length
+      const upVoteSum = votes.filter(
+        (v) => v.questionID === q.questionID && v.vote
+      ).length
 
-      const voted = votes.find((v) => v.questionID === q.questionID && v.userID === req.session?.userID)
+      const voted = votes.find(
+        (v) =>
+          v.questionID === q.questionID &&
+          v.userID === req.session?.userID
+      )
 
       delete q.answerCount
       return {
@@ -136,8 +164,9 @@ const getQuestionsByGroup = async (questionsInput: QuestionCursorInput, req: Req
     }
   }
 
-  const questionIDs = Object.values(questionsWithCursor.batch)
-    .map((q: Question) => q.questionID)
+  const questionIDs = Object.values(questionsWithCursor.batch).map(
+    (q: Question) => q.questionID
+  )
 
   let answers = await db('answers as a')
     .select(
@@ -155,42 +184,43 @@ const getQuestionsByGroup = async (questionsInput: QuestionCursorInput, req: Req
     .whereIn('questionID', questionIDs)
     .andWhere('a.moderationStatus', 'APPROVED')
 
-  answers = answers
-    .map((a) => {
-      const voteSum = votes
-        .filter((v) => v.answerID === a.answerID)
-        .length
+  answers = answers.map((a) => {
+    const voteSum = votes.filter((v) => v.answerID === a.answerID)
+      .length
 
-      const upVoteSum = votes
-        .filter((v) => v.answerID === a.answerID && v.vote)
-        .length
+    const upVoteSum = votes.filter(
+      (v) => v.answerID === a.answerID && v.vote
+    ).length
 
-      return {
-        ...omit([ 'userName', 'userEmail', 'avatar', 'userID' ], a),
-        votes: voteSum,
-        votesDelta: upVoteSum - (voteSum - upVoteSum),
-        author: { avatar: a.avatar, name: a.userName, userID: a.userID }
-      }
-    })
+    return {
+      ...omit(['userName', 'userEmail', 'avatar', 'userID'], a),
+      votes: voteSum,
+      votesDelta: upVoteSum - (voteSum - upVoteSum),
+      author: { avatar: a.avatar, name: a.userName, userID: a.userID }
+    }
+  })
 
   if (answers.length !== 0) {
     questionsWithCursor = {
       ...questionsWithCursor,
       batch: (questionsWithCursor.batch as any).map((q: Question) => {
-        const curAnswers = answers.filter((a) => a.questionID === q.questionID)
+        const curAnswers = answers.filter(
+          (a) => a.questionID === q.questionID
+        )
 
         return curAnswers.length !== 0
           ? {
-              ...omit([ 'votesDelta' ], q),
+              ...omit(['votesDelta'], q),
               answers: getCursor({
                 startCursor: undefined,
                 limit: answerLimit,
                 idProp: 'answerID',
-                data: sortItems(curAnswers, 'votesDelta_desc')
-                  .map((a) => omit([ 'votesDelta' ], a))
+                data: sortItems(curAnswers, 'votesDelta_desc').map(
+                  (a) => omit(['votesDelta'], a)
+                )
               })
             }
-          : omit([ 'votesDelta' ], q)
+          : omit(['votesDelta'], q)
       })
     }
   }
@@ -198,10 +228,14 @@ const getQuestionsByGroup = async (questionsInput: QuestionCursorInput, req: Req
   return questionsWithCursor
 }
 
-const getQuestionByID = async (req: Request): Promise<QuestionWithUser> => {
+const getQuestionByID = async (
+  req: Request
+): Promise<QuestionWithUser> => {
   const { questionID } = req.params
 
-  const question = await db<Question & { userEmail: string }>('questions as q')
+  const question = await db<Question & { userEmail: string }>(
+    'questions as q'
+  )
     .first(
       'q.questionID',
       'q.createdAt',
@@ -219,15 +253,21 @@ const getQuestionByID = async (req: Request): Promise<QuestionWithUser> => {
 
   if (question === undefined) throw new StatusError(404, 'Not Found')
 
-  const votes = await db<Vote>('votes')
-    .where('questionID', questionID)
+  const votes = await db<Vote>('votes').where(
+    'questionID',
+    questionID
+  )
 
-  const voteSum = votes.reduce((acc, cur) => (
-    acc += cur.vote ? 1 : -1
-  ), 0)
+  const voteSum = votes.reduce(
+    (acc, cur) => (acc += cur.vote ? 1 : -1),
+    0
+  )
 
   const _question: QuestionWithUser = {
-    ...(omit([ 'userName', 'userEmail', 'avatar', 'userID' ], question) as Question),
+    ...(omit(
+      ['userName', 'userEmail', 'avatar', 'userID'],
+      question
+    ) as Question),
     votes: voteSum,
     author: {
       avatar: question.avatar,
@@ -237,24 +277,33 @@ const getQuestionByID = async (req: Request): Promise<QuestionWithUser> => {
     }
   }
 
-  ![ 'ROOT', 'ADMIN' ].includes(req.session?.role) &&
+  !['ROOT', 'ADMIN'].includes(req.session?.role) &&
     delete _question.author
 
   return _question
 }
 
-const updateQuestion = async (questionInput: QuestionUpdateInput, req: Request): Promise<Question> => {
-  const userIsAdmin = [ 'ROOT', 'ADMIN' ].includes(req.session?.role)
+const updateQuestion = async (
+  questionInput: QuestionUpdateInput,
+  req: Request
+): Promise<Question> => {
+  const userIsAdmin = ['ROOT', 'ADMIN'].includes(req.session?.role)
 
-  const [ updatedQuestion ]: Question[] = await db('questions')
-    .update({
-      ...questionInput,
-      moderationStatus: userIsAdmin ? questionInput.moderationStatus : 'NEW',
-      updatedAt: new Date()
-    }, [ '*' ])
+  const [updatedQuestion]: Question[] = await db('questions')
+    .update(
+      {
+        ...questionInput,
+        moderationStatus: userIsAdmin
+          ? questionInput.moderationStatus
+          : 'NEW',
+        updatedAt: new Date()
+      },
+      ['*']
+    )
     .where('questionID', req.params.questionID)
 
-  if (updatedQuestion === undefined) throw new StatusError(404, 'Not Found')
+  if (updatedQuestion === undefined)
+    throw new StatusError(404, 'Not Found')
   return updatedQuestion
 }
 

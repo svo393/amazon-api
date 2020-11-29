@@ -1,19 +1,27 @@
 import Router from 'express'
 import categoryService from '../services/categoryService'
-import { checkCategoryFilters, checkCategoryUpdate, checkNewCategory } from '../utils/inputValidator'
+import {
+  checkCategoryFilters,
+  checkCategoryUpdate,
+  checkNewCategory
+} from '../utils/typeGuard'
 import { requireAdmin } from '../utils/middleware'
 
 const router = Router()
 
 router.post('/', requireAdmin, async (req, res) => {
   const categoryCreateInput = checkNewCategory(req)
-  const addedCategory = await categoryService.addCategory(categoryCreateInput)
+  const addedCategory = await categoryService.addCategory(
+    categoryCreateInput
+  )
   res.status(201).json(addedCategory)
 })
 
 router.get('/', async (req, res) => {
   const categoriesFiltersinput = checkCategoryFilters(req)
-  const categories = await categoryService.getCategories(categoriesFiltersinput)
+  const categories = await categoryService.getCategories(
+    categoriesFiltersinput
+  )
   res.json(categories)
 })
 
@@ -29,7 +37,10 @@ router.get('/:categoryID', async (req, res) => {
 
 router.put('/:categoryID', requireAdmin, async (req, res) => {
   const categoryUpdateInput = checkCategoryUpdate(req)
-  const updatedItem = await categoryService.updateCategory(categoryUpdateInput, req)
+  const updatedItem = await categoryService.updateCategory(
+    categoryUpdateInput,
+    req
+  )
   res.json(updatedItem)
 })
 

@@ -1,7 +1,18 @@
 import { Request } from 'express'
 import Knex from 'knex'
 import { omit, sum } from 'ramda'
-import { Address, Invoice, Order, OrderCreateInput, OrderFullData, OrderProduct, OrderProductFullData, OrdersFiltersInput, OrderUpdateInput, OrderWithUser } from '../types'
+import {
+  Address,
+  Invoice,
+  Order,
+  OrderCreateInput,
+  OrderFullData,
+  OrderProduct,
+  OrderProductFullData,
+  OrdersFiltersInput,
+  OrderUpdateInput,
+  OrderWithUser
+} from '../types'
 import reformatDate from '../utils/compareDates'
 import { smallLimit } from '../utils/constants'
 import { db, dbTrans } from '../utils/db'
@@ -9,7 +20,11 @@ import getCursor from '../utils/getCursor'
 import sortItems from '../utils/sortItems'
 import StatusError from '../utils/StatusError'
 
-const addOrder = async (orderInput: OrderCreateInput, req: Request): Promise<OrderFullData & Invoice & { invoiceCreatedAt: Date; invoiceUpdatedAt: Date }> => {
+const addOrder = async (
+  orderInput: OrderCreateInput,
+  req: Request
+): Promise<OrderFullData &
+  Invoice & { invoiceCreatedAt: Date; invoiceUpdatedAt: Date }> => {
   const now = new Date()
 
   return await dbTrans(async (trx: Knex.Transaction) => {
@@ -21,21 +36,32 @@ const addOrder = async (orderInput: OrderCreateInput, req: Request): Promise<Ord
 
     if (address === undefined) throw new StatusError()
 
-    const [ addedOrder ]: Order[] = await trx('orders')
-      .insert({
-        ...omit([ 'cart', 'details', 'paymentMethod', 'shippingCost', 'addressID' ], orderInput),
+    const [addedOrder]: Order[] = await trx('orders').insert(
+      {
+        ...omit(
+          [
+            'cart',
+            'details',
+            'paymentMethod',
+            'shippingCost',
+            'addressID'
+          ],
+          orderInput
+        ),
         address,
         orderStatus: 'NEW',
         createdAt: now,
         updatedAt: now,
         userID
-      }, [ '*' ])
+      },
+      ['*']
+    )
 
     const cartProducts: {
-      productID: number;
-      price: number;
-      qty: number;
-      size: string;
+      productID: number
+      price: number
+      qty: number
+      size: string
     }[] = await trx('cartProducts as cp')
       .select('p.productID', 'p.price', 'cp.qty', 'cp.size')
       .where('cp.userID', userID)
@@ -49,34 +75,39 @@ const addOrder = async (orderInput: OrderCreateInput, req: Request): Promise<Ord
       size: cp.size
     }))
 
-    const addedOrderProducts: OrderProduct[] = await trx('orderProducts')
-      .insert(newOrderProducts, [ '*' ])
+    const addedOrderProducts: OrderProduct[] = await trx(
+      'orderProducts'
+    ).insert(newOrderProducts, ['*'])
 
-    await Promise.all(newOrderProducts.map(async (op) => {
-      if (op.size === 'stock') {
-        const product = await trx('products')
-          .first('stock')
-          .where('productID', op.productID)
+    await Promise.all(
+      newOrderProducts.map(async (op) => {
+        if (op.size === 'stock') {
+          const product = await trx('products')
+            .first('stock')
+            .where('productID', op.productID)
 
-        await trx('products')
-          .where('productID', op.productID)
-          .update({ stock: product.stock - op.qty })
-      } else {
-        const productSize = await trx('productSizes')
-          .first('qty')
-          .where('productID', op.productID)
-          .andWhere('name', op.size)
+          await trx('products')
+            .where('productID', op.productID)
+            .update({ stock: product.stock - op.qty })
+        } else {
+          const productSize = await trx('productSizes')
+            .first('qty')
+            .where('productID', op.productID)
+            .andWhere('name', op.size)
 
-        await trx('productSizes')
-          .where('productID', op.productID)
-          .andWhere('name', op.size)
-          .update({ qty: productSize.qty - op.qty })
-      }
-    }))
+          await trx('productSizes')
+            .where('productID', op.productID)
+            .andWhere('name', op.size)
+            .update({ qty: productSize.qty - op.qty })
+        }
+      })
+    )
 
-    const [ addedInvoice ]: Invoice[] = await trx('invoices')
-      .insert({
-        amount: (sum(addedOrderProducts.map((op) => op.qty * op.price)) + orderInput.shippingCost * 100),
+    const [addedInvoice]: Invoice[] = await trx('invoices').insert(
+      {
+        amount:
+          sum(addedOrderProducts.map((op) => op.qty * op.price)) +
+          orderInput.shippingCost * 100,
         shippingCost: orderInput.shippingCost * 100,
         details: orderInput.details,
         orderID: addedOrder.orderID,
@@ -85,7 +116,9 @@ const addOrder = async (orderInput: OrderCreateInput, req: Request): Promise<Ord
         invoiceStatus: 'NEW',
         createdAt: now,
         updatedAt: now
-      }, [ '*' ])
+      },
+      ['*']
+    )
 
     const deleteCount = await db('cartProducts')
       .del()
@@ -105,7 +138,10 @@ const addOrder = async (orderInput: OrderCreateInput, req: Request): Promise<Ord
   })
 }
 
-const getOrders = async (ordersFiltersinput: OrdersFiltersInput, req: Request): Promise<any> => {
+const getOrders = async (
+  ordersFiltersinput: OrdersFiltersInput,
+  req: Request
+): Promise<any> => {
   const {
     page,
     sortBy = 'createdAt_desc',
@@ -120,13 +156,21 @@ const getOrders = async (ordersFiltersinput: OrdersFiltersInput, req: Request): 
     startCursor
   } = ordersFiltersinput
 
-  if (![ 'ROOT', 'ADMIN' ].includes(req.session?.role)) {
-    if (userID === undefined || req.session?.userID !== userID) {
-      throw new StatusError(403, 'Forbidden')
-    }
+  if (
+    !['ROOT', 'ADMIN'].includes(req.session?.role) &&
+    (userID === undefined || req.session?.userID !== userID)
+  ) {
+    throw new StatusError(403, 'Forbidden')
   }
 
-  let orders: (Order & Invoice & { invoiceCreatedAt: Date; invoiceUpdatedAt: Date; avatar: boolean; userName: string; userEmail: string })[] = await db('orders as o')
+  let orders: (Order &
+    Invoice & {
+      invoiceCreatedAt: Date
+      invoiceUpdatedAt: Date
+      avatar: boolean
+      userName: string
+      userEmail: string
+    })[] = await db('orders as o')
     .select(
       'o.orderID',
       'o.address',
@@ -157,66 +201,74 @@ const getOrders = async (ordersFiltersinput: OrdersFiltersInput, req: Request): 
   }))
 
   if (orderStatuses !== undefined) {
-    orders = orders
-      .filter((o) => orderStatuses.split(',').includes(o.orderStatus))
+    orders = orders.filter((o) =>
+      orderStatuses.split(',').includes(o.orderStatus)
+    )
   }
 
   if (shippingMethods !== undefined) {
-    orders = orders
-      .filter((o) => shippingMethods.split(',').includes(o.shippingMethod))
+    orders = orders.filter((o) =>
+      shippingMethods.split(',').includes(o.shippingMethod)
+    )
   }
 
   if (amountMin !== undefined) {
-    orders = orders
-      .filter((o) => o.amount >= amountMin)
+    orders = orders.filter((o) => o.amount >= amountMin)
   }
 
   if (amountMax !== undefined) {
-    orders = orders
-      .filter((o) => o.amount <= amountMax)
+    orders = orders.filter((o) => o.amount <= amountMax)
   }
 
   if (createdFrom !== undefined) {
-    orders = orders
-      .filter((o) =>
-        reformatDate(o.createdAt) >= reformatDate(new Date(createdFrom)))
+    orders = orders.filter(
+      (o) =>
+        reformatDate(o.createdAt) >=
+        reformatDate(new Date(createdFrom))
+    )
   }
 
   if (createdTo !== undefined) {
-    orders = orders
-      .filter((o) =>
-        reformatDate(o.createdAt) <= reformatDate(new Date(createdTo)))
+    orders = orders.filter(
+      (o) =>
+        reformatDate(o.createdAt) <= reformatDate(new Date(createdTo))
+    )
   }
 
   if (userEmail !== undefined) {
-    orders = orders
-      .filter((o) => o.userEmail?.toLowerCase().includes(userEmail.toLowerCase()))
+    orders = orders.filter((o) =>
+      o.userEmail?.toLowerCase().includes(userEmail.toLowerCase())
+    )
   }
 
   if (userID !== undefined) {
-    orders = orders
-      .filter((o) => o.userID === userID)
+    orders = orders.filter((o) => o.userID === userID)
   }
 
   const ordersSorted = sortItems(orders, sortBy)
 
-  const cursorData = page === undefined
-    ? getCursor({
-        startCursor,
-        limit: smallLimit,
-        idProp: 'orderID',
-        data: ordersSorted
-      })
-    : undefined
+  const cursorData =
+    page === undefined
+      ? getCursor({
+          startCursor,
+          limit: smallLimit,
+          idProp: 'orderID',
+          data: ordersSorted
+        })
+      : undefined
 
   const totalCount = orders.length
   const end = ((page ?? 1) - 1) * smallLimit + smallLimit
 
-  const batch = cursorData?.batch ?? ordersSorted.slice(((page ?? 1) - 1) * smallLimit, end)
+  const batch =
+    cursorData?.batch ??
+    ordersSorted.slice(((page ?? 1) - 1) * smallLimit, end)
 
   const orderIDs = batch.map((o) => o.orderID)
 
-  const orderProducts: OrderProductFullData[] = await db('orderProducts as op')
+  const orderProducts: OrderProductFullData[] = await db(
+    'orderProducts as op'
+  )
     .select(
       'op.price',
       'op.qty',
@@ -232,7 +284,7 @@ const getOrders = async (ordersFiltersinput: OrdersFiltersInput, req: Request): 
     .where('i.index', 0)
 
   const _batch = batch.map((o) => ({
-    ...(omit([ 'userName', 'userEmail', 'avatar' ], o)),
+    ...omit(['userName', 'userEmail', 'avatar'], o),
     orderProducts: orderProducts
       .filter((op) => op.orderID === o.orderID)
       .map((op) => ({
@@ -248,7 +300,9 @@ const getOrders = async (ordersFiltersinput: OrdersFiltersInput, req: Request): 
   }))
 
   _batch.forEach((o) => {
-    if (o.orderProducts.length === 0) { throw new StatusError() }
+    if (o.orderProducts.length === 0) {
+      throw new StatusError()
+    }
   })
   return cursorData !== undefined
     ? {
@@ -262,10 +316,19 @@ const getOrders = async (ordersFiltersinput: OrdersFiltersInput, req: Request): 
       }
 }
 
-const getOrderByID = async (req: Request): Promise<OrderWithUser & Invoice & { invoiceCreatedAt: Date; invoiceUpdatedAt: Date }> => {
+const getOrderByID = async (
+  req: Request
+): Promise<OrderWithUser &
+  Invoice & { invoiceCreatedAt: Date; invoiceUpdatedAt: Date }> => {
   const { orderID } = req.params
 
-  const order: Order & { invoiceCreatedAt: Date; invoiceUpdatedAt: Date; avatar: boolean; userName: string; userEmail: string } = await db('orders as o')
+  const order: Order & {
+    invoiceCreatedAt: Date
+    invoiceUpdatedAt: Date
+    avatar: boolean
+    userName: string
+    userEmail: string
+  } = await db('orders as o')
     .first(
       'o.orderID',
       'o.address',
@@ -288,7 +351,9 @@ const getOrderByID = async (req: Request): Promise<OrderWithUser & Invoice & { i
     .first()
     .where('orderID', orderID)
 
-  const orderProducts: OrderProductFullData[] = await db('orderProducts as op')
+  const orderProducts: OrderProductFullData[] = await db(
+    'orderProducts as op'
+  )
     .select(
       'op.price',
       'op.qty',
@@ -303,11 +368,13 @@ const getOrderByID = async (req: Request): Promise<OrderWithUser & Invoice & { i
     .join('images as i', 'p.productID', 'i.productID')
     .where('i.index', 0)
 
-  if (order === undefined || invoice === undefined) throw new StatusError(404, 'Not Found')
+  if (order === undefined || invoice === undefined)
+    throw new StatusError(404, 'Not Found')
 
-  const _order: OrderWithUser & Invoice & { invoiceCreatedAt: Date; invoiceUpdatedAt: Date } = {
+  const _order: OrderWithUser &
+    Invoice & { invoiceCreatedAt: Date; invoiceUpdatedAt: Date } = {
     ...invoice,
-    ...(omit([ 'userName', 'userEmail', 'avatar' ], order)),
+    ...omit(['userName', 'userEmail', 'avatar'], order),
     amount: invoice.amount / 100,
     shippingCost: invoice.shippingCost / 100,
     orderProducts: orderProducts.map((op) => ({
@@ -322,34 +389,51 @@ const getOrderByID = async (req: Request): Promise<OrderWithUser & Invoice & { i
     }
   }
 
-  ![ 'ROOT', 'ADMIN' ].includes(req.session?.role) &&
-  delete _order.user.email
+  !['ROOT', 'ADMIN'].includes(req.session?.role) &&
+    delete _order.user.email
 
   return _order
 }
 
-const updateOrder = async (orderInput: OrderUpdateInput, req: Request): Promise<Order> => {
+const updateOrder = async (
+  orderInput: OrderUpdateInput,
+  req: Request
+): Promise<Order> => {
   return await dbTrans(async (trx: Knex.Transaction) => {
     const now = new Date()
 
-    const order: { orderStatusName: string } = await trx('orders as o')
+    const order: { orderStatusName: string } = await trx(
+      'orders as o'
+    )
       .first('os.orderStatusName')
       .where('orderID', req.params.orderID)
-      .join('orderStatuses as os', 'o.orderStatus', 'os.orderStatusName')
+      .join(
+        'orderStatuses as os',
+        'o.orderStatus',
+        'os.orderStatusName'
+      )
 
-    if ([ 'DONE', 'CANCELED' ].includes(order.orderStatusName)) {
-      throw new StatusError(410, 'This order can\'t be updated anymore')
+    if (['DONE', 'CANCELED'].includes(order.orderStatusName)) {
+      throw new StatusError(
+        410,
+        "This order can't be updated anymore"
+      )
     }
 
-    const [ updatedOrder ]: Order[] = await trx('orders')
-      .update({
-        ...orderInput,
-        updatedAt: now,
-        shippedAt: orderInput.orderStatus === 'SHIPPED' ? now : undefined
-      }, [ '*' ])
+    const [updatedOrder]: Order[] = await trx('orders')
+      .update(
+        {
+          ...orderInput,
+          updatedAt: now,
+          shippedAt:
+            orderInput.orderStatus === 'SHIPPED' ? now : undefined
+        },
+        ['*']
+      )
       .where('orderID', req.params.orderID)
 
-    if (updatedOrder === undefined) throw new StatusError(404, 'Not Found')
+    if (updatedOrder === undefined)
+      throw new StatusError(404, 'Not Found')
     return updatedOrder
   })
 }

@@ -1,6 +1,6 @@
 import Router from 'express'
 import feedService from '../services/feedService'
-import { checkFeedFilters } from '../utils/inputValidator'
+import { checkFeedFilters } from '../utils/typeGuard'
 import { requireAdmin } from '../utils/middleware'
 
 const router = Router()

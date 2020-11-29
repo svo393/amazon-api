@@ -1,31 +1,42 @@
 import StatusError from './StatusError'
 
 type Props = {
-  startCursor?: number;
-  startCursorType?: string;
-  limit?: number;
-  idProp?: string;
-  idTypes?: string[];
-  data: any[];
+  startCursor?: number
+  startCursorType?: string
+  limit?: number
+  idProp?: string
+  idTypes?: string[]
+  data: any[]
 }
 
-const getCursor = ({ startCursor, startCursorType, limit = 4, idProp, idTypes, data }: Props) => {
+const getCursor = ({
+  startCursor,
+  startCursorType,
+  limit = 4,
+  idProp,
+  idTypes,
+  data
+}: Props) => {
   const totalCount = data.length
 
   if (totalCount === 0) {
     return {
       totalCount: 0,
       hasNextPage: false,
-      batch: []
+      batch: [] as any[]
     }
   }
 
   let start = 0
 
   if (startCursor !== undefined) {
-    const index = idProp !== undefined
-      ? data.findIndex((item) => item[idProp] === startCursor)
-      : data.findIndex((item) => item[(startCursorType as string) + 'ID'] === startCursor)
+    const index =
+      idProp !== undefined
+        ? data.findIndex((item) => item[idProp] === startCursor)
+        : data.findIndex(
+            (item) =>
+              item[(startCursorType as string) + 'ID'] === startCursor
+          )
     if (index === -1) throw new StatusError(404, 'Not Found')
     start = index + 1
   }

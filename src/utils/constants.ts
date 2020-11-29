@@ -1,5 +1,5 @@
-export const roles = [ 'ROOT', 'ADMIN', 'CUSTOMER' ]
-export const paymentMethods = [ 'CARD', 'CASH' ]
+export const roles = ['ROOT', 'ADMIN', 'CUSTOMER']
+export const paymentMethods = ['CARD', 'CASH']
 export const shippingMethods = [
   { shippingMethodName: 'INTL', isPrivate: true },
   { shippingMethodName: 'DOOR', isPrivate: true },
@@ -10,13 +10,12 @@ export const addressTypes = [
   { addressTypeName: 'LOCKER' }
 ]
 
-export const moderationStatuses = [ 'NEW', 'APPROVED', 'REJECTED' ]
-export const orderStatuses = [ 'DONE', 'SHIPPED', 'NEW', 'CANCELED' ]
-export const invoiceStatuses = [ 'DONE', 'NEW', 'CANCELED' ]
-
+export const moderationStatuses = ['NEW', 'APPROVED', 'REJECTED']
+export const orderStatuses = ['DONE', 'SHIPPED', 'NEW', 'CANCELED']
+export const invoiceStatuses = ['DONE', 'NEW', 'CANCELED']
 export const imagesBasePath = './public/media'
-
 export const baseAPI = '/api'
+
 export const apiURLs = {
   addresses: `${baseAPI}/addresses`,
   addressTypes: `${baseAPI}/address-types`,
@@ -61,12 +60,12 @@ export const parametersBL = [
   'Size'
 ]
 
-export const sizeMap: { [ k: string ]: string } = {
+export const sizeMap: { [k: string]: string } = {
   'xx-small': 'XXS',
   'x-small': 'XS',
-  small: 'S',
-  medium: 'M',
-  large: 'L',
+  'small': 'S',
+  'medium': 'M',
+  'large': 'L',
   'x-large': 'XL',
   'xx-large': '2XL',
   'xxx-large': '3XL',

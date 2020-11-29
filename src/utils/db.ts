@@ -2,7 +2,9 @@ import Knex from 'knex'
 import knexConfig from '../../db/knexfile'
 import env from '../../src/utils/config'
 
-export const db = Knex(knexConfig[env.NODE_ENV as keyof typeof knexConfig])
+export const db = Knex(
+  knexConfig[env.NODE_ENV as keyof typeof knexConfig]
+)
 
 export const dbTrans = async (cb: any): Promise<any> => {
   return new Promise((resolve, reject) => {

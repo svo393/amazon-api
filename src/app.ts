@@ -31,47 +31,52 @@ app.use(helmet())
 
 // TODO consider enabling cache
 
-app.use(cors({
-  credentials: true,
-  origin: (origin, callback) => {
-    if (!origin) return callback(null, true)
+app.use(
+  cors({
+    credentials: true,
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true)
 
-    if (!env.BASE_URLS.includes(origin)) {
-      return callback(new StatusError(401, 'CORS error'), false)
-    }
-    return callback(null, true)
-  },
-  optionsSuccessStatus: 200
-}))
+      if (!env.BASE_URLS.includes(origin)) {
+        return callback(new StatusError(401, 'CORS error'), false)
+      }
+      return callback(null, true)
+    },
+    optionsSuccessStatus: 200
+  })
+)
 
-env.STATIC_FILES_ENABLED && app.use(express.static(path.join(process.cwd(), 'public')))
+env.STATIC_FILES_ENABLED &&
+  app.use(express.static(path.join(process.cwd(), 'public')))
 app.use(express.json())
 app.use(cookieParser())
 
-app.use(session({
-  genid: () => cuid(),
-  store: new FileStore({}),
+app.use(
+  session({
+    genid: () => cuid(),
+    store: new FileStore({}),
 
-  // store: new RedisStore({
-  //   host: 'localhost',
-  //   port: 6379,
-  //   client: redisClient
+    // store: new RedisStore({
+    //   host: 'localhost',
+    //   port: 6379,
+    //   client: redisClient
 
-  // }),
+    // }),
 
-  name: 'sessionID',
-  secret: env.SESSION_SECRET,
-  saveUninitialized: false,
-  // saveUninitialized: true,
-  resave: false,
-  rolling: true,
-  cookie: {
-    httpOnly: true,
-    maxAge: parseInt(env.SESSION_MAX_AGE),
-    sameSite: 'lax'
-    // TODO add domain from origin
-  }
-}))
+    name: 'sessionID',
+    secret: env.SESSION_SECRET,
+    saveUninitialized: false,
+    // saveUninitialized: true,
+    resave: false,
+    rolling: true,
+    cookie: {
+      httpOnly: true,
+      maxAge: parseInt(env.SESSION_MAX_AGE),
+      sameSite: 'lax'
+      // TODO add domain from origin
+    }
+  })
+)
 
 env.NODE_ENV === 'development' && app.use(logger('dev'))
 

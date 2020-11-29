@@ -5,47 +5,56 @@ import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
 const addRole = async (roleInput: Role): Promise<Role> => {
-  const { rows: [ addedRole ] }: { rows: Role[] } = await db.raw(
+  const {
+    rows: [addedRole]
+  }: { rows: Role[] } = await db.raw(
     `
     ? ON CONFLICT
       DO NOTHING
       RETURNING *;
     `,
-    [ db('roles').insert(roleInput) ]
+    [db('roles').insert(roleInput)]
   )
 
   if (addedRole === undefined) {
-    throw new StatusError(409, `Role with name "${roleInput.roleName}" already exists`)
+    throw new StatusError(
+      409,
+      `Role with name "${roleInput.roleName}" already exists`
+    )
   }
   return addedRole
 }
 
 const getRoles = async (): Promise<Role[]> => {
-  return await db('roles')
-    .where('roleName', '!=', 'ROOT')
+  return await db('roles').where('roleName', '!=', 'ROOT')
 }
 
 type SingleRoleData = Role & {
-  users: UserSafeData[];
+  users: UserSafeData[]
 }
 
-const updateRole = async (roleInput: Role, req: Request): Promise<SingleRoleData> => {
-  const [ updatedRole ]: Role[] = await db('roles')
-    .update(roleInput, [ '*' ])
+const updateRole = async (
+  roleInput: Role,
+  req: Request
+): Promise<SingleRoleData> => {
+  const [updatedRole]: Role[] = await db('roles')
+    .update(roleInput, ['*'])
     .where('roleName', req.params.roleName)
 
-  if (updatedRole === undefined) throw new StatusError(404, 'Not Found')
+  if (updatedRole === undefined)
+    throw new StatusError(404, 'Not Found')
 
-  const users = await db<User>('users')
-    .where('role', req.params.roleName)
+  const users = await db<User>('users').where(
+    'role',
+    req.params.roleName
+  )
 
   return {
     ...updatedRole,
-    users: map(omit([
-      'password',
-      'resetToken',
-      'resetTokenCreatedAt'
-    ]), users)
+    users: map(
+      omit(['password', 'resetToken', 'resetTokenCreatedAt']),
+      users
+    )
   }
 }
 

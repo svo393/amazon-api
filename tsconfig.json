@@ -1,24 +1,23 @@
 {
   "compilerOptions": {
+    "allowJs": true,
     "allowSyntheticDefaultImports": true,
+    "composite": true,
+    "declaration": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "lib": [
-      "ESNext"
-    ],
     "module": "commonjs",
+    "moduleResolution": "Node",
     "noFallthroughCasesInSwitch": true,
-    "noImplicitReturns": true,
+    "noImplicitAny": true, // toDel
+    // "noImplicitReturns": true,
     // "noUnusedLocals": true,
     // "noUnusedParameters": true,
-    "outDir": "./build",
-    "rootDir": ".",
-    "strict": true,
+    "outDir": "dist",
+    "skipLibCheck": true,
+    // "strict": true,
     "target": "ES2019"
+    // "types": []
   },
-  "include": [
-    "src/**/*",
-    "tests/**/*",
-    "db/**/*",
-  ]
+  "include": ["src", "db"]
 }

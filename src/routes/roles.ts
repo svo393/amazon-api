@@ -1,6 +1,6 @@
 import Router from 'express'
 import roleService from '../services/roleService'
-import { checkRole } from '../utils/inputValidator'
+import { checkRole } from '../utils/typeGuard'
 import { requireRoot } from '../utils/middleware'
 
 const router = Router()
@@ -18,7 +18,10 @@ router.get('/', requireRoot, async (_, res) => {
 
 router.put('/:roleName', requireRoot, async (req, res) => {
   const roleUpdateInput = checkRole(req)
-  const updatedRole = await roleService.updateRole(roleUpdateInput, req)
+  const updatedRole = await roleService.updateRole(
+    roleUpdateInput,
+    req
+  )
   res.json(updatedRole)
 })
 

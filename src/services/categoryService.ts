@@ -1,41 +1,54 @@
 import { Request } from 'express'
-import { BatchWithCursor, CategoriesFiltersInput, Category, CategoryCreateInput, CategoryUpdateInput } from '../types'
+import {
+  BatchWithCursor,
+  CategoriesFiltersInput,
+  Category,
+  CategoryCreateInput,
+  CategoryUpdateInput
+} from '../types'
 import { defaultLimit } from '../utils/constants'
 import { db } from '../utils/db'
 import fuseIndexes from '../utils/fuseIndexes'
 import sortItems from '../utils/sortItems'
 import StatusError from '../utils/StatusError'
 
-const addCategory = async (categoryInput: CategoryCreateInput): Promise<Category> => {
-  const { rows: [ addedCategory ] }: { rows: Category[] } = await db.raw(
+const addCategory = async (
+  categoryInput: CategoryCreateInput
+): Promise<Category> => {
+  const {
+    rows: [addedCategory]
+  }: { rows: Category[] } = await db.raw(
     `
     ? ON CONFLICT
       DO NOTHING
       RETURNING *;
       `,
-    [ db('categories').insert(categoryInput) ]
+    [db('categories').insert(categoryInput)]
   )
 
   if (addedCategory === undefined) {
-    throw new StatusError(409, `Category with name "${categoryInput.name}" already exists`)
+    throw new StatusError(
+      409,
+      `Category with name "${categoryInput.name}" already exists`
+    )
   }
   return addedCategory
 }
 
 type CategoryListRawData = Category & { productCount: string }
 type CategoryListData = Omit<CategoryListRawData, 'productCount'> & {
-  children: { categoryID: number; name: string }[];
-  productCount: number;
+  children: { categoryID: number; name: string }[]
+  productCount: number
 }
 
-const getCategories = async (categoriesFiltersinput: CategoriesFiltersInput): Promise<BatchWithCursor<CategoryListData>> => {
-  const {
-    page = 1,
-    sortBy = 'groupID',
-    q
-  } = categoriesFiltersinput
+const getCategories = async (
+  categoriesFiltersinput: CategoriesFiltersInput
+): Promise<BatchWithCursor<CategoryListData>> => {
+  const { page = 1, sortBy = 'groupID', q } = categoriesFiltersinput
 
-  let rawCategories: CategoryListRawData[] = await db('categories as c')
+  const rawCategories: CategoryListRawData[] = await db(
+    'categories as c'
+  )
     .select('c.categoryID', 'c.name', 'c.parentCategoryID')
     .count('p.productID as productCount')
     .joinRaw('LEFT JOIN products as p USING ("categoryID")')
@@ -50,9 +63,9 @@ const getCategories = async (categoriesFiltersinput: CategoriesFiltersInput): Pr
   }))
 
   if (q !== undefined) {
-    categories = categories
-      .filter((_, i) =>
-        fuseIndexes(categories, [ 'name' ], q).includes(i))
+    categories = categories.filter((_, i) =>
+      fuseIndexes(categories, ['name'], q).includes(i)
+    )
   }
 
   const categoriesSorted = sortItems(categories, sortBy)
@@ -68,7 +81,10 @@ const getCategories = async (categoriesFiltersinput: CategoriesFiltersInput): Pr
   }))
 
   return {
-    batch: _categoriesSorted.slice((page - 1) * defaultLimit, (page - 1) * defaultLimit + defaultLimit),
+    batch: _categoriesSorted.slice(
+      (page - 1) * defaultLimit,
+      (page - 1) * defaultLimit + defaultLimit
+    ),
     totalCount,
     hasNextPage: end < totalCount
   }
@@ -77,14 +93,21 @@ const getCategories = async (categoriesFiltersinput: CategoriesFiltersInput): Pr
 const getDepartments = async (): Promise<Category[]> =>
   await db<Category>('categories').whereNull('parentCategoryID')
 
-type Parent = { name: string; categoryID: number };
+type Parent = { name: string; categoryID: number }
 
-type SingleCategoryData = Omit<CategoryListData, 'parentCategoryID'> & { parentChain: Parent[] }
+type SingleCategoryData = Omit<
+  CategoryListData,
+  'parentCategoryID'
+> & { parentChain: Parent[] }
 
-const getCategoryByID = async (req: Request): Promise<SingleCategoryData> => {
+const getCategoryByID = async (
+  req: Request
+): Promise<SingleCategoryData> => {
   const categoryID = Number(req.params.categoryID)
 
-  const categories: (Category & { productCount: string })[] = await db('categories as c')
+  const categories: (Category & {
+    productCount: string
+  })[] = await db('categories as c')
     .select('c.categoryID', 'c.name', 'c.parentCategoryID')
     .count('p.productID as productCount')
     .joinRaw('LEFT JOIN products as p USING ("categoryID")')
@@ -93,14 +116,19 @@ const getCategoryByID = async (req: Request): Promise<SingleCategoryData> => {
   const category = categories.find((c) => c.categoryID === categoryID)
   if (category === undefined) throw new StatusError(404, 'Not Found')
 
-  let parentChain: Parent[] = []
+  const parentChain: Parent[] = []
   let parentCategoryID = category.parentCategoryID
 
   while (parentCategoryID) {
-    const parent = categories.find((c) => c.categoryID === parentCategoryID)
+    const parent = categories.find(
+      (c) => c.categoryID === parentCategoryID
+    )
 
     if (parent !== undefined) {
-      parentChain.push({ name: parent.name, categoryID: parent.categoryID })
+      parentChain.push({
+        name: parent.name,
+        categoryID: parent.categoryID
+      })
       parentCategoryID = parent.parentCategoryID
     }
   }
@@ -119,12 +147,16 @@ const getCategoryByID = async (req: Request): Promise<SingleCategoryData> => {
   }
 }
 
-const updateCategory = async (categoryInput: CategoryUpdateInput, req: Request): Promise<SingleCategoryData> => {
-  const [ updatedCategory ] = await db<Category>('categories')
-    .update(categoryInput, [ 'categoryID' ])
+const updateCategory = async (
+  categoryInput: CategoryUpdateInput,
+  req: Request
+): Promise<SingleCategoryData> => {
+  const [updatedCategory] = await db<Category>('categories')
+    .update(categoryInput, ['categoryID'])
     .where('categoryID', req.params.categoryID)
 
-  if (updatedCategory === undefined) throw new StatusError(404, 'Not Found')
+  if (updatedCategory === undefined)
+    throw new StatusError(404, 'Not Found')
   return getCategoryByID(req)
 }
 

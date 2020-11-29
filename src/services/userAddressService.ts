@@ -1,29 +1,44 @@
 import { Request } from 'express'
-import { UserAddress, UserAddressCreateInput as UACreateInput, UserAddressUpdateInput as UAUpdateInput } from '../types'
+import {
+  UserAddress,
+  UserAddressCreateInput as UACreateInput,
+  UserAddressUpdateInput as UAUpdateInput
+} from '../types'
 import { db } from '../utils/db'
 import StatusError from '../utils/StatusError'
 
-const addUserAddress = async ({ isDefault }: UACreateInput, req: Request): Promise<UserAddress> => {
-  const { rows: [ addedUA ] }: { rows: UserAddress[] } = await db.raw(
+const addUserAddress = async (
+  { isDefault }: UACreateInput,
+  req: Request
+): Promise<UserAddress> => {
+  const {
+    rows: [addedUA]
+  }: { rows: UserAddress[] } = await db.raw(
     `
     ? ON CONFLICT
       DO NOTHING
       RETURNING *;
     `,
-    [ db('userAddresses').insert({
-      userID: req.session?.userID,
-      addressID: req.params.addressID,
-      isDefault
-    }) ]
+    [
+      db('userAddresses').insert({
+        userID: req.session?.userID,
+        addressID: req.params.addressID,
+        isDefault
+      })
+    ]
   )
 
-  if (addedUA === undefined) throw new StatusError(409, 'Address is already added')
+  if (addedUA === undefined)
+    throw new StatusError(409, 'Address is already added')
   return addedUA
 }
 
-const updateUserAddress = async (UAInput: UAUpdateInput, req: Request): Promise<UserAddress> => {
-  const [ updatedUA ]: UserAddress[] = await db('userAddresses')
-    .update(UAInput, [ '*' ])
+const updateUserAddress = async (
+  UAInput: UAUpdateInput,
+  req: Request
+): Promise<UserAddress> => {
+  const [updatedUA]: UserAddress[] = await db('userAddresses')
+    .update(UAInput, ['*'])
     .where('userID', req.params.userID)
     .andWhere('addressID', req.params.addressID)
 
