@@ -320,10 +320,10 @@ const updateUserRole = async (
   )
 }
 
-const uploadUserAvatar = (
+const uploadUserAvatar = async (
   file: Express.Multer.File,
   req: Request
-): void => {
+): Promise<any> => {
   const uploadConfig = {
     fileNames: [req.session?.userID],
     imagesPath: `${imagesBasePath}/images/avatars`,
@@ -332,20 +332,36 @@ const uploadUserAvatar = (
     thumbWidth: 48,
     thumbHeight: 48
   }
-  uploadImages([file], uploadConfig)
+
+  try {
+    await uploadImages([file], uploadConfig)
+  } catch (error) {
+    throw new StatusError(
+      error.message.includes('unsupported') ? 422 : 500,
+      error
+    )
+  }
 }
 
-const uploadUserCover = (
+const uploadUserCover = async (
   file: Express.Multer.File,
   req: Request
-): void => {
+): Promise<any> => {
   const uploadConfig = {
     fileNames: [req.session?.userID],
     imagesPath: `${imagesBasePath}/images/covers`,
     maxWidth: 1000,
     maxHeight: 320
   }
-  uploadImages([file], uploadConfig)
+
+  try {
+    await uploadImages([file], uploadConfig)
+  } catch (error) {
+    throw new StatusError(
+      error.message.includes('unsupported') ? 422 : 500,
+      error
+    )
+  }
 }
 
 export default {

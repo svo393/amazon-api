@@ -1,8 +1,8 @@
-import { Express } from 'express'
 import fs from 'fs'
 import path from 'path'
 import sharp from 'sharp'
 import logger from './logger'
+import { Express } from 'express'
 
 type UploadConfig = {
   fileNames: number[]
@@ -29,17 +29,19 @@ export const uploadImages = async (
     thumbHeight,
     addWebp = false
   }: UploadConfig
-): Promise<void> => {
-  await Promise.all(
+): Promise<any> => {
+  const res = await Promise.all(
     files.map(async (file, index) => {
       const image = sharp(file.path)
-      const info = await image.metadata()
+
+      const info = await image.metadata().catch((error) => {
+        fs.unlink(file.path, (err) => err && logger.error(err))
+        throw error
+      })
+
       const fileName = fileNames[index]
 
-      if (
-        (info.width as number) > maxWidth ||
-        (info.height as number) > maxHeight
-      ) {
+      if (info.width > maxWidth || info.height > maxHeight) {
         await image
           .resize(maxWidth, maxHeight, { fit: 'inside' })
           .jpeg({ progressive: true })
@@ -117,4 +119,6 @@ export const uploadImages = async (
   files.forEach((file) => {
     fs.unlink(file.path, (err) => err && logger.error(err))
   })
+
+  return res
 }

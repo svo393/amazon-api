@@ -869,7 +869,15 @@ const uploadProductImages = async (
       thumbWidth: 40,
       thumbHeight: 40
     }
-    uploadImages(files, uploadConfig)
+
+    try {
+      await uploadImages(files, uploadConfig)
+    } catch (error) {
+      throw new StatusError(
+        error.message.includes('unsupported') ? 422 : 500,
+        error
+      )
+    }
   })
 }
 

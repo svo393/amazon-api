@@ -422,7 +422,15 @@ const uploadReviewImages = async (
     thumbWidth: 117,
     thumbHeight: 117
   }
-  uploadImages(files, uploadConfig)
+
+  try {
+    await uploadImages(files, uploadConfig)
+  } catch (error) {
+    throw new StatusError(
+      error.message.includes('unsupported') ? 422 : 500,
+      error
+    )
+  }
 }
 
 export default {

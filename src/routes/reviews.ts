@@ -78,10 +78,10 @@ router.post(
   '/:reviewID/upload',
   requireCreator('reviews', 'reviewID', 'params'),
   multerUpload.array('reviewImages', 10),
-  (req, res) => {
+  async (req, res) => {
     req.socket.setTimeout(UPLOAD_TIMEOUT)
     const reviewImages = checkMediaUpload(req)
-    reviewService.uploadReviewImages(reviewImages, req)
+    await reviewService.uploadReviewImages(reviewImages, req)
     res.status(204).end()
   }
 )

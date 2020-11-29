@@ -56,10 +56,10 @@ router.post(
   '/:userID/upload-avatar',
   requireSameUser('params'),
   multerUpload.single('userAvatar'),
-  (req, res) => {
+  async (req, res) => {
     req.socket.setTimeout(UPLOAD_TIMEOUT)
     const userMedia = checkSingleMediaUpload(req)
-    userService.uploadUserAvatar(userMedia, req)
+    await userService.uploadUserAvatar(userMedia, req)
     res.status(204).end()
   }
 )
@@ -68,10 +68,10 @@ router.post(
   '/:userID/upload-cover',
   requireSameUser('params'),
   multerUpload.single('userCover'),
-  (req, res) => {
+  async (req, res) => {
     req.socket.setTimeout(UPLOAD_TIMEOUT)
     const userMedia = checkSingleMediaUpload(req)
-    userService.uploadUserCover(userMedia, req)
+    await userService.uploadUserCover(userMedia, req)
     res.status(204).end()
   }
 )

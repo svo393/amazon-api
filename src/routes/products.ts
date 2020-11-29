@@ -72,10 +72,10 @@ router.post(
   '/:productID/upload',
   requireAdmin,
   multerUpload.array('productImages', 10),
-  (req, res) => {
+  async (req, res) => {
     req.socket.setTimeout(UPLOAD_TIMEOUT)
     const productImages = checkMediaUpload(req)
-    productService.uploadProductImages(productImages, req)
+    await productService.uploadProductImages(productImages, req)
     res.status(204).end()
   }
 )
